@@ -8,6 +8,9 @@
 # ide
 .idea
 
+# config
+/backend/application/config/database.php
+
 # testing
 /frontend/coverage
 
