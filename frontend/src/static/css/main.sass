@@ -1,6 +1,16 @@
 $font-stack: sans-serif
 $main-color: #FFF
 
+$red: #F2745E
+$blue: #08B8F4
+$cobalt: #04CCDB
+$green: #9FCD60
+$yellow: #FFB804
+$pink: #F9A4A7
+$purple: #BF6EEB
+$brown: #9A8A7D
+$darkblue: #577CEF
+
 *:not(.icon)
     outline: none
     font-family: $font-stack !important
@@ -14,3 +24,62 @@ body
 
 #wrapper
     height: 100%
+
+.ui.container
+    max-width: 900px !important
+
+.tiles-list
+    margin-top: 2vh
+
+.tile
+    border-top: 4px solid #FFF
+    border-top-color: rgb(255, 255, 255)
+    padding-top: 1vh
+
+    .icon-container
+        position: relative
+
+        .icon
+            font-size: 5em
+            position: absolute
+            left: 0px
+
+    .trend
+        position: absolute
+        left: -10px
+
+    .trend-up
+        color: #DD523A
+
+    .trend-down
+        color: #7EC51D
+
+    .value
+        font-weight: 900
+        font-size: 2.4em
+        position: relative
+        padding-left: 20px
+
+.red
+    border-color: $red
+
+    .icon
+        color: $red
+
+.blue
+    border-color: $blue
+
+    .icon
+        color: $blue
+
+.cobalt
+    border-color: $cobalt
+
+    .icon
+        color: $cobalt
+
+.green
+    border-color: $green
+
+    .icon
+        color: $green

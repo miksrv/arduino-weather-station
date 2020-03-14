@@ -5,24 +5,26 @@
 //  sync thunks - when you have substantial business logic but it's not async
 //  plain object actions - when you just send a plain action to the reducer
 
-import * as types from './actionTypes';
+import * as types from './actionTypes'
 
-// import redditService from '../../services/reddit';
+const METEO_ENDPOINT = 'http://api.miksrv.ru'
 
 export function fetchMeteoData() {
-    return async(dispatch, getState) => {
+    return async(dispatch) => {
         try {
-            // const subredditArray = await redditService.getDefaultSubreddits();
-            // const topicsByUrl = _.keyBy(subredditArray, (subreddit) => subreddit.url);
+            const url = `${METEO_ENDPOINT}/api/get_summary`;
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json'
+                }
+            });
 
-            const payload = {
-                temp: 16.4,
-                humd: 78.23
-            }
+            const payload = await response.json();
 
             dispatch({ type: types.GET_METEO_DATA, payload });
         } catch (error) {
-            console.error(error);
+            console.error(error)
         }
     }
 }

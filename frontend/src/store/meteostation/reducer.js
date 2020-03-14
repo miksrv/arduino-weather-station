@@ -7,10 +7,7 @@
 import * as types from './actionTypes';
 
 const initialState = {
-    current: {
-        temp: 0,
-        humd: 0
-    }
+    current: {}
 }
 
 export default function reduce(state = initialState, action = {}) {

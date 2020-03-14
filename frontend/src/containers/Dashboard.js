@@ -1,24 +1,38 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+
+import { Container, Dimmer, Loader, Grid } from 'semantic-ui-react'
+
 import _ from 'lodash'
 
-import { Container } from 'semantic-ui-react'
-
 import Sensor from '../layouts/Sensor';
+
+import data from '../data/sensors'
 
 class Dashboard extends Component {
     render() {
         const { current } = this.props
 
         return (
-            <Container>
-                Dashboard
-                <Sensor value={current.temp} />
-                {/*{( ! _.isEmpty(this.props.sensors)) && (*/}
-                {/*    <Sensor value='23' />*/}
-                {/*) || (*/}
-                {/*    <div>Пусто</div>*/}
-                {/*)}*/}
+            <Container className='tiles-list'>
+                <Grid>
+                { ! _.isEmpty(current) && data.map((item, key) => (
+                    <Grid.Column width={4} key={key}>
+                        <Sensor
+                            name={item.name}
+                            color={item.color}
+                            icon={item.icon}
+                            trend={item.trend}
+                            average={current[item.value].avg}
+                            value={current[item.value].cur}
+                        />
+                    </Grid.Column>
+                )) || (
+                    <Dimmer active>
+                        <Loader>Loading</Loader>
+                    </Dimmer>
+                )}
+                </Grid>
             </Container>
         );
     }
