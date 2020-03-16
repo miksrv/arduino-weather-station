@@ -1,38 +1,55 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { } from 'semantic-ui-react'
+import {Checkbox, Container} from 'semantic-ui-react'
 
 import * as meteoActions from '../store/meteostation/actions'
 
 class Summary extends Component {
   state = {
-    intervalId: null
+    intervalId: null,
+    autoUpdate: false
   }
 
   componentDidMount() {
     const { dispatch } = this.props
+    const { autoUpdate } = this.state
 
-    // dispatch(meteoActions.fetchMeteoData())
-
-    var intervalId = setInterval(() => {
-          // dispatch(meteoActions.fetchMeteoData())
-    }
-
-        , 3000);
-
-    this.setState({intervalId: intervalId});
+    dispatch(meteoActions.fetchMeteoData())
   }
 
   componentWillUnmount() {
-    this.clearInterval(this.state.intervalId)
+
+  }
+
+  handleChange = () => {
+    const { autoUpdate } = this.state
+    const { dispatch } = this.props
+
+    this.setState(({ autoUpdate }) => ({ autoUpdate: !autoUpdate }))
+
+    if ( !autoUpdate) {
+      var intervalId = setInterval(() => {
+          dispatch(meteoActions.fetchMeteoData())
+      }, 3000)
+
+      this.setState({intervalId: intervalId})
+    } else {
+      clearInterval(this.state.intervalId)
+    }
   }
 
   render() {
-    console.log('this.props.current', this.props.current);
+    const { autoUpdate } = this.state
 
     return (
-        <div>Summary<br />{this.props.current.datestamp}
-
+        <div>Summary
+          <div>{this.props.current.datestamp}</div>
+          <Checkbox
+              toggle
+              checked={autoUpdate}
+              label='Автообновление данных'
+              onChange={this.handleChange}
+          />
         </div>
     );
   }
