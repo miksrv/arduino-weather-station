@@ -9,3 +9,14 @@ if ( ! function_exists('debug')) {
         echo '</pre>';
     }
 }
+
+if ( ! function_exists('timestamp_to_time')) {
+    /**
+     * Formats a date and time in time only
+     * @param datetime $timestamp
+     * @return datetime
+     */
+    function timestamp_to_time($timestamp) {
+        return date('H:i', $timestamp);
+    } // function timestamp_to_time($timestamp)
+}
