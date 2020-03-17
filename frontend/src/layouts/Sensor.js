@@ -5,7 +5,7 @@
 import React  from 'react'
 
 import { Grid } from 'semantic-ui-react'
-import { WiThermometer, WiHumidity, WiBarometer, WiDaySunny, WiHot } from 'react-icons/wi'
+import { WiThermometer, WiHumidity, WiBarometer, WiDaySunny, WiHot, WiRaindrops, WiSunrise, WiSunset, WiMoonrise, WiMoonset } from 'react-icons/wi'
 import { IoIosArrowRoundUp, IoIosArrowRoundDown } from 'react-icons/io'
 
 const Sensor = (data) => {
@@ -15,7 +15,12 @@ const Sensor = (data) => {
         humd: WiHumidity,
         press: WiBarometer,
         light: WiDaySunny,
-        uvindex: WiHot
+        uvindex: WiHot,
+        dewpoint: WiRaindrops,
+        sunrise: WiSunrise,
+        sunset: WiSunset,
+        moonrise: WiMoonrise,
+        moonset: WiMoonset
     };
 
     const trend = {

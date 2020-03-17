@@ -1,5 +1,6 @@
 $font-stack: sans-serif
 $main-color: #FFF
+$second-color: #CCC
 
 $red: #F2745E
 $blue: #08B8F4
@@ -28,8 +29,71 @@ body
 .ui.container
     max-width: 900px !important
 
+.summary
+    height: 300px
+    position: relative
+
+    .background-overlay
+        height: inherit
+        position: absolute
+        left: 0
+        right: 0
+        z-index: 0
+        margin-top: -3em
+        overflow: hidden
+
+        .background-image
+            display: block
+            background-repeat: no-repeat
+            background-size: cover
+            width: 100%
+            height: inherit
+            filter: blur(2px)
+            opacity: .7
+
+    .container
+        margin-top: 3vh
+
+    h1
+        margin-bottom: 0vh
+
+    h4
+        margin-top: .4vh
+        font-weight: 400
+
+    .ui.toggle.checkbox label, .ui.toggle.checkbox input:checked ~ label
+        color: $main-color !important
+
+    .current
+        margin: 1em 0
+
+        .icon
+            font-size: 5em
+            float: left
+            margin-top: -5px
+
+        .value
+            font-size: 3em
+            font-weight: 900
+
+        .sign
+            font-size: 2em
+            font-weight: 100
+
+    .update
+        margin: 2vh 0
+
+.footer
+    margin: 1vh 0 5vh
+    color: $second-color
+    font-size: .8em
+
 .tiles-list
     margin-top: 2vh
+
+    .grid
+        .column
+            margin-bottom: 30px
 
 .tile
     border-top: 4px solid #FFF
@@ -44,9 +108,13 @@ body
             position: absolute
             left: 0px
 
+    .title
+        font-weight: 400
+
     .trend
         position: absolute
-        left: -10px
+        left: -12px
+        font-size: 1.2em
 
     .trend-up
         color: #DD523A
@@ -83,3 +151,33 @@ body
 
     .icon
         color: $green
+
+.yellow
+    border-color: $yellow
+
+    .icon
+        color: $yellow
+
+.pink
+    border-color: $pink
+
+    .icon
+        color: $pink
+
+.purple
+    border-color: $purple
+
+    .icon
+        color: $purple
+
+.brown
+    border-color: $brown
+
+    .icon
+        color: $brown
+
+.darkblue
+    border-color: $darkblue
+
+    .icon
+        color: $darkblue

@@ -17,7 +17,7 @@ class Dashboard extends Component {
             <Container className='tiles-list'>
                 <Grid>
                 { ! _.isEmpty(current) && data.map((item, key) => (
-                    <Grid.Column width={4} key={key}>
+                    <Grid.Column computer={4} tablet={8} mobile={16} key={key}>
                         <Sensor
                             name={item.name}
                             color={item.color}

@@ -21,6 +21,41 @@ const data = [
     trend: true
   },
   {
+    name: 'Точка росы (℃)',
+    color: 'purple',
+    value: 'dewpoint',
+    icon: 'dewpoint',
+    trend: false
+  },
+  {
+    name: 'Рассвет Солнца',
+    color: 'yellow',
+    value: 'sunrise',
+    icon: 'sunrise',
+    trend: false
+  },
+  {
+    name: 'Закат Солнца',
+    color: 'yellow',
+    value: 'sunset',
+    icon: 'sunset',
+    trend: false
+  },
+  {
+    name: 'Восход луны',
+    color: 'darkblue',
+    value: 'moonrise',
+    icon: 'moonrise',
+    trend: false
+  },
+  {
+    name: 'Закат луны',
+    color: 'darkblue',
+    value: 'moonset',
+    icon: 'moonset',
+    trend: false
+  },
+  {
     name: 'Давление (мм)',
     color: 'cobalt',
     value: 'press',
@@ -40,7 +75,7 @@ const data = [
     value: 'uv',
     icon: 'uvindex',
     trend: true
-  }
+  },
 ];
 
 export default data;
