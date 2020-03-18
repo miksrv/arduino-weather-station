@@ -7,7 +7,8 @@
 import * as types from './actionTypes';
 
 const initialState = {
-    current: {}
+    current: {},
+    stat: {}
 }
 
 export default function reduce(state = initialState, action = {}) {
@@ -17,6 +18,13 @@ export default function reduce(state = initialState, action = {}) {
                 ...state,
                 current: action.payload
             };
+
+        case types.GET_STAT_DATA:
+            return {
+                ...state,
+                stat: action.payload
+            };
+
         default:
             return state
     }

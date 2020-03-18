@@ -28,3 +28,23 @@ export function fetchMeteoData() {
         }
     }
 }
+
+export function fetchStatData() {
+    return async(dispatch) => {
+        try {
+            const url = `http://miksrv.ru/meteo/statistics?data=true`;
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json'
+                }
+            });
+
+            const payload = await response.json();
+
+            dispatch({ type: types.GET_STAT_DATA, payload });
+        } catch (error) {
+            console.error(error)
+        }
+    }
+}
