@@ -7,11 +7,6 @@ import {
 
 import { Container } from "semantic-ui-react";
 
-Highcharts.createElement('link', {
-  href: 'https://fonts.googleapis.com/css?family=Unica+One',
-  rel: 'stylesheet',
-  type: 'text/css'
-}, null, document.getElementsByTagName('head')[0])
 Highcharts.theme = {
   colors: ["#2b908f", "#90ee7e", "#f45b5b", "#7798BF", "#aaeeee", "#ff0066", "#eeaaee",
     "#55BF3B", "#DF5353", "#7798BF", "#aaeeee", '#FFA500'],
@@ -105,7 +100,9 @@ Highcharts.theme = {
   legend: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     itemStyle: {
-      color: '#E0E0E3'
+      color: '#E0E0E3',
+      fontSize: '11px',
+      fontWeight: '400'
     },
     itemHoverStyle: {
       color: '#FFF'
@@ -240,7 +237,7 @@ class Stats extends Component {
           <HighchartsChart>
             <Chart />
 
-            <Title>Тест</Title>
+            <Title></Title>
 
             <Legend
                 layout='vertical'
@@ -252,8 +249,9 @@ class Stats extends Component {
             ></Legend>
             <Tooltip shared={true} xDateFormat='%A, %d %B %Y, %H:%M'></Tooltip>
             <XAxis type="datetime"></XAxis>
-            <YAxis opposite>
-              <YAxis.Title>Влажность (%)</YAxis.Title>
+            <YAxis opposite min={0} max={100} labels={{color: '#2b908f'}}>
+              <YAxis.Title style={{color: '#2b908f'}}>Влажность (%)</YAxis.Title>
+
               <Series
                   name='Влажность'
                   type='area'

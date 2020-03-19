@@ -44,8 +44,6 @@ class Summary extends Component {
     const { autoUpdate } = this.state
     const { current } = this.props
 
-    //({moment(current.datestamp * 1000).fromNow()})
-
     return (
         <div className='summary'>
           <div className='background-overlay'>

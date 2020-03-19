@@ -21,14 +21,13 @@ import Test from './pages/Test'
 const store = createStore(combineReducers(reducers), applyMiddleware(thunk));
 
 ReactDOM.render(
-    <Provider store={store}>
-        <div id='wrapper'>
-            <BrowserRouter>
-                <Route exact path="/" component={Main} />
-                <Route exact path="/test" component={Test} />
-            </BrowserRouter>
+    <Provider store={store} id='wrapper'>
+        <BrowserRouter>
+            <Header />
+            <Route exact path="/" component={Main} />
+            <Route exact path="/test" component={Test} />
             <Footer />
-        </div>
+        </BrowserRouter>
     </Provider>
     , document.getElementById('root')
 );

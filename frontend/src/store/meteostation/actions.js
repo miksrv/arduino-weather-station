@@ -32,7 +32,7 @@ export function fetchMeteoData() {
 export function fetchStatData() {
     return async(dispatch) => {
         try {
-            const url = `http://miksrv.ru/meteo/statistics?data=true`;
+            const url = `http://miksrv.ru/meteo/statistics?data=true&period=week`;
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {

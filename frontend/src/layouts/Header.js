@@ -1,12 +1,16 @@
 import React  from 'react'
-
-import { Segment } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
+import { Container } from 'semantic-ui-react'
 
 const Header = () => {
     return (
-        <Segment color='grey' inverted>
-            Header
-        </Segment>
+        <div>
+            <Container className='main-content'>
+                Header
+                <Link to='/'>Dashboard</Link>
+                <Link to='/test'>Statistic</Link>
+            </Container>
+        </div>
     )
 }
 
