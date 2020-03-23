@@ -29,7 +29,7 @@ class Dashboard extends Component {
                     </Grid.Column>
                 )) || (
                     <Dimmer active>
-                        <Loader>Loading</Loader>
+                        <Loader>Загрузка</Loader>
                     </Dimmer>
                 )}
                 </Grid>

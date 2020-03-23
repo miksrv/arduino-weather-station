@@ -29,8 +29,19 @@ body
 .ui.container
     max-width: 900px !important
 
+
+.navigation
+    a
+        display: inline-block
+        margin-right: 10px
+        padding: 1vh 0
+        color: $main-color
+
+.active
+    font-weight: 900
+
 .summary
-    height: 300px
+    height: 100%
     position: relative
 
     .background-overlay
@@ -50,8 +61,9 @@ body
             filter: blur(2px)
             opacity: .7
 
-    .container
-        margin-top: 3vh
+    .main-content
+        position: relative
+        padding: 4vh 0
 
     h1
         margin-bottom: 0vh
@@ -83,7 +95,7 @@ body
         margin: 2vh 0
 
 .footer
-    margin: 1vh 0 5vh
+    margin: 5vh 0
     color: $second-color
     font-size: .8em
 
@@ -92,7 +104,7 @@ body
 
     .grid
         .column
-            margin-bottom: 30px
+            margin-bottom: 10px
 
 .tile
     border-top: 4px solid #FFF
@@ -105,15 +117,22 @@ body
         .icon
             font-size: 5em
             position: absolute
-            left: 0px
+            left: 15px
 
     .title
         font-weight: 400
+        font-size: 0.9em
 
     .trend
+        font-size: 0.8em
+        padding-left: 1.6em
+
+    .trend-up, .trend-down
         position: absolute
-        left: -12px
-        font-size: 1.2em
+        font-size: 2em
+        left: 0
+        left: 8px
+        bottom: -3px
 
     .trend-up
         color: #DD523A
@@ -123,9 +142,8 @@ body
 
     .value
         font-weight: 900
-        font-size: 2.4em
-        position: relative
-        padding-left: 20px
+        font-size: 1.8em
+        line-height: 1.2
 
 .red
     border-color: $red

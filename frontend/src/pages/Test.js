@@ -22,11 +22,11 @@ class Test extends Component {
 
         return (
             <Container className='main-content'>
-                { ! _.isEmpty(stat) && (
+                { ! _.isEmpty(stat) ? (
                     <Stats data={stat} />
-                ) || (
+                ) : (
                     <Dimmer active>
-                        <Loader>Loading</Loader>
+                        <Loader>Загрузка</Loader>
                     </Dimmer>
                 )}
 

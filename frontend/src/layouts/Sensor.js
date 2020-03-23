@@ -29,23 +29,24 @@ const Sensor = (data) => {
     }
 
     const WeatherIcon = icons[data.icon]
-    const TrendIcon = data.value > data.average && trend['up'] || trend['down']
+    const TrendIcon  = data.value > data.average ? trend['up'] : trend['down']
+    const TrendValue = Number((data.value - data.average).toFixed(2))
 
     return (
         <div className={'tile' + ' ' + data.color}>
             <Grid>
                 <Grid.Row>
-                    <Grid.Column width={4} className='icon-container'>
+                    <Grid.Column width={5} className='icon-container'>
                         <WeatherIcon className='icon' />
                     </Grid.Column>
-                    <Grid.Column width={12}>
+                    <Grid.Column width={11}>
                         <div className='title'>{data.name}</div>
-                        <div className='value'>
-                            {(data.trend == true && (
-                                <TrendIcon className={'trend' + ' ' + (data.value > data.average && 'trend-up' || 'trend-down')} />
-                            ))}
-                            {data.value}
-                        </div>
+                        <div className='value'>{data.value}</div>
+                        {(data.trend === true && (
+                            <div className='trend'>
+                                тренд: <TrendIcon className={(data.value > data.average ? 'trend-up' : 'trend-down')} /> {data.value > data.average ? '+' : '-'} {TrendValue}
+                            </div>
+                        ))}
                     </Grid.Column>
                 </Grid.Row>
             </Grid>

@@ -1,284 +1,217 @@
 import React, { Component } from 'react'
 
 import Highcharts from 'highcharts'
-import {
-  HighchartsChart, Chart, withHighcharts, XAxis, YAxis, Title, Legend, LineSeries, Series, Tooltip
-} from 'react-jsx-highcharts'
+import HighchartsReact from 'highcharts-react-official'
 
-import { Container } from "semantic-ui-react";
+import { Container } from 'semantic-ui-react'
 
-Highcharts.theme = {
-  colors: ["#2b908f", "#90ee7e", "#f45b5b", "#7798BF", "#aaeeee", "#ff0066", "#eeaaee",
-    "#55BF3B", "#DF5353", "#7798BF", "#aaeeee", '#FFA500'],
-  chart: {
-    backgroundColor: {
-      linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
-      stops: [
-        [0, '#2a2a2b'],
-        [1, '#3e3e40']
-      ]
-    },
-    style: {
-      fontFamily: '\'Unica One\', sans-serif'
-    },
-    plotBorderColor: '#606063'
-  },
-  title: {
-    style: {
-      color: '#E0E0E3',
-      textTransform: 'uppercase',
-      fontSize: '20px'
-    }
-  },
-  subtitle: {
-    style: {
-      color: '#E0E0E3',
-      textTransform: 'uppercase'
-    }
-  },
-  xAxis: {
-    gridLineColor: '#707073',
-    labels: {
-      style: {
-        color: '#E0E0E3'
-      }
-    },
-    lineColor: '#707073',
-    minorGridLineColor: '#505053',
-    tickColor: '#707073',
-    title: {
-      style: {
-        color: '#A0A0A3'
-      }
-    }
-  },
-  yAxis: {
-    gridLineColor: '#707073',
-    labels: {
-      style: {
-        color: '#E0E0E3'
-      }
-    },
-    lineColor: '#707073',
-    minorGridLineColor: '#505053',
-    tickColor: '#707073',
-    tickWidth: 1,
-    title: {
-      style: {
-        color: '#A0A0A3'
-      }
-    }
-  },
-  tooltip: {
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    style: {
-      color: '#F0F0F0'
-    }
-  },
-  plotOptions: {
-    series: {
-      dataLabels: {
-        color: '#F0F0F3',
-        style: {
-          fontSize: '13px'
-        }
-      },
-      marker: {
-        lineColor: '#333'
-      }
-    },
-    boxplot: {
-      fillColor: '#505053'
-    },
-    candlestick: {
-      lineColor: 'white'
-    },
-    errorbar: {
-      color: 'white'
-    }
-  },
-  legend: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    itemStyle: {
-      color: '#E0E0E3',
-      fontSize: '11px',
-      fontWeight: '400'
-    },
-    itemHoverStyle: {
-      color: '#FFF'
-    },
-    itemHiddenStyle: {
-      color: '#606063'
-    },
-    title: {
-      style: {
-        color: '#C0C0C0'
-      }
-    }
-  },
-  credits: {
-    style: {
-      color: '#666'
-    }
-  },
-  labels: {
-    style: {
-      color: '#707073'
-    }
-  },
-  drilldown: {
-    activeAxisLabelStyle: {
-      color: '#F0F0F3'
-    },
-    activeDataLabelStyle: {
-      color: '#F0F0F3'
-    }
-  },
-  navigation: {
-    buttonOptions: {
-      symbolStroke: '#DDDDDD',
-      theme: {
-        fill: '#505053'
-      }
-    }
-  },
-  // scroll charts
-  rangeSelector: {
-    buttonTheme: {
-      fill: '#505053',
-      stroke: '#000000',
-      style: {
-        color: '#CCC'
-      },
-      states: {
-        hover: {
-          fill: '#707073',
-          stroke: '#000000',
-          style: {
-            color: 'white'
-          }
-        },
-        select: {
-          fill: '#000003',
-          stroke: '#000000',
-          style: {
-            color: 'white'
-          }
-        }
-      }
-    },
-    inputBoxBorderColor: '#505053',
-    inputStyle: {
-      backgroundColor: '#333',
-      color: 'silver'
-    },
-    labelStyle: {
-      color: 'silver'
-    }
-  },
-  navigator: {
-    handles: {
-      backgroundColor: '#666',
-      borderColor: '#AAA'
-    },
-    outlineColor: '#CCC',
-    maskFill: 'rgba(255,255,255,0.1)',
-    series: {
-      color: '#7798BF',
-      lineColor: '#A6C7ED'
-    },
-    xAxis: {
-      gridLineColor: '#505053'
-    }
-  },
-  scrollbar: {
-    barBackgroundColor: '#808083',
-    barBorderColor: '#808083',
-    buttonArrowColor: '#CCC',
-    buttonBackgroundColor: '#606063',
-    buttonBorderColor: '#606063',
-    rifleColor: '#FFF',
-    trackBackgroundColor: '#404043',
-    trackBorderColor: '#404043'
-  },
-  global: {
-    useUTC: false
-  },
-  lang: {
-    loading: 'Загрузка...',
-    months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-    weekdays: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-    shortMonths: ['Янв', 'Фев', 'Март', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сент', 'Окт', 'Нояб', 'Дек'],
-    exportButtonTitle: "Экспорт",
-    printButtonTitle: "Печать",
-    rangeSelectorFrom: "С",
-    rangeSelectorTo: "По",
-    rangeSelectorZoom: "Период",
-    downloadPNG: 'Скачать PNG',
-    downloadJPEG: 'Скачать JPEG',
-    downloadPDF: 'Скачать PDF',
-    downloadSVG: 'Скачать SVG',
-    printChart: 'Напечатать график'
-  }
-};
-Highcharts.setOptions(Highcharts.theme);
+import chart_config from '../data/chart_config'
+
+Highcharts.setOptions(Highcharts.theme = chart_config);
 
 class Stats extends Component {
 
   state = {
-    liveUpdate: false
+    liveUpdate: false,
+    chart1_Options: {
+      xAxis: [{
+        type: 'datetime',
+        dateTimeLabelFormats: {
+          month: '%e %b, %Y',
+          year: '%b'
+        },
+        gridLineWidth: 1
+      }],
+      yAxis: [{
+        labels: {
+          format: '{value}°C',
+          style: {
+            color: Highcharts.theme.colors[2]
+          }
+        },
+        title: {
+          text: 'Температура',
+          style: {
+            color: Highcharts.theme.colors[2]
+          }
+        },
+        opposite: false,
+      }, {
+        gridLineWidth: 0,
+        title: {
+          text: 'Влажность',
+          style: {
+            color: Highcharts.theme.colors[0]
+          }
+        },
+        labels: {
+          format: '{value} %',
+          style: {
+            color: Highcharts.theme.colors[0]
+          }
+        },
+        opposite: true,
+        min: 0,
+        max: 90,
+      }],
+      series: [{
+        name: 'Влажность',
+        type: 'area',
+        yAxis: 1,
+        // data: data.humd,
+        tooltip: {
+          valueSuffix: ' %'
+        }
+
+      }, {
+        name: 'На улице',
+        type: 'spline',
+        // data: data.temp1,
+        color: Highcharts.theme.colors[2],
+        tooltip: {
+          valueSuffix: ' °C'
+        }
+      }, {
+        name: 'В помещении',
+        type: 'spline',
+        // data: data.temp2,
+        color: Highcharts.theme.colors[5],
+        tooltip: {
+          valueSuffix: ' °C'
+        }
+      }]
+    },
+    chart2_Options: {
+      xAxis: [{
+        type: 'datetime',
+        dateTimeLabelFormats: {
+          month: '%e %b, %Y',
+          year: '%b'
+        },
+        tickInterval: 3600 * 1000 * 2,
+        gridLineWidth: 1
+      }],
+      yAxis: [{
+        labels: {
+          style: {
+            color: Highcharts.theme.colors[11]
+          }
+        },
+        title: {
+          text: 'Освещенность (lux)',
+          style: {
+            color: Highcharts.theme.colors[11]
+          }
+        },
+        opposite: false,
+
+      }, {
+        gridLineWidth: 0,
+        title: {
+          text: 'UV (мВт/см^2)',
+          style: {
+            color: Highcharts.theme.colors[9]
+          }
+        },
+        labels: {
+          style: {
+            color: Highcharts.theme.colors[9]
+          }
+        },
+        opposite: true,
+      }, {
+        gridLineWidth: 0,
+        title: {
+          text: 'Атмосферное давление (мм.рт.ст.)',
+          style: {
+            color: Highcharts.theme.colors[1]
+          }
+        },
+        labels: {
+          style: {
+            color: Highcharts.theme.colors[1]
+          }
+        },
+        opposite: true,
+      }],
+      series: [{
+        name: 'Освещенность',
+        type: 'area',
+        yAxis: 0,
+        // data: data.light,
+        color: Highcharts.theme.colors[11],
+        tooltip: {
+          valueSuffix: ' lux'
+        }
+      }, {
+        name: 'UV',
+        type: 'spline',
+        yAxis: 1,
+        // data: data.uv,
+        color: Highcharts.theme.colors[9],
+        marker: {
+          enabled: false
+        },
+        tooltip: {
+          valueSuffix: ' мВт/см^2'
+        }
+
+      }, {
+        name: 'Давление',
+        type: 'spline',
+        yAxis: 2,
+        // data: data.press,
+        color: Highcharts.theme.colors[1],
+        marker: {
+          enabled: false
+        },
+        tooltip: {
+          valueSuffix: ' мм.рт.ст.'
+        }
+
+      }]
+    }
   };
 
-  render() {
+  componentDidMount() {
     const { data } = this.props
+
+    this.setState({
+      chart1_Options: {
+        series: [
+          { data: data.humd },
+          { data: data.temp1 },
+          { data: data.temp2 }
+        ]
+      },
+      chart2_Options: {
+        series: [
+          { data: data.light },
+          { data: data.uv },
+          { data: data.press }
+        ]
+      }
+    });
+  }
+
+  render() {
+    const { chart1_Options, chart2_Options } = this.state
 
     return (
         <Container className='main-content'>
-          <HighchartsChart>
-            <Chart />
-
-            <Title></Title>
-
-            <Legend
-                layout='vertical'
-                floating={true}
-                verticalAlign='top'
-                align='left'
-                x={60}
-                y={8}
-            ></Legend>
-            <Tooltip shared={true} xDateFormat='%A, %d %B %Y, %H:%M'></Tooltip>
-            <XAxis type="datetime"></XAxis>
-            <YAxis opposite min={0} max={100} labels={{color: '#2b908f'}}>
-              <YAxis.Title style={{color: '#2b908f'}}>Влажность (%)</YAxis.Title>
-
-              <Series
-                  name='Влажность'
-                  type='area'
-                  data={data.humd}
-                  tooltip={{ valueSuffix: ` %` }}
-              />
-            </YAxis>
-            <YAxis>
-              <YAxis.Title style={{color: '#f45b5b'}}>Температура (°C)</YAxis.Title>
-              <LineSeries
-                  name='Температура 1'
-                  data={data.temp1}
-                  tooltip={{ valueSuffix: ` °C` }}
-                  color='#f45b5b'
-              />
-              <LineSeries
-                  name='Температура 2'
-                  data={data.temp2}
-                  tooltip={{ valueSuffix: ` °C` }}
-                  color='#ff0066'
-              />
-            </YAxis>
-          </HighchartsChart>
+          <HighchartsReact
+              highcharts={Highcharts}
+              options={chart1_Options}
+          />
+          <br />
+          <HighchartsReact
+              highcharts={Highcharts}
+              options={chart2_Options}
+          />
         </Container>
     );
   }
 }
 
 
-export default withHighcharts(Stats, Highcharts);
+export default Stats;

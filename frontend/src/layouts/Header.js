@@ -1,16 +1,16 @@
 import React  from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { Container } from 'semantic-ui-react'
 
 const Header = () => {
     return (
-        <div>
-            <Container className='main-content'>
-                Header
-                <Link to='/'>Dashboard</Link>
-                <Link to='/test'>Statistic</Link>
-            </Container>
-        </div>
+        <Container className='main-content'>
+            <nav className='navigation'>
+                <NavLink exact to='/'>Home</NavLink>
+                <NavLink to='/test' activeClassName='active'>Statistic</NavLink>
+                <NavLink to='/experemental' activeClassName='active'>Experemental</NavLink>
+            </nav>
+        </Container>
     )
 }
 

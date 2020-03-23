@@ -17,6 +17,7 @@ import Footer from './layouts/Footer'
 
 import Main from './pages/Main'
 import Test from './pages/Test'
+import Experemental from './pages/Experemental'
 
 const store = createStore(combineReducers(reducers), applyMiddleware(thunk));
 
@@ -26,6 +27,7 @@ ReactDOM.render(
             <Header />
             <Route exact path="/" component={Main} />
             <Route exact path="/test" component={Test} />
+            <Route exact path="/experemental" component={Experemental} />
             <Footer />
         </BrowserRouter>
     </Provider>
