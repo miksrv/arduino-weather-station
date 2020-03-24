@@ -12,7 +12,9 @@ import * as meteoActions from '../store/meteostation/actions'
 class Summary extends Component {
   state = {
     intervalId: null,
-    autoUpdate: false
+    autoUpdate: false,
+    tickTock: null,
+    lastUpdate: '---'
   }
 
   componentDidMount() {
@@ -24,25 +26,66 @@ class Summary extends Component {
   }
 
   handleChange = () => {
-    const { autoUpdate } = this.state
+    const { autoUpdate, intervalId, tickTock } = this.state
     const { dispatch } = this.props
 
     this.setState(({ autoUpdate }) => ({ autoUpdate: !autoUpdate }))
 
-    if ( !autoUpdate) {
-      var intervalId = setInterval(() => {
+    if ( ! autoUpdate) {
+      const intervalId = setInterval(() => {
           dispatch(meteoActions.fetchMeteoData())
       }, 30000)
 
-      this.setState({intervalId: intervalId})
+      const tickTock = setInterval(() => {
+        this.tickClock()
+      }, 1000)
+
+      this.setState({
+        intervalId: intervalId,
+        tickTock: tickTock
+      })
     } else {
-      clearInterval(this.state.intervalId)
+      clearInterval(intervalId)
+      clearInterval(tickTock)
     }
   }
 
-  render() {
-    const { autoUpdate } = this.state
+  tickClock = () => {
     const { current } = this.props
+
+    this.setState({
+      lastUpdate: moment.unix(current.datestamp).fromNow()
+    });
+  }
+
+  valueRange(x, min, max) {
+    return x >= min && x <= max;
+  }
+
+  renderValueSwitch(param) {
+    // #TODO: цвет в зависимости от температуры
+    return null
+
+    if (this.valueRange(param, -20, -15)) {
+      return 'value-15-20'
+    } else if (this.valueRange(param, -15, -10)) {
+      return 'value-10-15'
+    } else if (this.valueRange(param, -10, -5)) {
+      return 'value-5-10'
+    } else if (this.valueRange(param, -5, 0)) {
+      return 'value-0-5'
+    } else if (this.valueRange(param, 15, 20)) {
+      return 'value15-20'
+    }
+
+    return null;
+  }
+
+  render() {
+    const { autoUpdate, lastUpdate } = this.state
+    const { current } = this.props
+
+    const updateTimer = (!autoUpdate && !_.isEmpty(current)) ? moment.unix(current.datestamp).fromNow() : lastUpdate
 
     return (
         <div className='summary'>
@@ -55,16 +98,17 @@ class Summary extends Component {
             {(! _.isEmpty(current) && typeof current.temp1 !== 'undefined' && (
                 <div className='current'>
                   <WiDaySunny className='icon' />
-                  <span className='value'>{current.temp1.cur}</span>
+                  <span className={'value' + ' ' + this.renderValueSwitch(current.temp1.cur)}>{current.temp1.cur}</span>
                   <span className='sign'>℃</span>
                 </div>
             ))}
             <div className='update'>Обновлено: {moment.unix(current.datestamp).format("DD.MM.Y, h:mm:ss")}</div>
+            <div className='timeago'>Последние данные: {updateTimer}</div>
             <div>
               <Checkbox
                   toggle
                   checked={autoUpdate}
-                  label='Автообновление данных'
+                  label='Автообновление'
                   onChange={this.handleChange}
               />
             </div>
