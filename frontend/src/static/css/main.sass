@@ -52,6 +52,12 @@ body
         padding: 1vh 0
         color: $main-color
 
+.ui.toggle.checkbox label, .ui.toggle.checkbox input:checked ~ label, .ui.toggle.checkbox input:focus:checked ~ label
+    color: $main-color !important
+
+.update-switch
+    margin-top: 8px
+
 .active
     font-weight: 900
 
@@ -87,9 +93,6 @@ body
         margin-top: .4vh
         font-weight: 400
 
-    .ui.toggle.checkbox label, .ui.toggle.checkbox input:checked ~ label
-        color: $main-color !important
-
     .current
         margin: 1em 0
 
@@ -110,7 +113,6 @@ body
         margin: 2vh 0 0
 
     .timeago
-        margin: 0 0 2vh
         font-size: .8em
         color: $second-color
 

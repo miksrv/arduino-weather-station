@@ -1,6 +1,12 @@
 const chart_config = {
-    colors: ["#2b908f", "#90ee7e", "#f45b5b", "#7798BF", "#aaeeee", "#ff0066", "#eeaaee",
-        "#55BF3B", "#DF5353", "#7798BF", "#aaeeee", '#FFA500'],
+    colors: [
+        '#08B8F4',
+        '#e64b24',
+        '#d87040',
+        '#e6a241',
+        '#7face6',
+        '#9bbc2f'
+    ],
     chart: {
         // backgroundColor: {
         //   linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
@@ -14,7 +20,8 @@ const chart_config = {
             // fontFamily: '\'Unica One\', sans-serif'
         },
         plotBorderColor: '#606063',
-        marginTop: 30
+        marginTop: 30,
+        height: 300
     },
     title: {
         style: {

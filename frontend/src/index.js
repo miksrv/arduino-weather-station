@@ -12,22 +12,18 @@ import 'moment/locale/ru'
 import 'semantic-ui-css/semantic.min.css'
 import './static/css/main.sass'
 
-import Header from './layouts/Header'
 import Footer from './layouts/Footer'
 
 import Main from './pages/Main'
-import Test from './pages/Test'
-import Experemental from './pages/Experemental'
+import Charts from './pages/Charts'
 
-const store = createStore(combineReducers(reducers), applyMiddleware(thunk));
+const store = createStore(combineReducers(reducers), applyMiddleware(thunk))
 
 ReactDOM.render(
     <Provider store={store} id='wrapper'>
         <BrowserRouter>
-            <Header />
             <Route exact path="/" component={Main} />
-            <Route exact path="/test" component={Test} />
-            <Route exact path="/experemental" component={Experemental} />
+            <Route exact path="/test" component={Charts} />
             <Footer />
         </BrowserRouter>
     </Provider>

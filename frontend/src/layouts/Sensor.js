@@ -33,7 +33,7 @@ const Sensor = (data) => {
     const TrendValue = Number((data.value - data.average).toFixed(2))
 
     return (
-        <div className={'tile' + ' ' + data.color}>
+        <div className={'tile ' + data.color}>
             <Grid>
                 <Grid.Row>
                     <Grid.Column width={5} className='icon-container'>

@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
+import { Container } from 'semantic-ui-react'
 
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
-
-import { Container } from 'semantic-ui-react'
 
 import chart_config from '../data/chart_config'
 
@@ -26,13 +25,13 @@ class Stats extends Component {
         labels: {
           format: '{value}°C',
           style: {
-            color: Highcharts.theme.colors[2]
+            color: Highcharts.theme.colors[1]
           }
         },
         title: {
           text: 'Температура',
           style: {
-            color: Highcharts.theme.colors[2]
+            color: Highcharts.theme.colors[1]
           }
         },
         opposite: false,
@@ -58,16 +57,16 @@ class Stats extends Component {
         name: 'Влажность',
         type: 'area',
         yAxis: 1,
+        color: Highcharts.theme.colors[0],
         // data: data.humd,
         tooltip: {
           valueSuffix: ' %'
         }
-
       }, {
         name: 'На улице',
         type: 'spline',
         // data: data.temp1,
-        color: Highcharts.theme.colors[2],
+        color: Highcharts.theme.colors[1],
         tooltip: {
           valueSuffix: ' °C'
         }
@@ -75,7 +74,7 @@ class Stats extends Component {
         name: 'В помещении',
         type: 'spline',
         // data: data.temp2,
-        color: Highcharts.theme.colors[5],
+        color: Highcharts.theme.colors[2],
         tooltip: {
           valueSuffix: ' °C'
         }
@@ -88,19 +87,19 @@ class Stats extends Component {
           month: '%e %b, %Y',
           year: '%b'
         },
-        tickInterval: 3600 * 1000 * 2,
+        //tickInterval: 3600 * 1000 * 2,
         gridLineWidth: 1
       }],
       yAxis: [{
         labels: {
           style: {
-            color: Highcharts.theme.colors[11]
+            color: Highcharts.theme.colors[3]
           }
         },
         title: {
           text: 'Освещенность (lux)',
           style: {
-            color: Highcharts.theme.colors[11]
+            color: Highcharts.theme.colors[3]
           }
         },
         opposite: false,
@@ -110,12 +109,12 @@ class Stats extends Component {
         title: {
           text: 'UV (мВт/см^2)',
           style: {
-            color: Highcharts.theme.colors[9]
+            color: Highcharts.theme.colors[5]
           }
         },
         labels: {
           style: {
-            color: Highcharts.theme.colors[9]
+            color: Highcharts.theme.colors[5]
           }
         },
         opposite: true,
@@ -124,12 +123,12 @@ class Stats extends Component {
         title: {
           text: 'Атмосферное давление (мм.рт.ст.)',
           style: {
-            color: Highcharts.theme.colors[1]
+            color: Highcharts.theme.colors[4]
           }
         },
         labels: {
           style: {
-            color: Highcharts.theme.colors[1]
+            color: Highcharts.theme.colors[4]
           }
         },
         opposite: true,
@@ -139,7 +138,7 @@ class Stats extends Component {
         type: 'area',
         yAxis: 0,
         // data: data.light,
-        color: Highcharts.theme.colors[11],
+        color: Highcharts.theme.colors[3],
         tooltip: {
           valueSuffix: ' lux'
         }
@@ -148,7 +147,7 @@ class Stats extends Component {
         type: 'spline',
         yAxis: 1,
         // data: data.uv,
-        color: Highcharts.theme.colors[9],
+        color: Highcharts.theme.colors[5],
         marker: {
           enabled: false
         },
@@ -161,7 +160,7 @@ class Stats extends Component {
         type: 'spline',
         yAxis: 2,
         // data: data.press,
-        color: Highcharts.theme.colors[1],
+        color: Highcharts.theme.colors[4],
         marker: {
           enabled: false
         },
@@ -171,7 +170,7 @@ class Stats extends Component {
 
       }]
     }
-  };
+  }
 
   componentDidMount() {
     const { data } = this.props
@@ -191,7 +190,7 @@ class Stats extends Component {
           { data: data.press }
         ]
       }
-    });
+    })
   }
 
   render() {
@@ -209,9 +208,8 @@ class Stats extends Component {
               options={chart2_Options}
           />
         </Container>
-    );
+    )
   }
 }
 
-
-export default Stats;
+export default Stats
