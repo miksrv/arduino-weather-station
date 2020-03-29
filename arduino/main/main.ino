@@ -1,110 +1,139 @@
 #include <Wire.h>
 #include <BMP085.h>
-#include <BH1750.h>
 #include <TroykaDHT.h>
-
-#include <SPI.h>      // ethernet shield
+#include <BH1750.h>
+//#include <PCF8574.h>
 #include <Ethernet2.h>
 
-DHT dht(4, DHT22);
-
+// BMP 085 Initialization
 BMP085 dps = BMP085();
 
-BH1750 lightMeter;
+// DHT22 Initialization
+DHT dht(4, DHT22);
 
-long Temperature = 0, Pressure = 0, Altitude = 0;
-int ReadUVintensityPin = A0; //Output from the sensor
+// Lightmeter Initialization
+BH1750 lightmeter;
 
-// NETWORK SETTINGS
+// Wind direction Initialization (0x27 address)
+//PCF8574 pcf8574(0x27);
+
+long impulse;
+unsigned long timing; // Sensor Poll Countdown Timer
+char webclient_data[120];
+char temp1[6] = "00.0", temp2[6] = "00.0", mmHg[6] = "000.0", humd[6] = "00.0",
+     lux[5] = "0", uvindex[4] = "00.0", wind_dir[2] = "0", wind_speed[2] = "0";
+     
+// Network settings
 byte mac[] = { 0x38, 0x59, 0xF9, 0x6D, 0xD7, 0xFF }; // MAC-address
 IPAddress ip(10,10,5,23);                 // IP address of the device on the network
 char server[] = "miksrv.ru";
 
 EthernetClient LAN;
 
-char replyBuffer[160];
-char temp1[6] = "00.0", temp2[6] = "00.0", 
-     humd[6] = "00.0", uv[6] = "00.0", 
-     mmHg[6] = "000.0", lux[6] = "0";
-
+// If the variable is not commented out, debug mode is activated, messages are sent to the serial port
 #define DEBUG
 
+
+
 void setup() {
-  Serial.begin(9600);
+  #ifdef DEBUG
+    Serial.begin(9600);
+    delay(1500);
+    Serial.print("Program initialization...");
+  #endif
+
+  lightmeter.begin();
+  delay(1000);
 
   Wire.begin();
-
   delay(1000);
-  
-  dht.begin();
 
-
-  
-  delay(1000);
-//  
-  Serial.println("START");
-//
   dps.init();
-//
   delay(1000);
-//
-  lightMeter.begin();
-//
-  pinMode(ReadUVintensityPin, INPUT);
+
+  dht.begin();
+  delay(1000);
+
+  // Port extender initialization
+//  for (int i=0; i<8; i++) {
+//    pcf8574.pinMode(i, INPUT_PULLUP);
+//    delay(50);
+//  }
+//  delay(500);
+//  pcf8574.begin();
+//  delay(500);
+
+  pinMode(A0, INPUT);
 
   Ethernet.begin(mac, ip);
-  delay(2000);
+  delay(1000);
 
+  #ifdef DEBUG
+    Serial.begin(9600);
+    Serial.println("done!");
+  #endif
 }
+
 
 void loop() {
+  /* At this point, the execution of the delay () analogue begins
+   * We calculate the difference between the current moment and the previously saved reference point.
+   * If the difference is greater than the desired value, then execute the code.
+   * If not, do nothing
+   */
+  if (millis() - timing > 15000) {
+    timing = millis(); 
+    
+    #ifdef DEBUG
+      Serial.println("Reading sensors...");
+    #endif
 
-  pressure();
-  delay(300);
-  uv_sensor();
-  delay(300);
-  temp_humd();
-  delay(300);
-  luxmeter();
+    get_sensor_uvindex();
+    get_sensor_pressure();
+    get_sensor_dht22();
+    get_sensor_luxmeter();
+//    get_sensor_wind_direction();
+    get_sensor_anemometer();
 
-  Serial.println(" ");
+    webclient_send_data();
 
-  delay(2000);
-
-  send_server_data();
-
-  delay(5000);
+    #ifdef DEBUG
+      Serial.println(" ");
+    #endif
+  }
 }
 
 
+/** WebClinet send data to remote server **/
+void webclient_send_data() {
+    memset(webclient_data, 0, sizeof(webclient_data));
 
-void send_server_data() {
-    char buf5[5];
-  
-    memset(replyBuffer, 0, sizeof(replyBuffer));
+    strcpy(webclient_data, "ID=3859F96DD7FF");
 
-    strcpy(replyBuffer,"ID=3859F96DD7FF");
+    strcat(webclient_data, "&p=");  // Atmosphere pressure
+    strcat(webclient_data, mmHg);
+    strcat(webclient_data, "&t1="); // Room temperature
+    strcat(webclient_data, temp1);
+    strcat(webclient_data, "&t2="); // The temperature in the street
+    strcat(webclient_data, temp2);
+    strcat(webclient_data, "&h=");  // Air humidity
+    strcat(webclient_data, humd);
+    strcat(webclient_data, "&uv=");
+    strcat(webclient_data, uvindex);
+    strcat(webclient_data, "&lux=");
+    strcat(webclient_data, lux);
+    strcat(webclient_data, "&wd=");
+    strcat(webclient_data, wind_dir);
+    strcat(webclient_data, "&ws=");
+    strcat(webclient_data, wind_speed);
 
-    strcat(replyBuffer, "&p=");  // Atmosphere pressure
-    strcat(replyBuffer, mmHg);
-    strcat(replyBuffer, "&t1="); // Room temperature
-    strcat(replyBuffer, temp1);
-    strcat(replyBuffer, "&t2="); // The temperature in the street
-    strcat(replyBuffer, temp2);
-    strcat(replyBuffer, "&h=");  // Air humidity
-    strcat(replyBuffer, humd);
-    strcat(replyBuffer, "&uv=");
-    strcat(replyBuffer, uv);
-    strcat(replyBuffer, "&lux=");
-    strcat(replyBuffer, lux);
-
-    strcat(replyBuffer,'\0');
+    strcat(webclient_data,'\0');
 
     #ifdef DEBUG
-        Serial.print("[Content-Length: ");
-        Serial.print(len(replyBuffer));
+        Serial.print("  [Content-Length: ");
+        Serial.print(len(webclient_data));
         Serial.print("] ");
-        Serial.println(replyBuffer);
+        Serial.println(webclient_data);
     #endif
 
     if (LAN.connect(server, 80)) {
@@ -113,142 +142,176 @@ void send_server_data() {
         LAN.println("Content-Type: application/x-www-form-urlencoded");
         LAN.println("Connection: close");
         LAN.print("Content-Length: ");
-        LAN.println(len(replyBuffer));
+        LAN.println(len(webclient_data));
         LAN.println();
-        LAN.println(replyBuffer);
+        LAN.println(webclient_data);
         LAN.println();
-        delay(500);
+        
+        delay(2000);
+        
         LAN.stop();
 
         #ifdef DEBUG
-          Serial.println("SUCCESS!");
+          Serial.println("  [Webclient] Data send success");
           Serial.println();
         #endif
     } else {
         #ifdef DEBUG
-          Serial.println("ERROR!");
+          Serial.println("  [Webclient] Data send error");
           Serial.println();
         #endif
     }
+
+    delay(2000);
 }
 
 
+/** Reading BMP085 sensor (pressure) **/
+void get_sensor_pressure() {
+  long tmp_bmp085_temp = 0,
+       tmp_bmp085_pres = 0;
+  
+  dps.getPressure(&tmp_bmp085_pres);
+  dps.getTemperature(&tmp_bmp085_temp);
 
+  dtostrf(tmp_bmp085_pres / 133.3, 1, 1, mmHg);
+  dtostrf(tmp_bmp085_temp * 0.1, 1, 1, temp1);
 
-void luxmeter() {
-  uint16_t lux_val = lightMeter.readLightLevel();
-  Serial.print("Light: ");
-  Serial.print(lux_val);
-  Serial.println(" lx");
+  #ifdef DEBUG
+    Serial.print("  [Ok] BMP085 pressure: ");
+    Serial.print(mmHg);
+    Serial.println(" mmHg");
+    Serial.print("  [Ok] BMP085 temperature: ");
+    Serial.print(temp1);
+    Serial.println(" C");
+  #endif
 
-  dtostrf(lux_val, 3, 0, lux);
+  delay(2000);
 }
 
-void temp_humd() {
-  // считывание данных с датчика
+void get_sensor_dht22() {
   dht.read();
-  // проверяем состояние данных
-  switch(dht.getState()) {
-    // всё OK
-    case DHT_OK:
-      // выводим показания влажности и температуры
-      Serial.print("Temp = ");
-      Serial.print(dht.getTemperatureC());
-      Serial.print(" C \t ");
-//      Serial.print("Temperature = ");
-//      Serial.print(dht.getTemperatureK());
-//      Serial.println(" K \t");
-//      Serial.print("Temperature = ");
-//      Serial.print(dht.getTemperatureF());
-//      Serial.println(" F \t");
-      Serial.print("humidity = ");
-      Serial.print(dht.getHumidity());
-      Serial.println(" %");
 
-        dtostrf(dht.getTemperatureC(), 4, 1, temp2);
-        dtostrf(dht.getHumidity(), 4, 1, humd);
-      break;
-    // ошибка контрольной суммы
-    case DHT_ERROR_CHECKSUM:
-      Serial.println("Checksum error");
-      break;
-    // превышение времени ожидания
-    case DHT_ERROR_TIMEOUT:
-      Serial.println("Time out error");
-      break;
-    // данных нет, датчик не реагирует или отсутствует
-    case DHT_ERROR_NO_REPLY:
-      Serial.println("Sensor not connected");
-      break;
+  if (dht.getState() == DHT_OK) {
+    dtostrf(dht.getTemperatureC(), 4, 1, temp2);
+    dtostrf(dht.getHumidity(), 4, 1, humd);
+
+    #ifdef DEBUG
+      Serial.print("  [Ok] DHT22 temperature: ");
+      Serial.print(temp2);
+      Serial.println(" C");
+      Serial.print("  [Ok] DHT22 humidity: ");
+      Serial.print(humd);
+      Serial.println(" %");
+    #endif
+  } else {
+    #ifdef DEBUG
+      Serial.println("  [ERROR] DHT22 no data");
+    #endif
+  }
+
+  delay(2000);
+}
+
+void get_sensor_luxmeter() {
+  uint16_t lux_val = lightmeter.readLightLevel();
+
+  dtostrf(lux_val, 2, 0, lux);
+
+  #ifdef DEBUG
+    Serial.print("  [Ok] BH1750 Lightmeter: ");
+    Serial.print(lux);
+    Serial.println(" lx");
+  #endif
+
+  delay(2000);
+}
+
+void get_sensor_uvindex() {
+  int uvLevel = averageAnalogRead(A0);
+ 
+  float outputVoltage = 5 * uvLevel / 1024;
+  float uvIntensity = mapfloat(outputVoltage, 0.99, 2.9, 0.0, 15.0);
+
+  dtostrf(uvIntensity, 4, 1, uvindex);
+  
+  #ifdef DEBUG
+    Serial.print("  [Ok] UV Index data: ");
+    Serial.print(uvindex);
+    Serial.println(" mW/cm^2");
+  #endif
+
+ delay(2000);
+}
+
+void get_sensor_anemometer() {
+    impulse = 0;
+
+    attachInterrupt(0, rpm, RISING);
+    delay(5000);
+    detachInterrupt(0);
+
+    dtostrf((impulse / 5), 1, 0, wind_speed);
+
+    #ifdef DEBUG
+        Serial.print("  [OK] Wind speed = ");
+        Serial.print(wind_speed);
+        Serial.println(" RPS");
+    #endif
+
+    delay(500);
+}
+
+//void get_sensor_wind_direction() {
+//  String value = "";
+//
+//  for (int i=0; i<8; i++) {
+//    if (pcf8574.digitalRead(i) == 0) {
+//      value = value + String(i);
+//    }
+//    
+//    delay(80);
+//  }
+//
+//  value.toCharArray(wind_dir, 4);
+//
+//  #ifdef DEBUG
+//    Serial.print("  [Ok] Wind direction: ");
+//    Serial.println(wind_dir);
+//  #endif
+//  
+//  delay(2000);
+//}
+
+void rpm() {
+    impulse++;
+} // void rpm()
+
+/** Takes an average of readings on a given pin **/
+int averageAnalogRead(int pinToRead) {
+  byte numberOfReadings = 10;
+  unsigned int runningValue = 0; 
+
+  for (int x = 0 ; x < numberOfReadings ; x++) {
+    runningValue += analogRead(pinToRead);
   }
   
-}
-
-void uv_sensor() {
-    int uvLevel = averageAnalogRead(ReadUVintensityPin);
- 
-  float outputVoltage = 5.0 * uvLevel / 1024;
-  float uvIntensity = mapfloat(outputVoltage, 0.99, 2.9, 0.0, 15.0);
-  
- 
-//  Serial.print("UVAnalogOutput: ");
-//  Serial.print(uvLevel);
-// 
-//  Serial.print(" OutputVoltage: ");
-//  Serial.print(outputVoltage);
- 
-  Serial.print(" UV Intensity: ");
-  Serial.print(uvIntensity);
-  Serial.print(" mW/cm^2");
-
-  dtostrf(uvIntensity, 4, 2, uv);
- 
-  Serial.println(); 
-}
-
-void pressure() {
-  dps.getPressure(&Pressure);
-  dps.getTemperature(&Temperature);
-
-  Serial.print("Pressure(mm Hg):");
-  Serial.print(Pressure/133.3);
-  Serial.print(" Temp:");
-  Serial.println(Temperature*0.1);
-  delay(2000);
-
-  dtostrf(Temperature*0.1, 4, 1, temp1);
-  dtostrf(Pressure/133.3, 5, 1, mmHg);
-}
-
-
-//Takes an average of readings on a given pin
-//Returns the average
-int averageAnalogRead(int pinToRead)
-{
-  byte numberOfReadings = 8;
-  unsigned int runningValue = 0; 
- 
-  for(int x = 0 ; x < numberOfReadings ; x++)
-    runningValue += analogRead(pinToRead);
   runningValue /= numberOfReadings;
  
-  return(runningValue);  
- 
+  return(runningValue);
 }
 
-//The Arduino Map function but for floats
-//From: <a href="http://forum.arduino.cc/index.php?topic=3922.0">http://forum.arduino.cc/index.php?topic=3922.0</a>
-float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
-{
+/** The Arduino Map function but for floats **/
+/** From: http://forum.arduino.cc/index.php?topic=3922.0 **/
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-// The method determines the length of the string
+/** The method determines the length of the string **/
 int len(char *buf) {
   int i=0; 
-  do
-  {
+  do {
     i++;
   } while (buf[i]!='\0');
   return i;
-} // int len(char *buf)
+}
