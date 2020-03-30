@@ -20,7 +20,7 @@ const Summary = (props) => {
                     <span className='value'>{data.temp1.cur}</span>
                     <span className='sign'>℃</span>
                 </div>
-                <div className='update'>Обновлено: {moment.unix(data.datestamp).format("DD.MM.Y, h:mm:ss")}</div>
+                <div className='update'>Обновлено: {moment.unix(data.datestamp).format("DD.MM.Y, H:mm:ss")}</div>
                 <div className='timeago'>Последние данные: {updateTimer}</div>
             </Container>
         </div>

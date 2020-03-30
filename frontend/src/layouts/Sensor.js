@@ -44,7 +44,7 @@ const Sensor = (data) => {
                         <div className='value'>{data.value}</div>
                         {(data.trend === true && (
                             <div className='trend'>
-                                тренд: <TrendIcon className={(data.value > data.average ? 'trend-up' : 'trend-down')} /> {data.value > data.average ? '+' : '-'} {TrendValue}
+                                тренд: <TrendIcon className={(data.value > data.average ? 'trend-up' : 'trend-down')} /> {data.value < data.average ? '-' : ''} {TrendValue}
                             </div>
                         ))}
                     </Grid.Column>
