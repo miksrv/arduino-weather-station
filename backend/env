@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------
-# Environment Configuration file
+# Example Environment Configuration file
 #
 # This file can be used as a starting point for your own
 # custom .env files, and contains most of the possible settings
@@ -14,7 +14,7 @@
 # ENVIRONMENT
 #--------------------------------------------------------------------
 
- CI_ENVIRONMENT = development
+# CI_ENVIRONMENT = production
 
 #--------------------------------------------------------------------
 # APP
@@ -45,28 +45,21 @@
 
 # app.CSPEnabled = false
 
-# Error Logging Threshold (0 - disabled, 9 - all, 3 - default)
-logger.threshold = 6
-
-app.appTimezone = Asia/Yekaterinburg
-
 #--------------------------------------------------------------------
 # DATABASE
 #--------------------------------------------------------------------
 
-database.default.hostname = localhost
-database.default.database = mik_meteo
-database.default.username = 040135003_meteo
-database.default.password = 9_.)Z97mQVPN
-database.default.DBDriver = MySQLi
+# database.default.hostname = localhost
+# database.default.database = ci4
+# database.default.username = root
+# database.default.password = root
+# database.default.DBDriver = MySQLi
 
 # database.tests.hostname = localhost
 # database.tests.database = ci4
 # database.tests.username = root
 # database.tests.password = root
 # database.tests.DBDriver = MySQLi
-
-database.table.data = meteo_data
 
 #--------------------------------------------------------------------
 # CONTENT SECURITY POLICY

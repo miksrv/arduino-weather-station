@@ -84,7 +84,7 @@ void loop() {
    * If the difference is greater than the desired value, then execute the code.
    * If not, do nothing
    */
-  if (millis() - timing > 3000) {
+  if (millis() - timing > 20000) {
     timing = millis(); 
     
     #ifdef DEBUG
@@ -111,7 +111,7 @@ void loop() {
 void webclient_send_data() {
     memset(webclient_data, 0, sizeof(webclient_data));
 
-    strcpy(webclient_data, "ID=3859F96DD7FF");
+    strcpy(webclient_data, "id=A7FE9540D1F5");
 
     strcat(webclient_data, "&p=");  // Atmosphere pressure
     strcat(webclient_data, mmHg);
@@ -140,7 +140,7 @@ void webclient_send_data() {
     #endif
 
     if (LAN.connect(server, 80)) {
-        LAN.println("POST http://miksrv.ru/meteo/insert HTTP/1.0");
+        LAN.println("POST http://api.miksrv.ru/set/data HTTP/1.0");
         LAN.println("Host: miksrv.ru");
         LAN.println("Content-Type: application/x-www-form-urlencoded");
         LAN.println("Connection: close");
