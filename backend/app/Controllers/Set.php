@@ -38,11 +38,13 @@ class Set extends BaseController
         $this->_check_token();
         $this->_fetch_data();
 
+        // DEPRECATED
+        // 'item_token' => $this->_token,
+        // 'item_client_ip' => $this->request->getIPAddress(),
+
         $db = \Config\Database::connect();
         $db->table($_dataTable)->insert([
             'item_id' => uniqid(),
-            'item_token' => $this->_token,
-            'item_client_ip' => $this->request->getIPAddress(),
             'item_raw_data' => json_encode($this->rawData)
         ]);
 

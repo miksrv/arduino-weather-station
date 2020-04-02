@@ -6,7 +6,7 @@ import { createStore, applyMiddleware, combineReducers } from 'redux'
 import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
 
-import * as reducers from './store/reducers';
+import * as reducers from './store/reducers'
 
 import 'moment/locale/ru'
 import 'semantic-ui-css/semantic.min.css'
