@@ -7,8 +7,6 @@ class Get extends BaseController
 
     protected $_updated;
 
-
-
     /**
      * Receives data from a weather station, checks a token, enters data into a storage
      */
@@ -34,6 +32,10 @@ class Get extends BaseController
         exit();
     }
 
+    /**
+     * Returns the calculated time of sunset and sunrise
+     * @return object
+     */
      protected function _sun() {
         return (object) [
             'rise' => date_sunrise(
@@ -55,6 +57,10 @@ class Get extends BaseController
         ];
     }
 
+    /**
+     * Returns lunar data - sunset, dawn, age, phase, illumination, distance
+     * @return object
+     */
     protected function _moon()
     {
         $MoonCalc = new \MoonCalc();
@@ -76,6 +82,10 @@ class Get extends BaseController
         ];
     }
 
+    /**
+     * Returns ready-made sensor data
+     * @throws \Exception
+     */
     protected function _fetch_data()
     {
         if (empty($this->_data)) return ;
@@ -120,6 +130,11 @@ class Get extends BaseController
         $this->_data = $temp;
     }
 
+    /**
+     * Creates an initial array of sensor data
+     * @param $sensor_array
+     * @return array|void
+     */
     protected function _make_initial_data($sensor_array)
     {
         if (empty($sensor_array) || ! is_object($sensor_array)) return ;
