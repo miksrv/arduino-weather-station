@@ -26,7 +26,7 @@ char temp1[6], temp2[6], mmHg[6], humd[6],
 
 // Network settings
 byte mac[] = { 0x38, 0x59, 0xF9, 0x6D, 0xD7, 0xFF }; // MAC-address
-IPAddress ip(10,10,5,23);                 // IP address of the device on the network
+IPAddress ip(10,10,1,100);                 // IP address of the device on the network
 char server[] = "miksrv.ru";
 
 EthernetClient LAN;
@@ -84,7 +84,7 @@ void loop() {
    * If the difference is greater than the desired value, then execute the code.
    * If not, do nothing
    */
-  if (millis() - timing > 20000) {
+  if (millis() - timing > 10000) {
     timing = millis(); 
     
     #ifdef DEBUG
@@ -93,10 +93,12 @@ void loop() {
 
     get_sensor_uvindex();
     get_sensor_pressure();
+    delay(4000);
     get_sensor_dht22();
     get_sensor_luxmeter();
-    //get_sensor_wind_direction();
-    //get_sensor_anemometer();
+    delay(4000);
+    get_sensor_wind_direction();
+    get_sensor_anemometer();
 
     webclient_send_data();
 

@@ -12,7 +12,7 @@ const METEO_ENDPOINT = 'http://api.miksrv.ru'
 export function fetchMeteoData() {
     return async(dispatch) => {
         try {
-            const url = `${METEO_ENDPOINT}/api/get_summary`;
+            const url = `${METEO_ENDPOINT}/get/general`;
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
