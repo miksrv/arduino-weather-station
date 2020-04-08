@@ -1,81 +1,74 @@
 const data = [
   {
-    name: 'На улице (℃)',
+    type: 'sensors',
+    source: 't1',
+    name: 'Температура 1 (℃)',
     color: 'red',
-    value: 'temp1',
     icon: 'temp',
     trend: true
   },
   {
-    name: 'В помещении (℃)',
+    type: 'sensors',
+    source: 't2',
+    name: 'Температура 2 (℃)',
     color: 'red',
-    value: 'temp2',
     icon: 'temp',
     trend: true
   },
   {
+    type: 'sensors',
+    source: 'h',
     name: 'Влажность воздуха',
     color: 'blue',
-    value: 'humd',
     icon: 'humd',
     trend: true
   },
   {
-    name: 'Точка росы (℃)',
-    color: 'purple',
-    value: 'dewpoint',
-    icon: 'dewpoint',
-    trend: false
-  },
-  {
-    name: 'Рассвет Солнца',
-    color: 'yellow',
-    value: 'sunrise',
-    icon: 'sunrise',
-    trend: false
-  },
-  {
-    name: 'Закат Солнца',
-    color: 'yellow',
-    value: 'sunset',
-    icon: 'sunset',
-    trend: false
-  },
-  {
-    name: 'Восход луны',
-    color: 'darkblue',
-    value: 'moonrise',
-    icon: 'moonrise',
-    trend: false
-  },
-  {
-    name: 'Закат луны',
-    color: 'darkblue',
-    value: 'moonset',
-    icon: 'moonset',
-    trend: false
-  },
-  {
+    type: 'sensors',
+    source: 'p',
     name: 'Давление (мм)',
     color: 'cobalt',
-    value: 'press',
     icon: 'press',
     trend: true
   },
   {
+    type: 'sensors',
+    source: 'lux',
     name: 'Освещенность (lx)',
     color: 'green',
-    value: 'light',
     icon: 'light',
     trend: true
   },
   {
+    type: 'sensors',
+    source: 'uv',
     name: 'UV индекс',
     color: 'green',
-    value: 'uv',
     icon: 'uvindex',
     trend: true
   },
-];
+  {
+    type: 'sensors',
+    source: 'wd',
+    name: 'Направление ветра',
+    color: 'purple',
+    icon: 'windir',
+    trend: false
+  },
+  {
+    type: 'sensors',
+    source: 'ws',
+    name: 'Скорость ветра',
+    color: 'brown',
+    icon: 'winspeed',
+    trend: true
+  },
+  {
+    type: 'sun',
+    name: 'Солнечный день',
+    color: 'yellow',
+    icon: 'sunrise',
+  }
+]
 
-export default data;
+export default data

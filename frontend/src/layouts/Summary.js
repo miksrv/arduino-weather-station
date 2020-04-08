@@ -17,10 +17,10 @@ const Summary = (props) => {
                 <h4>Россия, г. Оренбург, ул. Чкалова</h4>
                 <div className='current'>
                     <WiDaySunny className='icon' />
-                    <span className='value'>{data.temp1.cur}</span>
+                    <span className='value'>{data.sensors.t1.value}</span>
                     <span className='sign'>℃</span>
                 </div>
-                <div className='update'>Обновлено: {moment.unix(data.datestamp).format("DD.MM.Y, H:mm:ss")}</div>
+                <div className='update'>Обновлено: {moment.unix(data.update).format("DD.MM.Y, H:mm:ss")}</div>
                 <div className='timeago'>Последние данные: {updateTimer}</div>
             </Container>
         </div>

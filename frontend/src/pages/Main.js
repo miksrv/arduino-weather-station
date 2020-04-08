@@ -87,14 +87,14 @@ class Main extends Component {
         const { current } = this.props
 
         this.setState({
-            lastUpdate: moment.unix(current.datestamp).fromNow()
+            lastUpdate: moment.unix(current.update).fromNow()
         });
     }
 
     render() {
         const { current } = this.props
         const { autoUpdate, lastUpdate } = this.state
-        const updateTimer = (!autoUpdate && !_.isEmpty(current)) ? moment.unix(current.datestamp).fromNow() : lastUpdate
+        const updateTimer = (!autoUpdate && !_.isEmpty(current)) ? moment.unix(current.update).fromNow() : lastUpdate
 
         return (
             <div>

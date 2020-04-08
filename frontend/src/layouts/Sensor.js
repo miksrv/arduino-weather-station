@@ -5,10 +5,10 @@
 import React  from 'react'
 
 import { Grid } from 'semantic-ui-react'
-import { WiThermometer, WiHumidity, WiBarometer, WiDaySunny, WiHot, WiRaindrops, WiSunrise, WiSunset, WiMoonrise, WiMoonset } from 'react-icons/wi'
+import { WiThermometer, WiHumidity, WiBarometer, WiDaySunny, WiHot, WiRaindrops, WiSunrise, WiSunset, WiMoonrise, WiMoonset, WiWindDeg, WiStrongWind } from 'react-icons/wi'
 import { IoIosArrowRoundUp, IoIosArrowRoundDown } from 'react-icons/io'
 
-const Sensor = (data) => {
+const Sensor = (params) => {
 
     const icons = {
         temp: WiThermometer,
@@ -20,7 +20,9 @@ const Sensor = (data) => {
         sunrise: WiSunrise,
         sunset: WiSunset,
         moonrise: WiMoonrise,
-        moonset: WiMoonset
+        moonset: WiMoonset,
+        windir: WiWindDeg,
+        winspeed: WiStrongWind
     };
 
     const trend = {
@@ -28,23 +30,22 @@ const Sensor = (data) => {
         down: IoIosArrowRoundDown
     }
 
-    const WeatherIcon = icons[data.icon]
-    const TrendIcon  = data.value > data.average ? trend['up'] : trend['down']
-    const TrendValue = Number((data.value - data.average).toFixed(2))
+    const WeatherIcon = icons[params.widget.icon]
+    const TrendIcon  = params.data.trend > 0 ? trend['up'] : trend['down']
 
     return (
-        <div className={'tile ' + data.color}>
+        <div className={'tile ' + params.widget.color}>
             <Grid>
                 <Grid.Row>
                     <Grid.Column width={5} className='icon-container'>
                         <WeatherIcon className='icon' />
                     </Grid.Column>
                     <Grid.Column width={11}>
-                        <div className='title'>{data.name}</div>
-                        <div className='value'>{data.value}</div>
-                        {(data.trend === true && (
+                        <div className='title'>{params.widget.name}</div>
+                        <div className='value'>{params.data.value}</div>
+                        {(params.widget.trend === true && params.data.trend !== 0 && (
                             <div className='trend'>
-                                тренд: <TrendIcon className={(data.value > data.average ? 'trend-up' : 'trend-down')} /> {data.value < data.average ? '-' : ''} {TrendValue}
+                                тренд: <TrendIcon className={(params.data.trend > 0 ? 'trend-up' : 'trend-down')} /> {params.data.trend > 0 ? '+' : ''} {params.data.trend}
                             </div>
                         ))}
                     </Grid.Column>

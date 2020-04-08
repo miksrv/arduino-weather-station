@@ -26,7 +26,7 @@ class Get extends BaseController
 
         $this->response
             ->setJSON([
-                'update'  => $this->_updated,
+                'update'  => strtotime($this->_updated),
                 'moon'    => $this->_moon(),
                 'sun'     => $this->_sun(),
                 'sensors' => $this->_data

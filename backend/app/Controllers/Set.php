@@ -44,8 +44,9 @@ class Set extends BaseController
 
         $db = \Config\Database::connect();
         $db->table($_dataTable)->insert([
-            'item_id' => uniqid(),
-            'item_raw_data' => json_encode($this->rawData)
+            'item_id'        => uniqid(),
+            'item_raw_data'  => json_encode($this->rawData),
+            'item_timestamp' => date("Y-m-d H:i:s")
         ]);
 
         $response = ['state' => TRUE, 'data' => 'Data accepted'];
