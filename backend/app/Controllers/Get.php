@@ -9,7 +9,7 @@ class Get extends BaseController
     protected $_data;
 
     protected $_updated;
-
+    
     /**
      * Receives data from a weather station, checks a token, enters data into a storage
      */

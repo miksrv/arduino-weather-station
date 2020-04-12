@@ -47,14 +47,14 @@ const data = [
     icon: 'uvindex',
     trend: true
   },
-  {
-    type: 'sensors',
-    source: 'wd',
-    name: 'Направление ветра',
-    color: 'purple',
-    icon: 'windir',
-    trend: false
-  },
+  // {
+  //   type: 'sensors',
+  //   source: 'wd',
+  //   name: 'Направление ветра',
+  //   color: 'purple',
+  //   icon: 'windir',
+  //   trend: false
+  // },
   {
     type: 'sensors',
     source: 'ws',

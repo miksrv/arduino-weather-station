@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Weather station",
+  "name": "Arduino weather station project",
   "icons": [
     {
       "src": "favicon.ico",

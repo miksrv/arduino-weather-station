@@ -7,7 +7,7 @@
 
 import * as types from './actionTypes'
 
-const METEO_ENDPOINT = 'http://api.miksrv.ru'
+const METEO_ENDPOINT = 'https://api.miksoft.pro'
 
 export function fetchMeteoData() {
     return async(dispatch) => {

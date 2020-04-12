@@ -58,15 +58,14 @@ void setup() {
   delay(1000);
 
   dht.begin();
-  delay(1000);
 
   // Port extender initialization
-  expander.begin();
-  delay(100);
-  for (int i=0; i<8; i++) {
-    expander.pinMode(i, INPUT_PULLUP);
-    delay(50);
-  }
+//  expander.begin();
+//  delay(100);
+//  for (int i=0; i<8; i++) {
+//    expander.pinMode(i, INPUT_PULLUP);
+//    delay(50);
+//  }
 
   Ethernet.begin(mac, ip);
   delay(1000);
@@ -84,7 +83,7 @@ void loop() {
    * If the difference is greater than the desired value, then execute the code.
    * If not, do nothing
    */
-  if (millis() - timing > 10000) {
+  if (millis() - timing > 30000) {
     timing = millis(); 
     
     #ifdef DEBUG
@@ -93,11 +92,9 @@ void loop() {
 
     get_sensor_uvindex();
     get_sensor_pressure();
-    delay(4000);
     get_sensor_dht22();
     get_sensor_luxmeter();
-    delay(4000);
-    get_sensor_wind_direction();
+//    get_sensor_wind_direction();
     get_sensor_anemometer();
 
     webclient_send_data();

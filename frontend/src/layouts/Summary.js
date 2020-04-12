@@ -14,7 +14,7 @@ const Summary = (props) => {
             </div>
             <Container className='main-content'>
                 <h1>Погодная станция</h1>
-                <h4>Россия, г. Оренбург, ул. Чкалова</h4>
+                <h4>Оренбургская обл., c. Ивановка, ЖК "Приуралье"</h4>
                 <div className='current'>
                     <WiDaySunny className='icon' />
                     <span className='value'>{data.sensors.t1.value}</span>
