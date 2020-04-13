@@ -9,15 +9,13 @@ class Header extends Component {
 
         return (
             <Container className='main-content'>
-                <Grid className='header-toolbar'>
-                    <Grid.Column width={10}>
-                        <nav className='navigation'>
-                            <NavLink exact to='/'>Датчики</NavLink>
-                            <NavLink to='/test' activeClassName='active'>Графики</NavLink>
-                            {/*<NavLink to='/experemental' activeClassName='active'>Experemental</NavLink>*/}
-                        </nav>
-                    </Grid.Column>
-                    <Grid.Column textAlign='right' width={6}>
+                <div className='header-toolbar'>
+                    <nav className='navigation'>
+                        <NavLink exact to='/'>Датчики</NavLink>
+                        <NavLink to='/test' activeClassName='active'>Графики</NavLink>
+                        {/*<NavLink to='/experemental' activeClassName='active'>Experemental</NavLink>*/}
+                    </nav>
+                    <div className='update-container'>
                         <Checkbox
                             toggle
                             checked={autoUpdate}
@@ -25,8 +23,8 @@ class Header extends Component {
                             onChange={onChangeAutoupdate}
                             className='update-switch'
                         />
-                    </Grid.Column>
-                </Grid>
+                    </div>
+                </div>
             </Container>
         )
     }
