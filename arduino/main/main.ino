@@ -27,7 +27,7 @@ char temp1[6], temp2[6], mmHg[6], humd[6],
 // Network settings
 byte mac[] = { 0x38, 0x59, 0xF9, 0x6D, 0xD7, 0xFF }; // MAC-address
 IPAddress ip(10,10,1,100);                 // IP address of the device on the network
-char server[] = "miksrv.ru";
+char server[] = "api.miksoft.pro";
 
 EthernetClient LAN;
 
@@ -139,8 +139,8 @@ void webclient_send_data() {
     #endif
 
     if (LAN.connect(server, 80)) {
-        LAN.println("POST http://api.miksrv.ru/set/data HTTP/1.0");
-        LAN.println("Host: miksrv.ru");
+        LAN.println("POST https://api.miksoft.pro/set/data HTTP/1.0");
+        LAN.println("Host: api.miksoft.pro");
         LAN.println("Content-Type: application/x-www-form-urlencoded");
         LAN.println("Connection: close");
         LAN.print("Content-Length: ");
