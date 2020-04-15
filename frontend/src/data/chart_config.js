@@ -5,7 +5,8 @@ const chart_config = {
         '#d87040',
         '#e6a241',
         '#7face6',
-        '#9bbc2f'
+        '#9bbc2f',
+        '#9A8A7D'
     ],
     chart: {
         // backgroundColor: {

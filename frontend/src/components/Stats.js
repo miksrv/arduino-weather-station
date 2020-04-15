@@ -11,7 +11,7 @@ Highcharts.setOptions(Highcharts.theme = chart_config);
 class Stats extends Component {
 
   state = {
-    liveUpdate: false,
+    liveUpdate: true,
     chart1_Options: {
       xAxis: [{
         type: 'datetime',
@@ -52,7 +52,24 @@ class Stats extends Component {
         opposite: true,
         min: 0,
         max: 90,
-      }],
+      }, {
+          gridLineWidth: 0,
+          title: {
+            text: 'Скорость ветра',
+            style: {
+              color: Highcharts.theme.colors[6]
+            }
+          },
+          labels: {
+            format: '{value} м/с',
+            style: {
+              color: Highcharts.theme.colors[6]
+            }
+          },
+          opposite: true,
+          min: 0,
+          max: 20,
+        }],
       series: [{
         name: 'Влажность',
         type: 'area',
@@ -63,7 +80,7 @@ class Stats extends Component {
           valueSuffix: ' %'
         }
       }, {
-        name: 'На улице',
+        name: 'Температура',
         type: 'spline',
         // data: data.temp1,
         color: Highcharts.theme.colors[1],
@@ -71,15 +88,18 @@ class Stats extends Component {
           valueSuffix: ' °C'
         }
       }, {
-        name: 'В помещении',
-        type: 'spline',
-        // data: data.temp2,
-        color: Highcharts.theme.colors[2],
+        name: 'Скорость ветра',
+        type: 'column',
+        pointWidth: 4,
+        borderWidth: 0.4,
+        // data: data.ws,
+        color: Highcharts.theme.colors[6],
         tooltip: {
-          valueSuffix: ' °C'
+          valueSuffix: ' м/с'
         }
       }]
     },
+
     chart2_Options: {
       xAxis: [{
         type: 'datetime',
@@ -103,7 +123,6 @@ class Stats extends Component {
           }
         },
         opposite: false,
-
       }, {
         gridLineWidth: 0,
         title: {
@@ -173,21 +192,32 @@ class Stats extends Component {
   }
 
   componentDidMount() {
+    this.handleUpdateCharts()
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    // if (this.props.data.update !== prevProps.data.update) {
+    //   this.handleUpdateCharts()
+    // }
+  }
+
+  handleUpdateCharts() {
     const { data } = this.props
 
     this.setState({
       chart1_Options: {
+        ...this.state.chart1_Options,
         series: [
-          { data: data.humd },
-          { data: data.temp1 },
-          { data: data.temp2 }
+          { data: data.sensors.h },
+          { data: data.sensors.t1 },
+          { data: data.sensors.ws }
         ]
       },
       chart2_Options: {
         series: [
-          { data: data.light },
-          { data: data.uv },
-          { data: data.press }
+          { data: data.sensors.lux },
+          { data: data.sensors.uv },
+          { data: data.sensors.p }
         ]
       }
     })

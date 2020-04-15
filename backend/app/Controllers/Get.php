@@ -35,6 +35,98 @@ class Get extends BaseController
         exit();
     }
 
+    public function graphdata()
+    {
+        $_dataTable = getenv('database.table.data');
+
+        $db = \Config\Database::connect();
+
+        // Select all data from the database in the interval of the day
+        $interval    = '`item_timestamp` >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
+        $this->_data = $db->table($_dataTable)->where($interval)->orderBy('item_timestamp', 'DESC')->get()->getResult();
+        $this->_make_graph_data();
+
+        $this->response
+            ->setJSON([
+                'update'  => strtotime($this->_updated),
+                'sensors' => $this->_data
+            ])->send();
+
+        exit();
+    }
+
+    protected function _make_graph_data()
+    {
+        if (empty($this->_data))
+        {
+            return ;
+        }
+
+        $_result = [];
+        $_period = 'day';
+
+        $_counter   = 0; // Счетчик итераций
+        $_prev_time = 0; // Изначальное время первой итерации
+        $_temp_val  = []; // Массив средних значений
+
+        // Если период - день, то достаточно значения раз в 10 мин
+        foreach ($this->_data as $num => $item)
+        {
+            if ($num === 0)
+            {
+                $this->_updated = $item->item_timestamp;
+            }
+
+            // ------------------------------------------------------------
+            // Если время между первой и текущей итерацией больше или равно
+            // 10 мин (для одного дня - 10 мин усреднение)
+            if ($_prev_time - strtotime($item->item_timestamp) >= 600)
+            {
+                foreach ($_temp_val as $_key => $_val)
+                {
+                    if ($_key === 'timestamp')
+                    {
+                        continue;
+                    }
+
+                    $_result[$_key][] = [
+                        round($_temp_val['timestamp'] / $_counter, 0) * 1000,
+                        round($_val / $_counter, 1)];
+                }
+
+                $_counter   = 0;
+                $_prev_time = 0;
+                $_temp_val  = [];
+            }
+
+            if ($_counter == 0) {
+                $_prev_time = strtotime($item->item_timestamp);
+            }
+
+            foreach (json_decode($item->item_raw_data) as $key => $val)
+            {
+
+                if ( ! isset($_temp_val[$key]))
+                {
+                    $_temp_val[$key] = 0;
+                }
+
+                $_temp_val[$key] += $val;
+            }
+
+            if ( ! isset($_temp_val['timestamp']))
+            {
+                $_temp_val['timestamp'] = 0;
+            }
+
+            $_temp_val['timestamp'] += strtotime($item->item_timestamp);
+            $_counter++;
+        }
+
+        return $this->_data = $_result;
+    }
+
+
     /**
      * Returns the calculated time of sunset and sunrise
      * @return object

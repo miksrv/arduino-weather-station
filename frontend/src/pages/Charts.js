@@ -54,7 +54,8 @@ class Charts extends Component {
 
         if (autoUpdate) {
             const intervalId = setInterval(() => {
-                dispatch(meteoActions.fetchStatData())
+                // #TODO
+                // dispatch(meteoActions.fetchStatData())
             }, 30000)
 
             this.setState({
@@ -92,7 +93,7 @@ class Charts extends Component {
 
 function mapStateToProps(state) {
     return {
-        chartData: state.meteostation.stat,
+        chartData: state.meteostation.chartData,
         current: state.meteostation.current
     }
 }
