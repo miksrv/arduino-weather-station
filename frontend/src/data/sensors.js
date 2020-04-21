@@ -68,6 +68,9 @@ const data = [
     name: 'Солнечный день',
     color: 'yellow',
     icon: 'sunrise',
+  },
+  {
+    type: 'moon',
   }
 ]
 

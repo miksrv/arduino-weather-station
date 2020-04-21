@@ -11,6 +11,7 @@ import moment from 'moment'
 
 const Sun = (params) => {
     return (
+        <Grid.Column computer={4} tablet={8} mobile={16}>
         <div className={'tile sun ' + params.widget.color}>
             <Grid>
                 <Grid.Column width={5} className='icon-container'>
@@ -23,6 +24,7 @@ const Sun = (params) => {
                 </Grid.Column>
             </Grid>
         </div>
+        </Grid.Column>
     )
 }
 

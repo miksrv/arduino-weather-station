@@ -25,7 +25,7 @@ ReactDOM.render(
         <BrowserRouter>
             <Switch>
                 <Route exact path="/" component={Main} />
-                <Route path="/test" component={Charts} />
+                <Route path="/charts" component={Charts} />
                 <Route component={Error404} />
             </Switch>
         </BrowserRouter>

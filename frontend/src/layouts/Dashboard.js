@@ -2,6 +2,7 @@ import React from 'react'
 import { Container, Dimmer, Loader, Grid } from 'semantic-ui-react'
 
 import Sensor from './Sensor'
+import Moon from './Moon'
 import Sun from './Sun'
 
 import sensors from '../data/sensors'
@@ -12,9 +13,7 @@ const Dashboard = (props) => {
     return (
         <Container className='tiles-list'>
             <Grid>
-                {sensors.map((item, key) => (
-                    <Grid.Column computer={4} tablet={8} mobile={16} key={key}>
-                        {(() => {
+                {sensors.map((item, key) => {
                             switch (item.type) {
                                 case 'sensors': return (
                                     <Sensor
@@ -30,11 +29,16 @@ const Dashboard = (props) => {
                                     />
                                 )
 
+                                case 'moon': return (
+                                    <Moon
+                                        data={data[item.type]}
+                                    />
+                                )
+
                                 default: return null
                             }
-                        })()}
-                    </Grid.Column>
-                )) || (
+
+                }) || (
                     <Dimmer active>
                         <Loader>Загрузка</Loader>
                     </Dimmer>

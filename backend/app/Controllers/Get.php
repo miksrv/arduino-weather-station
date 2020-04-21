@@ -173,7 +173,10 @@ class Get extends BaseController
             'diameter'     => $MoonCalc->diameter(),
             'distance'     => $MoonCalc->distance(),
             'illumination' => $MoonCalc->illumination(),
-            'phase_name'   => $MoonCalc->phase_name()
+            'phase_name'   => $MoonCalc->phase_name(),
+            'phase_icon'   => $MoonCalc->phase_name_icon(),
+            'phase_new'    => round($MoonCalc->next_new_moon(), 0),
+            'phase_full'   => round($MoonCalc->next_full_moon(), 0)
         ];
     }
 

@@ -34,6 +34,7 @@ const Sensor = (params) => {
     const TrendIcon  = params.data.trend > 0 ? trend['up'] : trend['down']
 
     return (
+        <Grid.Column computer={4} tablet={8} mobile={16}>
         <div className={'tile ' + params.widget.color}>
             <Grid>
                 <Grid.Row>
@@ -52,6 +53,7 @@ const Sensor = (params) => {
                 </Grid.Row>
             </Grid>
         </div>
+        </Grid.Column>
     )
 }
 

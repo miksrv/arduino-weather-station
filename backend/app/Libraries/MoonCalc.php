@@ -283,19 +283,19 @@ class MoonCalc {
         return $names[ floor( ( $this->phase + 0.0625 ) * 8 ) ];
     }
 
-    function phase_name_class() {
+    function phase_name_icon() {
         $phase = round($this->phase, 3);
         $round = round($this->phase, 2);
 
-        $stage = $phase < 0.5 ? 'waxing-' : 'waning-';
-        $stage = $round == 0.5 ? 'full' : $stage;
-        $stage = $round == 0 ? 'new' : $stage;
+        $stage = $phase < 0.5 ? 'Waxing-' : 'Waning';
+        $stage = $round == 0.5 ? 'Full' : $stage;
+        $stage = $round == 0 ? 'New' : $stage;
 
         if ($round == 0.25) {
-            $stage = 'first-quarter';
+            $stage = 'FirstQuarter';
 
         } else if ($round == 0.75) {
-            $stage = 'third-quarter';
+            $stage = 'ThirdQuarter';
 
         } else if ($phase > 0 && $phase < 0.25) {
             $i = 0;
@@ -306,7 +306,7 @@ class MoonCalc {
                 $d += 0.04;
             }
 
-            $stage .= 'crescent-' . $i;
+            $stage .= 'Crescent' . $i;
 
         } else if ($phase > 0.25 && $phase < 0.5) {
             $i = 0;
@@ -317,7 +317,7 @@ class MoonCalc {
                 $d += 0.04;
             }
 
-            $stage .= 'gibbous-' . $i;
+            $stage .= 'Gibbous' . $i;
 
         } else if ($phase > 0.5 && $phase < 0.75) {
             $i = 0;
@@ -328,7 +328,7 @@ class MoonCalc {
                 $d += 0.04;
             }
 
-            $stage .= 'gibbous-' . $i;
+            $stage .= 'Gibbous' . $i;
 
         } else if ($phase > 0.75 && $phase < 1) {
             $i = 0;
@@ -339,10 +339,10 @@ class MoonCalc {
                 $d += 0.04;
             }
 
-            $stage .= 'crescent-' . $i;
+            $stage .= 'Crescent' . $i;
         }
 
-        $name  = 'wi-moon-alt-' . $stage;
+        $name  = /*'WiMoonAlt' . */$stage;
 
         return $name;
     }
