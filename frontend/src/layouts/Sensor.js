@@ -35,24 +35,24 @@ const Sensor = (params) => {
 
     return (
         <Grid.Column computer={4} tablet={8} mobile={16}>
-        <div className={'tile ' + params.widget.color}>
-            <Grid>
-                <Grid.Row>
-                    <Grid.Column width={5} className='icon-container'>
-                        <WeatherIcon className='icon' />
-                    </Grid.Column>
-                    <Grid.Column width={11}>
-                        <div className='title'>{params.widget.name}</div>
-                        <div className='value'>{params.data.value}</div>
-                        {(params.widget.trend === true && params.data.trend !== 0 && (
-                            <div className='trend'>
-                                тренд: <TrendIcon className={(params.data.trend > 0 ? 'trend-up' : 'trend-down')} /> {params.data.trend > 0 ? '+' : ''} {params.data.trend}
-                            </div>
-                        ))}
-                    </Grid.Column>
-                </Grid.Row>
-            </Grid>
-        </div>
+            <div className={'tile ' + params.widget.color}>
+                <Grid>
+                    <Grid.Row>
+                        <Grid.Column width={5} className='icon-container'>
+                            <WeatherIcon className='icon' />
+                        </Grid.Column>
+                        <Grid.Column width={11}>
+                            <div className='title'>{params.widget.name}</div>
+                            <div className='value'>{params.data.value}</div>
+                            {(params.widget.trend === true && params.data.trend !== 0 && (
+                                <div className='trend'>
+                                    тренд: <TrendIcon className={(params.data.trend > 0 ? 'trend-up' : 'trend-down')} /> {params.data.trend > 0 ? '+' : ''} {params.data.trend}
+                                </div>
+                            ))}
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
+            </div>
         </Grid.Column>
     )
 }

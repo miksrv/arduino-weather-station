@@ -31,6 +31,7 @@ const Dashboard = (props) => {
 
                                 case 'moon': return (
                                     <Moon
+                                        widget={item}
                                         data={data[item.type]}
                                     />
                                 )

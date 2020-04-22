@@ -1,32 +1,6 @@
+@import "colors"
+
 $font-stack: sans-serif
-$main-color: #FFF
-$second-color: #CCC
-
-$red: #F2745E
-$orange: #f78d03
-$blue: #08B8F4
-$cobalt: #04CCDB
-$green: #9FCD60
-$yellow: #FFB804
-$pink: #F9A4A7
-$purple: #BF6EEB
-$brown: #9A8A7D
-$darkblue: #577CEF
-
-$temp-15-20: #2238e6
-$temp-10-15: #4558e6
-$temp-5-10: #7face6
-$temp-0-5: #51b4c4
-$temp0-5: #00adbd
-$temp5-10: #9bbc2f
-$temp10-15: #e6a241
-$temp15-20: #f78d03
-$temp20-25: #d87040
-$temp25-30: #e64b24
-$temp30-35: #cc504c
-$temp35-40: #88342e
-$temp40-45: #532a96
-$temp45-50: #813062
 
 *:not(.icon)
     outline: none
@@ -125,6 +99,15 @@ body
     color: $second-color
     font-size: .8em
 
+
+.error404
+    text-align: center
+    padding-top: 14%
+
+.description
+    font-size: 0.9em
+    color: $second-color
+
 .tiles-list
     margin-top: 4vh
 
@@ -171,125 +154,7 @@ body
         font-size: 1.8em
         line-height: 1.2
 
-.tile.sun
-    .title
-        margin-bottom: 5px
 
-    .value
-        font-size: 1em
-        color: $main-color
-
-.tile.moon
-    font-size: .9em
-
-    .icon-holder
-        position: relative
-
-    .icon
-        position: absolute
-        font-size: 86px
-        left: -20%
-        top: -5px
-        color: $brown
-
-    .icon-info
-        position: absolute
-        right: 0
-        font-size: 26px
-        top: -5px
-        color: $cobalt
-
-    .icon-info-container
-        position: relative
-        padding-right: 25px
-
-.error404
-    text-align: center
-    padding-top: 14%
-
-.description
-    font-size: 0.9em
-    color: $second-color
-
-.red
-    border-color: $red
-
-    .icon
-        color: $red
-
-.blue
-    border-color: $blue
-
-    .icon
-        color: $blue
-
-.cobalt
-    border-color: $cobalt
-
-    .icon
-        color: $cobalt
-
-.green
-    border-color: $green
-
-    .icon
-        color: $green
-
-.yellow
-    border-color: $yellow
-
-    .icon
-        color: $yellow
-
-.pink
-    border-color: $pink
-
-    .icon
-        color: $pink
-
-.purple
-    border-color: $purple
-
-    .icon
-        color: $purple
-
-.brown
-    border-color: $brown
-
-    .icon
-        color: $brown
-
-.darkblue
-    border-color: $darkblue
-
-    .icon
-        color: $darkblue
-
-.value-15-20
-    color: $temp-15-20
-.value-10-15
-    color: $temp-10-15
-.value-5-10
-    color: $temp-5-10
-.value-0-5
-    color: $temp-0-5
-.value0-5
-    color: $temp0-5
-.value5-10
-    color: $temp5-10
-.value10-15
-    color: $temp10-15
-.value15-20
-    color: $temp15-20
-.value20-25
-    color: $temp20-25
-.value25-30
-    color: $temp25-30
-.value30-35
-    color: $temp30-35
-.value35-40
-    color: $temp35-40
-.value40-45
-    color: $temp40-45
-.value45-50
-    color: $temp45-50
+@import "tile_colors"
+@import "tile_sun"
+@import "tile_moon"

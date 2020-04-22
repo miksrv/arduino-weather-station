@@ -54,43 +54,43 @@ const Moon = (params) => {
 
     return (
         <Grid.Column computer={8} tablet={16} mobile={16}>
-        <div className='tile moon'>
-            <Grid columns={3}>
-                <Grid.Row stretched>
-                    <Grid.Column textAlign='left' width={7}>
-                        <div>
-                            Возраст (дней): <b>{Number((params.data.age).toFixed(2))}</b>
-                        </div>
-                        <div>
-                            Освещенность: <b>{Number((params.data.illumination).toFixed(2)) * 100}%</b>
-                        </div>
-                        <div>
-                            Расстояние (км): <b>{Number((params.data.distance).toFixed(0))}</b>
-                        </div>
-                        <div>
-                            Фаза Луны: <b>{params.data.phase_name}</b>
-                        </div>
-                    </Grid.Column>
-                    <Grid.Column width={2} className='icon-holder'>
-                        <MoonPhraseIcon className='icon' />
-                    </Grid.Column>
-                    <Grid.Column textAlign='right' width={7}>
-                        <div className='icon-info-container'>
-                            <WiMoonrise class='icon-info' /> Восход Луны: <b>{moment.unix(params.data.rise).format("H:mm")}</b>
-                        </div>
-                        <div className='icon-info-container'>
-                            <WiMoonset class='icon-info' /> Закат Луны: <b>{moment.unix(params.data.set).format("H:mm")}</b>
-                        </div>
-                        <div>
-                            Новолуние: <b>{moment.unix(params.data.phase_new).format("DD.MM.Y")}</b>
-                        </div>
-                        <div>
-                            Полнолуние: <b>{moment.unix(params.data.phase_full).format("DD.MM.Y")}</b>
-                        </div>
-                    </Grid.Column>
-                </Grid.Row>
-            </Grid>
-        </div>
+            <div className={'tile moon ' + params.widget.color}>
+                <Grid columns={3}>
+                    <Grid.Row stretched>
+                        <Grid.Column textAlign='left' width={7}>
+                            <div>
+                                Возраст (дней): <b>{Number((params.data.age).toFixed(2))}</b>
+                            </div>
+                            <div>
+                                Освещенность: <b>{Number((params.data.illumination).toFixed(2)) * 100}%</b>
+                            </div>
+                            <div>
+                                Расстояние (км): <b>{Number((params.data.distance).toFixed(0))}</b>
+                            </div>
+                            <div>
+                                Фаза Луны: <b>{params.data.phase_name}</b>
+                            </div>
+                        </Grid.Column>
+                        <Grid.Column width={2} className='icon-holder'>
+                            <MoonPhraseIcon className='icon' />
+                        </Grid.Column>
+                        <Grid.Column textAlign='right' width={7}>
+                            <div className='icon-info-container'>
+                                <WiMoonrise class='icon-info' /> Восход Луны: <b>{moment.unix(params.data.rise).format("H:mm")}</b>
+                            </div>
+                            <div className='icon-info-container'>
+                                <WiMoonset class='icon-info' /> Закат Луны: <b>{moment.unix(params.data.set).format("H:mm")}</b>
+                            </div>
+                            <div>
+                                Новолуние: <b>{moment.unix(params.data.phase_new).format("DD.MM.Y")}</b>
+                            </div>
+                            <div>
+                                Полнолуние: <b>{moment.unix(params.data.phase_full).format("DD.MM.Y")}</b>
+                            </div>
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
+            </div>
         </Grid.Column>
     )
 }

@@ -17,6 +17,14 @@ const data = [
   },
   {
     type: 'sensors',
+    source: 'dp',
+    name: 'Точка росы (℃)',
+    color: 'orange',
+    icon: 'dewpoint',
+    trend: true
+  },
+  {
+    type: 'sensors',
     source: 'h',
     name: 'Влажность воздуха',
     color: 'blue',
@@ -59,7 +67,7 @@ const data = [
     type: 'sensors',
     source: 'ws',
     name: 'Скорость ветра',
-    color: 'brown',
+    color: 'purple',
     icon: 'winspeed',
     trend: true
   },
@@ -67,10 +75,11 @@ const data = [
     type: 'sun',
     name: 'Солнечный день',
     color: 'yellow',
-    icon: 'sunrise',
+    icon: 'sunrise'
   },
   {
     type: 'moon',
+    color: 'brown'
   }
 ]
 

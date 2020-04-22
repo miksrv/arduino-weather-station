@@ -55,6 +55,58 @@ class Get extends BaseController
         exit();
     }
 
+    public function forecast()
+    {
+        if ( ! $foreacst = cache('forecast'))
+        {
+            $client   = \Config\Services::curlrequest();
+            $api_url  = 'http://api.openweathermap.org/data/2.5/forecast?id=' . getenv('app.openweather.city') . '&appid=' . getenv('app.openweather.key') . '&units=metric&lang=ru';
+            $response = $client->get($api_url);
+
+            if ($response->getStatusCode() !== 200)
+            {
+                $this->response
+                    ->setStatusCode($response->getStatusCode())
+                    ->setJSON([
+                        'error'  => $response->getBody(),
+                    ])->send();
+
+                exit();
+            }
+
+            $foreacst = $response->getBody();
+
+            // Save into the cache for 10 minutes
+            cache()->save('foreacst', $foreacst, 600);
+        }
+
+        $this->response
+            ->setJSON([
+                'data' => json_decode($foreacst)->list,
+            ])->send();
+
+        exit();
+    }
+
+    public function kindex()
+    {
+        if ( ! $kindex = cache('kindex'))
+        {
+            $api_url = 'https://services.swpc.noaa.gov/json/planetary_k_index_1m.json';
+            $kindex  = file_get_contents($api_url);
+
+            // Save into the cache for 10 minutes
+            cache()->save('kindex', $kindex, 600);
+        }
+
+        $this->response
+            ->setJSON([
+                'data' => json_decode($kindex),
+            ])->send();
+
+        exit();
+    }
+
     protected function _make_graph_data()
     {
         if (empty($this->_data))
@@ -126,6 +178,19 @@ class Get extends BaseController
         return $this->_data = $_result;
     }
 
+    protected function _calc_dew_point($humidity, $temp)
+    {
+        return round(((pow(($humidity / 100), 0.125)) * (112 + 0.9 * $temp) + (0.1 * $temp) - 112),1);
+    }
+
+    protected function _insert_additional_data($raw_input)
+    {
+
+        $_tmp = json_decode($raw_input);
+        $_tmp->dp = $this->_calc_dew_point($_tmp->h, $_tmp->t2);
+
+        return json_encode($_tmp);
+    }
 
     /**
      * Returns the calculated time of sunset and sunrise
@@ -193,6 +258,8 @@ class Get extends BaseController
 
         foreach ($this->_data as $key => $item)
         {
+
+            $item->item_raw_data = $this->_insert_additional_data($item->item_raw_data);
 
             if ($key === 0)
             {
