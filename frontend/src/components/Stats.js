@@ -82,14 +82,25 @@ class Stats extends Component {
       }, {
         name: 'Температура',
         type: 'spline',
+        yAxis: 0,
         // data: data.temp1,
         color: Highcharts.theme.colors[1],
         tooltip: {
           valueSuffix: ' °C'
         }
       }, {
+        name: 'Точка росы',
+        type: 'spline',
+        yAxis: 0,
+        // data: data.temp1,
+        color: Highcharts.theme.colors[2],
+        tooltip: {
+          valueSuffix: ' °C'
+        }
+      }, {
         name: 'Скорость ветра',
         type: 'column',
+        yAxis: 2,
         pointWidth: 4,
         borderWidth: 0.4,
         // data: data.ws,
@@ -210,6 +221,7 @@ class Stats extends Component {
         series: [
           { data: data.sensors.h },
           { data: data.sensors.t1 },
+          { data: data.sensors.dp },
           { data: data.sensors.ws }
         ]
       },

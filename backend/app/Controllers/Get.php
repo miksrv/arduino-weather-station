@@ -124,6 +124,8 @@ class Get extends BaseController
         // Если период - день, то достаточно значения раз в 10 мин
         foreach ($this->_data as $num => $item)
         {
+            $item->item_raw_data = $this->_insert_additional_data($item->item_raw_data);
+
             if ($num === 0)
             {
                 $this->_updated = $item->item_timestamp;
