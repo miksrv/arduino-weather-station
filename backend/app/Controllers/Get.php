@@ -7,21 +7,16 @@ class Get extends BaseController
 {
 
     protected $_data;
-
     protected $_updated;
-    
+
     /**
      * Receives data from a weather station, checks a token, enters data into a storage
      */
     public function general()
     {
-        $_dataTable = getenv('database.table.data');
+        $dataModel = model('App\Models\SensorData');
 
-        $db = \Config\Database::connect();
-
-        // Select all data from the database in the interval of the day
-        $interval    = '`item_timestamp` >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
-        $this->_data = $db->table($_dataTable)->where($interval)->orderBy('item_timestamp', 'DESC')->get()->getResult();
+        $this->_data = $dataModel->get_period();
         $this->_fetch_data();
 
         $this->response
@@ -35,15 +30,14 @@ class Get extends BaseController
         exit();
     }
 
+    /**
+     * Returns an array of data for plotting
+     */
     public function graphdata()
     {
-        $_dataTable = getenv('database.table.data');
+        $dataModel = model('App\Models\SensorData');
 
-        $db = \Config\Database::connect();
-
-        // Select all data from the database in the interval of the day
-        $interval    = '`item_timestamp` >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
-        $this->_data = $db->table($_dataTable)->where($interval)->orderBy('item_timestamp', 'DESC')->get()->getResult();
+        $this->_data = $dataModel->get_period();
         $this->_make_graph_data();
 
         $this->response
@@ -55,6 +49,10 @@ class Get extends BaseController
         exit();
     }
 
+    /**
+     * #TODO OpenWeatherMap library
+     * Weather forecast from OpenWeatherMap service
+     */
     public function forecast()
     {
         if ( ! $foreacst = cache('forecast'))
@@ -88,6 +86,10 @@ class Get extends BaseController
         exit();
     }
 
+    /**
+     * #TODO nooa.gov library
+     * Getting data from the weather data service
+     */
     public function kindex()
     {
         if ( ! $kindex = cache('kindex'))
@@ -107,6 +109,10 @@ class Get extends BaseController
         exit();
     }
 
+    /**
+     * Make and return graph data array
+     * @return array|void
+     */
     protected function _make_graph_data()
     {
         if (empty($this->_data))
@@ -180,11 +186,22 @@ class Get extends BaseController
         return $this->_data = $_result;
     }
 
+    /**
+     * Return calculated dew point value by temperature and humidity
+     * @param $humidity float
+     * @param $temp float
+     * @return false|float
+     */
     protected function _calc_dew_point($humidity, $temp)
     {
         return round(((pow(($humidity / 100), 0.125)) * (112 + 0.9 * $temp) + (0.1 * $temp) - 112),1);
     }
 
+    /**
+     * Inserted some data in first sensors array elements
+     * @param $raw_input
+     * @return false|string
+     */
     protected function _insert_additional_data($raw_input)
     {
 

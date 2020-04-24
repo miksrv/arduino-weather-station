@@ -287,7 +287,7 @@ class MoonCalc {
         $phase = round($this->phase, 3);
         $round = round($this->phase, 2);
 
-        $stage = $phase < 0.5 ? 'Waxing-' : 'Waning';
+        $stage = $phase < 0.5 ? 'Waxing' : 'Waning';
         $stage = $round == 0.5 ? 'Full' : $stage;
         $stage = $round == 0 ? 'New' : $stage;
 
