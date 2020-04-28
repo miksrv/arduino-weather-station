@@ -17,6 +17,7 @@ const Dashboard = (props) => {
                             switch (item.type) {
                                 case 'sensors': return (
                                     <Sensor
+                                        key={key}
                                         widget={item}
                                         data={data[item.type][item.source]}
                                     />
@@ -24,6 +25,7 @@ const Dashboard = (props) => {
 
                                 case 'sun': return (
                                     <Sun
+                                        key={key}
                                         widget={item}
                                         data={data[item.type]}
                                     />
@@ -31,6 +33,7 @@ const Dashboard = (props) => {
 
                                 case 'moon': return (
                                     <Moon
+                                        key={key}
                                         widget={item}
                                         data={data[item.type]}
                                     />

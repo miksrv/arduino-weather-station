@@ -50,7 +50,7 @@ class Charts extends Component {
      */
     timerControl = () => {
         const { autoUpdate, intervalId } = this.state
-        const { dispatch } = this.props
+        // const { dispatch } = this.props
 
         if (autoUpdate) {
             const intervalId = setInterval(() => {

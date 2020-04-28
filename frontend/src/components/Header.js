@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
-import { Checkbox, Container, Grid } from 'semantic-ui-react'
+import { Checkbox, Container } from 'semantic-ui-react'
 
 class Header extends Component {
 

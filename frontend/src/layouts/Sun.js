@@ -5,7 +5,7 @@
 import React  from 'react'
 
 import { Grid } from 'semantic-ui-react'
-import { WiSunrise, WiSunset } from 'react-icons/wi'
+import { WiSunset } from 'react-icons/wi'
 
 import moment from 'moment'
 

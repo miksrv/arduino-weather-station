@@ -77,10 +77,10 @@ const Moon = (params) => {
                         </Grid.Column>
                         <Grid.Column textAlign='right' width={7}>
                             <div className='icon-info-container'>
-                                <WiMoonrise class='icon-info' /> Восход Луны: <b>{moment.unix(params.data.rise).format("H:mm")}</b>
+                                <WiMoonrise className='icon-info' /> Восход Луны: <b>{moment.unix(params.data.rise).format("H:mm")}</b>
                             </div>
                             <div className='icon-info-container'>
-                                <WiMoonset class='icon-info' /> Закат Луны: <b>{moment.unix(params.data.set).format("H:mm")}</b>
+                                <WiMoonset className='icon-info' /> Закат Луны: <b>{moment.unix(params.data.set).format("H:mm")}</b>
                             </div>
                             <div>
                                 Новолуние: <b>{moment.unix(params.data.phase_new).format("DD.MM.Y")}</b>

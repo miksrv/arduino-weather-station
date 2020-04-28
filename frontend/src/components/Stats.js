@@ -220,7 +220,7 @@ class Stats extends Component {
         ...this.state.chart1_Options,
         series: [
           { data: data.sensors.h },
-          { data: data.sensors.t1 },
+          { data: data.sensors.t2 },
           { data: data.sensors.dp },
           { data: data.sensors.ws }
         ]
