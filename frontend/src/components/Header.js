@@ -13,6 +13,7 @@ class Header extends Component {
                     <nav className='navigation'>
                         <NavLink exact to='/'>Датчики</NavLink>
                         <NavLink to='/charts' activeClassName='active'>Графики</NavLink>
+                        <NavLink to='/forecast' activeClassName='active'>Прогноз</NavLink>
                     </nav>
                     <div className='update-container'>
                         <Checkbox

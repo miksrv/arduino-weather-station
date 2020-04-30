@@ -4,10 +4,11 @@
 // the other exports in this file are selectors, which is business logic that digests parts of the store's state
 // for easier consumption by views
 
-import * as types from './actionTypes';
+import * as types from './actionTypes'
 
 const initialState = {
     current: {},
+    forecast: {},
     chartData: {}
 }
 
@@ -17,13 +18,19 @@ export default function reduce(state = initialState, action = {}) {
             return {
                 ...state,
                 current: action.payload
-            };
+            }
+
+        case types.GET_FORECAST_DATA:
+            return {
+                ...state,
+                forecast: action.payload
+            }
 
         case types.GET_STAT_DATA:
             return {
                 ...state,
                 chartData: action.payload
-            };
+            }
 
         default:
             return state

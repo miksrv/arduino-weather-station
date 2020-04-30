@@ -12,7 +12,7 @@ const METEO_ENDPOINT = 'https://api.miksoft.pro'
 export function fetchMeteoData() {
     return async(dispatch) => {
         try {
-            const url = `${METEO_ENDPOINT}/get/general`;
+            const url = `${METEO_ENDPOINT}/get/general`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -20,9 +20,9 @@ export function fetchMeteoData() {
                 }
             });
 
-            const payload = await response.json();
+            const payload = await response.json()
 
-            dispatch({ type: types.GET_METEO_DATA, payload });
+            dispatch({ type: types.GET_METEO_DATA, payload })
         } catch (error) {
             console.error(error)
         }
@@ -32,7 +32,7 @@ export function fetchMeteoData() {
 export function fetchStatData() {
     return async(dispatch) => {
         try {
-            const url = `https://api.miksoft.pro/get/graphdata`;
+            const url = `${METEO_ENDPOINT}/get/graphdata`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -40,9 +40,29 @@ export function fetchStatData() {
                 }
             });
 
-            const payload = await response.json();
+            const payload = await response.json()
 
-            dispatch({ type: types.GET_STAT_DATA, payload });
+            dispatch({ type: types.GET_STAT_DATA, payload })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+}
+
+export function fetchForecastData() {
+    return async(dispatch) => {
+        try {
+            const url = `${METEO_ENDPOINT}/get/forecast`
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json'
+                }
+            });
+
+            const payload = await response.json()
+
+            dispatch({ type: types.GET_FORECAST_DATA, payload })
         } catch (error) {
             console.error(error)
         }

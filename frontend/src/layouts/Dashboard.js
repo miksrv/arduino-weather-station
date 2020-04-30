@@ -14,34 +14,33 @@ const Dashboard = (props) => {
         <Container className='tiles-list'>
             <Grid>
                 {sensors.map((item, key) => {
-                            switch (item.type) {
-                                case 'sensors': return (
-                                    <Sensor
-                                        key={key}
-                                        widget={item}
-                                        data={data[item.type][item.source]}
-                                    />
-                                )
+                    switch (item.type) {
+                        case 'sensors': return (
+                            <Sensor
+                                key={key}
+                                widget={item}
+                                data={data[item.type][item.source]}
+                            />
+                        )
 
-                                case 'sun': return (
-                                    <Sun
-                                        key={key}
-                                        widget={item}
-                                        data={data[item.type]}
-                                    />
-                                )
+                        case 'sun': return (
+                            <Sun
+                                key={key}
+                                widget={item}
+                                data={data[item.type]}
+                            />
+                        )
 
-                                case 'moon': return (
-                                    <Moon
-                                        key={key}
-                                        widget={item}
-                                        data={data[item.type]}
-                                    />
-                                )
+                        case 'moon': return (
+                            <Moon
+                                key={key}
+                                widget={item}
+                                data={data[item.type]}
+                            />
+                        )
 
-                                default: return null
-                            }
-
+                        default: return null
+                    }
                 }) || (
                     <Dimmer active>
                         <Loader>Загрузка</Loader>
