@@ -15,8 +15,8 @@ DHT dht(4, DHT22);
 // Lightmeter Initialization
 BH1750 lightmeter;
 
-// Wind direction Initialization (0x27 address)
-PCF8574 expander(0x27);
+// Wind direction Initialization (0x20 address)
+PCF8574 expander(0x20);
 
 long impulse;
 unsigned long timing; // Sensor Poll Countdown Timer
@@ -27,14 +27,14 @@ char temp1[6], temp2[6], mmHg[6], humd[6],
 // Network settings
 byte mac[] = { 0x38, 0x59, 0xF9, 0x6D, 0xD7, 0xFF }; // MAC-address
 IPAddress ip(10,10,1,100);                 // IP address of the device on the network
-char server[] = "api.miksoft.pro";
+char server[] = "api.miksoft.pro"; //{ 217, 107, 34, 252 };
 
 EthernetClient LAN;
 
 int ReadUVintensityPin = A0; //Output from the sensor
 
 // If the variable is not commented out, debug mode is activated, messages are sent to the serial port
-#define DEBUG
+// #define DEBUG
 
 
 
@@ -60,12 +60,12 @@ void setup() {
   dht.begin();
 
   // Port extender initialization
-//  expander.begin();
-//  delay(100);
-//  for (int i=0; i<8; i++) {
-//    expander.pinMode(i, INPUT_PULLUP);
-//    delay(50);
-//  }
+  expander.begin();
+  delay(100);
+  for (int i=0; i<8; i++) {
+    expander.pinMode(i, INPUT_PULLUP);
+    delay(50);
+  }
 
   Ethernet.begin(mac, ip);
   delay(1000);
@@ -94,7 +94,7 @@ void loop() {
     get_sensor_pressure();
     get_sensor_dht22();
     get_sensor_luxmeter();
-//    get_sensor_wind_direction();
+    get_sensor_wind_direction();
     get_sensor_anemometer();
 
     webclient_send_data();
@@ -139,7 +139,7 @@ void webclient_send_data() {
     #endif
 
     if (LAN.connect(server, 80)) {
-        LAN.println("POST https://api.miksoft.pro/set/data HTTP/1.0");
+        LAN.println("POST /set/data HTTP/1.1");
         LAN.println("Host: api.miksoft.pro");
         LAN.println("Content-Type: application/x-www-form-urlencoded");
         LAN.println("Connection: close");
@@ -232,7 +232,7 @@ void get_sensor_luxmeter() {
 void get_sensor_uvindex() {
   int uvLevel = averageAnalogRead(ReadUVintensityPin);
  
-  float outputVoltage = 5.0 * uvLevel / 1024;
+  float outputVoltage = 4.89 * uvLevel / 1024;
   float uvIntensity = mapfloat(outputVoltage, 0.99, 2.9, 0.0, 15.0);
 
   dtostrf(uvIntensity, 5, 2, uvindex);
