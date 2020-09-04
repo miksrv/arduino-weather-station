@@ -20,13 +20,14 @@ PCF8574 expander(0x20);
 
 long impulse;
 unsigned long timing; // Sensor Poll Countdown Timer
+const byte interruptPin = 4;
 char webclient_data[120];
 char temp1[6], temp2[6], mmHg[6], humd[6],
      lux[6], uvindex[5], wind_dir[2], wind_speed[2];
 
 // Network settings
 byte mac[] = { 0x38, 0x59, 0xF9, 0x6D, 0xD7, 0xFF }; // MAC-address
-IPAddress ip(10,10,1,100);                 // IP address of the device on the network
+IPAddress ip(10,10,2,9);                 // IP address of the device on the network
 char server[] = "api.miksoft.pro"; //{ 217, 107, 34, 252 };
 
 EthernetClient LAN;
@@ -45,6 +46,7 @@ void setup() {
     Serial.print("Program initialization...");
   #endif
 
+  pinMode(interruptPin, INPUT_PULLUP);
   pinMode(ReadUVintensityPin, INPUT);
   delay(200);
 
@@ -249,7 +251,7 @@ void get_sensor_uvindex() {
 void get_sensor_anemometer() {
     impulse = 0;
 
-    attachInterrupt(0, rpm, RISING);
+    attachInterrupt(interruptPin, rpm, RISING);
     delay(5000);
     detachInterrupt(0);
 
