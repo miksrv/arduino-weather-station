@@ -43,7 +43,14 @@ const Sensor = (params) => {
                         </Grid.Column>
                         <Grid.Column width={11}>
                             <div className='title'>{params.widget.name}</div>
-                            <div className='value'>{params.data.value}</div>
+                            <div className='value'>{params.data.value}
+                                {(typeof params.widget.sign !== 'undefined' && (
+                                    <span className='sign'>{params.widget.sign}</span>
+                                ))}
+                            </div>
+                            {(typeof params.data.info !== 'undefined' && (
+                                <div className='info'>({params.data.info})</div>
+                            ))}
                             {(params.widget.trend === true && params.data.trend !== 0 && (
                                 <div className='trend'>
                                     тренд: <TrendIcon className={(params.data.trend > 0 ? 'trend-up' : 'trend-down')} /> {params.data.trend > 0 ? '+' : ''} {params.data.trend}

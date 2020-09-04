@@ -207,8 +207,62 @@ class Get extends BaseController
 
         $_tmp = json_decode($raw_input);
         $_tmp->dp = $this->_calc_dew_point($_tmp->h, $_tmp->t2);
+        $_tmp->wd = $this->_calc_wind_deg($_tmp->wd);
+        $_tmp->uv = $_tmp->uv < 0 ? 0 : $_tmp->uv;
 
         return json_encode($_tmp);
+    }
+
+
+    /**
+     * @param $wind_value
+     * @param $text
+     * @return int
+     * Calculate wind deg
+     */
+    private function _calc_wind_deg($wind_value) {
+        $_wind_dir = [
+            1 => 0, 12 => 22, 2 => 45, 23 => 67, 3 => 90, 34 => 112,
+            4 => 135, 45 => 157, 5 => 180, 56 => 202, 6 => 225,
+            67 => 247,  7 => 270, 78 => 292, 8 => 315, 81 => 337
+        ];
+
+        return key_exists($wind_value, $_wind_dir) ? $_wind_dir[$wind_value] : 0;
+    }
+
+    private function _wind_deg_to_name($wind_deg) {
+        if ($wind_deg >= 337 && $wind_deg < 22)
+        {
+            return 'Север';
+        }
+        else if ($wind_deg >= 22 && $wind_deg < 67)
+        {
+            return 'Северо-восток';
+        }
+        else if ($wind_deg >= 67 && $wind_deg < 112)
+        {
+            return 'Восток';
+        }
+        else if ($wind_deg >= 112 && $wind_deg < 157)
+        {
+            return 'Юго-восток';
+        }
+        else if ($wind_deg >= 157 && $wind_deg < 202)
+        {
+            return 'Юг';
+        }
+        else if ($wind_deg >= 202 && $wind_deg < 247)
+        {
+            return 'Юго-запад';
+        }
+        else if ($wind_deg >= 247 && $wind_deg < 292)
+        {
+            return 'Запад';
+        }
+        else
+        {
+            return 'Северо-запад';
+        }
     }
 
     /**
@@ -298,6 +352,11 @@ class Get extends BaseController
             {
                 $temp[$sensorKey]->min = $sensorVal < $temp[$sensorKey]->min ? $sensorVal : $temp[$sensorKey]->min;
                 $temp[$sensorKey]->max = $sensorVal > $temp[$sensorKey]->max ? $sensorVal : $temp[$sensorKey]->max;
+
+                if ($sensorKey == 'wd')
+                {
+                    $temp[$sensorKey]->info = $this->_wind_deg_to_name($sensorVal);
+                }
 
                 if ($_avg_en)
                 {

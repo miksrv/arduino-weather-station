@@ -32,6 +32,7 @@ const Moon = (params) => {
         WaningCrescent6: WiMoonAltWaningCrescent6,
         WaningCrescent7: WiMoonAltWaningCrescent6,
         NewCrescent1: WiMoonAltWaningGibbous1,
+        WaningGibbous1: WiMoonAltNew,
         WaningGibbous2: WiMoonAltWaningGibbous2,
         WaningGibbous3: WiMoonAltWaningGibbous3,
         WaningGibbous4: WiMoonAltWaningGibbous4,
