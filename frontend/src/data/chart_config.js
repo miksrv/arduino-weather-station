@@ -6,7 +6,7 @@ const chart_config = {
         '#e6a241',
         '#7face6',
         '#9bbc2f',
-        '#9A8A7D'
+        '#9A8A7D',
     ],
     chart: {
         // backgroundColor: {
@@ -22,7 +22,7 @@ const chart_config = {
         },
         plotBorderColor: '#606063',
         marginTop: 30,
-        height: 300
+        height: 300,
     },
     title: {
         style: {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container } from 'semantic-ui-react'
+import { Container, Grid } from 'semantic-ui-react'
 import { WiDaySunny } from 'react-icons/wi'
 
 import moment from 'moment'
@@ -15,11 +15,26 @@ const Summary = (props) => {
             <Container className='main-content'>
                 <h1>Погодная станция</h1>
                 <h4>Оренбургская обл., c. Ивановка, ЖК "Приуралье"</h4>
-                <div className='current'>
-                    <WiDaySunny className='icon' />
-                    <span className='value'>{data.sensors.t1.value}</span>
-                    <span className='sign'>℃</span>
-                </div>
+                <Grid>
+                    <Grid.Row>
+                        <Grid.Column width={4}>
+                            <div className='current'>
+                                <WiDaySunny className='icon' />
+                                <span className='value'>{data.sensors.t1.value}</span>
+                                <span className='sign'>℃</span>
+                            </div>
+                        </Grid.Column>
+                        <Grid.Column width={2} className='minmax-value'>
+                            <div>max:
+                                <span className='value'>{data.sensors.t1.max}</span>
+                                <span className='sign'>℃</span></div>
+                            <div>min:
+                                <span className='value'>{data.sensors.t1.min}</span>
+                                <span className='sign'>℃</span>
+                            </div>
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
                 <div className='update'>Обновлено: {moment.unix(data.update).format("DD.MM.Y, H:mm:ss")}</div>
                 <div className='timeago'>Последние данные: {updateTimer}</div>
             </Container>

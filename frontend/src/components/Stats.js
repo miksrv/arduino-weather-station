@@ -1,10 +1,13 @@
 import React, { Component } from 'react'
-import { Container } from 'semantic-ui-react'
+import {Container, Grid} from 'semantic-ui-react'
 
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
+import HighchartsMore from 'highcharts/highcharts-more'
 
 import chart_config from '../data/chart_config'
+
+HighchartsMore(Highcharts)
 
 Highcharts.setOptions(Highcharts.theme = chart_config);
 
@@ -199,6 +202,85 @@ class Stats extends Component {
         }
 
       }]
+    },
+
+    chart3_Options: {
+      chart: {
+        polar: true
+      },
+
+      title: {
+        //text: 'Highcharts Polar Chart'
+      },
+
+      subtitle: {
+        //text: 'Also known as Radar Chart'
+      },
+
+      pane: {
+        startAngle: 0,
+        endAngle: 360
+      },
+
+      xAxis: {
+        tickInterval: 45,
+        min: 0,
+        max: 360,
+        labels: {
+          format: '{value}°',
+          style: {
+            color: Highcharts.theme.colors[0]
+          }
+        }
+      },
+
+      // yAxis: {
+      //   min: 0
+      // },
+
+      plotOptions: {
+        series: {
+          pointStart: 0,
+          pointInterval: 45
+        },
+        column: {
+          pointPadding: 0,
+          groupPadding: 0
+        }
+      },
+      tooltip: {
+        formatter: function() {
+          var tooltip = '111';
+
+          if (this.x == '0') {
+            return 'Север';
+          } else if (this.x == '45') {
+            return 'Северо-восток';
+          } else if (this.x == '90') {
+            return 'Восток';
+          } else if (this.x == '135') {
+            return 'Юго-восток';
+          } else if (this.x == '180') {
+            return 'Юг';
+          } else if (this.x == '225') {
+            return 'Юго-запад';
+          } else if (this.x == '270') {
+            return 'Запад';
+          } else {
+            return 'Северо-запад';
+          }
+
+          return tooltip;
+        }
+      },
+      series: [{
+        type: 'area',
+        name: 'Роза ветров',
+        color: Highcharts.theme.colors[0],
+        tooltip: {
+          valueSuffix: ''
+        }
+      }]
     }
   }
 
@@ -231,12 +313,17 @@ class Stats extends Component {
           { data: data.sensors.uv },
           { data: data.sensors.p }
         ]
+      },
+      chart3_Options: {
+        series: [
+          { data: data.sensors.wd }
+        ]
       }
     })
   }
 
   render() {
-    const { chart1_Options, chart2_Options } = this.state
+    const { chart1_Options, chart2_Options, chart3_Options } = this.state
 
     return (
         <Container className='main-content'>
@@ -249,6 +336,17 @@ class Stats extends Component {
               highcharts={Highcharts}
               options={chart2_Options}
           />
+          <br />
+          <Grid>
+            <Grid.Row>
+              <Grid.Column computer={8} tablet={8} mobile={16}>
+                <HighchartsReact
+                    highcharts={Highcharts}
+                    options={chart3_Options}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
         </Container>
     )
   }
