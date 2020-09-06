@@ -17,9 +17,11 @@ const Summary = (props) => {
                 <h4>Оренбургская обл., c. Ивановка, ЖК "Приуралье"</h4>
                 <Grid>
                     <Grid.Row>
-                        <Grid.Column width={4}>
+                        <Grid.Column width={1}>
+                            <WiDaySunny className='current-icon' />
+                        </Grid.Column>
+                        <Grid.Column width={3}>
                             <div className='current'>
-                                <WiDaySunny className='icon' />
                                 <span className='value'>{data.sensors.t1.value}</span>
                                 <span className='sign'>℃</span>
                             </div>

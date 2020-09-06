@@ -126,6 +126,7 @@ class Get extends BaseController
         $_counter   = 0; // Счетчик итераций
         $_prev_time = 0; // Изначальное время первой итерации
         $_temp_val  = []; // Массив средних значений
+        $_temp_wd   = [0, 0, 0, 0, 0, 0, 0, 0]; // Массив направлений ветра (8 направлений)
 
         // Если период - день, то достаточно значения раз в 10 мин
         foreach ($this->_data as $num => $item)
@@ -145,6 +146,12 @@ class Get extends BaseController
                 foreach ($_temp_val as $_key => $_val)
                 {
                     if ($_key === 'timestamp')
+                    {
+                        continue;
+                    }
+
+                    // Для графика направления ветра значения timestamp не нужны
+                    if ($_key === 'wd')
                     {
                         continue;
                     }
@@ -171,6 +178,48 @@ class Get extends BaseController
                     $_temp_val[$key] = 0;
                 }
 
+                // Определяем направление ветра
+                if ($key === 'wd')
+                {
+                    $_tmp_wind_position = 0;
+
+                    if (($val >= 337 && $val < 22) || $val == 0)
+                    {
+                        $_tmp_wind_position = 0;
+                    }
+                    else if ($val >= 22 && $val < 67)
+                    {
+                        $_tmp_wind_position = 1;
+                    }
+                    else if ($val >= 67 && $val < 112)
+                    {
+                        $_tmp_wind_position = 2;
+                    }
+                    else if ($val >= 112 && $val < 157)
+                    {
+                        $_tmp_wind_position = 3;
+                    }
+                    else if ($val >= 157 && $val < 202)
+                    {
+                        $_tmp_wind_position = 4;
+                    }
+                    else if ($val >= 202 && $val < 247)
+                    {
+                        $_tmp_wind_position = 5;
+                    }
+                    else if ($val >= 247 && $val < 292)
+                    {
+                        $_tmp_wind_position = 6;
+                    }
+                    else if ($val >= 292 && $val < 337)
+                    {
+                        $_tmp_wind_position = 7;
+                    }
+
+                    $_temp_wd[$_tmp_wind_position]++;
+                    continue;
+                }
+
                 $_temp_val[$key] += $val;
             }
 
@@ -182,6 +231,18 @@ class Get extends BaseController
             $_temp_val['timestamp'] += strtotime($item->item_timestamp);
             $_counter++;
         }
+
+        $tmp = $_temp_wd;
+        $wind_dir = [];
+
+        sort($tmp);
+
+        foreach ($_temp_wd as $key => $val)
+        {
+            $wind_dir[$key] = array_search($val, $tmp);
+        }
+
+        $_result['wd'] = $wind_dir;
 
         return $this->_data = $_result;
     }
@@ -207,7 +268,7 @@ class Get extends BaseController
 
         $_tmp = json_decode($raw_input);
         $_tmp->dp = $this->_calc_dew_point($_tmp->h, $_tmp->t2);
-        $_tmp->wd = $this->_calc_wind_deg($_tmp->wd);
+        $_tmp->wd = $this->_calc_wind_deg((int) $_tmp->wd);
         $_tmp->uv = $_tmp->uv < 0 ? 0 : $_tmp->uv;
 
         return json_encode($_tmp);
@@ -231,7 +292,7 @@ class Get extends BaseController
     }
 
     private function _wind_deg_to_name($wind_deg) {
-        if ($wind_deg >= 337 && $wind_deg < 22)
+        if (($wind_deg >= 337 && $wind_deg < 22) || $wind_deg == 0)
         {
             return 'Север';
         }
@@ -259,7 +320,7 @@ class Get extends BaseController
         {
             return 'Запад';
         }
-        else
+        else if ($wind_deg >= 292 && $wind_deg < 337)
         {
             return 'Северо-запад';
         }
@@ -353,11 +414,6 @@ class Get extends BaseController
                 $temp[$sensorKey]->min = $sensorVal < $temp[$sensorKey]->min ? $sensorVal : $temp[$sensorKey]->min;
                 $temp[$sensorKey]->max = $sensorVal > $temp[$sensorKey]->max ? $sensorVal : $temp[$sensorKey]->max;
 
-                if ($sensorKey == 'wd')
-                {
-                    $temp[$sensorKey]->info = $this->_wind_deg_to_name($sensorVal);
-                }
-
                 if ($_avg_en)
                 {
                     $temp[$sensorKey]->trend += $sensorVal;
@@ -392,6 +448,11 @@ class Get extends BaseController
                 'max'   => $val,
                 'min'   => $val
             ];
+
+            if ($key == 'wd')
+            {
+                $_tmp[$key]->info = $this->_wind_deg_to_name($val);
+            }
         }
 
         return $_tmp;
