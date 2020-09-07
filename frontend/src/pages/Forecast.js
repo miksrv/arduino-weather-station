@@ -9,8 +9,6 @@ import moment from "moment";
 import * as meteoActions from '../store/meteostation/actions'
 
 import _ from 'lodash'
-import Stats from "../components/Stats";
-import sensors from "../data/sensors";
 
 class Forecast extends Component {
 

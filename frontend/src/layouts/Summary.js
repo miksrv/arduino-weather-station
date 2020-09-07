@@ -10,23 +10,23 @@ const Summary = (props) => {
     return (
         <div className='summary'>
             <div className='background-overlay'>
-                <div className='background-image' style={{backgroundImage: 'url(/background/spring-sunrise.jpg)'}}></div>
+                <div className='background-image' style={{backgroundImage: 'url(/background/autumn-day.jpg)'}}></div>
             </div>
             <Container className='main-content'>
                 <h1>Погодная станция</h1>
                 <h4>Оренбургская обл., c. Ивановка, ЖК "Приуралье"</h4>
                 <Grid>
-                    <Grid.Row>
-                        <Grid.Column width={1}>
+                    <Grid.Row className='current-grid'>
+                        <Grid.Column width={2}>
                             <WiDaySunny className='current-icon' />
                         </Grid.Column>
-                        <Grid.Column width={3}>
+                        <Grid.Column width={5}>
                             <div className='current'>
                                 <span className='value'>{data.sensors.t1.value}</span>
                                 <span className='sign'>℃</span>
                             </div>
                         </Grid.Column>
-                        <Grid.Column width={2} className='minmax-value'>
+                        <Grid.Column width={4} className='minmax-value'>
                             <div>max:
                                 <span className='value'>{data.sensors.t1.max}</span>
                                 <span className='sign'>℃</span></div>
