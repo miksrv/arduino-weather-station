@@ -21,11 +21,19 @@ class SensorData extends Model
 
     /**
      * Return sensor data in period
+     * #TODO Optimize
      * @return mixed
      */
-    public function get_period()
+    public function get_period($period = 'today')
     {
-        $interval = '`item_timestamp` >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
+        switch ($period) {
+            case 'today'     : $period = 'DATE_SUB(NOW(), INTERVAL 1 DAY)'; break;
+            case 'yesterday' : $period = 'CURDATE() - INTERVAL 1 DAY'; break;
+            case 'week'      : $period = 'DATE_SUB(NOW(), INTERVAL 7 DAY)'; break;
+            case 'month'     : $period = 'DATE_SUB(NOW(), INTERVAL 30 DAY)'; break;
+        }
+
+        $interval = '`item_timestamp` >= ' . $period;
 
         return $this->db->table($this->table)
                     ->where($interval)

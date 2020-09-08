@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Container, Grid} from 'semantic-ui-react'
+import { Container, Grid, Button } from 'semantic-ui-react'
 
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
@@ -289,9 +289,9 @@ class Stats extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    // if (this.props.data.update !== prevProps.data.update) {
-    //   this.handleUpdateCharts()
-    // }
+    if (this.props.data !== prevProps.data) {
+      this.handleUpdateCharts()
+    }
   }
 
   handleUpdateCharts() {
@@ -322,11 +322,23 @@ class Stats extends Component {
     })
   }
 
+  setPeriodHandler = ( period ) => {
+    this.props.onChangePeriod( period )
+  }
+
   render() {
     const { chart1_Options, chart2_Options, chart3_Options } = this.state
 
     return (
         <Container className='main-content'>
+          <div className='toolBar'>
+            <Button.Group size='mini'>
+              <Button onClick={() => this.setPeriodHandler('today')}>Сегодня</Button>
+              <Button onClick={() => this.setPeriodHandler('yesterday')}>Вчера</Button>
+              <Button onClick={() => this.setPeriodHandler('week')}>Неделя</Button>
+              <Button onClick={() => this.setPeriodHandler('month')}>Месяц</Button>
+            </Button.Group>
+          </div>
           <HighchartsReact
               highcharts={Highcharts}
               options={chart1_Options}

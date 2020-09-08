@@ -10,4 +10,7 @@ Options -MultiViews
   RewriteCond %{REQUEST_FILENAME} !-l
   RewriteRule . /index.html [L]
 
+  RewriteCond %{ENV:HTTPS} !on
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
 </IfModule>

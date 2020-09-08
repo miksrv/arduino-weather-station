@@ -31,10 +31,10 @@ export function fetchMeteoData() {
     }
 }
 
-export function fetchStatData() {
+export function fetchStatData(period = 'today') {
     return async(dispatch) => {
         try {
-            const url = `${METEO_ENDPOINT}/get/graphdata`
+            const url = `${METEO_ENDPOINT}/get/graphdata?period=${period}`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {

@@ -78,22 +78,22 @@ class Forecast extends Component {
                                     </Table.Cell>
                                     <Table.Cell>{moment.unix(item.dt).format("DD.MM.Y H:mm")}</Table.Cell>
                                     <Table.Cell>{item.weather[0].description}</Table.Cell>
-                                    <Table.Cell textAlign='center'>
+                                    <Table.Cell>
                                         {this.valueColor(Number((item.main.temp).toFixed(1)))}
                                     </Table.Cell>
-                                    <Table.Cell textAlign='center'>
+                                    <Table.Cell>
                                         {this.valueColor(Number((item.main.feels_like).toFixed(1)))}
                                     </Table.Cell>
-                                    <Table.Cell textAlign='center'>
+                                    <Table.Cell>
                                         {item.main.humidity}
                                     </Table.Cell>
-                                    <Table.Cell textAlign='center'>
+                                    <Table.Cell>
                                         {Number((item.main.pressure * 0.75).toFixed(1))}
                                     </Table.Cell>
-                                    <Table.Cell textAlign='center'>
+                                    <Table.Cell>
                                         {Number((item.wind.speed).toFixed(1))}
                                     </Table.Cell>
-                                    <Table.Cell textAlign='center'>
+                                    <Table.Cell>
                                         {item.wind.deg}°
                                     </Table.Cell>
                                 </Table.Row>

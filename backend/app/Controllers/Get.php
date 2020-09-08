@@ -8,6 +8,7 @@ class Get extends BaseController
 
     protected $_data;
     protected $_updated;
+    protected $_period = ['today', 'yesterday', 'week', 'month'];
 
     /**
      * Receives data from a weather station, checks a token, enters data into a storage
@@ -36,9 +37,11 @@ class Get extends BaseController
     public function graphdata()
     {
         $dataModel = model('App\Models\SensorData');
+        $period = $this->request->getGet('period');
+        $period = ! in_array($period, $this->_period) ? $this->_period[0] : $period;
 
-        $this->_data = $dataModel->get_period();
-        $this->_make_graph_data();
+        $this->_data = $dataModel->get_period($period);
+        $this->_make_graph_data($period);
 
         $this->response
             ->setJSON([
@@ -113,7 +116,7 @@ class Get extends BaseController
      * Make and return graph data array
      * @return array|void
      */
-    protected function _make_graph_data()
+    protected function _make_graph_data($period)
     {
         if (empty($this->_data))
         {
@@ -121,12 +124,18 @@ class Get extends BaseController
         }
 
         $_result = [];
-        $_period = 'day';
 
         $_counter   = 0; // Счетчик итераций
         $_prev_time = 0; // Изначальное время первой итерации
         $_temp_val  = []; // Массив средних значений
         $_temp_wd   = [0, 0, 0, 0, 0, 0, 0, 0]; // Массив направлений ветра (8 направлений)
+
+        switch ($period) {
+            case 'today'     :
+            case 'yesterday' : $period = '600'; break;
+            case 'week'      : $period = '3600'; break;
+            case 'month'     : $period = '18000'; break;
+        }
 
         // Если период - день, то достаточно значения раз в 10 мин
         foreach ($this->_data as $num => $item)
@@ -141,7 +150,7 @@ class Get extends BaseController
             // ------------------------------------------------------------
             // Если время между первой и текущей итерацией больше или равно
             // 10 мин (для одного дня - 10 мин усреднение)
-            if ($_prev_time - strtotime($item->item_timestamp) >= 600)
+            if ($_prev_time - strtotime($item->item_timestamp) >= $period)
             {
                 foreach ($_temp_val as $_key => $_val)
                 {

@@ -13,16 +13,19 @@ class Charts extends Component {
 
     state = {
         intervalId: null,
-        autoUpdate: false
+        autoUpdate: false,
+        period: 'today',
+        update: false
     }
 
     componentDidMount() {
         const { dispatch } = this.props
+        const { period } = this.state
         const autoUpdate = localStorage.getItem('autoUpdate') === 'true'
 
         this.setState({autoUpdate: autoUpdate})
 
-        dispatch(meteoActions.fetchStatData())
+        dispatch(meteoActions.fetchStatData(period))
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -50,7 +53,8 @@ class Charts extends Component {
      */
     timerControl = () => {
         const { autoUpdate, intervalId } = this.state
-        // const { dispatch } = this.props
+        const { period } = this.state
+        const { dispatch } = this.props
 
         if (autoUpdate) {
             const intervalId = setInterval(() => {
@@ -66,9 +70,25 @@ class Charts extends Component {
         }
     }
 
+    changePeriod = ( period ) => {
+        const { dispatch } = this.props
+
+        // , update: true
+        this.setState({ period })
+
+        if ( period !== this.state.period ) {
+            dispatch(meteoActions.fetchStatData(period))
+        }
+    }
+
+    // #TODO Not working
+    loaderOff = () => {
+        this.setState({ update: false })
+    }
+
     render() {
         const { chartData } = this.props
-        const { autoUpdate } = this.state
+        const { autoUpdate, update } = this.state
 
         return (
             <div>
@@ -78,8 +98,11 @@ class Charts extends Component {
                 />
                 <br />
                 <Container className='main-content'>
-                    { ! _.isEmpty(chartData) ? (
-                        <Stats data={chartData} />
+                    { (! _.isEmpty(chartData) && ! update) ? (
+                        <Stats
+                            data={chartData}
+                            onChangePeriod={this.changePeriod}
+                        />
                     ) : (
                         <Dimmer active>
                             <Loader>Загрузка</Loader>
