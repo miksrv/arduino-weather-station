@@ -22,8 +22,6 @@ export function fetchMeteoData() {
 
             const payload = await response.json()
 
-            console.log(payload);
-
             dispatch({ type: types.GET_METEO_DATA, payload })
         } catch (error) {
             console.error(error)

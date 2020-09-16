@@ -76,16 +76,6 @@ const data = [
     icon: 'winspeed',
     trend: true,
     sign: 'м/с'
-  },
-  {
-    type: 'sun',
-    name: 'Световой день',
-    color: 'yellow',
-    icon: 'sunrise'
-  },
-  {
-    type: 'moon',
-    color: 'brown'
   }
 ]
 

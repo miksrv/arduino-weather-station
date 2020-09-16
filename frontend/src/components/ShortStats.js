@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, Grid, Button } from 'semantic-ui-react'
+import { Grid } from 'semantic-ui-react'
 
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
@@ -11,11 +11,10 @@ HighchartsMore(Highcharts)
 
 Highcharts.setOptions(Highcharts.theme = chart_config);
 
-class Stats extends Component {
+class ShortStats extends Component {
 
   state = {
-    liveUpdate: true,
-    chart1_Options: {
+    chartTempHumd: {
       xAxis: [{
         type: 'datetime',
         dateTimeLabelFormats: {
@@ -32,7 +31,7 @@ class Stats extends Component {
           }
         },
         title: {
-          text: 'Температура',
+          text: '', // Температура
           style: {
             color: Highcharts.theme.colors[1]
           }
@@ -41,7 +40,7 @@ class Stats extends Component {
       }, {
         gridLineWidth: 0,
         title: {
-          text: 'Влажность',
+          text: '', // Влажность
           style: {
             color: Highcharts.theme.colors[0]
           }
@@ -55,24 +54,7 @@ class Stats extends Component {
         opposite: true,
         min: 0,
         max: 90,
-      }, {
-          gridLineWidth: 0,
-          title: {
-            text: 'Скорость ветра',
-            style: {
-              color: Highcharts.theme.colors[6]
-            }
-          },
-          labels: {
-            format: '{value} м/с',
-            style: {
-              color: Highcharts.theme.colors[6]
-            }
-          },
-          opposite: true,
-          min: 0,
-          max: 10,
-        }],
+      }],
       series: [{
         name: 'Влажность',
         type: 'area',
@@ -100,21 +82,9 @@ class Stats extends Component {
         tooltip: {
           valueSuffix: ' °C'
         }
-      }, {
-        name: 'Скорость ветра',
-        type: 'column',
-        yAxis: 2,
-        pointWidth: 4,
-        borderWidth: 0.4,
-        // data: data.ws,
-        color: Highcharts.theme.colors[6],
-        tooltip: {
-          valueSuffix: ' м/с'
-        }
       }]
     },
-
-    chart2_Options: {
+    chartLuxPress: {
       xAxis: [{
         type: 'datetime',
         dateTimeLabelFormats: {
@@ -131,7 +101,7 @@ class Stats extends Component {
           }
         },
         title: {
-          text: 'Освещенность (lux)',
+          text: '', // Освещенность (lux)
           style: {
             color: Highcharts.theme.colors[3]
           }
@@ -140,7 +110,7 @@ class Stats extends Component {
       }, {
         gridLineWidth: 0,
         title: {
-          text: 'UV (мВт/см^2)',
+          text: '', // UV (мВт/см^2)
           style: {
             color: Highcharts.theme.colors[5]
           }
@@ -154,7 +124,7 @@ class Stats extends Component {
       }, {
         gridLineWidth: 0,
         title: {
-          text: 'Атмосферное давление (мм.рт.ст.)',
+          text: '', // Атмосферное давление (мм.рт.ст.)
           style: {
             color: Highcharts.theme.colors[4]
           }
@@ -203,8 +173,43 @@ class Stats extends Component {
 
       }]
     },
-
-    chart3_Options: {
+    chartWindSpeed: {
+      xAxis: [{
+        type: 'datetime',
+        dateTimeLabelFormats: {
+          month: '%e %b, %Y',
+          year: '%b'
+        },
+        gridLineWidth: 1
+      }],
+      yAxis: [{
+        gridLineWidth: 1,
+        title: {
+          text: '',
+          style: {
+            color: Highcharts.theme.colors[6]
+          }
+        },
+        labels: {
+          format: '{value} м/с',
+          style: {
+            color: Highcharts.theme.colors[6]
+          }
+        }
+      }],
+      series: [{
+        name: 'Скорость ветра',
+        type: 'column',
+        pointWidth: 4,
+        borderWidth: 0.4,
+        // data: data.ws,
+        color: Highcharts.theme.colors[6],
+        tooltip: {
+          valueSuffix: ' м/с'
+        }
+      }]
+    },
+    chartWindDir: {
       chart: {
         polar: true
       },
@@ -298,25 +303,29 @@ class Stats extends Component {
     const { data } = this.props
 
     this.setState({
-      chart1_Options: {
-        ...this.state.chart1_Options,
+      chartTempHumd: {
+        ...this.state.chartTempHumd,
         series: [
           { data: data.sensors.h },
           { data: data.sensors.t2 },
-          { data: data.sensors.dp },
-          { data: data.sensors.ws }
+          { data: data.sensors.dp }
         ]
       },
-      chart2_Options: {
+      chartLuxPress: {
         series: [
           { data: data.sensors.lux },
           { data: data.sensors.uv },
           { data: data.sensors.p }
         ]
       },
-      chart3_Options: {
+      chartWindDir: {
         series: [
           { data: data.sensors.wd }
+        ]
+      },
+      chartWindSpeed: {
+        series: [
+          { data: data.sensors.ws }
         ]
       }
     })
@@ -327,41 +336,45 @@ class Stats extends Component {
   }
 
   render() {
-    const { chart1_Options, chart2_Options, chart3_Options } = this.state
+    const { chartTempHumd, chartLuxPress, chartWindDir, chartWindSpeed } = this.state
 
     return (
-        <Container className='main-content'>
-          <div className='toolBar'>
-            <Button.Group size='mini'>
-              <Button onClick={() => this.setPeriodHandler('today')}>Сегодня</Button>
-              <Button onClick={() => this.setPeriodHandler('yesterday')}>Вчера</Button>
-              <Button onClick={() => this.setPeriodHandler('week')}>Неделя</Button>
-              <Button onClick={() => this.setPeriodHandler('month')}>Месяц</Button>
-            </Button.Group>
-          </div>
-          <HighchartsReact
-              highcharts={Highcharts}
-              options={chart1_Options}
-          />
-          <br />
-          <HighchartsReact
-              highcharts={Highcharts}
-              options={chart2_Options}
-          />
-          <br />
+        <section className='chart'>
           <Grid>
             <Grid.Row>
-              <Grid.Column computer={8} tablet={8} mobile={16}>
+              <Grid.Column computer={8} tablet={16} mobile={16} className='chart-container'>
                 <HighchartsReact
                     highcharts={Highcharts}
-                    options={chart3_Options}
+                    options={chartTempHumd}
+                />
+              </Grid.Column>
+              <Grid.Column computer={8} tablet={16} mobile={16} className='chart-container'>
+                <HighchartsReact
+                    highcharts={Highcharts}
+                    options={chartWindSpeed}
                 />
               </Grid.Column>
             </Grid.Row>
           </Grid>
-        </Container>
+          <Grid>
+            <Grid.Row>
+              <Grid.Column computer={10} tablet={8} mobile={16} className='chart-container'>
+                <HighchartsReact
+                    highcharts={Highcharts}
+                    options={chartLuxPress}
+                />
+              </Grid.Column>
+              <Grid.Column computer={6} tablet={8} mobile={16} className='chart-container'>
+                <HighchartsReact
+                    highcharts={Highcharts}
+                    options={chartWindDir}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </section>
     )
   }
 }
 
-export default Stats
+export default ShortStats

@@ -16,11 +16,13 @@ const chart_config = {
         //     [1, '#3e3e40']
         //   ]
         // },
-        backgroundColor: '#2a2a2b',
+        borderRadius: '5',
+        shadow: false,
+        backgroundColor: '#373737',
         style: {
             // fontFamily: '\'Unica One\', sans-serif'
         },
-        plotBorderColor: '#606063',
+        plotBorderColor: '#373737',
         marginTop: 30,
         height: 300,
     },
@@ -122,7 +124,7 @@ const chart_config = {
         layout: 'vertical',
         align: 'left',
         verticalAlign: 'top',
-        x: 80,
+        x: 50,
         y: 8,
         floating: true,
     },

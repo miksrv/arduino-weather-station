@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Container, Dimmer, Loader } from 'semantic-ui-react'
 
 import Header from '../components/Header'
-import Stats from '../components/Stats'
+import ShortStats from '../components/ShortStats'
 
 import * as meteoActions from '../store/meteostation/actions'
 
@@ -99,7 +99,7 @@ class Charts extends Component {
                 <br />
                 <Container className='main-content'>
                     { (! _.isEmpty(chartData) && ! update) ? (
-                        <Stats
+                        <ShortStats
                             data={chartData}
                             onChangePeriod={this.changePeriod}
                         />

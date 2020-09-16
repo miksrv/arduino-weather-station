@@ -17,6 +17,7 @@ import Footer from './layouts/Footer'
 import Main from './pages/Main'
 import Charts from './pages/Charts'
 import Forecast from './pages/Forecast'
+import Dashboard from './pages/Dashboard'
 import Error404 from './pages/Error404'
 
 const store = createStore(combineReducers(reducers), applyMiddleware(thunk))
@@ -28,6 +29,7 @@ ReactDOM.render(
                 <Route exact path="/" component={Main} />
                 <Route path="/charts" component={Charts} />
                 <Route path="/forecast" component={Forecast} />
+                <Route path="/dashboard" component={Dashboard} />
                 <Route component={Error404} />
             </Switch>
         </BrowserRouter>
