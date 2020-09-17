@@ -94,14 +94,14 @@ class Header extends Component {
                         <nav className='navigation'>
                             <NavLink exact to='/'>Сводка</NavLink>
                             <NavLink to='/dashboard' activeClassName='active'>Датчики</NavLink>
-                            {/*<NavLink to='/statistic' activeClassName='active'>Статистика</NavLink>*/}
-                            {/*<NavLink to='/forecast' activeClassName='active'>Прогноз</NavLink>*/}
+                            <NavLink to='/statistic' activeClassName='active'>Статистика</NavLink>
+                            <NavLink to='/forecast' activeClassName='active'>Прогноз</NavLink>
                         </nav>
                         <div className='update-container'>
                             <Checkbox
                                 toggle
                                 checked={autoUpdate}
-                                label='Автообновление'
+                                label=''
                                 onChange={this.handleChangeAutoupdate}
                                 className='update-switch'
                             />

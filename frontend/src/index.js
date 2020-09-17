@@ -15,7 +15,7 @@ import './static/css/main.sass'
 import Footer from './layouts/Footer'
 
 import Main from './pages/Main'
-import Charts from './pages/Charts'
+import Statistic from './pages/Statistic'
 import Forecast from './pages/Forecast'
 import Dashboard from './pages/Dashboard'
 import Error404 from './pages/Error404'
@@ -27,7 +27,7 @@ ReactDOM.render(
         <BrowserRouter>
             <Switch>
                 <Route exact path="/" component={Main} />
-                <Route path="/charts" component={Charts} />
+                <Route path="/statistic" component={Statistic} />
                 <Route path="/forecast" component={Forecast} />
                 <Route path="/dashboard" component={Dashboard} />
                 <Route component={Error404} />

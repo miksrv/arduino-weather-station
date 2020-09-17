@@ -37,7 +37,7 @@ body
     color: $main-color !important
 
 .update-switch
-    margin-top: 8px
+    margin-top: 12px
 
 .active
     font-weight: 900
@@ -165,7 +165,7 @@ body
         color: $second-color
 
     .image
-        margin: -.2em auto -.4em
+        margin: -.1em auto -.4em
         font-size: 6em
 
     .temp, .wind
@@ -271,9 +271,10 @@ body
             display: block
             background-repeat: no-repeat
             background-size: cover
+            background-position: center
             width: 100%
             height: inherit
-            filter: blur(3px)
+            filter: blur(2px)
             opacity: .7
 
     .content
@@ -284,10 +285,20 @@ body
 
         h4
             margin-top: .4vh
+            margin-bottom: 3vh
             font-weight: 400
 
-    .main-info
-        max-width: 500px
+    .main-info, .second-info
+        margin-top: 1em
+        min-width: 500px
+
+        > div
+            display: inline-block
+            margin-right: 1em
+            vertical-align: top
+
+    .second-info
+        margin-top: -1em
 
     .grid
         .column
@@ -296,10 +307,12 @@ body
     .value
         font-weight: 100
         font-size: 2.5em
+        margin-right: .3em !important
 
     .summary-icon
         font-size: 5em
         margin-top: -.2em
+        margin-right: 0em !important
 
         .icon-float
             float: left

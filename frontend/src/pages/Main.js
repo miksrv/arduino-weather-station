@@ -4,7 +4,7 @@ import { Container, Dimmer, Loader } from 'semantic-ui-react'
 
 import Header from '../components/Header'
 import Summary from '../layouts/Summary'
-import ShortForecast from '../layouts/ShortForecast'
+import ForeacstTile from '../layouts/ForeacstTile'
 
 import * as meteoActions from '../store/meteostation/actions'
 
@@ -44,8 +44,8 @@ class Main extends Component {
                             dWindDir={current.sensors.wd.info}
                             openWeatherData={forecast.data[0]}
                         />
-                        <ShortForecast
-                            data={forecast}
+                        <ForeacstTile
+                            data={forecast.data.slice(0, 4)}
                         />
                     </Container>
                 ) : (
