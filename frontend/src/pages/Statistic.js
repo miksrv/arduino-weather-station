@@ -27,7 +27,6 @@ class Statistic extends Component {
 
     changePeriod = ( period ) => {
         const { dispatch } = this.props
-        const { loader } = this.state
 
         if ( period !== this.state.period ) {
             this.setState({ loader: true, period })

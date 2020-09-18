@@ -6,6 +6,7 @@ import HighchartsReact from 'highcharts-react-official'
 import HighchartsMore from 'highcharts/highcharts-more'
 
 import chart_config from '../data/chart_config'
+import windDirection from '../data/windDirection'
 
 HighchartsMore(Highcharts)
 
@@ -255,27 +256,7 @@ class ShortStats extends Component {
       },
       tooltip: {
         formatter: function() {
-          var tooltip = '111';
-
-          if (this.x == '0') {
-            return 'Север';
-          } else if (this.x == '45') {
-            return 'Северо-восток';
-          } else if (this.x == '90') {
-            return 'Восток';
-          } else if (this.x == '135') {
-            return 'Юго-восток';
-          } else if (this.x == '180') {
-            return 'Юг';
-          } else if (this.x == '225') {
-            return 'Юго-запад';
-          } else if (this.x == '270') {
-            return 'Запад';
-          } else {
-            return 'Северо-запад';
-          }
-
-          return tooltip;
+          return windDirection(this.x)
         }
       },
       series: [{

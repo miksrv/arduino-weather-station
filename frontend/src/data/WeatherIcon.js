@@ -1,5 +1,9 @@
+/**
+ * React weather icons: https://react-icons.netlify.com/#/icons/wi
+ */
+
 import React from 'react'
-import { WiThunderstorm, WiRainMix, WiRain, WiSnowWind, WiFog, WiDaySunny, WiCloud, WiAlien } from 'react-icons/wi'
+import { WiThunderstorm, WiRainMix, WiRain, WiSnowWind, WiFog, WiDaySunny, WiCloud, WiAlien, WiDayCloudy, WiDayCloudyHigh } from 'react-icons/wi'
 
 const WeatherIcon = props => {
     switch (props.code.toString()[0]) {
@@ -22,6 +26,13 @@ const WeatherIcon = props => {
             switch (props.code.toString()[2]) {
                 case '0':
                     return <WiDaySunny />
+
+                case '2':
+                case '3':
+                    return <WiDayCloudy />
+
+                case '4':
+                    return <WiDayCloudyHigh />
 
                 default:
                     return <WiCloud />
