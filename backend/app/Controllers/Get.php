@@ -31,6 +31,7 @@ class Get extends BaseController
         exit();
     }
 
+
     /**
      * Returns an array of data for plotting
      */

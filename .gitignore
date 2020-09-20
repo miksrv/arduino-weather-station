@@ -142,7 +142,7 @@ nb-configuration.xml
 /backend/writable/cache
 /backend/writable/debugbar
 
-
+..gitignore.swp
 # testing
 /frontend/coverage
 
