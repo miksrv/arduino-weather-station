@@ -3,7 +3,9 @@
  */
 
 import React from 'react'
-import { WiThunderstorm, WiRainMix, WiRain, WiSnowWind, WiFog, WiDaySunny, WiCloud, WiAlien, WiDayCloudy, WiDayCloudyHigh } from 'react-icons/wi'
+import { WiThunderstorm, WiRainMix, WiRain, WiSnowWind, WiFog, WiDaySunny, WiCloud, WiAlien, WiDayCloudy, WiDayCloudyHigh,
+         WiDaySleet, WiDayShowers, WiDayRain, WiDayRainWind, WiSnow, WiNightSleet, WiNightShowers, WiNightRain,
+         WiNightRainWind } from 'react-icons/wi'
 
 const WeatherIcon = props => {
     switch (props.code.toString()[0]) {
@@ -14,7 +16,41 @@ const WeatherIcon = props => {
             return <WiRainMix />
 
         case '5': // Rain
-            return <WiRain />
+            switch (props.code.toString()[1]) {
+                case '0':
+                    switch (props.code.toString()[2]) {
+                        case '0': // light rain
+                            return <WiDaySleet />
+                        case '1': // moderate rain
+                        case '2': // heavy intensity rain
+                            return <WiDayShowers />
+                        case '3': // very heavy rain
+                            return <WiDayRain />
+                        default: // extreme rain
+                            return <WiDayRainWind />
+                    }
+
+                case '1': // freezing rain
+                    return <WiSnow />
+
+                case '2':
+                    switch (props.code.toString()[2]) {
+                        case '0': // light intensity shower rain
+                            return <WiNightSleet />
+                        case '1': // shower rain
+                        case '2': // heavy intensity shower rain
+                            return <WiNightShowers />
+                        case '3': // very heavy rain
+                            return <WiNightRain />
+                        default: // ragged shower rain
+                            return <WiNightRainWind />
+                    }
+
+
+
+                default:
+                    return <WiRain />
+            }
 
         case '6': // Snow
             return <WiSnowWind />

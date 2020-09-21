@@ -71,7 +71,7 @@ class ShortStats extends Component {
         },
         opposite: true,
         min: 0,
-        max: 10,
+        max: 15,
       }],
       series: [{
         name: 'Влажность',
@@ -206,20 +206,10 @@ class ShortStats extends Component {
       chart: {
         polar: true
       },
-
-      title: {
-        //text: 'Highcharts Polar Chart'
-      },
-
-      subtitle: {
-        //text: 'Also known as Radar Chart'
-      },
-
       pane: {
         startAngle: 0,
         endAngle: 360
       },
-
       xAxis: {
         tickInterval: 45,
         min: 0,
@@ -231,11 +221,6 @@ class ShortStats extends Component {
           }
         }
       },
-
-      // yAxis: {
-      //   min: 0
-      // },
-
       plotOptions: {
         series: {
           pointStart: 0,

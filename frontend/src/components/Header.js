@@ -4,6 +4,8 @@ import { Checkbox, Container } from 'semantic-ui-react'
 
 import moment from 'moment'
 
+import timeAgo from '../data/timeAgo'
+
 class Header extends Component {
 
     state = {
@@ -81,8 +83,10 @@ class Header extends Component {
 
         this.setState({
             lastUpdate: moment.unix(updateTime).fromNow()
-        });
+        })
     }
+
+
 
     render() {
         const { autoUpdate, lastUpdate } = this.state
@@ -109,7 +113,8 @@ class Header extends Component {
                     </div>
                     <div className='update-info'>
                         <span className={((lastUpdate - moment().unix() < 180 && autoUpdate) ? 'online' : 'offline')}></span>
-                        Обновлено: {moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss")}, {moment.unix(lastUpdate).fromNow()}
+                        Обновлено: {moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss")}, {timeAgo(lastUpdate - moment().unix())}
+                        {/*{moment.unix(lastUpdate).fromNow()}*/}
                     </div>
                 </div>
             </Container>

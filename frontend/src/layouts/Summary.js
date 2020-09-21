@@ -39,7 +39,7 @@ const Summary = (props) => {
                             <WiHumidity className='icon' /> {dHumidity}%
                         </div>
                         <div>
-                            <WiBarometer className='icon' /> {dPressure} мм.рт.ст.
+                            <WiBarometer className='icon' /> {dPressure} мм.
                         </div>
                         <div>
                             <WiStrongWind className='icon' /> {dWindSpeed} м\с, {dWindDir}
