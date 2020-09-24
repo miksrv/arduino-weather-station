@@ -113,7 +113,7 @@ class Header extends Component {
                     </div>
                     <div className='update-info'>
                         <span className={((lastUpdate - moment().unix() < 180 && autoUpdate) ? 'online' : 'offline')}></span>
-                        Обновлено: {moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss")} {timeAgo(moment().unix() - lastUpdate)}
+                        Обновлено: {moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss")}{timeAgo(moment().unix() - lastUpdate)}
                         {/*{moment.unix(lastUpdate).fromNow()}*/}
                     </div>
                 </div>

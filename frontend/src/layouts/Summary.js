@@ -27,7 +27,7 @@ const Summary = (props) => {
                             {dTemperature > 0 ? '+' : ''}{dTemperature}<span className='sign'>℃</span>
                         </div>
                         <div className='summary-icon'>
-                            <WeatherIcon code={openWeatherData.weather[0].id} />
+                            <WeatherIcon code={openWeatherData.weather[0].id} daytime={openWeatherData.sys.pod}  />
                         </div>
                         <div className='info'>
                             <div>{openWeatherData.weather[0].description}</div>

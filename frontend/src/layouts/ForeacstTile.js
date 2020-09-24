@@ -32,7 +32,7 @@ const ForeacstTile = (props) => {
                             <Grid>
                                 <Grid.Column width={8} className='icon-container no-padding-bottom'>
                                     <div className='image'>
-                                        <WeatherIcon code={item.weather[0].id} />
+                                        <WeatherIcon code={item.weather[0].id} daytime={item.sys.pod}  />
                                     </div>
                                 </Grid.Column>
                                 <Grid.Column width={8} className='value-container'>

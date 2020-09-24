@@ -3,11 +3,13 @@
  */
 
 import React from 'react'
-import { WiThunderstorm, WiRainMix, WiRain, WiSnowWind, WiFog, WiDaySunny, WiCloud, WiAlien, WiDayCloudy, WiDayCloudyHigh,
+import { WiThunderstorm, WiRainMix, WiRain, WiSnowWind, WiFog, WiDaySunny, WiCloudy, WiAlien, WiDayCloudy,
          WiDaySleet, WiDayShowers, WiDayRain, WiDayRainWind, WiSnow, WiNightSleet, WiNightShowers, WiNightRain,
-         WiNightRainWind } from 'react-icons/wi'
+         WiNightRainWind, WiNightClear, WiNightAltCloudy } from 'react-icons/wi'
 
 const WeatherIcon = props => {
+    let daytime = (typeof props.daytime !== 'undefined' && props.daytime !== '') ? props.daytime : 'd'
+
     switch (props.code.toString()[0]) {
         case '2': // Thunderstorm
             return <WiThunderstorm />
@@ -61,17 +63,19 @@ const WeatherIcon = props => {
         case '8': // Clear
             switch (props.code.toString()[2]) {
                 case '0':
-                    return <WiDaySunny />
+                    if (daytime === 'n')
+                        return <WiNightClear />
+                    else
+                        return <WiDaySunny />
 
-                case '2':
-                case '3':
-                    return <WiDayCloudy />
-
-                case '4':
-                    return <WiDayCloudyHigh />
+                case '1':
+                    if (daytime === 'n')
+                        return <WiNightAltCloudy />
+                    else
+                        return <WiDayCloudy />
 
                 default:
-                    return <WiCloud />
+                    return <WiCloudy />
             }
 
         default:

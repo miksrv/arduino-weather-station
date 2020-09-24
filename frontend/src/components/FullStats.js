@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Grid } from 'semantic-ui-react'
 
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
@@ -15,7 +16,7 @@ Highcharts.setOptions(Highcharts.theme = chart_config)
 class ShortStats extends Component {
 
   state = {
-    chart1_Options: {
+    chartTempHumd: {
       xAxis: [{
         type: 'datetime',
         dateTimeLabelFormats: {
@@ -113,7 +114,7 @@ class ShortStats extends Component {
         }
       }]
     },
-    chart2_Options: {
+    chartLuxPress: {
       xAxis: [{
         type: 'datetime',
         dateTimeLabelFormats: {
@@ -202,7 +203,7 @@ class ShortStats extends Component {
 
       }]
     },
-    chart3_Options: {
+    chartWindDir: {
       chart: {
         polar: true
       },
@@ -261,8 +262,8 @@ class ShortStats extends Component {
     const { data } = this.props
 
     this.setState({
-      chart1_Options: {
-        ...this.state.chart1_Options,
+      chartTempHumd: {
+        ...this.state.chartTempHumd,
         series: [
           { data: data.sensors.h },
           { data: data.sensors.t2 },
@@ -270,14 +271,14 @@ class ShortStats extends Component {
           { data: data.sensors.ws }
         ]
       },
-      chart2_Options: {
+      chartLuxPress: {
         series: [
           { data: data.sensors.lux },
           { data: data.sensors.uv },
           { data: data.sensors.p }
         ]
       },
-      chart3_Options: {
+      chartWindDir: {
         series: [
           { data: data.sensors.wd }
         ]
@@ -290,19 +291,28 @@ class ShortStats extends Component {
   }
 
   render() {
-    const { chart1_Options, chart2_Options } = this.state
+    const { chartTempHumd, chartLuxPress, chartWindDir } = this.state
 
     return (
         <section className='chart'>
           <HighchartsReact
               highcharts={Highcharts}
-              options={chart1_Options}
+              options={chartTempHumd}
           />
           <br />
           <HighchartsReact
               highcharts={Highcharts}
-              options={chart2_Options}
+              options={chartLuxPress}
           />
+          <br />
+          <Grid>
+            <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>
+              <HighchartsReact
+                  highcharts={Highcharts}
+                  options={chartWindDir}
+              />
+            </Grid.Column>
+          </Grid>
         </section>
     )
   }
