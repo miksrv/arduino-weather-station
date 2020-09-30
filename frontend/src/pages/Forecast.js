@@ -2,15 +2,15 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Table, Dimmer, Loader, Container, Image, Popup, Responsive } from 'semantic-ui-react'
 
-import Header from '../components/Header'
-
 import moment from 'moment'
 
 import * as meteoActions from '../store/meteostation/actions'
 
+import MainContainer from '../components/MainContainer'
+import ForeacstTile from '../layouts/ForeacstTile'
+
 import _ from 'lodash'
 import valueColor from '../data/valueColor'
-import ForeacstTile from '../layouts/ForeacstTile'
 
 class Forecast extends Component {
 
@@ -26,11 +26,10 @@ class Forecast extends Component {
         const { forecast } = this.props
 
         return (
-            <div>
-                <Header
-                    updateTime={moment().unix()}
-                    onUpdateData={this.updateWeatherData}
-                />
+            <MainContainer
+                updateTime={moment().unix()}
+                onUpdateData={this.updateWeatherData}
+            >
                 { ! _.isEmpty(forecast) ? (
                     <div>
                         <Responsive as={Container} minWidth={768}>
@@ -97,7 +96,7 @@ class Forecast extends Component {
                         <Loader>Загрузка</Loader>
                     </Dimmer>
                 )}
-            </div>
+            </MainContainer>
         )
     }
 }

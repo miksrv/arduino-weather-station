@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
-import { NavLink } from 'react-router-dom'
-import { Checkbox, Container } from 'semantic-ui-react'
+import { Checkbox, Container, Icon } from 'semantic-ui-react'
 
 import moment from 'moment'
 
@@ -87,36 +86,30 @@ class Header extends Component {
     }
 
 
-
     render() {
         const { autoUpdate, lastUpdate } = this.state
+        const { onClickMenu } = this.props
 
         return (
-            <Container>
-                <div className='header-toolbar'>
-                    <div>
-                        <nav className='navigation'>
-                            <NavLink exact to='/'>Сводка</NavLink>
-                            <NavLink to='/dashboard' activeClassName='active'>Датчики</NavLink>
-                            <NavLink to='/statistic' activeClassName='active'>Статистика</NavLink>
-                            <NavLink to='/forecast' activeClassName='active'>Прогноз</NavLink>
-                        </nav>
-                        <div className='update-container'>
-                            <Checkbox
-                                toggle
-                                checked={autoUpdate}
-                                label=''
-                                onChange={this.handleChangeAutoupdate}
-                                className='update-switch'
-                            />
-                        </div>
-                    </div>
-                    <div className='update-info'>
-                        <span className={((lastUpdate - moment().unix() < 180 && autoUpdate) ? 'online' : 'offline')}></span>
-                        Обновлено: {moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss")}{timeAgo(moment().unix() - lastUpdate)}
-                        {/*{moment.unix(lastUpdate).fromNow()}*/}
-                    </div>
-                </div>
+            <Container className='header-toolbar'>
+                <Icon
+                    className='hamburger'
+                    name='bars'
+                    size='big'
+                    onClick={() => onClickMenu()}
+                />
+                <span className='last-update'>
+                    <span className={((lastUpdate - moment().unix() < 180 && autoUpdate) ? 'online' : 'offline')}></span>
+                    {moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss")}{timeAgo(moment().unix() - lastUpdate)}
+                </span>
+                {/*{moment.unix(lastUpdate).fromNow()}*/}
+                <Checkbox
+                    toggle
+                    checked={autoUpdate}
+                    label=''
+                    onChange={this.handleChangeAutoupdate}
+                    className='update-switch'
+                />
             </Container>
         )
     }

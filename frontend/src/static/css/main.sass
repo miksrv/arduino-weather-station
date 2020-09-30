@@ -6,6 +6,9 @@ $font-stack: sans-serif
     outline: none
     font-family: $font-stack !important
 
+#root
+    height: 100%
+
 body
     color: $main-color
     font-size: 14px
@@ -20,19 +23,16 @@ body
 .ui.container
     max-width: 1200px !important
 
-.update-container
-    float: right
-    margin-top: -34px
-
-.navigation
-    a
-        display: inline-block
-        padding: 1vh
-        color: $main-color
+//.update-container
+//    float: right
+//    margin-top: -34px
 
 .ui.toggle.checkbox label, .ui.toggle.checkbox input:checked ~ label, .ui.toggle.checkbox input:focus:checked ~ label
     color: $main-color !important
 
+.hamburger
+    cursor: pointer
+    
 .update-switch
     margin-top: 5px
     float: right
@@ -98,19 +98,24 @@ body
     text-align: center
     padding-top: 14%
 
-.description
-    font-size: 0.9em
-    color: $second-color
+//.description
+//    font-size: 0.9em
+//    color: $second-color
 
 .header-toolbar
     background: #373737
-    padding: .4em 1em
+    padding: .8em 1em
     margin: 2em 0
 
-.update-info
-    margin: 0 1vh
-    font-size: 11px
-    color: $second-color
+.last-update
+    display: inline-block
+    margin-left: 2em
+    font-size: .8em
+
+//.update-info
+//    margin: 0 1vh
+//    font-size: 11px
+//    color: $second-color
 
 .online, .offline
     background: $green
@@ -119,8 +124,8 @@ body
     height: 11px
     border-radius: 50%
     margin-right: 1vh
+    margin-top: 3px
     float: left
-    margin-top: 2px
 
 .online
     -webkit-animation: pulsate 2s infinite

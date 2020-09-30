@@ -28,13 +28,13 @@ class ShortStats extends Component {
         labels: {
           format: '{value}°C',
           style: {
-            color: Highcharts.theme.colors[1]
+            color: Highcharts.theme.colors[7]
           }
         },
         title: {
           text: '', // Температура
           style: {
-            color: Highcharts.theme.colors[1]
+            color: Highcharts.theme.colors[7]
           }
         },
         opposite: false,
@@ -43,13 +43,13 @@ class ShortStats extends Component {
         title: {
           text: '', // Влажность
           style: {
-            color: Highcharts.theme.colors[0]
+            color: Highcharts.theme.colors[6]
           }
         },
         labels: {
           format: '{value} %',
           style: {
-            color: Highcharts.theme.colors[0]
+            color: Highcharts.theme.colors[6]
           }
         },
         opposite: true,
@@ -60,7 +60,7 @@ class ShortStats extends Component {
         name: 'Влажность',
         type: 'area',
         yAxis: 1,
-        color: Highcharts.theme.colors[0],
+        color: Highcharts.theme.colors[6],
         // data: data.humd,
         tooltip: {
           valueSuffix: ' %'
@@ -70,7 +70,7 @@ class ShortStats extends Component {
         type: 'spline',
         yAxis: 0,
         // data: data.temp1,
-        color: Highcharts.theme.colors[1],
+        color: Highcharts.theme.colors[7],
         tooltip: {
           valueSuffix: ' °C'
         }
@@ -79,7 +79,7 @@ class ShortStats extends Component {
         type: 'spline',
         yAxis: 0,
         // data: data.temp1,
-        color: Highcharts.theme.colors[2],
+        color: Highcharts.theme.colors[8],
         tooltip: {
           valueSuffix: ' °C'
         }
@@ -98,13 +98,13 @@ class ShortStats extends Component {
       yAxis: [{
         labels: {
           style: {
-            color: Highcharts.theme.colors[3]
+            color: Highcharts.theme.colors[9]
           }
         },
         title: {
           text: '', // Освещенность (lux)
           style: {
-            color: Highcharts.theme.colors[3]
+            color: Highcharts.theme.colors[9]
           }
         },
         opposite: false,
@@ -113,12 +113,12 @@ class ShortStats extends Component {
         title: {
           text: '', // UV (мВт/см^2)
           style: {
-            color: Highcharts.theme.colors[5]
+            color: Highcharts.theme.colors[11]
           }
         },
         labels: {
           style: {
-            color: Highcharts.theme.colors[5]
+            color: Highcharts.theme.colors[11]
           }
         },
         opposite: true,
@@ -127,12 +127,12 @@ class ShortStats extends Component {
         title: {
           text: '', // Атмосферное давление (мм.рт.ст.)
           style: {
-            color: Highcharts.theme.colors[4]
+            color: Highcharts.theme.colors[10]
           }
         },
         labels: {
           style: {
-            color: Highcharts.theme.colors[4]
+            color: Highcharts.theme.colors[10]
           }
         },
         opposite: true,
@@ -142,7 +142,7 @@ class ShortStats extends Component {
         type: 'area',
         yAxis: 0,
         // data: data.light,
-        color: Highcharts.theme.colors[3],
+        color: Highcharts.theme.colors[9],
         tooltip: {
           valueSuffix: ' lux'
         }
@@ -151,7 +151,7 @@ class ShortStats extends Component {
         type: 'spline',
         yAxis: 1,
         // data: data.uv,
-        color: Highcharts.theme.colors[5],
+        color: Highcharts.theme.colors[11],
         marker: {
           enabled: false
         },
@@ -164,7 +164,7 @@ class ShortStats extends Component {
         type: 'spline',
         yAxis: 2,
         // data: data.press,
-        color: Highcharts.theme.colors[4],
+        color: Highcharts.theme.colors[10],
         marker: {
           enabled: false
         },
@@ -188,13 +188,13 @@ class ShortStats extends Component {
         title: {
           text: '',
           style: {
-            color: Highcharts.theme.colors[6]
+            color: Highcharts.theme.colors[12]
           }
         },
         labels: {
           format: '{value} м/с',
           style: {
-            color: Highcharts.theme.colors[6]
+            color: Highcharts.theme.colors[12]
           }
         },
       }],
@@ -204,7 +204,7 @@ class ShortStats extends Component {
         pointWidth: 4,
         borderWidth: 0.4,
         // data: data.ws,
-        color: Highcharts.theme.colors[6],
+        color: Highcharts.theme.colors[12],
         tooltip: {
           valueSuffix: ' м/с'
         }
@@ -226,7 +226,7 @@ class ShortStats extends Component {
         labels: {
           format: '{value}°',
           style: {
-            color: Highcharts.theme.colors[0]
+            color: Highcharts.theme.colors[3]
           }
         }
       },
@@ -248,7 +248,7 @@ class ShortStats extends Component {
       series: [{
         type: 'area',
         name: 'Роза ветров',
-        color: Highcharts.theme.colors[0],
+        color: Highcharts.theme.colors[3],
         tooltip: {
           valueSuffix: ''
         }

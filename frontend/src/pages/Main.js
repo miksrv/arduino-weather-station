@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Container, Dimmer, Loader } from 'semantic-ui-react'
 
-import Header from '../components/Header'
+import MainContainer from '../components/MainContainer'
 import Summary from '../layouts/Summary'
 import ForeacstTile from '../layouts/ForeacstTile'
 
@@ -29,11 +29,10 @@ class Main extends Component {
         const { current, forecast } = this.props
 
         return (
-            <div>
-                <Header
-                    updateTime={current.update}
-                    onUpdateData={this.updateWeatherData}
-                />
+            <MainContainer
+                updateTime={current.update}
+                onUpdateData={this.updateWeatherData}
+            >
                 { ! _.isEmpty(current) && ! _.isEmpty(forecast)  ? (
                     <Container>
                         <Summary
@@ -53,7 +52,7 @@ class Main extends Component {
                         <Loader>Загрузка</Loader>
                     </Dimmer>
                 )}
-            </div>
+            </MainContainer>
         );
     }
 }

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Container, Dimmer, Loader, Button } from 'semantic-ui-react'
 
-import Header from '../components/Header'
+import MainContainer from '../components/MainContainer'
 import FullStats from '../components/FullStats'
 
 import moment from 'moment'
@@ -44,11 +44,10 @@ class Statistic extends Component {
         const { loader } = this.state
 
         return (
-            <div>
-                <Header
-                    updateTime={moment().unix()}
-                    onUpdateData={this.updateWeatherData}
-                />
+            <MainContainer
+                updateTime={moment().unix()}
+                onUpdateData={this.updateWeatherData}
+            >
                 <Container>
                     <div className='toolBar'>
                         <Button.Group size='mini'>
@@ -69,7 +68,7 @@ class Statistic extends Component {
                         </Dimmer>
                     )}
                 </Container>
-            </div>
+            </MainContainer>
         );
     }
 }

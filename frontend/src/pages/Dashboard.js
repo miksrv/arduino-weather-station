@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Container, Dimmer, Grid, Loader } from 'semantic-ui-react'
 
-import Header from '../components/Header'
+import MainContainer from '../components/MainContainer'
 import ShortStats from '../components/ShortStats'
 import Sensor from '../layouts/Sensor'
 
@@ -31,11 +31,10 @@ class Dashboard extends Component {
         const { current, chartData } = this.props
 
         return (
-            <div>
-                <Header
-                    updateTime={current.update}
-                    onUpdateData={this.updateWeatherData}
-                />
+            <MainContainer
+                updateTime={current.update}
+                onUpdateData={this.updateWeatherData}
+            >
                 { ! _.isEmpty(current) && ! _.isEmpty(chartData) ? (
                     <Container>
                         <Grid>
@@ -59,7 +58,7 @@ class Dashboard extends Component {
                         <Loader>Загрузка</Loader>
                     </Dimmer>
                 )}
-            </div>
+            </MainContainer>
         );
     }
 }
