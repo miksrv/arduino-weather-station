@@ -131,6 +131,30 @@ class Get extends BaseController
         $_temp_val  = []; // Массив средних значений
         $_temp_wd   = [0, 0, 0, 0, 0, 0, 0, 0]; // Массив направлений ветра (8 направлений)
 
+        $_temp_wr   = []; // Массив розы ветров
+        $_temp_wr_total = 0; // Общее число для высчитывания процента
+
+        // Заполняем пустыми значениями
+        // Скорость
+        for ($i = 0; $i <= 6; $i++)
+        {
+            // Направление
+            for ($k = 0; $k <= 7; $k++)
+            {
+                $_temp_wr[$i][$k] = 0;
+            }
+        }
+
+        /* Wind Rose
+         * 1. < 0.5
+         * 2. 0.5 - 2
+         * 3. 2 - 4
+         * 4. 4 - 6
+         * 5. 6 - 8
+         * 6. 8 - 10
+         * 7. > 10
+         */
+
         switch ($period) {
             case 'today'     :
             case 'yesterday' : $period = '600'; break;
@@ -180,7 +204,9 @@ class Get extends BaseController
                 $_prev_time = strtotime($item->item_timestamp);
             }
 
-            foreach (json_decode($item->item_raw_data) as $key => $val)
+            $json_data = json_decode($item->item_raw_data);
+
+            foreach ($json_data as $key => $val)
             {
 
                 if ( ! isset($_temp_val[$key]))
@@ -226,7 +252,14 @@ class Get extends BaseController
                         $_tmp_wind_position = 7;
                     }
 
-                    $_temp_wd[$_tmp_wind_position]++;
+                    // Только если есть ветер
+                    if ($json_data->ws > 0) {
+                        $_temp_wd[$_tmp_wind_position]++;
+
+                        $_temp_wr[$this->_map_wind_speed($json_data->ws)][$_tmp_wind_position]++;
+                        $_temp_wr_total++;
+                    }
+
                     continue;
                 }
 
@@ -252,9 +285,63 @@ class Get extends BaseController
             $wind_dir[$key] = array_search($val, $tmp);
         }
 
+        // Считаем сколько процентов составляет числа розы ветров
+        $new_wr_array = [];
+        foreach ($_temp_wr as $key_wr_1 => $val_wr_direct)
+        {
+            foreach ($val_wr_direct as $key_wr_2 => $val_wr_speed)
+            {
+//                unset($_temp_wr[$key_wr_1][$key_wr_2]);
+
+                $new_wr_array[$key_wr_1][] = [
+                    $this->_map_windkey_degree($key_wr_2),
+                    round((($val_wr_speed / $_temp_wr_total) * 100), 1)
+                ];
+
+//                $_temp_wr[$key_wr_1][$this->_map_windkey_degree($key_wr_2)] =
+//                    round((($val_wr_speed / $_temp_wr_total) * 100), 1);
+            }
+        }
+
         $_result['wd'] = $wind_dir;
+        $_result['wr'] = $new_wr_array;
 
         return $this->_data = $_result;
+    }
+
+
+    protected function _map_windkey_degree($key) {
+        switch ($key)
+        {
+            case 0 : return 0;
+            case 1 : return 45;
+            case 2 : return 90;
+            case 3 : return 135;
+            case 4 : return 180;
+            case 5 : return 225;
+            case 6 : return 270;
+            case 7 : return 315;
+
+            default: return 0;
+        }
+    }
+
+    protected function _map_wind_speed($wind_speed)
+    {
+        $wind_speed = (int) $wind_speed;
+
+        if ($wind_speed > 0 && $wind_speed <= 1)
+            return 0;
+        else if ($wind_speed > 1 && $wind_speed <= 3)
+            return 1;
+        else if ($wind_speed > 3 && $wind_speed <= 5)
+            return 2;
+        else if ($wind_speed > 5 && $wind_speed <= 7)
+            return 3;
+        else if ($wind_speed > 7 && $wind_speed <= 9)
+            return 4;
+        else
+            return 5;
     }
 
     /**
