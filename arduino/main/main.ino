@@ -1,3 +1,9 @@
+//**************************************************************//
+//  Name    : WEATHER STATION
+//  Author  : Mik™ <miksoft.tm@gmail.com>
+//  Version : 1.1.0 (07 Oct 2020)
+//**************************************************************//
+
 #include <Wire.h>
 #include <BMP085.h>
 #include <TroykaDHT.h>
@@ -20,24 +26,24 @@ PCF8574 expander(0x20);
 
 long impulse;
 unsigned long timing; // Sensor Poll Countdown Timer
+unsigned long WinSpeedTiming; // Wind speed timer
 const byte interruptPin = 4;
 char webclient_data[120];
 char temp1[6], temp2[6], mmHg[6], humd[6],
      lux[6], uvindex[5], wind_dir[2], wind_speed[2];
 
 // Network settings
-byte mac[] = { 0x38, 0x59, 0xF9, 0x6D, 0xD7, 0xFF }; // MAC-address
-IPAddress ip(10,10,2,9);                 // IP address of the device on the network
-char server[] = "api.miksoft.pro"; //{ 217, 107, 34, 252 };
+byte MAC[] = { 0x38, 0x59, 0xF9, 0x6D, 0xD7, 0xFF }; // MAC-address
+IPAddress IP(10,10,2,9);
+char server[] = "api.miksoft.pro";
 
 EthernetClient LAN;
 
+int MAXwind = 0;
 int ReadUVintensityPin = A0; //Output from the sensor
 
 // If the variable is not commented out, debug mode is activated, messages are sent to the serial port
 // #define DEBUG
-
-
 
 void setup() {
   #ifdef DEBUG
@@ -69,7 +75,44 @@ void setup() {
     delay(50);
   }
 
-  Ethernet.begin(mac, ip);
+  // start the Ethernet connection:
+  #ifdef DEBUG
+    Serial.println("Initialize Ethernet with DHCP:");
+  #endif
+  
+  if (Ethernet.begin(MAC) == 0) {
+    #ifdef DEBUG
+      Serial.println("Failed to configure Ethernet using DHCP");
+    #endif
+
+    // Check for Ethernet hardware present
+    if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+      #ifdef DEBUG
+        Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
+      #endif
+
+      while (true) {
+        delay(1); // do nothing, no point running without Ethernet hardware
+      }
+    }
+    if (Ethernet.linkStatus() == LinkOFF) {
+      #ifdef DEBUG
+        Serial.println("Ethernet cable is not connected.");
+      #endif
+    }
+    // try to congifure using IP address instead of DHCP:
+    Ethernet.begin(MAC, IP);
+    #ifdef DEBUG
+      Serial.print("My IP address: ");
+      Serial.println(Ethernet.localIP());
+    #endif
+  } else {
+    #ifdef DEBUG
+      Serial.print("DHCP assigned IP: ");
+      Serial.println(Ethernet.localIP());
+    #endif
+  }
+  // give the Ethernet shield a second to initialize:
   delay(1000);
 
   #ifdef DEBUG
@@ -85,7 +128,13 @@ void loop() {
    * If the difference is greater than the desired value, then execute the code.
    * If not, do nothing
    */
-  if (millis() - timing > 30000) {
+  if (millis() - WinSpeedTiming > 10000) {
+    WinSpeedTiming = millis();
+
+    get_sensor_anemometer();
+  }
+   
+  if (millis() - timing > 60000) {
     timing = millis(); 
     
     #ifdef DEBUG
@@ -97,9 +146,10 @@ void loop() {
     get_sensor_dht22();
     get_sensor_luxmeter();
     get_sensor_wind_direction();
-    get_sensor_anemometer();
 
     webclient_send_data();
+
+    MAXwind = 0;
 
     #ifdef DEBUG
       Serial.println(" ");
@@ -108,146 +158,6 @@ void loop() {
 }
 
 
-/** WebClinet send data to remote server **/
-void webclient_send_data() {
-    memset(webclient_data, 0, sizeof(webclient_data));
-
-    strcpy(webclient_data, "id=A7FE9540D1F5");
-
-    strcat(webclient_data, "&p=");  // Atmosphere pressure
-    strcat(webclient_data, mmHg);
-    strcat(webclient_data, "&t1="); // Room temperature
-    strcat(webclient_data, temp1);
-    strcat(webclient_data, "&t2="); // The temperature in the street
-    strcat(webclient_data, temp2);
-    strcat(webclient_data, "&h=");  // Air humidity
-    strcat(webclient_data, humd);
-    strcat(webclient_data, "&uv=");
-    strcat(webclient_data, uvindex);
-    strcat(webclient_data, "&lux=");
-    strcat(webclient_data, lux);
-    strcat(webclient_data, "&wd=");
-    strcat(webclient_data, wind_dir);
-    strcat(webclient_data, "&ws=");
-    strcat(webclient_data, wind_speed);
-
-    //strcat(webclient_data,'\0');
-
-    #ifdef DEBUG
-        Serial.print("  [Content-Length: ");
-        Serial.print(len(webclient_data));
-        Serial.print("] ");
-        Serial.println(webclient_data);
-    #endif
-
-    if (LAN.connect(server, 80)) {
-        LAN.println("POST /set/data HTTP/1.1");
-        LAN.println("Host: api.miksoft.pro");
-        LAN.println("Content-Type: application/x-www-form-urlencoded");
-        LAN.println("Connection: close");
-        LAN.print("Content-Length: ");
-        LAN.println(len(webclient_data));
-        LAN.println();
-        LAN.println(webclient_data);
-        LAN.println();
-        
-        delay(2000);
-        
-        LAN.stop();
-
-        #ifdef DEBUG
-          Serial.println("  [Webclient] Data send success");
-          Serial.println();
-        #endif
-    } else {
-        #ifdef DEBUG
-          Serial.println("  [Webclient] Data send error");
-          Serial.println();
-        #endif
-    }
-
-    delay(2000);
-}
-
-
-/** Reading BMP085 sensor (pressure) **/
-void get_sensor_pressure() {
-  long tmp_bmp085_temp = 0,
-       tmp_bmp085_pres = 0;
-  
-  dps.getPressure(&tmp_bmp085_pres);
-  dps.getTemperature(&tmp_bmp085_temp);
-
-  dtostrf(tmp_bmp085_pres / 133.3, 1, 1, mmHg);
-  dtostrf(tmp_bmp085_temp * 0.1, 1, 1, temp1);
-
-  #ifdef DEBUG
-    Serial.print("  [Ok] BMP085 pressure: ");
-    Serial.print(mmHg);
-    Serial.println(" mmHg");
-    Serial.print("  [Ok] BMP085 temperature: ");
-    Serial.print(temp1);
-    Serial.println(" C");
-  #endif
-
-  delay(2000);
-}
-
-void get_sensor_dht22() {
-  dht.read();
-
-  if (dht.getState() == DHT_OK) {
-    dtostrf(dht.getTemperatureC(), 4, 1, temp2);
-    dtostrf(dht.getHumidity(), 4, 1, humd);
-
-    #ifdef DEBUG
-      Serial.print("  [Ok] DHT22 temperature: ");
-      Serial.print(temp2);
-      Serial.println(" C");
-      Serial.print("  [Ok] DHT22 humidity: ");
-      Serial.print(humd);
-      Serial.println(" %");
-    #endif
-  } else {
-    #ifdef DEBUG
-      Serial.println("  [ERROR] DHT22 no data");
-    #endif
-  }
-
-  delay(2000);
-}
-
-void get_sensor_luxmeter() {
-  uint16_t lux_val = lightmeter.readLightLevel();
-
-  dtostrf(lux_val, 2, 0, lux);
-
-  #ifdef DEBUG
-    Serial.print("  [Ok] BH1750 Lightmeter: ");
-    Serial.print(lux);
-    Serial.println(" lx");
-  #endif
-
-  delay(2000);
-}
-
-void get_sensor_uvindex() {
-  int uvLevel = averageAnalogRead(ReadUVintensityPin);
- 
-  float outputVoltage = 4.89 * uvLevel / 1024;
-  float uvIntensity = mapfloat(outputVoltage, 0.99, 2.9, 0.0, 15.0);
-
-  dtostrf(uvIntensity, 5, 2, uvindex);
-  
-  #ifdef DEBUG
-    Serial.print("  [Ok] UV Index data: ");
-    Serial.print(uvindex);
-    Serial.println(" mW/cm^2");
-  #endif
-
- delay(2000);
-}
-
 void get_sensor_anemometer() {
     impulse = 0;
 
@@ -255,7 +165,11 @@ void get_sensor_anemometer() {
     delay(5000);
     detachInterrupt(0);
 
-    dtostrf((impulse / 5), 1, 0, wind_speed);
+    if (impulse > MAXwind) {
+      MAXwind = impulse;
+    }
+
+    dtostrf((MAXwind / 4), 1, 0, wind_speed);
 
     #ifdef DEBUG
         Serial.print("  [OK] Wind speed = ");
@@ -264,27 +178,6 @@ void get_sensor_anemometer() {
     #endif
 
     delay(500);
-}
-
-void get_sensor_wind_direction() {
-  String value = "";
-
-  for (int i=0; i<8; i++) {
-    if (expander.digitalRead(i) == 0) {
-      value = value + String(i);
-    }
-    
-    delay(80);
-  }
-
-  value.toCharArray(wind_dir, 4);
-
-  #ifdef DEBUG
-    Serial.print("  [Ok] Wind direction: ");
-    Serial.println(wind_dir);
-  #endif
-  
-  delay(2000);
 }
 
 void rpm() {
