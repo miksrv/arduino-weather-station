@@ -23,10 +23,6 @@ body
 .ui.container
     max-width: 1200px !important
 
-//.update-container
-//    float: right
-//    margin-top: -34px
-
 .ui.toggle.checkbox label, .ui.toggle.checkbox input:checked ~ label, .ui.toggle.checkbox input:focus:checked ~ label
     color: $main-color !important
 
@@ -102,10 +98,6 @@ body
     text-align: center
     padding-top: 14%
 
-//.description
-//    font-size: 0.9em
-//    color: $second-color
-
 .header-toolbar
     background: #373737
     padding: .8em 1em
@@ -113,13 +105,8 @@ body
 
 .last-update
     display: inline-block
-    margin-left: 2em
+    margin-left: 1em
     font-size: .8em
-
-//.update-info
-//    margin: 0 1vh
-//    font-size: 11px
-//    color: $second-color
 
 .online, .offline
     background: $green
@@ -342,6 +329,34 @@ body
         height: 40px
         margin: -2vh 0px
         margin-right: -2vh
+
+@media (max-width: 390px)
+    .summary .content h1
+        font-size: 1.5em
+
+    .summary .content h4
+        font-size: .9em
+
+    .summary .value
+        font-size: 2em
+
+    .summary .summary-icon, .forecast-tile .image
+        font-size: 4em
+
+    .summary .main-info > div:last-of-type
+        display: block
+        margin: -2em 0 2em
+
+    .second-info > div
+        display: block !important
+        margin: 0 0 .3em
+
+    .forecast-tile .temp, .forecast-tile .wind
+        font-size: 1.3em
+
+    .forecast-tile .desc
+        margin-bottom: 1em
+        height: 1.9em
 
 @-webkit-keyframes pulsate
     0%

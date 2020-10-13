@@ -90,7 +90,7 @@ class Header extends Component {
         const { autoUpdate, lastUpdate } = this.state
         const { onClickMenu } = this.props
 
-        let last_update = lastUpdate - moment().unix()
+        let last_update = moment().unix() - lastUpdate
 
         return (
             <Container className='header-toolbar'>
@@ -101,8 +101,8 @@ class Header extends Component {
                     onClick={() => onClickMenu()}
                 />
                 <span className='last-update'>
-                    <span className={((last_update > 0 && last_update < 180 && autoUpdate) ? 'online' : 'offline')}></span>
-                    {moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss")}{timeAgo(moment().unix() - lastUpdate)}
+                    <span className={((last_update > -180 && last_update < 180 && autoUpdate) ? 'online' : 'offline')}></span>
+                    {moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss")}{timeAgo(last_update)}
                 </span>
                 {/*{moment.unix(lastUpdate).fromNow()}*/}
                 <Checkbox

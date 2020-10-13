@@ -28,14 +28,14 @@ class Main extends Component {
 
     render() {
         const { current, forecast } = this.props
-        let last_update = current.update - moment().unix()
+        let last_update = moment().unix() - current.update
 
         return (
             <MainContainer
                 updateTime={current.update}
                 onUpdateData={this.updateWeatherData}
             >
-                { (last_update < 0 && last_update > 180) && (
+                {(last_update < -180 || last_update > 180) && (
                     <Container>
                         <Message negative>
                             <Message.Header>Данные устарели</Message.Header>
