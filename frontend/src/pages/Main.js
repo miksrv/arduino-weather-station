@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Dimmer, Loader } from 'semantic-ui-react'
+import { Container, Dimmer, Loader, Message } from 'semantic-ui-react'
 
 import MainContainer from '../components/MainContainer'
 import Summary from '../layouts/Summary'
@@ -9,6 +9,7 @@ import ForeacstTile from '../layouts/ForeacstTile'
 import * as meteoActions from '../store/meteostation/actions'
 
 import _ from 'lodash'
+import moment from "moment";
 
 class Main extends Component {
 
@@ -27,13 +28,23 @@ class Main extends Component {
 
     render() {
         const { current, forecast } = this.props
+        let last_update = moment().unix() - current.update
 
         return (
             <MainContainer
                 updateTime={current.update}
                 onUpdateData={this.updateWeatherData}
             >
-                { ! _.isEmpty(current) && ! _.isEmpty(forecast)  ? (
+                {(last_update < -180 || last_update > 180) && (
+                    <Container>
+                        <Message negative>
+                            <Message.Header>Данные устарели</Message.Header>
+                            <p>Последние показания погодная станция передавала {moment.unix(current.update).format("DD.MM.Y в H:mm:ss")}</p>
+                        </Message>
+                    </Container>
+                )}
+
+                { ! _.isEmpty(current) && ! _.isEmpty(forecast) ? (
                     <Container>
                         <Summary
                             dTemperature={current.sensors.t1.value}
