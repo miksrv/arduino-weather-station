@@ -370,10 +370,6 @@ class ShortStats extends Component {
     })
   }
 
-  setPeriodHandler = ( period ) => {
-    this.props.onChangePeriod( period )
-  }
-
   render() {
     const { chartTempHumd, chartLuxPress, chartWindDir, chartWindRose } = this.state
 

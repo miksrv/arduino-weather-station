@@ -11,6 +11,8 @@ import * as meteoActions from '../store/meteostation/actions'
 
 import _ from 'lodash'
 
+const data_set = 'p,t2,h,dp,uv,lux,ws,wd'
+
 class Statistic extends Component {
 
     state = {
@@ -22,7 +24,7 @@ class Statistic extends Component {
         const { dispatch } = this.props
         const { period } = this.state
 
-        dispatch(meteoActions.fetchStatData(period))
+        dispatch(meteoActions.fetchStatData(period, data_set))
     }
 
     changePeriod = ( period ) => {
@@ -31,7 +33,7 @@ class Statistic extends Component {
         if ( period !== this.state.period ) {
             this.setState({ loader: true, period })
 
-            dispatch(meteoActions.fetchStatData(period)).then(() => {
+            dispatch(meteoActions.fetchStatData(period, data_set)).then(() => {
                 this.setState({ loader: false })
             });
         }
@@ -40,7 +42,7 @@ class Statistic extends Component {
     updateWeatherData = () => {}
 
     render() {
-        const { chartData } = this.props
+        const { statistic } = this.props
         const { loader } = this.state
 
         return (
@@ -57,9 +59,9 @@ class Statistic extends Component {
                             <Button color='grey' onClick={() => this.changePeriod('month')}>Месяц</Button>
                         </Button.Group>
                     </div>
-                    { (! _.isEmpty(chartData) && ! loader) ? (
+                    { (! _.isEmpty(statistic) && ! loader) ? (
                         <FullStats
-                            data={chartData}
+                            data={statistic}
                             onChangePeriod={this.changePeriod}
                         />
                     ) : (
@@ -75,7 +77,7 @@ class Statistic extends Component {
 
 function mapStateToProps(state) {
     return {
-        chartData: state.meteostation.chartData,
+        statistic: state.meteostation.statistic,
         current: state.meteostation.current
     }
 }

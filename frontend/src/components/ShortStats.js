@@ -6,7 +6,6 @@ import HighchartsReact from 'highcharts-react-official'
 import HighchartsMore from 'highcharts/highcharts-more'
 
 import chart_config from '../data/chart_config'
-import windDirection from '../data/windDirection'
 
 HighchartsMore(Highcharts)
 
@@ -71,15 +70,6 @@ class ShortStats extends Component {
         yAxis: 0,
         // data: data.temp1,
         color: Highcharts.theme.colors[7],
-        tooltip: {
-          valueSuffix: ' °C'
-        }
-      }, {
-        name: 'Точка росы',
-        type: 'spline',
-        yAxis: 0,
-        // data: data.temp1,
-        color: Highcharts.theme.colors[8],
         tooltip: {
           valueSuffix: ' °C'
         }
@@ -210,14 +200,16 @@ class ShortStats extends Component {
         }
       }]
     },
-
-    chartWindDir: {
+    chartWindRose: {
       chart: {
-        polar: true
+        polar: true,
+        type: 'column'
       },
       pane: {
-        startAngle: 0,
-        endAngle: 360
+        size: '90%'
+      },
+      legend: {
+        x: 10,
       },
       xAxis: {
         tickInterval: 45,
@@ -226,33 +218,35 @@ class ShortStats extends Component {
         labels: {
           format: '{value}°',
           style: {
-            color: Highcharts.theme.colors[3]
           }
         }
       },
-      plotOptions: {
-        series: {
-          pointStart: 0,
-          pointInterval: 45
+      yAxis: {
+        min: 0,
+        endOnTick: false,
+        showLastLabel: true,
+        title: {
+          text: ''
         },
-        column: {
-          pointPadding: 0,
-          groupPadding: 0
-        }
+        labels: {
+          formatter: function () {
+            return this.value + '%';
+          }
+        },
+        reversedStacks: false
       },
       tooltip: {
-        formatter: function() {
-          return windDirection(this.x)
+        valueSuffix: '%',
+        followPointer: true
+      },
+      plotOptions: {
+        series: {
+          stacking: 'normal',
+          shadow: false,
+          groupPadding: 0,
+          pointPlacement: 'on'
         }
       },
-      series: [{
-        type: 'area',
-        name: 'Роза ветров',
-        color: Highcharts.theme.colors[3],
-        tooltip: {
-          valueSuffix: ''
-        }
-      }]
     }
   }
 
@@ -274,8 +268,7 @@ class ShortStats extends Component {
         ...this.state.chartTempHumd,
         series: [
           { data: data.sensors.h },
-          { data: data.sensors.t2 },
-          { data: data.sensors.dp }
+          { data: data.sensors.t2 }
         ]
       },
       chartLuxPress: {
@@ -285,25 +278,43 @@ class ShortStats extends Component {
           { data: data.sensors.p }
         ]
       },
-      chartWindDir: {
-        series: [
-          { data: data.sensors.wd }
-        ]
-      },
       chartWindSpeed: {
         series: [
           { data: data.sensors.ws }
         ]
+      },
+      chartWindRose: {
+        series: [{
+          "name": "&lt; 1 м/с",
+          "data": data.sensors.wr[0],
+          "_colorIndex": 0
+        }, {
+          "name": "1-3 м/с",
+          "data": data.sensors.wr[1],
+          "_colorIndex": 1
+        }, {
+          "name": "3-5 м/с",
+          "data": data.sensors.wr[2],
+          "_colorIndex": 2
+        }, {
+          "name": "5-7 м/с",
+          "data": data.sensors.wr[3],
+          "_colorIndex": 3
+        }, {
+          "name": "7-9 м/с",
+          "data": data.sensors.wr[4],
+          "_colorIndex": 4
+        }, {
+          "name": "&gt; 9 м/с",
+          "data": data.sensors.wr[5],
+          "_colorIndex": 5
+        }]
       }
     })
   }
 
-  setPeriodHandler = ( period ) => {
-    this.props.onChangePeriod( period )
-  }
-
   render() {
-    const { chartTempHumd, chartLuxPress, chartWindDir, chartWindSpeed } = this.state
+    const { chartTempHumd, chartLuxPress, chartWindSpeed, chartWindRose } = this.state
 
     return (
         <section className='chart'>
@@ -331,7 +342,7 @@ class ShortStats extends Component {
             <Grid.Column computer={6} tablet={8} mobile={16} className='chart-container'>
               <HighchartsReact
                   highcharts={Highcharts}
-                  options={chartWindDir}
+                  options={chartWindRose}
               />
             </Grid.Column>
           </Grid>

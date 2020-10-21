@@ -101,7 +101,7 @@ class Header extends Component {
                     onClick={() => onClickMenu()}
                 />
                 <span className='last-update'>
-                    <span className={((last_update > -180 && last_update < 180 && autoUpdate) ? 'online' : 'offline')}></span>
+                    <span className={((last_update > -180 && last_update < 180) ? 'online' : 'offline') + (autoUpdate ? ' pulsate' : '')}></span>
                     {moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss")}{timeAgo(last_update)}
                 </span>
                 {/*{moment.unix(lastUpdate).fromNow()}*/}

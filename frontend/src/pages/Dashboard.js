@@ -12,13 +12,15 @@ import * as meteoActions from '../store/meteostation/actions'
 
 import _ from 'lodash'
 
+const data_set = 'p,t2,h,uv,lux,ws,wd'
+
 class Dashboard extends Component {
 
     componentDidMount() {
         const { dispatch } = this.props
 
         this.updateWeatherData()
-        dispatch(meteoActions.fetchStatData('today'))
+        dispatch(meteoActions.fetchStatData('today', data_set))
     }
 
     updateWeatherData = () => {
@@ -28,14 +30,14 @@ class Dashboard extends Component {
     }
 
     render() {
-        const { current, chartData } = this.props
+        const { current, statistic } = this.props
 
         return (
             <MainContainer
                 updateTime={current.update}
                 onUpdateData={this.updateWeatherData}
             >
-                { ! _.isEmpty(current) && ! _.isEmpty(chartData) ? (
+                { ! _.isEmpty(current) && ! _.isEmpty(statistic) ? (
                     <Container>
                         <Grid>
                             {sensors.map((item, key) => {
@@ -49,7 +51,7 @@ class Dashboard extends Component {
                             })}
                         </Grid>
                         <ShortStats
-                            data={chartData}
+                            data={statistic}
                             onChangePeriod={this.changePeriod}
                         />
                     </Container>
@@ -65,7 +67,7 @@ class Dashboard extends Component {
 
 function mapStateToProps(state) {
     return {
-        chartData: state.meteostation.chartData,
+        statistic: state.meteostation.statistic,
         current: state.meteostation.current
     }
 }

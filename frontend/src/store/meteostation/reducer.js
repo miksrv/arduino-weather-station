@@ -9,7 +9,7 @@ import * as types from './actionTypes'
 const initialState = {
     current: {},
     forecast: {},
-    chartData: {}
+    statistic: {}
 }
 
 export default function reduce(state = initialState, action = {}) {
@@ -29,7 +29,7 @@ export default function reduce(state = initialState, action = {}) {
         case types.GET_STAT_DATA:
             return {
                 ...state,
-                chartData: action.payload
+                statistic: action.payload
             }
 
         default:

@@ -1,7 +1,7 @@
 const data = [
   {
     type: 'sensors',
-    source: 't1',
+    source: 't2',
     name: 'Температура',
     color: 'red',
     icon: 'temp',

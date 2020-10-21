@@ -47,7 +47,7 @@ class Main extends Component {
                 { ! _.isEmpty(current) && ! _.isEmpty(forecast) ? (
                     <Container>
                         <Summary
-                            dTemperature={current.sensors.t1.value}
+                            dTemperature={current.sensors.t2.value}
                             dHumidity={current.sensors.h.value}
                             dPressure={current.sensors.p.value}
                             dWindSpeed={current.sensors.ws.value}
