@@ -1,7 +1,7 @@
 //**************************************************************//
 //  Name    : WEATHER STATION
 //  Author  : Mik™ <miksoft.tm@gmail.com>
-//  Version : 1.1.0 (07 Oct 2020)
+//  Version : 1.2.0 (23 Oct 2020)
 //**************************************************************//
 
 #include <Wire.h>
@@ -11,6 +11,7 @@
 #include <PCF8574.h>
 #include <SPI.h>
 #include <Ethernet.h>
+#include <Adafruit_MLX90614.h>
 
 // BMP 085 Initialization
 BMP085 dps = BMP085();
@@ -24,13 +25,18 @@ BH1750 lightmeter;
 // Wind direction Initialization (0x20 address)
 PCF8574 expander(0x20);
 
+// MLX Initialization
+Adafruit_MLX90614 MLX = Adafruit_MLX90614();
+
+const byte interruptPin = 4; // PIN Anemometr
+
 long impulse;
 unsigned long timing; // Sensor Poll Countdown Timer
 unsigned long WinSpeedTiming; // Wind speed timer
-const byte interruptPin = 4;
 char webclient_data[120];
 char temp1[6], temp2[6], mmHg[6], humd[6],
-     lux[6], uvindex[5], wind_dir[2], wind_speed[2];
+     mlxA[6], mlxO[6], lux[6], uvindex[5], 
+     wind_dir[2], wind_speed[2];
 
 // Network settings
 byte MAC[] = { 0x38, 0x59, 0xF9, 0x6D, 0xD7, 0xFF }; // MAC-address
@@ -66,6 +72,10 @@ void setup() {
   delay(1000);
 
   dht.begin();
+  delay(500);
+
+  MLX.begin();
+  delay(500);
 
   // Port extender initialization
   expander.begin();
@@ -144,6 +154,7 @@ void loop() {
     get_sensor_uvindex();
     get_sensor_pressure();
     get_sensor_dht22();
+    get_sensor_mlx();
     get_sensor_luxmeter();
     get_sensor_wind_direction();
 
