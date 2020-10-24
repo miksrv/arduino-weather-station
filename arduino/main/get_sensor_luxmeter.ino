@@ -1,6 +1,8 @@
 // Get BH1750 sensor data
 
 void get_sensor_luxmeter() {
+  delay(500);
+  
   uint16_t lux_val = lightmeter.readLightLevel();
 
   dtostrf(lux_val, 2, 0, lux);
