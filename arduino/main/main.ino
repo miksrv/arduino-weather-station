@@ -11,7 +11,7 @@
 #include <PCF8574.h>
 #include <SPI.h>
 #include <Ethernet.h>
-#include <Adafruit_MLX90614.h>
+//#include <Adafruit_MLX90614.h>
 
 // BMP 085 Initialization
 BMP085 dps = BMP085();
@@ -26,7 +26,7 @@ BH1750 lightmeter;
 PCF8574 expander(0x27);
 
 // MLX Initialization
-Adafruit_MLX90614 MLX = Adafruit_MLX90614();
+//Adafruit_MLX90614 MLX = Adafruit_MLX90614();
 
 const byte interruptPin = 4; // PIN Anemometr
 
@@ -34,8 +34,8 @@ long impulse;
 unsigned long timing; // Sensor Poll Countdown Timer
 unsigned long WinSpeedTiming; // Wind speed timer
 char webclient_data[120];
-char temp1[6], temp2[6], mmHg[6], humd[6],
-     mlxA[6], mlxO[6], lux[6], uvindex[5], 
+char temp1[6], temp2[6], mmHg[6], humd[6], // mlxA[6], mlxO[6],
+     lux[6], uvindex[5], 
      wind_dir[2], wind_speed[2];
 
 // Network settings
@@ -89,11 +89,11 @@ void setup() {
     Serial.print("-");
   #endif
 
-  MLX.begin();
-  delay(1000);
-  #ifdef DEBUG
-    Serial.print("-");
-  #endif
+//  MLX.begin();
+//  delay(1000);
+//  #ifdef DEBUG
+//    Serial.print("-");
+//  #endif
 
   // Port extender initialization
   expander.begin();
@@ -166,13 +166,13 @@ void loop() {
    * If the difference is greater than the desired value, then execute the code.
    * If not, do nothing
    */
-  if (millis() - WinSpeedTiming > 10000) {
+  if (millis() - WinSpeedTiming > 60000) {
     WinSpeedTiming = millis();
 
     get_sensor_anemometer();
   }
    
-  if (millis() - timing > 60000) {
+  if (millis() - timing > 15000) {
     timing = millis(); 
     
     #ifdef DEBUG
@@ -189,7 +189,7 @@ void loop() {
     get_sensor_uvindex();
     get_sensor_pressure();
     get_sensor_dht22();
-    get_sensor_mlx();
+//    get_sensor_mlx();
     get_sensor_luxmeter();
     get_sensor_wind_direction();
 
