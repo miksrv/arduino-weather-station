@@ -85,7 +85,6 @@ class Header extends Component {
         })
     }
 
-
     render() {
         const { autoUpdate, lastUpdate } = this.state
         const { onClickMenu } = this.props
