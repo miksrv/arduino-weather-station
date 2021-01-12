@@ -58,7 +58,7 @@ class ShortStats extends Component {
         },
         opposite: true,
         min: 0,
-        max: 90,
+        max: 90
       }, {
         gridLineWidth: 0,
         title: {
@@ -75,7 +75,7 @@ class ShortStats extends Component {
         },
         opposite: true,
         min: 0,
-        max: 15,
+        max: 15
       }],
       series: [{
         name: 'Влажность',

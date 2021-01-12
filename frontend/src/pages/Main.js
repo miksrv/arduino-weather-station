@@ -1,15 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Dimmer, Loader, Message } from 'semantic-ui-react'
+import { Container, Message } from 'semantic-ui-react'
 
 import MainContainer from '../components/MainContainer'
 import Summary from '../layouts/Summary'
 import ForeacstTile from '../layouts/ForeacstTile'
 
 import * as meteoActions from '../store/meteostation/actions'
-
 import _ from 'lodash'
-import moment from "moment";
+import moment from 'moment'
 
 class Main extends Component {
 
@@ -44,25 +43,17 @@ class Main extends Component {
                     </Container>
                 )}
 
-                { ! _.isEmpty(current) && ! _.isEmpty(forecast) ? (
-                    <Container>
-                        <Summary
-                            dTemperature={current.sensors.t2.value}
-                            dHumidity={current.sensors.h.value}
-                            dPressure={current.sensors.p.value}
-                            dWindSpeed={current.sensors.ws.value}
-                            dWindDir={current.sensors.wd.info}
-                            openWeatherData={forecast.data[0]}
-                        />
+                <Container>
+                    <Summary
+                        currentData={current}
+                        openWeatherData={forecast}
+                    />
+                    {! _.isEmpty(forecast) && (
                         <ForeacstTile
                             data={forecast.data.slice(0, 4)}
                         />
-                    </Container>
-                ) : (
-                    <Dimmer active>
-                        <Loader>Загрузка</Loader>
-                    </Dimmer>
-                )}
+                    )}
+                </Container>
             </MainContainer>
         );
     }

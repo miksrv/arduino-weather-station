@@ -3,7 +3,9 @@ import React from 'react'
 const valueColor = value => {
     let color = ''
 
-    if (value >= -20 && value < -15) {
+    if (value >= -25 && value < -20) {
+        color = 'value-20-25'
+    } else if (value >= -20 && value < -15) {
         color = 'value-15-20'
     } else if (value >= -15 && value < -10) {
         color = 'value-10-15'
