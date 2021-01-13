@@ -5,7 +5,7 @@
 
 import React from 'react'
 
-import { Grid, Icon } from 'semantic-ui-react'
+import {Dimmer, Grid, Icon, Loader } from 'semantic-ui-react'
 import { WiStrongWind, WiBarometer, WiHumidity } from 'react-icons/wi'
 import WeatherIcon from '../data/WeatherIcon'
 
@@ -19,6 +19,13 @@ const Summary = (props) => {
     return (
         <Grid.Column computer={8} tablet={16} mobile={16}>
             <div className='informer summary'>
+                {
+                    _.isEmpty(currentData) && (
+                        <Dimmer active>
+                            <Loader />
+                        </Dimmer>
+                    )
+                }
                 <div className='background-overlay'>
                     <div className='background-image' style={{backgroundImage: background}}></div>
                 </div>

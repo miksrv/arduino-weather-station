@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Message } from 'semantic-ui-react'
+import { Container, Dimmer, Grid, Loader, Message } from 'semantic-ui-react'
 
 import MainContainer from '../components/MainContainer'
 import Summary from '../layouts/Summary'
@@ -48,10 +48,27 @@ class Main extends Component {
                         currentData={current}
                         openWeatherData={forecast}
                     />
-                    {! _.isEmpty(forecast) && (
+                    {! _.isEmpty(forecast) ? (
                         <ForeacstTile
                             data={forecast.data.slice(0, 4)}
                         />
+                    ) : (
+                        <Grid className='forecast-list-loader'>
+                            <Grid.Column computer={8} tablet={16} mobile={16}>
+                                <div className='informer' style={{height: 210}}>
+                                    <Dimmer active>
+                                        <Loader />
+                                    </Dimmer>
+                                </div>
+                            </Grid.Column>
+                            <Grid.Column computer={8} tablet={16} mobile={16}>
+                                <div className='informer' style={{height: 210}}>
+                                    <Dimmer active>
+                                        <Loader />
+                                    </Dimmer>
+                                </div>
+                            </Grid.Column>
+                        </Grid>
                     )}
                 </Container>
             </MainContainer>

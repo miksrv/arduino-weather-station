@@ -37,31 +37,69 @@ class Dashboard extends Component {
                 updateTime={current.update}
                 onUpdateData={this.updateWeatherData}
             >
-                { ! _.isEmpty(current) && ! _.isEmpty(statistic) ? (
-                    <Container>
-                        <Grid>
-                            {sensors.map((item, key) => {
-                                return (
-                                    <Sensor
-                                        key={key}
-                                        widget={item}
-                                        data={current[item.type][item.source]}
-                                    />
-                                )
-                            })}
-                        </Grid>
+                <Container>
+                    <Grid>
+                        {sensors.map((item, key) => {
+                            return (
+                                <Sensor
+                                    key={key}
+                                    widget={item}
+                                    data={! _.isEmpty(current) ? current[item.type][item.source] : []}
+                                />
+                            )
+                        })}
+                    </Grid>
+                    { ! _.isEmpty(statistic) ? (
                         <ShortStats
                             data={statistic}
                             onChangePeriod={this.changePeriod}
                         />
-                    </Container>
-                ) : (
-                    <Dimmer active>
-                        <Loader>Загрузка</Loader>
-                    </Dimmer>
-                )}
+                    ) : (
+                        <Grid>
+                            <Grid.Column computer={8} tablet={16} mobile={16}>
+                                <div className='informer' style={{height: 305}}>
+                                    <Dimmer active>
+                                        <Loader />
+                                    </Dimmer>
+                                </div>
+                            </Grid.Column>
+                            <Grid.Column computer={8} tablet={16} mobile={16}>
+                                <div className='informer' style={{height: 305}}>
+                                    <Dimmer active>
+                                        <Loader />
+                                    </Dimmer>
+                                </div>
+                            </Grid.Column>
+                        </Grid>
+                    )}
+                </Container>
+
+
+                {/*{ ! _.isEmpty(current) && ! _.isEmpty(statistic) ? (*/}
+                {/*    <Container>*/}
+                {/*        <Grid>*/}
+                {/*            {sensors.map((item, key) => {*/}
+                {/*                return (*/}
+                {/*                    <Sensor*/}
+                {/*                        key={key}*/}
+                {/*                        widget={item}*/}
+                {/*                        data={current[item.type][item.source]}*/}
+                {/*                    />*/}
+                {/*                )*/}
+                {/*            })}*/}
+                {/*        </Grid>*/}
+                {/*        <ShortStats*/}
+                {/*            data={statistic}*/}
+                {/*            onChangePeriod={this.changePeriod}*/}
+                {/*        />*/}
+                {/*    </Container>*/}
+                {/*) : (*/}
+                {/*    <Dimmer active>*/}
+                {/*        <Loader>Загрузка</Loader>*/}
+                {/*    </Dimmer>*/}
+                {/*)}*/}
             </MainContainer>
-        );
+        )
     }
 }
 

@@ -4,9 +4,11 @@
 
 import React  from 'react'
 
-import { Grid } from 'semantic-ui-react'
+import { Grid, Dimmer, Loader } from 'semantic-ui-react'
 import { WiThermometer, WiHumidity, WiBarometer, WiDaySunny, WiHot, WiRaindrops, WiWindDeg, WiStrongWind } from 'react-icons/wi'
 import { IoIosArrowRoundUp, IoIosArrowRoundDown } from 'react-icons/io'
+
+import _ from 'lodash'
 
 const Sensor = (params) => {
 
@@ -32,11 +34,18 @@ const Sensor = (params) => {
     return (
         <Grid.Column computer={4} tablet={8} mobile={16}>
             <div className={'informer ' + params.widget.color}>
+                {
+                    _.isEmpty(params.data) && (
+                        <Dimmer active>
+                            <Loader />
+                        </Dimmer>
+                    )
+                }
                 <div className='title'>{params.widget.name}</div>
                 <Grid>
                     <Grid.Row>
                         <Grid.Column width={9} className='icon-container'>
-                            <div className='value'>{params.data.value}
+                            <div className='value'>{!_.isEmpty(params.data) ? params.data.value : '000'}
                                 {(typeof params.widget.sign !== 'undefined' && (
                                     <span className='sign'>{params.widget.sign}</span>
                                 ))}
@@ -55,7 +64,7 @@ const Sensor = (params) => {
                             ))}
                             {(params.widget.trend === true && params.data.trend !== 0 && (
                                 <div className='trend'>
-                                    <TrendIcon className={(params.data.trend > 0 ? 'trend-up' : 'trend-down')} /> {params.data.trend > 0 ? '+' : ''} {params.data.trend}
+                                    <TrendIcon className={(params.data.trend > 0 ? 'trend-up' : 'trend-down')} /> {params.data.trend > 0 ? '+' : ''} {!_.isEmpty(params.data) ? params.data.trend : '0'}
                                 </div>
                             ))}
                         </Grid.Column>
