@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Checkbox, Container, Icon } from 'semantic-ui-react'
 
+import _ from 'lodash'
 import moment from 'moment'
 
 import timeAgo from '../data/timeAgo'
@@ -11,7 +12,7 @@ class Header extends Component {
         intervalId: null,
         autoUpdate: false,
         tickTock: null,
-        lastUpdate: '---'
+        lastUpdate: null
     }
 
     componentDidMount() {
@@ -101,7 +102,11 @@ class Header extends Component {
                 />
                 <span className='last-update'>
                     <span className={((last_update > -180 && last_update < 180) ? 'online' : 'offline') + (autoUpdate ? ' pulsate' : '')}></span>
-                    {moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss")}{timeAgo(last_update)}
+                    {_.isInteger(lastUpdate) ? (
+                        moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss") + timeAgo(last_update)
+                    ) : (
+                        <span><Icon loading name='spinner' /> Загрузка...</span>
+                    )}
                 </span>
                 {/*{moment.unix(lastUpdate).fromNow()}*/}
                 <Checkbox

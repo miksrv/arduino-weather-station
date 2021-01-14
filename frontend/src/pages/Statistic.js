@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Dimmer, Loader, Button } from 'semantic-ui-react'
+import {Container, Dimmer, Loader, Button, Grid} from 'semantic-ui-react'
 
 import MainContainer from '../components/MainContainer'
 import FullStats from '../components/FullStats'
@@ -65,9 +65,22 @@ class Statistic extends Component {
                             onChangePeriod={this.changePeriod}
                         />
                     ) : (
-                        <Dimmer active>
-                            <Loader>Загрузка</Loader>
-                        </Dimmer>
+                        <Grid>
+                            <Grid.Column computer={16} tablet={16} mobile={16}>
+                                <div className='informer' style={{height: 330}}>
+                                    <Dimmer active>
+                                        <Loader />
+                                    </Dimmer>
+                                </div>
+                            </Grid.Column>
+                            <Grid.Column computer={16} tablet={16} mobile={16}>
+                                <div className='informer' style={{height: 330}}>
+                                    <Dimmer active>
+                                        <Loader />
+                                    </Dimmer>
+                                </div>
+                            </Grid.Column>
+                        </Grid>
                     )}
                 </Container>
             </MainContainer>
