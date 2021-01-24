@@ -35,7 +35,7 @@ const Summary = (props) => {
                     <div className='main-info'>
                         <div className='value'>
                             {!_.isEmpty(currentData) ? (
-                                currentData.sensors.t2.value > 0 ? '+' : '' + currentData.sensors.t2.value
+                                (currentData.sensors.t2.value > 0 ? '+' : '') + currentData.sensors.t2.value
                             ) : (
                                 <span>00.0</span>
                             )}
