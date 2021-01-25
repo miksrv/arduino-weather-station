@@ -42,6 +42,7 @@ export function fetchStatData(period = 'today', dataset = 'p,t1,h') {
 
             const payload = await response.json()
 
+            dispatch({ type: types.CLEAR_STAT_DATA })
             dispatch({ type: types.GET_STAT_DATA, payload })
         } catch (error) {
             console.error(error)

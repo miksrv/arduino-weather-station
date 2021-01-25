@@ -32,6 +32,12 @@ export default function reduce(state = initialState, action = {}) {
                 statistic: action.payload
             }
 
+        case types.CLEAR_STAT_DATA:
+            return {
+                ...state,
+                statistic: {}
+            }
+
         default:
             return state
     }
