@@ -16,41 +16,41 @@ class Main extends Component {
         const { dispatch } = this.props
 
         this.updateWeatherData()
-        dispatch(meteoActions.fetchForecastData())
+        dispatch(meteoActions.fetchDataForecast())
     }
 
     updateWeatherData = () => {
         const { dispatch } = this.props
 
-        dispatch(meteoActions.fetchMeteoData())
+        dispatch(meteoActions.fetchDataSummary())
     }
 
     render() {
-        const { current, forecast } = this.props
-        let last_update = moment().unix() - current.update
+        const { storeSummary, storeForecast } = this.props
+        let last_update = moment().unix() - storeSummary.update
 
         return (
             <MainContainer
-                updateTime={current.update}
+                updateTime={storeSummary.update}
                 onUpdateData={this.updateWeatherData}
             >
                 {(last_update < -180 || last_update > 180) && (
                     <Container>
                         <Message negative>
                             <Message.Header>Данные устарели</Message.Header>
-                            <p>Последние показания погодная станция передавала {moment.unix(current.update).format("DD.MM.Y в H:mm:ss")}</p>
+                            <p>Последние показания погодная станция передавала {moment.unix(storeSummary.update).format("DD.MM.Y в H:mm:ss")}</p>
                         </Message>
                     </Container>
                 )}
 
                 <Container>
                     <Summary
-                        currentData={current}
-                        openWeatherData={forecast}
+                        storeSummary={storeSummary}
+                        openWeatherData={storeForecast}
                     />
-                    {! _.isEmpty(forecast) ? (
+                    {! _.isEmpty(storeForecast) ? (
                         <ForeacstTile
-                            data={forecast.data.slice(0, 4)}
+                            data={storeForecast.data.slice(0, 4)}
                         />
                     ) : (
                         <Grid className='forecast-list-loader'>
@@ -78,8 +78,8 @@ class Main extends Component {
 
 function mapStateToProps(state) {
     return {
-        current: state.meteostation.current,
-        forecast: state.meteostation.forecast
+        storeSummary: state.meteostation.storeSummary,
+        storeForecast: state.meteostation.storeForecast
     }
 }
 

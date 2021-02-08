@@ -261,52 +261,52 @@ class ShortStats extends Component {
   }
 
   handleUpdateCharts() {
-    const { data } = this.props
+    const { storeStatistic } = this.props
 
     this.setState({
       chartTempHumd: {
         ...this.state.chartTempHumd,
         series: [
-          { data: data.sensors.h },
-          { data: data.sensors.t2 }
+          { data: storeStatistic.data.h },
+          { data: storeStatistic.data.t2 }
         ]
       },
       chartLuxPress: {
         series: [
-          { data: data.sensors.lux },
-          { data: data.sensors.uv },
-          { data: data.sensors.p }
+          { data: storeStatistic.data.lux },
+          { data: storeStatistic.data.uv },
+          { data: storeStatistic.data.p }
         ]
       },
       chartWindSpeed: {
         series: [
-          { data: data.sensors.ws }
+          { data: storeStatistic.data.ws }
         ]
       },
       chartWindRose: {
         series: [{
           "name": "&lt; 1 м/с",
-          "data": data.sensors.wr[0],
+          "data": storeStatistic.data.wr[0],
           "_colorIndex": 0
         }, {
           "name": "1-3 м/с",
-          "data": data.sensors.wr[1],
+          "data": storeStatistic.data.wr[1],
           "_colorIndex": 1
         }, {
           "name": "3-5 м/с",
-          "data": data.sensors.wr[2],
+          "data": storeStatistic.data.wr[2],
           "_colorIndex": 2
         }, {
           "name": "5-7 м/с",
-          "data": data.sensors.wr[3],
+          "data": storeStatistic.data.wr[3],
           "_colorIndex": 3
         }, {
           "name": "7-9 м/с",
-          "data": data.sensors.wr[4],
+          "data": storeStatistic.data.wr[4],
           "_colorIndex": 4
         }, {
           "name": "&gt; 9 м/с",
-          "data": data.sensors.wr[5],
+          "data": storeStatistic.data.wr[5],
           "_colorIndex": 5
         }]
       }

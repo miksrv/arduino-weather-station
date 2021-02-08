@@ -1,42 +1,36 @@
-// reducers hold the store's state (the initialState object defines it)
-// reducers also handle plain object actions and modify their state (immutably) accordingly
-// this is the only way to change the store's state
-// the other exports in this file are selectors, which is business logic that digests parts of the store's state
-// for easier consumption by views
-
 import * as types from './actionTypes'
 
 const initialState = {
-    current: {},
-    forecast: {},
-    statistic: {}
+    storeSummary: {},
+    storeForecast: {},
+    storeStatistic: {}
 }
 
 export default function reduce(state = initialState, action = {}) {
     switch (action.type) {
-        case types.GET_METEO_DATA:
+        case types.GET_SUMMARY:
             return {
                 ...state,
-                current: action.payload
+                storeSummary: action.payload
             }
 
-        case types.GET_FORECAST_DATA:
+        case types.GET_FORECAST:
             return {
                 ...state,
-                forecast: action.payload
+                storeForecast: action.payload
             }
 
-        case types.GET_STAT_DATA:
+        case types.GET_STATISTIC:
             return {
                 ...state,
-                statistic: action.payload
+                storeStatistic: action.payload
             }
 
-        case types.CLEAR_STAT_DATA:
-            return {
-                ...state,
-                statistic: {}
-            }
+        // case types.CLEAR_STAT_DATA:
+        //     return {
+        //         ...state,
+        //         statistic: {}
+        //     }
 
         default:
             return state

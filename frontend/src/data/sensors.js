@@ -1,6 +1,5 @@
 const data = [
   {
-    type: 'sensors',
     source: 't2',
     name: 'Температура',
     color: 'red',
@@ -9,7 +8,6 @@ const data = [
     sign: '℃'
   },
   // {
-  //   type: 'sensors',
   //   source: 't2',
   //   name: 'Температура 2 (℃)',
   //   color: 'red',
@@ -17,7 +15,6 @@ const data = [
   //   trend: true
   // },
   {
-    type: 'sensors',
     source: 'dp',
     name: 'Точка росы',
     color: 'orange',
@@ -26,7 +23,6 @@ const data = [
     sign: '℃'
   },
   {
-    type: 'sensors',
     source: 'h',
     name: 'Влажность воздуха',
     color: 'blue',
@@ -35,7 +31,6 @@ const data = [
     sign: '%'
   },
   {
-    type: 'sensors',
     source: 'p',
     name: 'Давление (мм)',
     color: 'cobalt',
@@ -43,7 +38,6 @@ const data = [
     trend: true
   },
   {
-    type: 'sensors',
     source: 'lux',
     name: 'Освещенность (lux)',
     color: 'green',
@@ -51,7 +45,6 @@ const data = [
     trend: true
   },
   {
-    type: 'sensors',
     source: 'uv',
     name: 'УФ интенсивность',
     color: 'green',
@@ -60,7 +53,6 @@ const data = [
     sign: 'мВт/м2'
   },
   {
-    type: 'sensors',
     source: 'wd',
     name: 'Направление ветра',
     color: 'purple',
@@ -69,7 +61,6 @@ const data = [
     sign: '°'
   },
   {
-    type: 'sensors',
     source: 'ws',
     name: 'Скорость ветра',
     color: 'purple',

@@ -5,14 +5,14 @@
 
 import React from 'react'
 
-import {Dimmer, Grid, Icon, Loader } from 'semantic-ui-react'
+import { Dimmer, Grid, Icon, Loader } from 'semantic-ui-react'
 import { WiStrongWind, WiBarometer, WiHumidity } from 'react-icons/wi'
 import WeatherIcon from '../data/WeatherIcon'
 
 import _ from 'lodash'
 
 const Summary = (props) => {
-    const { currentData, openWeatherData } = props
+    const { storeSummary, openWeatherData } = props
     const dayTimes   = !_.isEmpty(openWeatherData) ? openWeatherData.data[0].sys.pod : 'd'
     const background = 'url(/background/winter-' + dayTimes + '.jpg)'
 
@@ -20,7 +20,7 @@ const Summary = (props) => {
         <Grid.Column computer={8} tablet={16} mobile={16}>
             <div className='informer summary'>
                 {
-                    _.isEmpty(currentData) && (
+                    _.isEmpty(storeSummary) && (
                         <Dimmer active>
                             <Loader />
                         </Dimmer>
@@ -34,8 +34,8 @@ const Summary = (props) => {
                     <h4>Оренбургская обл., c. Ивановка, ЖК "Приуралье"</h4>
                     <div className='main-info'>
                         <div className='value'>
-                            {!_.isEmpty(currentData) ? (
-                                (currentData.sensors.t2.value > 0 ? '+' : '') + currentData.sensors.t2.value
+                            {!_.isEmpty(storeSummary) ? (
+                                (storeSummary.data.t2.value > 0 ? '+' : '') + storeSummary.data.t2.value
                             ) : (
                                 <span>00.0</span>
                             )}
@@ -58,16 +58,16 @@ const Summary = (props) => {
                     <div className='second-info'>
                         <div>
                             <WiHumidity className='icon' />
-                            {!_.isEmpty(currentData) ? (currentData.sensors.h.value) : (<Icon loading name='spinner' />)}%
+                            {!_.isEmpty(storeSummary) ? (storeSummary.data.h.value) : (<Icon loading name='spinner' />)}%
                         </div>
                         <div>
                             <WiBarometer className='icon' />
-                            {!_.isEmpty(currentData) ? (currentData.sensors.p.value) : (<Icon loading name='spinner' />)} мм.
+                            {!_.isEmpty(storeSummary) ? (storeSummary.data.p.value) : (<Icon loading name='spinner' />)} мм.
                         </div>
                         <div>
                             <WiStrongWind className='icon' />
-                            {!_.isEmpty(currentData) ? (
-                                currentData.sensors.ws.value + ' м\\с ' + currentData.sensors.wd.info
+                            {!_.isEmpty(storeSummary) ? (
+                                storeSummary.data.ws.value + ' м\\с ' + storeSummary.data.wd.info
                             ) : (<Icon loading name='spinner' />)}
                         </div>
                     </div>

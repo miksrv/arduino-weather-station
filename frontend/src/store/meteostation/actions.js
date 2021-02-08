@@ -1,18 +1,11 @@
-// actions are where most of the business logic takes place
-// they are dispatched by views or by other actions
-// there are 3 types of actions:
-//  async thunks - when doing asynchronous business logic like accessing a service
-//  sync thunks - when you have substantial business logic but it's not async
-//  plain object actions - when you just send a plain action to the reducer
-
 import * as types from './actionTypes'
 
-const METEO_ENDPOINT = 'https://api.miksoft.pro'
+const METEO_API = 'https://api.miksoft.pro/meteo/get/'
 
-export function fetchMeteoData() {
+export function fetchDataSummary() {
     return async(dispatch) => {
         try {
-            const url = `${METEO_ENDPOINT}/get/general`
+            const url = `${METEO_API}summary`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -22,17 +15,17 @@ export function fetchMeteoData() {
 
             const payload = await response.json()
 
-            dispatch({ type: types.GET_METEO_DATA, payload })
+            dispatch({ type: types.GET_SUMMARY, payload })
         } catch (error) {
             console.error(error)
         }
     }
 }
 
-export function fetchStatData(period = 'today', dataset = 'p,t1,h') {
+export function fetchDataForecast() {
     return async(dispatch) => {
         try {
-            const url = `${METEO_ENDPOINT}/get/statistic?period=${period}&dataset=${dataset}`
+            const url = `${METEO_API}forecast`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -42,18 +35,17 @@ export function fetchStatData(period = 'today', dataset = 'p,t1,h') {
 
             const payload = await response.json()
 
-            dispatch({ type: types.CLEAR_STAT_DATA })
-            dispatch({ type: types.GET_STAT_DATA, payload })
+            dispatch({ type: types.GET_FORECAST, payload })
         } catch (error) {
             console.error(error)
         }
     }
 }
 
-export function fetchForecastData() {
+export function fetchDataStatistic() {
     return async(dispatch) => {
         try {
-            const url = `${METEO_ENDPOINT}/get/forecast`
+            const url = `${METEO_API}statistic`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -63,7 +55,7 @@ export function fetchForecastData() {
 
             const payload = await response.json()
 
-            dispatch({ type: types.GET_FORECAST_DATA, payload })
+            dispatch({ type: types.GET_STATISTIC, payload })
         } catch (error) {
             console.error(error)
         }

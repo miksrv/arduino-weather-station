@@ -12,29 +12,27 @@ import * as meteoActions from '../store/meteostation/actions'
 
 import _ from 'lodash'
 
-const data_set = 'p,t2,h,uv,lux,ws,wd'
-
 class Dashboard extends Component {
 
     componentDidMount() {
         const { dispatch } = this.props
 
         this.updateWeatherData()
-        dispatch(meteoActions.fetchStatData('today', data_set))
+        dispatch(meteoActions.fetchDataStatistic())
     }
 
     updateWeatherData = () => {
         const { dispatch } = this.props
 
-        dispatch(meteoActions.fetchMeteoData())
+        dispatch(meteoActions.fetchDataSummary())
     }
 
     render() {
-        const { current, statistic } = this.props
+        const { storeSummary, storeStatistic } = this.props
 
         return (
             <MainContainer
-                updateTime={current.update}
+                updateTime={storeSummary.update}
                 onUpdateData={this.updateWeatherData}
             >
                 <Container>
@@ -44,14 +42,14 @@ class Dashboard extends Component {
                                 <Sensor
                                     key={key}
                                     widget={item}
-                                    data={! _.isEmpty(current) ? current[item.type][item.source] : []}
+                                    data={! _.isEmpty(storeSummary) ? storeSummary.data[item.source] : []}
                                 />
                             )
                         })}
                     </Grid>
-                    { ! _.isEmpty(statistic) ? (
+                    { ! _.isEmpty(storeStatistic) ? (
                         <ShortStats
-                            data={statistic}
+                            storeStatistic={storeStatistic}
                             onChangePeriod={this.changePeriod}
                         />
                     ) : (
@@ -73,31 +71,6 @@ class Dashboard extends Component {
                         </Grid>
                     )}
                 </Container>
-
-
-                {/*{ ! _.isEmpty(current) && ! _.isEmpty(statistic) ? (*/}
-                {/*    <Container>*/}
-                {/*        <Grid>*/}
-                {/*            {sensors.map((item, key) => {*/}
-                {/*                return (*/}
-                {/*                    <Sensor*/}
-                {/*                        key={key}*/}
-                {/*                        widget={item}*/}
-                {/*                        data={current[item.type][item.source]}*/}
-                {/*                    />*/}
-                {/*                )*/}
-                {/*            })}*/}
-                {/*        </Grid>*/}
-                {/*        <ShortStats*/}
-                {/*            data={statistic}*/}
-                {/*            onChangePeriod={this.changePeriod}*/}
-                {/*        />*/}
-                {/*    </Container>*/}
-                {/*) : (*/}
-                {/*    <Dimmer active>*/}
-                {/*        <Loader>Загрузка</Loader>*/}
-                {/*    </Dimmer>*/}
-                {/*)}*/}
             </MainContainer>
         )
     }
@@ -105,8 +78,8 @@ class Dashboard extends Component {
 
 function mapStateToProps(state) {
     return {
-        statistic: state.meteostation.statistic,
-        current: state.meteostation.current
+        storeStatistic: state.meteostation.storeStatistic,
+        storeSummary: state.meteostation.storeSummary
     }
 }
 

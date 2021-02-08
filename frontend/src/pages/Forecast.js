@@ -17,20 +17,20 @@ class Forecast extends Component {
     componentDidMount() {
         const { dispatch } = this.props
 
-        dispatch(meteoActions.fetchForecastData())
+        dispatch(meteoActions.fetchDataForecast())
     }
 
     updateWeatherData = () => {}
 
     render() {
-        const { forecast } = this.props
+        const { storeForecast } = this.props
 
         return (
             <MainContainer
                 updateTime={moment().unix()}
                 onUpdateData={this.updateWeatherData}
             >
-                { ! _.isEmpty(forecast) ? (
+                { ! _.isEmpty(storeForecast) ? (
                     <div>
                         <Responsive as={Container} minWidth={768}>
                             <Table celled inverted selectable className='weather-table'>
@@ -55,7 +55,7 @@ class Forecast extends Component {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    {forecast.data.map((item, key) => (
+                                    {storeForecast.data.map((item, key) => (
                                         <Table.Row key={key}>
                                             <Table.Cell>
                                                 <Image src={'http://openweathermap.org/img/wn/' + item.weather[0].icon + '.png'} />
@@ -87,7 +87,7 @@ class Forecast extends Component {
                         </Responsive>
                         <Responsive as={Container} maxWidth={766}>
                             <ForeacstTile
-                                data={forecast.data}
+                                data={storeForecast.data}
                             />
                         </Responsive>
                     </div>
@@ -103,7 +103,7 @@ class Forecast extends Component {
 
 function mapStateToProps(state) {
     return {
-        forecast: state.meteostation.forecast
+        storeForecast: state.meteostation.storeForecast
     }
 }
 

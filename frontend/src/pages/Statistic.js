@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import {Container, Dimmer, Loader, Button, Grid} from 'semantic-ui-react'
+import { Container, Dimmer, Loader, Button, Grid } from 'semantic-ui-react'
 
 import MainContainer from '../components/MainContainer'
 import FullStats from '../components/FullStats'
@@ -11,7 +11,6 @@ import * as meteoActions from '../store/meteostation/actions'
 
 import _ from 'lodash'
 
-const data_set = 'p,t2,h,dp,uv,lux,ws,wd'
 
 class Statistic extends Component {
 
@@ -24,7 +23,7 @@ class Statistic extends Component {
         const { dispatch } = this.props
         const { period } = this.state
 
-        dispatch(meteoActions.fetchStatData(period, data_set))
+        dispatch(meteoActions.fetchDataStatistic())
     }
 
     changePeriod = ( period ) => {
@@ -33,7 +32,7 @@ class Statistic extends Component {
         if ( period !== this.state.period ) {
             this.setState({ loader: true, period })
 
-            dispatch(meteoActions.fetchStatData(period, data_set)).then(() => {
+            dispatch(meteoActions.fetchDataStatistic()).then(() => {
                 this.setState({ loader: false })
             });
         }
@@ -42,7 +41,7 @@ class Statistic extends Component {
     updateWeatherData = () => {}
 
     render() {
-        const { statistic } = this.props
+        const { storeStatistic } = this.props
         const { loader } = this.state
 
         return (
@@ -59,9 +58,9 @@ class Statistic extends Component {
                             <Button color='grey' onClick={() => this.changePeriod('month')}>Месяц</Button>
                         </Button.Group>
                     </div>
-                    { (! _.isEmpty(statistic) && ! loader) ? (
+                    { (! _.isEmpty(storeStatistic) && ! loader) ? (
                         <FullStats
-                            data={statistic}
+                            storeStatistic={storeStatistic}
                             onChangePeriod={this.changePeriod}
                         />
                     ) : (
@@ -90,8 +89,7 @@ class Statistic extends Component {
 
 function mapStateToProps(state) {
     return {
-        statistic: state.meteostation.statistic,
-        current: state.meteostation.current
+        storeStatistic: state.meteostation.storeStatistic
     }
 }
 

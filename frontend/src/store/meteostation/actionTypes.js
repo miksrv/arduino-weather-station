@@ -1,6 +1,6 @@
-// strings should be unique across reducers so namespace them with the reducer name
+export const GET_SUMMARY   = 'meteo.GET_SUMMARY'
+export const GET_FORECAST  = 'meteo.GET_FORECAST'
+export const GET_STATISTIC = 'meteo.GET_STATISTIC'
 
-export const GET_METEO_DATA = 'meteo.GET_METEO_DATA'
-export const GET_STAT_DATA = 'meteo.GET_STAT_DATA'
-export const CLEAR_STAT_DATA = 'meteo.CLEAR_STAT_DATA'
-export const GET_FORECAST_DATA = 'meteo.GET_FORECAST_DATA'
+// export const GET_STAT_DATA = 'meteo.GET_STAT_DATA'
+// export const CLEAR_STAT_DATA = 'meteo.CLEAR_STAT_DATA'
