@@ -20,7 +20,7 @@ class Main extends Component {
     }
 
     updateWeatherData = () => {
-        const { dispatch } = this.props
+        const { dispatch, storeSummary } = this.props
 
         dispatch(meteoActions.fetchDataSummary())
     }

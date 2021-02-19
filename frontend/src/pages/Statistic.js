@@ -50,14 +50,14 @@ class Statistic extends Component {
                 onUpdateData={this.updateWeatherData}
             >
                 <Container>
-                    <div className='toolBar'>
-                        <Button.Group size='mini'>
-                            <Button color='grey' onClick={() => this.changePeriod('today')}>Сегодня</Button>
-                            <Button color='grey' onClick={() => this.changePeriod('yesterday')}>Вчера</Button>
-                            <Button color='grey' onClick={() => this.changePeriod('week')}>Неделя</Button>
-                            <Button color='grey' onClick={() => this.changePeriod('month')}>Месяц</Button>
-                        </Button.Group>
-                    </div>
+                    {/*<div className='toolBar'>*/}
+                    {/*    <Button.Group size='mini'>*/}
+                    {/*        <Button color='grey' onClick={() => this.changePeriod('today')}>Сегодня</Button>*/}
+                    {/*        <Button color='grey' onClick={() => this.changePeriod('yesterday')}>Вчера</Button>*/}
+                    {/*        <Button color='grey' onClick={() => this.changePeriod('week')}>Неделя</Button>*/}
+                    {/*        <Button color='grey' onClick={() => this.changePeriod('month')}>Месяц</Button>*/}
+                    {/*    </Button.Group>*/}
+                    {/*</div>*/}
                     { (! _.isEmpty(storeStatistic) && ! loader) ? (
                         <FullStats
                             storeStatistic={storeStatistic}
