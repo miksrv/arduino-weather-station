@@ -43,10 +43,10 @@ class MainContainer extends Component {
                         <Icon name='area graph' />
                         Статистика
                     </Menu.Item>
-                    <Menu.Item as={NavLink} to='/forecast' activeClassName='active'>
-                        <Icon name='clock' />
-                        Прогноз
-                    </Menu.Item>
+                    {/*<Menu.Item as={NavLink} to='/forecast' activeClassName='active'>*/}
+                    {/*    <Icon name='clock' />*/}
+                    {/*    Прогноз*/}
+                    {/*</Menu.Item>*/}
                 </Sidebar>
 
                 <Sidebar.Pusher dimmed={showSidebar}>

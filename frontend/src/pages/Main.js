@@ -48,9 +48,10 @@ class Main extends Component {
                         storeSummary={storeSummary}
                         openWeatherData={storeForecast}
                     />
+                    <br />
                     {! _.isEmpty(storeForecast) ? (
                         <ForeacstTile
-                            data={storeForecast.data.slice(0, 4)}
+                            data={storeForecast.data}
                         />
                     ) : (
                         <Grid className='forecast-list-loader'>

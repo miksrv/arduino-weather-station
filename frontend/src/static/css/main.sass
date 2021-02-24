@@ -16,10 +16,6 @@ body
     background-color: #191b22
     margin: 0
 
-.no-padding-bottom
-    padding-bottom: 0 !important
-    margin-bottom: 0 !important
-
 .ui.container
     max-width: 1200px !important
 
@@ -141,33 +137,46 @@ body
 .chart-container > div
     box-shadow: 0 0 10px rgba(0,0,0,0.5)
 
-.forecast-list
-    margin-top: 1em !important
+// Forecast carousel nav button
+.lgksPe, .iLquPE
+    background-color: rgb(55, 55, 55) !important
+    color: $main-color !important
+    border-radius: 10% !important
+    font-size: 1.3em !important
+    padding: 0 20px !important
 
-    .column
-        margin-bottom: 2em !important
+.lgksPe
+    padding: 0 10px !important
+
+.lgksPe:disabled, .iLquPE:disabled
+    opacity: .4
+
+.lgksPe:hover:enabled, .lgksPe:focus:enabled
+    background-color: rgb(98, 98, 98) !important
 
 .forecast-tile
     border-radius: 5px
     padding: 1em
-    box-shadow: 0 0 10px rgba(0,0,0,0.5)
-
     text-align: center
-
-    .time
-        font-size: 1.5em
+    width: 340px
+    background: #373737
 
     .date
         font-size: .8em
         color: $second-color
 
+    .desc
+        font-size: .9em
+        line-height: 1em
+        height: 28px
+        color: $second-color
+
     .image
         margin: -.1em auto -.4em
-        font-size: 6em
+        font-size: 4em
 
     .temp, .wind
-        font-size: 2em
-        font-weight: 900
+        font-size: 1.6em
 
         .sign
             font-size: 13px
@@ -177,18 +186,6 @@ body
     .icon-container
         text-align: right
         padding-right: 0 !important
-
-    .value-container
-        text-align: left
-
-.forecast-list > .row > .column:nth-child(even) .forecast-tile
-    background: #464646
-
-.forecast-list > .row > .column:nth-child(odd) .forecast-tile
-    background: #5b5b5b
-
-.forecast-list-loader
-    margin-top: 2vh !important
 
 .informer
     position: relative

@@ -11,12 +11,10 @@ import * as meteoActions from '../store/meteostation/actions'
 
 import _ from 'lodash'
 
-
 class Statistic extends Component {
 
     state = {
         loader: false,
-        period: 'today'
     }
 
     componentDidMount() {
