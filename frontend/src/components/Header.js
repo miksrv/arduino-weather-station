@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Checkbox, Container, Icon } from 'semantic-ui-react'
+import { Container, Button, Icon } from 'semantic-ui-react'
 
 import _ from 'lodash'
 import moment from 'moment'
@@ -46,6 +46,8 @@ class Header extends Component {
     }
 
     handleChangeAutoupdate = () => {
+        console.log('autoUpdate', this.state.autoUpdate)
+
         this.setState(({ autoUpdate }) => ({ autoUpdate: !autoUpdate }))
     }
 
@@ -109,13 +111,10 @@ class Header extends Component {
                     )}
                 </span>
                 {/*{moment.unix(lastUpdate).fromNow()}*/}
-                <Checkbox
-                    toggle
-                    checked={autoUpdate}
-                    label=''
-                    onChange={this.handleChangeAutoupdate}
-                    className='update-switch'
-                />
+                <span className='buttons'>
+                    {/*<Button icon='lightbulb' disabled size='mini' active={false} />*/}
+                    <Button icon='refresh' color={autoUpdate ? 'green' : 'gray'} size='mini' onClick={this.handleChangeAutoupdate} />
+                </span>
             </Container>
         )
     }

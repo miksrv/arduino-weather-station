@@ -108,6 +108,15 @@ body
     padding: .8em 1em
     margin: 2em 0
 
+    .buttons
+        display: inline-block
+        margin-left: 1em
+        font-size: .8em
+        float: right
+
+        .icon
+            color: $main-color
+
 .last-update
     display: inline-block
     margin-left: 1em
@@ -138,20 +147,20 @@ body
     box-shadow: 0 0 10px rgba(0,0,0,0.5)
 
 // Forecast carousel nav button
-.lgksPe, .iLquPE
+.rec-arrow-right, .rec-arrow-left
     background-color: rgb(55, 55, 55) !important
     color: $main-color !important
     border-radius: 10% !important
     font-size: 1.3em !important
+    padding: 0 15px !important
+
+.rec-arrow-right
     padding: 0 20px !important
 
-.lgksPe
-    padding: 0 10px !important
-
-.lgksPe:disabled, .iLquPE:disabled
+.rec-arrow-right:disabled, .rec-arrow-left:disabled
     opacity: .4
 
-.lgksPe:hover:enabled, .lgksPe:focus:enabled
+.rec-arrow-right:hover:enabled, .rec-arrow-left:focus:enabled
     background-color: rgb(98, 98, 98) !important
 
 .forecast-tile
@@ -201,7 +210,7 @@ body
         color: #D9D9D9
 
     .value
-        font-size: 25px
+        font-size: 1.5em
         font-weight: 600
         text-shadow: 0 0 10px rgba(0, 0, 0, 0.5)
 
@@ -212,8 +221,8 @@ body
     .icon
         position: absolute
         right: 0
-        top: -12px
-        font-size: 4em
+        top: -6px
+        font-size: 3em
 
     .spinner
         position: initial

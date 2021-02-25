@@ -25,7 +25,7 @@ const ForeacstTile = (props) => {
             breakPoints={breakPoints}
             itemsToScroll={1}
             pagination={false}
-            itemPadding={[0, 10]}
+            itemPadding={[0, 5]}
         >
             {data.map((item, key) => (
                 <div className='forecast-tile' key={key}>
