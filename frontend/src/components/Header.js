@@ -46,8 +46,6 @@ class Header extends Component {
     }
 
     handleChangeAutoupdate = () => {
-        console.log('autoUpdate', this.state.autoUpdate)
-
         this.setState(({ autoUpdate }) => ({ autoUpdate: !autoUpdate }))
     }
 
@@ -61,7 +59,7 @@ class Header extends Component {
         if (autoUpdate) {
             const intervalId = setInterval(() => {
                 onUpdateData()
-            }, 30000)
+            }, 5000)
 
             const tickTock = setInterval(() => {
                 this.tickClock()
@@ -113,7 +111,7 @@ class Header extends Component {
                 {/*{moment.unix(lastUpdate).fromNow()}*/}
                 <span className='buttons'>
                     {/*<Button icon='lightbulb' disabled size='mini' active={false} />*/}
-                    <Button icon='refresh' color={autoUpdate ? 'green' : 'gray'} size='mini' onClick={this.handleChangeAutoupdate} />
+                    <Button icon='refresh' color={autoUpdate ? 'green' : 'orange'} size='mini' onClick={this.handleChangeAutoupdate} />
                 </span>
             </Container>
         )

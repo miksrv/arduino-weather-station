@@ -1,6 +1,8 @@
+import _ from 'lodash'
+
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Dimmer, Loader, Button, Grid } from 'semantic-ui-react'
+import { Container, Dimmer, Loader, Grid } from 'semantic-ui-react'
 
 import MainContainer from '../components/MainContainer'
 import FullStats from '../components/FullStats'
@@ -9,8 +11,6 @@ import moment from 'moment'
 
 import * as meteoActions from '../store/meteostation/actions'
 
-import _ from 'lodash'
-
 class Statistic extends Component {
 
     state = {
@@ -18,25 +18,26 @@ class Statistic extends Component {
     }
 
     componentDidMount() {
-        const { dispatch } = this.props
-        const { period } = this.state
+        const { dispatch, storeStatistic } = this.props
 
-        dispatch(meteoActions.fetchDataStatistic())
+        let last_update = (! _.isEmpty(storeStatistic) ? moment().unix() - storeStatistic.update : null)
+
+        if (last_update === null || (last_update < -180 || last_update > 180))
+            dispatch(meteoActions.fetchDataStatistic())
+
     }
 
-    changePeriod = ( period ) => {
-        const { dispatch } = this.props
-
-        if ( period !== this.state.period ) {
-            this.setState({ loader: true, period })
-
-            dispatch(meteoActions.fetchDataStatistic()).then(() => {
-                this.setState({ loader: false })
-            });
-        }
-    }
-
-    updateWeatherData = () => {}
+    // changePeriod = ( period ) => {
+    //     const { dispatch } = this.props
+    //
+    //     if ( period !== this.state.period ) {
+    //         this.setState({ loader: true, period })
+    //
+    //         dispatch(meteoActions.fetchDataStatistic()).then(() => {
+    //             this.setState({ loader: false })
+    //         })
+    //     }
+    // }
 
     render() {
         const { storeStatistic } = this.props
@@ -45,7 +46,6 @@ class Statistic extends Component {
         return (
             <MainContainer
                 updateTime={moment().unix()}
-                onUpdateData={this.updateWeatherData}
             >
                 <Container>
                     {/*<div className='toolBar'>*/}

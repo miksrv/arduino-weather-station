@@ -1,4 +1,7 @@
+import _ from 'lodash'
+
 import React, { Component } from 'react'
+import moment from 'moment'
 import { connect } from 'react-redux'
 import { Container, Dimmer, Grid, Loader, Message } from 'semantic-ui-react'
 
@@ -7,22 +10,14 @@ import Summary from '../layouts/Summary'
 import ForeacstTile from '../layouts/ForeacstTile'
 
 import * as meteoActions from '../store/meteostation/actions'
-import _ from 'lodash'
-import moment from 'moment'
 
 class Main extends Component {
 
     componentDidMount() {
-        const { dispatch } = this.props
+        const { dispatch, storeForecast } = this.props
 
-        this.updateWeatherData()
-        dispatch(meteoActions.fetchDataForecast())
-    }
-
-    updateWeatherData = () => {
-        const { dispatch, storeSummary } = this.props
-
-        dispatch(meteoActions.fetchDataSummary())
+        if (_.isEmpty(storeForecast))
+            dispatch(meteoActions.fetchDataForecast())
     }
 
     render() {
@@ -32,7 +27,6 @@ class Main extends Component {
         return (
             <MainContainer
                 updateTime={storeSummary.update}
-                onUpdateData={this.updateWeatherData}
             >
                 {(last_update < -180 || last_update > 180) && (
                     <Container>
@@ -73,7 +67,7 @@ class Main extends Component {
                     )}
                 </Container>
             </MainContainer>
-        );
+        )
     }
 }
 

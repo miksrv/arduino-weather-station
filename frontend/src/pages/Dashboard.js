@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Container, Dimmer, Grid, Loader } from 'semantic-ui-react'
@@ -9,22 +11,17 @@ import Sensor from '../layouts/Sensor'
 import sensors from '../data/sensors'
 
 import * as meteoActions from '../store/meteostation/actions'
-
-import _ from 'lodash'
+import moment from "moment";
 
 class Dashboard extends Component {
 
     componentDidMount() {
-        const { dispatch } = this.props
+        const { dispatch, storeStatistic } = this.props
 
-        this.updateWeatherData()
-        dispatch(meteoActions.fetchDataStatistic())
-    }
+        let last_update = (! _.isEmpty(storeStatistic) ? moment().unix() - storeStatistic.update : null)
 
-    updateWeatherData = () => {
-        const { dispatch } = this.props
-
-        dispatch(meteoActions.fetchDataSummary())
+        if (last_update === null || (last_update < -180 || last_update > 180))
+            dispatch(meteoActions.fetchDataStatistic())
     }
 
     render() {
@@ -33,7 +30,6 @@ class Dashboard extends Component {
         return (
             <MainContainer
                 updateTime={storeSummary.update}
-                onUpdateData={this.updateWeatherData}
             >
                 <Container>
                     <Grid>

@@ -1,14 +1,33 @@
+import _ from 'lodash'
+
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import { Sidebar, Menu, Icon } from 'semantic-ui-react'
 
 import Header from '../components/Header'
 import Footer from '../layouts/Footer'
 
+import * as meteoActions from '../store/meteostation/actions'
+import moment from "moment";
+
 class MainContainer extends Component {
 
     state = {
         showSidebar: false,
+    }
+
+    componentDidMount() {
+        this.updateWeatherData()
+    }
+
+    updateWeatherData = () => {
+        const { dispatch, storeSummary } = this.props
+
+        let last_update = (! _.isEmpty(storeSummary) ? moment().unix() - storeSummary.update : null)
+
+        if (last_update === null || (last_update < -180 || last_update > 180))
+            dispatch(meteoActions.fetchDataSummary())
     }
 
     setVisible = showSidebar => {
@@ -32,12 +51,12 @@ class MainContainer extends Component {
                     width='thin'
                 >
                     <Menu.Item as={NavLink} exact to='/'>
-                            <Icon name='calendar check outline' />
-                            Сводка
+                        <Icon name='calendar check outline' />
+                        Сводка
                     </Menu.Item>
                     <Menu.Item as={NavLink} to='/dashboard' activeClassName='active'>
-                            <Icon name='dashboard' />
-                            Датчики
+                        <Icon name='dashboard' />
+                        Датчики
                     </Menu.Item>
                     <Menu.Item as={NavLink} to='/statistic' activeClassName='active'>
                         <Icon name='area graph' />
@@ -48,11 +67,10 @@ class MainContainer extends Component {
                     {/*    Прогноз*/}
                     {/*</Menu.Item>*/}
                 </Sidebar>
-
                 <Sidebar.Pusher dimmed={showSidebar}>
                     <Header
                         updateTime={updateTime}
-                        onUpdateData={onUpdateData}
+                        onUpdateData={() => this.updateWeatherData()}
                         onClickMenu={() => this.setVisible(true)}
                     />
                     {children}
@@ -63,4 +81,10 @@ class MainContainer extends Component {
     }
 }
 
-export default MainContainer
+function mapStateToProps(state) {
+    return {
+        storeSummary: state.meteostation.storeSummary
+    }
+}
+
+export default connect(mapStateToProps)(MainContainer)
