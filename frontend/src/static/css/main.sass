@@ -22,9 +22,6 @@ body
 .ui.toggle.checkbox label, .ui.toggle.checkbox input:checked ~ label, .ui.toggle.checkbox input:focus:checked ~ label
     color: $main-color !important
 
-.hamburger
-    cursor: pointer
-
 .update-switch
     margin-top: 2px
     float: right
@@ -107,38 +104,42 @@ body
     background: #373737
     padding: .8em 1em
     margin: 2em 0
+    display: flex !important
+    flex-direction: row
+    align-items: center
+
+    .hamburger
+        cursor: pointer
+        font-size: 33px !important
+
+    .hamburger:hover
+        color: $second-color
 
     .buttons
-        display: inline-block
         margin-left: 1em
         font-size: .8em
-        float: right
+        margin-left: auto
 
         .icon
             color: $main-color
 
-.last-update
-    display: inline-block
-    margin-left: 1em
-    font-size: .8em
+    .last-update
+        margin-left: .5vh
+        font-size: .8em
 
-.online, .offline
-    background: $green
-    display: inline-block
-    width: 11px
-    height: 11px
-    border-radius: 50%
-    margin-right: 1vh
-    margin-top: 3px
-    float: left
+    .online, .offline
+        background: $green
+        width: 5px
+        height: 26px
+        margin-left: 1vh
 
-.online.pulsate
-    -webkit-animation: pulsate 2s infinite
-    -moz-animation: pulsate 2s infinite
-    animation: pulsate 2s infinite
+    .online.pulsate
+        -webkit-animation: pulsate 2s infinite
+        -moz-animation: pulsate 2s infinite
+        animation: pulsate 2s infinite
 
-.offline
-    background: $red
+    .offline
+        background: $red
 
 .chart
     margin-top: 1.5vh
@@ -201,17 +202,20 @@ body
     border-radius: 5px
     padding: 1em
     box-shadow: 0 0 10px rgba(0,0,0,0.5)
-    height: 126px
+    height: 115px
+
+    .row-value
+        padding: .4em 0 !important
 
     .title
-        text-transform: uppercase
-        font-size: 11px
+        font-size: 12px
         color: #D9D9D9
+        border-top: 4px solid transparent
+        padding-top: 1vh
 
     .value
         font-size: 1.5em
         font-weight: 600
-        text-shadow: 0 0 10px rgba(0, 0, 0, 0.5)
 
         .sign
             font-size: 13px
@@ -258,9 +262,26 @@ body
     .grid
         margin: 0 0
 
-
     .grid-info
         margin-top: 0 !important
+
+.informer.orange .title
+    border-top-color: $orange
+
+.informer.red .title
+    border-top-color: $red
+
+.informer.blue .title
+    border-top-color: $blue
+
+.informer.cobalt .title
+    border-top-color: $cobalt
+
+.informer.green .title
+    border-top-color: $green
+
+.informer.purple .title
+    border-top-color: $purple
 
 .summary
     height: auto

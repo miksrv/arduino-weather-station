@@ -43,7 +43,7 @@ const Sensor = (params) => {
                 }
                 <div className='title'>{params.widget.name}</div>
                 <Grid>
-                    <Grid.Row>
+                    <Grid.Row className='row-value'>
                         <Grid.Column width={9} className='icon-container'>
                             <div className='value'>{!_.isEmpty(params.data) ? params.data.value : '000'}
                                 {(typeof params.widget.sign !== 'undefined' && (

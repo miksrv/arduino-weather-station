@@ -59,7 +59,7 @@ class Header extends Component {
         if (autoUpdate) {
             const intervalId = setInterval(() => {
                 onUpdateData()
-            }, 5000)
+            }, 30000)
 
             const tickTock = setInterval(() => {
                 this.tickClock()
@@ -100,10 +100,13 @@ class Header extends Component {
                     size='big'
                     onClick={() => onClickMenu()}
                 />
+                <span className={((last_update > -180 && last_update < 180) ? 'online' : 'offline') + (autoUpdate ? ' pulsate' : '')}></span>
                 <span className='last-update'>
-                    <span className={((last_update > -180 && last_update < 180) ? 'online' : 'offline') + (autoUpdate ? ' pulsate' : '')}></span>
                     {_.isInteger(lastUpdate) ? (
-                        moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss") + timeAgo(last_update)
+                        <>
+                            <div>{moment.unix(lastUpdate).format("DD.MM.Y, H:mm:ss")}</div>
+                            <div>{timeAgo(last_update)}</div>
+                        </>
                     ) : (
                         <span><Icon loading name='spinner' /> Загрузка...</span>
                     )}
@@ -111,7 +114,7 @@ class Header extends Component {
                 {/*{moment.unix(lastUpdate).fromNow()}*/}
                 <span className='buttons'>
                     {/*<Button icon='lightbulb' disabled size='mini' active={false} />*/}
-                    <Button icon='refresh' color={autoUpdate ? 'green' : 'orange'} size='mini' onClick={this.handleChangeAutoupdate} />
+                    <Button icon='refresh' color={autoUpdate ? 'green' : 'orange'} size='tiny' onClick={this.handleChangeAutoupdate} />
                 </span>
             </Container>
         )

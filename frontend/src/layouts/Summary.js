@@ -14,7 +14,7 @@ import _ from 'lodash'
 const Summary = (props) => {
     const { storeSummary, openWeatherData } = props
     const dayTimes   = !_.isEmpty(openWeatherData) ? openWeatherData.data[0].sys.pod : 'd'
-    const background = 'url(/background/winter-' + dayTimes + '.jpg)'
+    const background = 'url(/background/spring-' + dayTimes + '.jpg)'
 
     return (
         <Grid.Column computer={8} tablet={16} mobile={16}>

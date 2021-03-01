@@ -26,7 +26,7 @@ class MainContainer extends Component {
 
         let last_update = (! _.isEmpty(storeSummary) ? moment().unix() - storeSummary.update : null)
 
-        if (last_update === null || (last_update < -180 || last_update > 180))
+        if (last_update === null || (last_update < -140 || last_update > 140))
             dispatch(meteoActions.fetchDataSummary())
     }
 
