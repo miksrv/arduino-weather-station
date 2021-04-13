@@ -2,7 +2,7 @@ import _ from 'lodash'
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Dimmer, Loader, Grid } from 'semantic-ui-react'
+import { Container, Dimmer, Loader, Grid, Button } from 'semantic-ui-react'
 
 import MainContainer from '../components/MainContainer'
 import FullStats from '../components/FullStats'
@@ -24,20 +24,22 @@ class Statistic extends Component {
 
         if (last_update === null || (last_update < -180 || last_update > 180))
             dispatch(meteoActions.fetchDataStatistic())
-
     }
 
-    // changePeriod = ( period ) => {
-    //     const { dispatch } = this.props
-    //
-    //     if ( period !== this.state.period ) {
-    //         this.setState({ loader: true, period })
-    //
-    //         dispatch(meteoActions.fetchDataStatistic()).then(() => {
-    //             this.setState({ loader: false })
-    //         })
-    //     }
-    // }
+    changePeriod = ( period ) => {
+        const { dispatch } = this.props
+
+        if ( period !== this.state.period ) {
+            this.setState({ loader: true, period })
+
+            let date_start = moment().subtract(period,'d').format('YYYY-MM-DD'),
+                date_end   = moment().format('YYYY-MM-DD')
+
+            dispatch(meteoActions.fetchDataStatistic(date_start, date_end)).then(() => {
+                this.setState({ loader: false })
+            })
+        }
+    }
 
     render() {
         const { storeStatistic } = this.props
@@ -48,14 +50,14 @@ class Statistic extends Component {
                 updateTime={moment().unix()}
             >
                 <Container>
-                    {/*<div className='toolBar'>*/}
-                    {/*    <Button.Group size='mini'>*/}
-                    {/*        <Button color='grey' onClick={() => this.changePeriod('today')}>Сегодня</Button>*/}
-                    {/*        <Button color='grey' onClick={() => this.changePeriod('yesterday')}>Вчера</Button>*/}
-                    {/*        <Button color='grey' onClick={() => this.changePeriod('week')}>Неделя</Button>*/}
-                    {/*        <Button color='grey' onClick={() => this.changePeriod('month')}>Месяц</Button>*/}
-                    {/*    </Button.Group>*/}
-                    {/*</div>*/}
+                    <div className='toolBar'>
+                        <Button.Group size='mini'>
+                            <Button color='grey' onClick={() => this.changePeriod(0)}>Сегодня</Button>
+                            <Button color='grey' onClick={() => this.changePeriod(1)}>Вчера</Button>
+                            <Button color='grey' onClick={() => this.changePeriod(7)}>Неделя</Button>
+                            <Button color='grey' onClick={() => this.changePeriod(30)}>Месяц</Button>
+                        </Button.Group>
+                    </div>
                     { (! _.isEmpty(storeStatistic) && ! loader) ? (
                         <FullStats
                             storeStatistic={storeStatistic}

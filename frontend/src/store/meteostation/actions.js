@@ -42,10 +42,11 @@ export function fetchDataForecast() {
     }
 }
 
-export function fetchDataStatistic() {
+export function fetchDataStatistic(start = null, end = null) {
     return async(dispatch) => {
         try {
-            const url = `${METEO_API}statistic`
+            const range = (start !== null && end !== null) ? `?date_start=${start}&date_end=${end}` : ``
+            const url   = `${METEO_API}statistic${range}`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
