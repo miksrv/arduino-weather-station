@@ -49,14 +49,7 @@ class Main extends Component {
                         />
                     ) : (
                         <Grid className='forecast-list-loader'>
-                            <Grid.Column computer={8} tablet={16} mobile={16}>
-                                <div className='informer' style={{height: 210}}>
-                                    <Dimmer active>
-                                        <Loader />
-                                    </Dimmer>
-                                </div>
-                            </Grid.Column>
-                            <Grid.Column computer={8} tablet={16} mobile={16}>
+                            <Grid.Column computer={16} tablet={16} mobile={16}>
                                 <div className='informer' style={{height: 210}}>
                                     <Dimmer active>
                                         <Loader />
