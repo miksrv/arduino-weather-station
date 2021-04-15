@@ -11,7 +11,8 @@ import Sensor from '../layouts/Sensor'
 import sensors from '../data/sensors'
 
 import * as meteoActions from '../store/meteostation/actions'
-import moment from "moment";
+
+import moment from 'moment'
 
 class Dashboard extends Component {
 
@@ -30,6 +31,7 @@ class Dashboard extends Component {
         return (
             <MainContainer
                 updateTime={storeSummary.update}
+                title='Датчики'
             >
                 <Container>
                     <Grid>

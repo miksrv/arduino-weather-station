@@ -67,6 +67,7 @@ class Statistic extends Component {
         return (
             <MainContainer
                 updateTime={moment().unix()}
+                title='Статистика'
             >
                 <Container>
                     <div className='toolBar'>

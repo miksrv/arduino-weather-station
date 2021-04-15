@@ -27,6 +27,7 @@ class Main extends Component {
         return (
             <MainContainer
                 updateTime={storeSummary.update}
+                title='Погода в Оренбурге'
             >
                 {(last_update < -180 || last_update > 180) && (
                     <Container>

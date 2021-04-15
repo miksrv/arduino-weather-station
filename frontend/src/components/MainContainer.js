@@ -4,12 +4,15 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import { Sidebar, Menu, Icon } from 'semantic-ui-react'
+import { Helmet } from 'react-helmet'
 
 import Header from '../components/Header'
 import Footer from '../layouts/Footer'
 
 import * as meteoActions from '../store/meteostation/actions'
-import moment from "moment";
+import moment from 'moment'
+
+const SITE_TITLE = 'Погодная станция'
 
 class MainContainer extends Component {
 
@@ -36,7 +39,7 @@ class MainContainer extends Component {
 
     render() {
         const { showSidebar } = this.state
-        const { updateTime, onUpdateData, children } = this.props
+        const { updateTime, onUpdateData, children, title } = this.props
 
         return (
             <Sidebar.Pushable>
@@ -68,6 +71,9 @@ class MainContainer extends Component {
                     {/*</Menu.Item>*/}
                 </Sidebar>
                 <Sidebar.Pusher dimmed={showSidebar}>
+                    <Helmet>
+                        <title>{title !== undefined ? `${title} - ${SITE_TITLE}` : SITE_TITLE}</title>
+                    </Helmet>
                     <Header
                         updateTime={updateTime}
                         onUpdateData={() => this.updateWeatherData()}
