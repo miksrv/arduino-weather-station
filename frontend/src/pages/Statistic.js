@@ -16,30 +16,70 @@ class Statistic extends Component {
 
     state = {
         loader: false,
-        rangeStart: moment().subtract(1,'d').format('YYYY-MM-DD'),
-        rangeEnd: moment().format('YYYY-MM-DD')
+        rangeStart: moment().subtract(1,'d'),
+        rangeEnd: moment()
     }
 
     componentDidMount() {
         const { dispatch, storeStatistic } = this.props
         const { rangeStart, rangeEnd } = this.state
+        const { urlStart, urlEnd } = this.getDateFromUrl()
 
         let last_update = (! _.isEmpty(storeStatistic) ? moment().unix() - storeStatistic.update : null)
 
         if (last_update === null || (last_update < -180 || last_update > 180))
-            dispatch(meteoActions.fetchDataStatistic(rangeStart, rangeEnd))
+            dispatch(meteoActions.fetchDataStatistic(
+                moment(urlStart ? urlStart : rangeStart).format('YYYY-MM-DD'),
+                moment(urlEnd ? urlEnd : rangeEnd).format('YYYY-MM-DD')
+            ))
     }
 
-    changePeriod = ( period ) => {
+    getDateFromUrl = () => {
+        let rangeStart = this.getUrlParameter('start'),
+            rangeEnd   = this.getUrlParameter('end'),
+            response   = {
+                urlStart: null,
+                urlEnd: null
+            }
+
+        if (_.isEmpty(rangeStart) || _.isEmpty(rangeEnd)) return response
+
+        rangeStart = moment(rangeStart, 'DD-MM-YYYY')
+        rangeEnd   = moment(rangeEnd, 'DD-MM-YYYY')
+
+        let diff = rangeStart.diff(rangeEnd, 'days')
+
+        if (
+            ! moment(rangeStart).isAfter('2020-04-10') ||
+            ! moment(rangeEnd).isBefore(moment()) ||
+            (diff > 0 || diff < -31)
+        ) return response
+
+        response.urlStart = rangeStart
+        response.urlEnd   = rangeEnd
+
+        this.setState({rangeStart: response.urlStart, rangeEnd: response.urlEnd})
+
+        return response
+    }
+
+    getUrlParameter = (name) => {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]')
+        let regex = new RegExp('[\\?&]' + name + '=([^&#]*)')
+        let results = regex.exec(window.location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '))
+    }
+
+    changePeriod = period => {
         const { dispatch } = this.props
 
         if ( period !== this.state.period ) {
-            let rangeStart = moment().subtract(period,'d').format('YYYY-MM-DD'),
-                rangeEnd   = moment().format('YYYY-MM-DD')
+            let rangeStart = moment().subtract(period,'d'),
+                rangeEnd   = moment()
 
             this.setState({ loader: true, period, rangeStart, rangeEnd })
 
-            dispatch(meteoActions.fetchDataStatistic(rangeStart, rangeEnd)).then(() => {
+            dispatch(meteoActions.fetchDataStatistic(rangeStart.format('YYYY-MM-DD'), rangeEnd.format('YYYY-MM-DD'))).then(() => {
                 this.setState({ loader: false })
             })
         }
@@ -48,14 +88,24 @@ class Statistic extends Component {
     handleDatePicker = range => {
         const { dispatch } = this.props
 
-        this.setState({ loader: true })
+        let rangeStart = moment(range[0]),
+            rangeEnd = moment(range[1]),
+            dateDiff = moment(range[0]).diff(moment(range[1]), 'days')
 
-        let rangeStart = moment(range[0]).format('YYYY-MM-DD'),
-            rangeEnd = moment(range[1]).format('YYYY-MM-DD')
+        if (dateDiff > 0 || dateDiff < -31) {
+            return this.setState({
+                rangeStart: moment().subtract(1,'d'),
+                rangeEnd: moment()
+            })
+        }
 
-        this.setState({rangeStart, rangeEnd})
+        this.setState({
+            rangeStart,
+            rangeEnd,
+            loader: true
+        })
 
-        dispatch(meteoActions.fetchDataStatistic(rangeStart, rangeEnd)).then(() => {
+        dispatch(meteoActions.fetchDataStatistic(rangeStart.format('YYYY-MM-DD'), rangeEnd.format('YYYY-MM-DD'))).then(() => {
             this.setState({ loader: false })
         })
     }
@@ -86,8 +136,8 @@ class Statistic extends Component {
                             clearIcon={null}
                             format='dd.MM.yyyy'
                             value={[
-                                rangeStart,
-                                rangeEnd
+                                rangeStart._d,
+                                rangeEnd._d
                             ]}
                         />
                     </div>
