@@ -19,6 +19,27 @@ class ShortStats extends Component {
     chartTempHumd: {
       chart: {
         height: 350,
+        // events: {
+        //   load: function () {
+        //     // set up the updating of the chart each second
+        //     let series = this.series
+        //     let getRandomInt = (min, max) => {
+        //       min = Math.ceil(min)
+        //       max = Math.floor(max)
+        //       return Math.floor(Math.random() * (max - min)) + min
+        //     }
+        //
+        //
+        //     setInterval(function () {
+        //       let time = new Date().getTime()
+        //
+        //       series[0].addPoint([time, getRandomInt(30, 70)], true, true) // H
+        //       series[1].addPoint([time, getRandomInt(-10, 30)], true, true) // T2
+        //       series[2].addPoint([time, getRandomInt(1, 10)], true, true) // DP
+        //       series[3].addPoint([time, getRandomInt(0, 10)], true, true) // WS
+        //     }, 1000)
+        //   }
+        // }
       },
       xAxis: [{
         type: 'datetime',
@@ -320,7 +341,7 @@ class ShortStats extends Component {
 
     this.setState({
       chartTempHumd: {
-        ...this.state.chartTempHumd,
+        // ...this.state.chartTempHumd, <-- WTF?
         series: [
           { data: storeStatistic.data.h },
           { data: storeStatistic.data.t2 },

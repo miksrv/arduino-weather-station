@@ -1,7 +1,7 @@
 {
   "name": "frontend",
-  "version": "1.6.2",
-  "update": "16.04.2021",
+  "version": "1.6.3",
+  "update": "19.04.2021",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
