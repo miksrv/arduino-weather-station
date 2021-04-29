@@ -139,6 +139,13 @@ class Statistic extends Component {
                                 rangeStart._d,
                                 rangeEnd._d
                             ]}
+                        />&nbsp;
+                        <Button
+                            size='mini'
+                            icon='download'
+                            color='grey'
+                            as='a'
+                            href={`https://api.miksoft.pro/meteo/get/csv/?date_start=${rangeStart.format('YYYY-MM-DD')}&date_end=${rangeEnd.format('YYYY-MM-DD')}`}
                         />
                     </div>
                     { (! _.isEmpty(storeStatistic) && ! loader) ? (
