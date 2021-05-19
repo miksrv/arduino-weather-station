@@ -2,7 +2,7 @@ import _ from 'lodash'
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Dimmer, Loader, Grid, Button, Icon } from 'semantic-ui-react'
+import { Container, Dimmer, Loader, Grid, Button, Icon, Message } from 'semantic-ui-react'
 
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 import MainContainer from '../components/MainContainer'
@@ -148,7 +148,13 @@ class Statistic extends Component {
                             href={`https://api.miksoft.pro/meteo/get/csv/?date_start=${rangeStart.format('YYYY-MM-DD')}&date_end=${rangeEnd.format('YYYY-MM-DD')}`}
                         />
                     </div>
-                    { (! _.isEmpty(storeStatistic) && ! loader) ? (
+                    {(_.isEmpty(storeStatistic.data)) && (
+                        <Message negative>
+                            <Message.Header>Данные не найдены</Message.Header>
+                            <p>За период с {rangeStart.format('YYYY-MM-DD')} по {rangeEnd.format('YYYY-MM-DD')} метеостанция не зафиксировала никаких данных. Пожалуйста, выберите другой период для вывода статистики.</p>
+                        </Message>
+                    )}
+                    { (! _.isEmpty(storeStatistic) && ! _.isEmpty(storeStatistic.data) && ! loader) ? (
                         <FullStats
                             storeStatistic={storeStatistic}
                             onChangePeriod={this.changePeriod}
