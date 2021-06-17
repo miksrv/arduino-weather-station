@@ -200,54 +200,128 @@ class ShortStats extends Component {
         }
       }]
     },
-    chartWindRose: {
-      chart: {
-        polar: true,
-        type: 'column'
-      },
-      pane: {
-        size: '90%'
-      },
-      legend: {
-        x: 10,
-      },
-      xAxis: {
-        tickInterval: 45,
-        min: 0,
-        max: 360,
-        labels: {
-          format: '{value}°',
-          style: {
-          }
-        }
-      },
-      yAxis: {
-        min: 0,
-        endOnTick: false,
-        showLastLabel: true,
+    chartKIndex: {
+      xAxis: [{
+        type: 'datetime',
+        dateTimeLabelFormats: {
+          month: '%e %b, %Y',
+          year: '%b'
+        },
+        gridLineWidth: 1
+      }],
+      yAxis: [{
+        gridLineWidth: 1,
         title: {
-          text: ''
-        },
-        labels: {
-          formatter: function () {
-            return this.value + '%';
+          text: '',
+          style: {
+            color: Highcharts.theme.colors[8]
           }
         },
-        reversedStacks: false
-      },
-      tooltip: {
-        valueSuffix: '%',
-        followPointer: true
-      },
+        labels: {
+          format: '{value}',
+          style: {
+            color: Highcharts.theme.colors[8]
+          }
+        },
+      }],
       plotOptions: {
         series: {
-          stacking: 'normal',
-          shadow: false,
-          groupPadding: 0,
-          pointPlacement: 'on'
+          zones: [{
+            value: 0,
+            color: Highcharts.theme.kindex[0]
+          }, {
+            value: 1,
+            color: Highcharts.theme.kindex[1]
+          }, {
+            value: 2,
+            color: Highcharts.theme.kindex[2]
+          }, {
+            value: 3,
+            color: Highcharts.theme.kindex[3]
+          }, {
+            value: 4,
+            color: Highcharts.theme.kindex[4]
+          }, {
+            value: 5,
+            color: Highcharts.theme.kindex[5]
+          }, {
+            value: 6,
+            color: Highcharts.theme.kindex[6]
+          }, {
+            value: 7,
+            color: Highcharts.theme.kindex[7]
+          }, {
+            value: 8,
+            color: Highcharts.theme.kindex[8]
+          }, {
+            value: 9,
+            color: Highcharts.theme.kindex[9]
+          }, {
+            value: 10,
+            color: Highcharts.theme.kindex[10]
+          }, {
+            value: 11,
+            color: Highcharts.theme.kindex[11]
+          }],
         }
       },
-    }
+      series: [{
+        name: 'K-индекс',
+        type: 'column',
+        pointWidth: 2,
+        borderWidth: 0,
+        // data: data.ws,
+        color: Highcharts.theme.colors[8],
+      }]
+    },
+    // chartWindRose: {
+    //   chart: {
+    //     polar: true,
+    //     type: 'column'
+    //   },
+    //   pane: {
+    //     size: '90%'
+    //   },
+    //   legend: {
+    //     x: 10,
+    //   },
+    //   xAxis: {
+    //     tickInterval: 45,
+    //     min: 0,
+    //     max: 360,
+    //     labels: {
+    //       format: '{value}°',
+    //       style: {
+    //       }
+    //     }
+    //   },
+    //   yAxis: {
+    //     min: 0,
+    //     endOnTick: false,
+    //     showLastLabel: true,
+    //     title: {
+    //       text: ''
+    //     },
+    //     labels: {
+    //       formatter: function () {
+    //         return this.value + '%';
+    //       }
+    //     },
+    //     reversedStacks: false
+    //   },
+    //   tooltip: {
+    //     valueSuffix: '%',
+    //     followPointer: true
+    //   },
+    //   plotOptions: {
+    //     series: {
+    //       stacking: 'normal',
+    //       shadow: false,
+    //       groupPadding: 0,
+    //       pointPlacement: 'on'
+    //     }
+    //   },
+    // }
   }
 
   componentDidMount() {
@@ -261,7 +335,7 @@ class ShortStats extends Component {
   }
 
   handleUpdateCharts() {
-    const { storeStatistic } = this.props
+    const { storeStatistic, storeKIndex } = this.props
 
     this.setState({
       chartTempHumd: {
@@ -283,38 +357,43 @@ class ShortStats extends Component {
           { data: storeStatistic.data.ws }
         ]
       },
-      chartWindRose: {
-        series: [{
-          "name": "&lt; 1 м/с",
-          "data": storeStatistic.data.wr[0],
-          "_colorIndex": 0
-        }, {
-          "name": "1-3 м/с",
-          "data": storeStatistic.data.wr[1],
-          "_colorIndex": 1
-        }, {
-          "name": "3-5 м/с",
-          "data": storeStatistic.data.wr[2],
-          "_colorIndex": 2
-        }, {
-          "name": "5-7 м/с",
-          "data": storeStatistic.data.wr[3],
-          "_colorIndex": 3
-        }, {
-          "name": "7-9 м/с",
-          "data": storeStatistic.data.wr[4],
-          "_colorIndex": 4
-        }, {
-          "name": "&gt; 9 м/с",
-          "data": storeStatistic.data.wr[5],
-          "_colorIndex": 5
-        }]
-      }
+      chartKIndex: {
+        series: [
+          { data: storeKIndex.data }
+        ]
+      },
+      // chartWindRose: {
+      //   series: [{
+      //     "name": "&lt; 1 м/с",
+      //     "data": storeStatistic.data.wr[0],
+      //     "_colorIndex": 0
+      //   }, {
+      //     "name": "1-3 м/с",
+      //     "data": storeStatistic.data.wr[1],
+      //     "_colorIndex": 1
+      //   }, {
+      //     "name": "3-5 м/с",
+      //     "data": storeStatistic.data.wr[2],
+      //     "_colorIndex": 2
+      //   }, {
+      //     "name": "5-7 м/с",
+      //     "data": storeStatistic.data.wr[3],
+      //     "_colorIndex": 3
+      //   }, {
+      //     "name": "7-9 м/с",
+      //     "data": storeStatistic.data.wr[4],
+      //     "_colorIndex": 4
+      //   }, {
+      //     "name": "&gt; 9 м/с",
+      //     "data": storeStatistic.data.wr[5],
+      //     "_colorIndex": 5
+      //   }]
+      // }
     })
   }
 
   render() {
-    const { chartTempHumd, chartLuxPress, chartWindSpeed, chartWindRose } = this.state
+    const { chartTempHumd, chartLuxPress, chartWindSpeed, chartKIndex } = this.state // chartWindRose
 
     return (
         <section className='chart'>
@@ -342,8 +421,13 @@ class ShortStats extends Component {
             <Grid.Column computer={6} tablet={8} mobile={16} className='chart-container'>
               <HighchartsReact
                   highcharts={Highcharts}
-                  options={chartWindRose}
+                  options={chartKIndex}
               />
+
+              {/*<HighchartsReact*/}
+              {/*    highcharts={Highcharts}*/}
+              {/*    options={chartWindRose}*/}
+              {/*/>*/}
             </Grid.Column>
           </Grid>
         </section>

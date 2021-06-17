@@ -23,10 +23,12 @@ class Dashboard extends Component {
 
         if (last_update === null || (last_update < -180 || last_update > 180))
             dispatch(meteoActions.fetchDataStatistic())
+
+        dispatch(meteoActions.fetchDataKIndex())
     }
 
     render() {
-        const { storeSummary, storeStatistic } = this.props
+        const { storeSummary, storeStatistic, storeKIndex } = this.props
 
         return (
             <MainContainer
@@ -45,9 +47,10 @@ class Dashboard extends Component {
                             )
                         })}
                     </Grid>
-                    { ! _.isEmpty(storeStatistic) ? (
+                    { ! _.isEmpty(storeStatistic) && ! _.isEmpty(storeKIndex) ? (
                         <ShortStats
                             storeStatistic={storeStatistic}
+                            storeKIndex={storeKIndex}
                             onChangePeriod={this.changePeriod}
                         />
                     ) : (
@@ -77,7 +80,8 @@ class Dashboard extends Component {
 function mapStateToProps(state) {
     return {
         storeStatistic: state.meteostation.storeStatistic,
-        storeSummary: state.meteostation.storeSummary
+        storeSummary: state.meteostation.storeSummary,
+        storeKIndex: state.meteostation.storeKIndexStat
     }
 }
 

@@ -62,3 +62,23 @@ export function fetchDataStatistic(start = null, end = null) {
         }
     }
 }
+
+export function fetchDataKIndex() {
+    return async(dispatch) => {
+        try {
+            const url   = `${METEO_API}kindex`
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json'
+                }
+            });
+
+            const payload = await response.json()
+
+            dispatch({ type: types.GET_KINDEX, payload })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+}

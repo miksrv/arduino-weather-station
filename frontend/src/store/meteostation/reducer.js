@@ -3,7 +3,8 @@ import * as types from './actionTypes'
 const initialState = {
     storeSummary: {},
     storeForecast: {},
-    storeStatistic: {}
+    storeStatistic: {},
+    storeKIndexStat: {}
 }
 
 export default function reduce(state = initialState, action = {}) {
@@ -24,6 +25,12 @@ export default function reduce(state = initialState, action = {}) {
             return {
                 ...state,
                 storeStatistic: action.payload
+            }
+
+        case types.GET_KINDEX:
+            return {
+                ...state,
+                storeKIndexStat: action.payload
             }
 
         // case types.CLEAR_STAT_DATA:
