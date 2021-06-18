@@ -2,8 +2,11 @@ Arduino Weather Station
 ===============
 This project is designed to teach the basic skills and understanding of working with microcontrollers ATmega (Arduino). The project is a working model of an automated weather station, consisting of two the Component: transmitter and receiver. The controller transmits data to a remote web server, and to indicate the current readings uses character.
 
-The weather station is capable of transmitting on the following environmental sotoyanii data protection:
+[ [DEMO](https://meteo.miksoft.pro/) ]
 
+![alt text](./documentation/photo-1.jpg)
+
+The weather station is capable of transmitting the following data on the state of the environment: 
 - temperature
 - humidity
 - illumination
@@ -11,6 +14,12 @@ The weather station is capable of transmitting on the following environmental so
 - wind speed
 - wind direction
 - atmosphere pressure
+
+![alt text](./documentation/ui-screen-1.png)
+
+To display data, a web interface was built in ReactJS, which requests data from a remote server. The interface displays not only current indicators, but also archived data, allows you to make a selection for a certain period. 
+
+![alt text](./documentation/ui-screen-2.png)
 
 ----------------------
 
