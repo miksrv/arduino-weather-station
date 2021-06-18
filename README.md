@@ -23,7 +23,22 @@ To display data, a web interface was built in ReactJS, which requests data from 
 
 ----------------------
 
-### Components
+### Project structure
+
+This project consists of 4 main sections: 
+
+1. [ **arduino** ] Firmware for Arduino microcontroller (AVR), weather station control unit.
+2. [ **models** ] 3D model of weather station for printing.
+3. [ **backend** ] Backend server (repository [here](https://github.com/miksrv/api-backend)). 
+4. [ **frontend** ] Interface for displaying current and statistical data from the weather station. Written in ReactJS + Redux (use Node and NPM). To debug an application on a local server, you must first install the necessary dependencies:
+  * `npm install` Installing dependencies.
+  * `npm update` Update all dependencies.
+  * `npm start` Launches a local webserver for debugging the application.
+  * `npm run build` Compiles applications for deployment.
+
+----------------------
+
+### Necessary electronic components 
 
 - Arduino Leonardo ETH \ Nano + NC28J60 Ethernet
 - BMP085 \ BMP280
