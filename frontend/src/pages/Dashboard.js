@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Container, Dimmer, Grid, Loader } from 'semantic-ui-react'
@@ -8,11 +6,12 @@ import MainContainer from '../components/MainContainer'
 import ShortStats from '../components/ShortStats'
 import Sensor from '../layouts/Sensor'
 
+import moment from 'moment'
 import sensors from '../data/sensors'
 
 import * as meteoActions from '../store/meteostation/actions'
 
-import moment from 'moment'
+import _ from 'lodash'
 
 class Dashboard extends Component {
 

@@ -1,11 +1,11 @@
 import * as types from './actionTypes'
 
-const METEO_API = 'https://api.miksoft.pro/meteo/get/'
+const hostAPI = process.env.REACT_APP_API_HOST
 
 export function fetchDataSummary() {
     return async(dispatch) => {
         try {
-            const url = `${METEO_API}summary`
+            const url = `${hostAPI}summary`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -25,7 +25,7 @@ export function fetchDataSummary() {
 export function fetchDataForecast() {
     return async(dispatch) => {
         try {
-            const url = `${METEO_API}forecast`
+            const url = `${hostAPI}forecast`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -46,7 +46,7 @@ export function fetchDataStatistic(start = null, end = null) {
     return async(dispatch) => {
         try {
             const range = (start !== null && end !== null) ? `?date_start=${start}&date_end=${end}` : ``
-            const url   = `${METEO_API}statistic${range}`
+            const url   = `${hostAPI}statistic${range}`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -66,7 +66,7 @@ export function fetchDataStatistic(start = null, end = null) {
 export function fetchDataKIndex() {
     return async(dispatch) => {
         try {
-            const url   = `${METEO_API}kindex`
+            const url   = `${hostAPI}kindex`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {

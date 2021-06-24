@@ -1,5 +1,5 @@
-import meteostation from './meteostation/reducer';
+import meteostation from './meteostation/reducer'
 
 export {
     meteostation
-};
+}

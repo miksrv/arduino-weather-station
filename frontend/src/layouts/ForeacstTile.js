@@ -17,7 +17,7 @@ const ForeacstTile = (props) => {
     const breakPoints = [
         { width: 1, itemsToShow: 2},
         { width: 550, itemsToShow: 3},
-        { width: 850, itemsToShow: 6},
+        { width: 850, itemsToShow: 6}
     ]
 
     return (

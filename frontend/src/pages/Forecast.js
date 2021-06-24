@@ -2,15 +2,15 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Table, Dimmer, Loader, Container, Image, Popup, Responsive } from 'semantic-ui-react'
 
+import MainContainer from '../components/MainContainer'
+import ForeacstTile from '../layouts/ForeacstTile'
+import valueColor from '../data/valueColor'
+
 import moment from 'moment'
 
 import * as meteoActions from '../store/meteostation/actions'
 
-import MainContainer from '../components/MainContainer'
-import ForeacstTile from '../layouts/ForeacstTile'
-
 import _ from 'lodash'
-import valueColor from '../data/valueColor'
 
 class Forecast extends Component {
 

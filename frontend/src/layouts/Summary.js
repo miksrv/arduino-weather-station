@@ -1,8 +1,3 @@
-/**
- * The component displays summary weather statistics at the current time
- * (temperature, humidity, pressure, wind speed and direction)
- */
-
 import React from 'react'
 
 import { Dimmer, Grid, Icon, Loader } from 'semantic-ui-react'
@@ -13,9 +8,11 @@ import getSeason from '../data/getSeason'
 import _ from 'lodash'
 
 const Summary = (props) => {
-    const { storeSummary, openWeatherData } = props
-    const dayTimes   = !_.isEmpty(openWeatherData) ? openWeatherData.data[0].sys.pod : 'd'
-    const background = 'url(/background/' + getSeason() + '-' + dayTimes + '.jpg)'
+    const { storeSummary, openWeatherData } = props,
+          currDate = new Date(),
+          curHours = currDate.getHours(),
+          dayTimes = (curHours > 8 && curHours < 20) ? 'd' : 'n',
+          imgURL   = 'url(/background/' + getSeason() + '-' + dayTimes + '.jpg)'
 
     return (
         <Grid.Column computer={8} tablet={16} mobile={16}>
@@ -28,7 +25,7 @@ const Summary = (props) => {
                     )
                 }
                 <div className='background-overlay'>
-                    <div className='background-image' style={{backgroundImage: background}}></div>
+                    <div className='background-image' style={{backgroundImage: imgURL}}></div>
                 </div>
                 <div className='content'>
                     <h1>Погодная станция</h1>

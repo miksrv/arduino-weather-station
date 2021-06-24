@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 import React, { Component } from 'react'
 import moment from 'moment'
 import { connect } from 'react-redux'
@@ -10,6 +8,8 @@ import Summary from '../layouts/Summary'
 import ForeacstTile from '../layouts/ForeacstTile'
 
 import * as meteoActions from '../store/meteostation/actions'
+
+import _ from 'lodash'
 
 class Main extends Component {
 

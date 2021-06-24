@@ -33,12 +33,6 @@ export default function reduce(state = initialState, action = {}) {
                 storeKIndexStat: action.payload
             }
 
-        // case types.CLEAR_STAT_DATA:
-        //     return {
-        //         ...state,
-        //         statistic: {}
-        //     }
-
         default:
             return state
     }

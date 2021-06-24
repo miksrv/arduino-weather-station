@@ -11,7 +11,6 @@ import { IoIosArrowRoundUp, IoIosArrowRoundDown } from 'react-icons/io'
 import _ from 'lodash'
 
 const Sensor = (params) => {
-
     const icons = {
         temp: WiThermometer,
         humd: WiHumidity,
@@ -21,7 +20,7 @@ const Sensor = (params) => {
         dewpoint: WiRaindrops,
         windir: WiWindDeg,
         winspeed: WiStrongWind
-    };
+    }
 
     const trend = {
         up: IoIosArrowRoundUp,

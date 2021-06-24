@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Container, Dimmer, Loader, Grid, Button, Icon, Message } from 'semantic-ui-react'
@@ -11,6 +9,8 @@ import FullStats from '../components/FullStats'
 import moment from 'moment'
 
 import * as meteoActions from '../store/meteostation/actions'
+
+import _ from 'lodash'
 
 class Statistic extends Component {
 
@@ -179,7 +179,7 @@ class Statistic extends Component {
                     )}
                 </Container>
             </MainContainer>
-        );
+        )
     }
 }
 
