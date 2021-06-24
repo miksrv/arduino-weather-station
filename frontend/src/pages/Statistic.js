@@ -148,7 +148,7 @@ class Statistic extends Component {
                             href={`https://api.miksoft.pro/meteo/get/csv/?date_start=${rangeStart.format('YYYY-MM-DD')}&date_end=${rangeEnd.format('YYYY-MM-DD')}`}
                         />
                     </div>
-                    {(_.isEmpty(storeStatistic.data)) && (
+                    {(storeStatistic.update === false) && (
                         <Message negative>
                             <Message.Header>Данные не найдены</Message.Header>
                             <p>За период с {rangeStart.format('YYYY-MM-DD')} по {rangeEnd.format('YYYY-MM-DD')} метеостанция не зафиксировала никаких данных. Пожалуйста, выберите другой период для вывода статистики.</p>

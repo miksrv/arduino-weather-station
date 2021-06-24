@@ -54,22 +54,40 @@ class Dashboard extends Component {
                             onChangePeriod={this.changePeriod}
                         />
                     ) : (
-                        <Grid>
-                            <Grid.Column computer={8} tablet={16} mobile={16}>
-                                <div className='informer' style={{height: 305}}>
-                                    <Dimmer active>
-                                        <Loader />
-                                    </Dimmer>
-                                </div>
-                            </Grid.Column>
-                            <Grid.Column computer={8} tablet={16} mobile={16}>
-                                <div className='informer' style={{height: 305}}>
-                                    <Dimmer active>
-                                        <Loader />
-                                    </Dimmer>
-                                </div>
-                            </Grid.Column>
-                        </Grid>
+                        <>
+                            <Grid>
+                                <Grid.Column computer={8} tablet={16} mobile={16}>
+                                    <div className='informer' style={{height: 305}}>
+                                        <Dimmer active>
+                                            <Loader />
+                                        </Dimmer>
+                                    </div>
+                                </Grid.Column>
+                                <Grid.Column computer={8} tablet={16} mobile={16}>
+                                    <div className='informer' style={{height: 305}}>
+                                        <Dimmer active>
+                                            <Loader />
+                                        </Dimmer>
+                                    </div>
+                                </Grid.Column>
+                            </Grid>
+                            <Grid>
+                                <Grid.Column computer={10} tablet={16} mobile={16}>
+                                    <div className='informer' style={{height: 305}}>
+                                        <Dimmer active>
+                                            <Loader />
+                                        </Dimmer>
+                                    </div>
+                                </Grid.Column>
+                                <Grid.Column computer={6} tablet={16} mobile={16}>
+                                    <div className='informer' style={{height: 305}}>
+                                        <Dimmer active>
+                                            <Loader />
+                                        </Dimmer>
+                                    </div>
+                                </Grid.Column>
+                            </Grid>
+                        </>
                     )}
                 </Container>
             </MainContainer>
