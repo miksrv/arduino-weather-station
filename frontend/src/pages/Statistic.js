@@ -92,12 +92,12 @@ class Statistic extends Component {
             rangeEnd = moment(range[1]),
             dateDiff = moment(range[0]).diff(moment(range[1]), 'days')
 
-        if (dateDiff > 0 || dateDiff < -31) {
-            return this.setState({
-                rangeStart: moment().subtract(1,'d'),
-                rangeEnd: moment()
-            })
-        }
+        // if (dateDiff > 0 || dateDiff < -31) {
+        //     return this.setState({
+        //         rangeStart: moment().subtract(1,'d'),
+        //         rangeEnd: moment()
+        //     })
+        // }
 
         this.setState({
             rangeStart,

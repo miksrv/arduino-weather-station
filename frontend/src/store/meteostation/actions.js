@@ -82,3 +82,23 @@ export function fetchDataKIndex() {
         }
     }
 }
+
+export function fetchHeatMap() {
+    return async(dispatch) => {
+        try {
+            const url   = `${hostAPI}heatmap`
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json'
+                }
+            });
+
+            const payload = await response.json()
+
+            dispatch({ type: types.GET_HEATMAP, payload })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+}

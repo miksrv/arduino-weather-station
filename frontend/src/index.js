@@ -16,6 +16,7 @@ import Main from './pages/Main'
 import Statistic from './pages/Statistic'
 import Forecast from './pages/Forecast'
 import Dashboard from './pages/Dashboard'
+import Archive from './pages/Archive'
 import Error404 from './pages/Error404'
 
 const store = createStore(combineReducers(reducers), applyMiddleware(thunk))
@@ -28,6 +29,7 @@ ReactDOM.render(
                 <Route path="/statistic" component={Statistic} />
                 <Route path="/forecast" component={Forecast} />
                 <Route path="/dashboard" component={Dashboard} />
+                <Route path="/archive" component={Archive} />
                 <Route component={Error404} />
             </Switch>
         </BrowserRouter>

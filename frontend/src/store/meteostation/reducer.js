@@ -4,7 +4,8 @@ const initialState = {
     storeSummary: {},
     storeForecast: {},
     storeStatistic: {},
-    storeKIndexStat: {}
+    storeKIndexStat: {},
+    storeHeatMap: {}
 }
 
 export default function reduce(state = initialState, action = {}) {
@@ -31,6 +32,12 @@ export default function reduce(state = initialState, action = {}) {
             return {
                 ...state,
                 storeKIndexStat: action.payload
+            }
+
+        case types.GET_HEATMAP:
+            return {
+                ...state,
+                storeHeatMap: action.payload
             }
 
         default:
