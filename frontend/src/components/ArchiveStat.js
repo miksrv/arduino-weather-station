@@ -15,7 +15,9 @@ class ArchiveStat extends Component {
   state = {
     chartArchive: {
       chart: {
-        type: 'heatmap'
+        type: 'heatmap',
+        height: 400,
+        marginTop: 60,
       },
 
       boost: {
@@ -23,13 +25,13 @@ class ArchiveStat extends Component {
       },
 
       title: {
-        text: 'Highcharts heat map',
+        text: 'Тепловая карта',
         align: 'left',
         x: 40
       },
 
       subtitle: {
-        text: 'Temperature variation by day and hour through 2017',
+        text: 'Изменение температуры в течение последних 10 месяцев',
         align: 'left',
         x: 40
       },
@@ -97,7 +99,7 @@ class ArchiveStat extends Component {
         nullColor: '#4e4e4e',
         colsize: 24 * 36e5, // one day
         tooltip: {
-          headerFormat: 'Temperature<br/>',
+          headerFormat: 'Температура<br/>',
           pointFormat: '{point.x:%e %b, %Y} {point.y}:00: <b>{point.value} ℃</b>'
         },
         turboThreshold: Number.MAX_VALUE // #3404, remove after 4.0.5 release
@@ -130,8 +132,6 @@ class ArchiveStat extends Component {
 
   render() {
     const { chartArchive } = this.state
-
-    console.log('chartArchive', chartArchive)
 
     return (
         <section className='chart'>

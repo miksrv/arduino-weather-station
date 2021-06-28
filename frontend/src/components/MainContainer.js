@@ -65,6 +65,10 @@ class MainContainer extends Component {
                         <Icon name='area graph' />
                         Статистика
                     </Menu.Item>
+                    <Menu.Item as={NavLink} to='/archive' activeClassName='active'>
+                        <Icon name='archive' />
+                        Архив
+                    </Menu.Item>
                     {/*<Menu.Item as={NavLink} to='/forecast' activeClassName='active'>*/}
                     {/*    <Icon name='clock' />*/}
                     {/*    Прогноз*/}

@@ -10,28 +10,18 @@ import moment from 'moment'
 import * as meteoActions from '../store/meteostation/actions'
 
 import _ from 'lodash'
-import FullStats from "../components/FullStats";
 
-class Statistic extends Component {
+class Archive extends Component {
 
     state = {
         loader: false
     }
 
     componentDidMount() {
-        const { dispatch, storeStatistic } = this.props
+        const { dispatch, storeHeatMap } = this.props
 
-        dispatch(meteoActions.fetchHeatMap())
-        // const { rangeStart, rangeEnd } = this.state
-        // const { urlStart, urlEnd } = this.getDateFromUrl()
-
-        // let last_update = (! _.isEmpty(storeStatistic) ? moment().unix() - storeStatistic.update : null)
-        //
-        // if (last_update === null || (last_update < -180 || last_update > 180))
-        //     dispatch(meteoActions.fetchDataStatistic(
-        //         moment(urlStart ? urlStart : rangeStart).format('YYYY-MM-DD'),
-        //         moment(urlEnd ? urlEnd : rangeEnd).format('YYYY-MM-DD')
-        //     ))
+        if (_.isEmpty(storeHeatMap))
+            dispatch(meteoActions.fetchHeatMap())
     }
 
     render() {
@@ -72,4 +62,4 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps)(Statistic)
+export default connect(mapStateToProps)(Archive)
