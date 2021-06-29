@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Dimmer, Loader, Grid, Button, Icon, Message } from 'semantic-ui-react'
+import { Container, Dimmer, Loader, Grid } from 'semantic-ui-react'
 
 import MainContainer from '../components/MainContainer'
 import ArchiveStat from '../components/ArchiveStat'

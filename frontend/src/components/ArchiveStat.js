@@ -70,7 +70,7 @@ class ArchiveStat extends Component {
 
       colorAxis: {
         stops: [
-          [0, '#3060cf'],
+          [0, '#0625cf'],
           [0.3, '#2884bc'],
           [0.5, '#fffbbc'],
           [0.6, '#FFA500'],
