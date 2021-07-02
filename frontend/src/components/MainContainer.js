@@ -39,7 +39,7 @@ class MainContainer extends Component {
 
     render() {
         const { showSidebar } = this.state
-        const { updateTime, onUpdateData, children, title } = this.props
+        const { updateTime, children, title } = this.props
 
         return (
             <Sidebar.Pushable>

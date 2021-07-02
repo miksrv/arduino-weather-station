@@ -63,8 +63,9 @@ class Statistic extends Component {
         return response
     }
 
+    // http://localhost:3000/statistic?start=24.06.2021&end=30.06.2021
     getUrlParameter = (name) => {
-        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]')
+        name = name.replace(/[\\[]/, '\\[').replace(/[\]]/, '\\]')
         let regex = new RegExp('[\\?&]' + name + '=([^&#]*)')
         let results = regex.exec(window.location.search);
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '))
