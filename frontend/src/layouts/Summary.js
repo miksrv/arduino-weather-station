@@ -11,7 +11,7 @@ const Summary = (props) => {
     const { storeSummary, openWeatherData } = props,
           currDate = new Date(),
           curHours = currDate.getHours(),
-          dayTimes = (curHours => 8 && curHours < 20) ? 'd' : 'n',
+          dayTimes = (curHours > 7 && curHours < 21) ? 'd' : 'n',
           imgURL   = 'url(/background/' + getSeason() + '-' + dayTimes + '.jpg)'
 
     return (
