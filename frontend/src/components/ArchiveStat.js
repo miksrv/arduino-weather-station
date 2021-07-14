@@ -5,6 +5,7 @@ import HighchartsReact from 'highcharts-react-official'
 import HighchartsMore from 'highcharts/highcharts-more'
 
 import chart_config from '../data/chart_config'
+import {Grid} from "semantic-ui-react";
 
 HighchartsMore(Highcharts)
 
@@ -124,7 +125,7 @@ class ArchiveStat extends Component {
       chartArchive: {
         ...this.state.chartArchive,
         series: [{
-          data: storeStatistic.data
+          data: storeStatistic
         }]
       }
     })

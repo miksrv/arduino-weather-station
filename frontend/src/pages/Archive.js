@@ -4,6 +4,7 @@ import { Container, Dimmer, Loader, Grid } from 'semantic-ui-react'
 
 import MainContainer from '../components/MainContainer'
 import ArchiveStat from '../components/ArchiveStat'
+import Extreme from '../layouts/Extreme'
 
 import moment from 'moment'
 
@@ -31,12 +32,23 @@ class Archive extends Component {
         return (
             <MainContainer
                 updateTime={moment().unix()}
-                title='Статистика'
+                title='Тепловая карта'
             >
                 <Container>
+                    <Grid>
+                        <Extreme
+                            type='max'
+                            data={! _.isEmpty(storeHeatMap.data) ? storeHeatMap.data.max : []}
+                        />
+                        <Extreme
+                            type='min'
+                            data={! _.isEmpty(storeHeatMap.data) ? storeHeatMap.data.min : []}
+                        />
+                    </Grid>
+
                     { (! _.isEmpty(storeHeatMap) && ! _.isEmpty(storeHeatMap.data) && ! loader) ? (
                         <ArchiveStat
-                            storeStatistic={storeHeatMap}
+                            storeStatistic={storeHeatMap.data.chart}
                             onChangePeriod={this.changePeriod}
                         />
                     ) : (
