@@ -102,3 +102,9 @@ export function fetchHeatMap() {
         }
     }
 }
+
+export function clearHeatMap() {
+    return async(dispatch) => {
+        dispatch({ type: types.CLEAR_HEATMAP })
+    }
+}

@@ -29,7 +29,7 @@ const Extreme = params => {
                 }
                 <div className='title'>{TITLE}</div>
                 <div className='grid-info date'>
-                    {!_.isEmpty(params.data) ? moment.unix(params.data.time).format("LLLL") : 'Идёт загрузка...'}
+                    {!_.isEmpty(params.data) ? moment.unix(params.data.time).format('LLLL') : 'Идёт загрузка...'}
                 </div>
                 <Grid>
                     <Grid.Row className='row-value'>

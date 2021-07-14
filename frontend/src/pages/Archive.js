@@ -25,6 +25,12 @@ class Archive extends Component {
             dispatch(meteoActions.fetchHeatMap())
     }
 
+    componentWillUnmount() {
+        const { dispatch } = this.props
+
+        dispatch(meteoActions.clearHeatMap())
+    }
+
     render() {
         const { storeHeatMap } = this.props
         const { loader } = this.state

@@ -40,6 +40,12 @@ export default function reduce(state = initialState, action = {}) {
                 storeHeatMap: action.payload
             }
 
+        case types.CLEAR_HEATMAP:
+            return {
+                ...state,
+                storeHeatMap: []
+            }
+
         default:
             return state
     }
