@@ -1,10 +1,16 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Dimmer, Grid, Loader } from 'semantic-ui-react'
+import { Container, Grid } from 'semantic-ui-react'
 
 import MainContainer from '../components/MainContainer'
-import ShortStats from '../components/ShortStats'
+
 import Sensor from '../layouts/Sensor'
+import Chart from '../layouts/Chart'
+
+import chart_temphumd from '../data/chart_temphumd'
+import chart_luxpress from '../data/chart_luxpress'
+import chart_kindex from '../data/chart_kindex'
+import chart_windspeed from '../data/chart_windspeed'
 
 import moment from 'moment'
 import sensors from '../data/sensors'
@@ -36,58 +42,53 @@ class Dashboard extends Component {
             >
                 <Container>
                     <Grid>
-                        {sensors.map((item, key) => {
-                            return (
-                                <Sensor
-                                    key={key}
-                                    widget={item}
-                                    data={! _.isEmpty(storeSummary) ? storeSummary.data[item.source] : []}
-                                />
-                            )
-                        })}
+                        {sensors.map((item, key) =>
+                            <Sensor
+                                key={key}
+                                widget={item}
+                                data={! _.isEmpty(storeSummary) ? storeSummary.data[item.source] : []}
+                            />
+                        )}
                     </Grid>
-                    { ! _.isEmpty(storeStatistic) && ! _.isEmpty(storeKIndex) ? (
-                        <ShortStats
-                            storeStatistic={storeStatistic}
-                            storeKIndex={storeKIndex}
-                            onChangePeriod={this.changePeriod}
-                        />
-                    ) : (
-                        <>
-                            <Grid>
-                                <Grid.Column computer={8} tablet={16} mobile={16}>
-                                    <div className='informer' style={{height: 305}}>
-                                        <Dimmer active>
-                                            <Loader />
-                                        </Dimmer>
-                                    </div>
-                                </Grid.Column>
-                                <Grid.Column computer={8} tablet={16} mobile={16}>
-                                    <div className='informer' style={{height: 305}}>
-                                        <Dimmer active>
-                                            <Loader />
-                                        </Dimmer>
-                                    </div>
-                                </Grid.Column>
-                            </Grid>
-                            <Grid>
-                                <Grid.Column computer={10} tablet={16} mobile={16}>
-                                    <div className='informer' style={{height: 305}}>
-                                        <Dimmer active>
-                                            <Loader />
-                                        </Dimmer>
-                                    </div>
-                                </Grid.Column>
-                                <Grid.Column computer={6} tablet={16} mobile={16}>
-                                    <div className='informer' style={{height: 305}}>
-                                        <Dimmer active>
-                                            <Loader />
-                                        </Dimmer>
-                                    </div>
-                                </Grid.Column>
-                            </Grid>
-                        </>
-                    )}
+                    <Grid>
+                        <Grid.Column computer={8} tablet={16} mobile={16} className='chart-container'>
+                            <Chart
+                                config={chart_temphumd}
+                                data={{
+                                    humd: ! _.isEmpty(storeStatistic) ? storeStatistic.data.h : [],
+                                    temp: ! _.isEmpty(storeStatistic) ? storeStatistic.data.t2 : []
+                                }}
+                            />
+                        </Grid.Column>
+                        <Grid.Column computer={8} tablet={16} mobile={16} className='chart-container'>
+                            <Chart
+                                config={chart_windspeed}
+                                data={{
+                                    wspeed: ! _.isEmpty(storeStatistic) ? storeStatistic.data.ws : [],
+                                }}
+                            />
+                        </Grid.Column>
+                    </Grid>
+                    <Grid>
+                        <Grid.Column computer={10} tablet={8} mobile={16} className='chart-container'>
+                            <Chart
+                                config={chart_luxpress}
+                                data={{
+                                    lux: ! _.isEmpty(storeStatistic) ? storeStatistic.data.lux : [],
+                                    uv: ! _.isEmpty(storeStatistic) ? storeStatistic.data.uv : [],
+                                    press: ! _.isEmpty(storeStatistic) ? storeStatistic.data.p : []
+                                }}
+                            />
+                        </Grid.Column>
+                        <Grid.Column computer={6} tablet={8} mobile={16} className='chart-container'>
+                            <Chart
+                                config={chart_kindex}
+                                data={{
+                                    kindex: ! _.isEmpty(storeKIndex) ? storeKIndex.data : [],
+                                }}
+                            />
+                        </Grid.Column>
+                    </Grid>
                 </Container>
             </MainContainer>
         )

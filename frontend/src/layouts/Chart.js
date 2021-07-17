@@ -6,19 +6,34 @@ import HighchartsReact from 'highcharts-react-official'
 import HighchartsMore from 'highcharts/highcharts-more'
 
 import chart_config from '../data/chart_config'
-import chartHeatMap from '../data/chart_heatmap'
 
 HighchartsMore(Highcharts)
 
 Highcharts.setOptions(Highcharts.theme = chart_config)
 
-const ChartHeatMap = params => {
-    (params.data.length!== 0) && (chartHeatMap.series[0].data = params.data)
+/**
+ * The component for displaying the chart
+ * @param params {config: {}, data: {}, height: (opt) int}
+ * @returns {JSX.Element}
+ * @constructor
+ */
+const Chart = params => {
+    let isLoaded = false,
+        index = 0,
+        height = chart_config.chart.height
+
+    for (let prop in params.data) {
+        if (params.data[prop].length) {
+            isLoaded = true
+            params.config.series[index].data = params.data[prop]
+            index++
+        }
+    }
 
     return (
         <section className='chart'>
-            {(params.data.length === 0) ? (
-                <div className='informer' style={{height: 330}}>
+            {! isLoaded ? (
+                <div className='informer' style={{height: height + 30}}>
                     <Dimmer active>
                         <Loader />
                     </Dimmer>
@@ -26,11 +41,11 @@ const ChartHeatMap = params => {
             ) : (
                 <HighchartsReact
                     highcharts={Highcharts}
-                    options={chartHeatMap}
+                    options={params.config}
                 />
             )}
         </section>
     )
 }
 
-export default ChartHeatMap
+export default Chart

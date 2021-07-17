@@ -3,8 +3,10 @@ import { connect } from 'react-redux'
 import { Container, Grid } from 'semantic-ui-react'
 
 import MainContainer from '../components/MainContainer'
-import ChartHeatMap from '../layouts/ChartHeatMap'
 import Extreme from '../layouts/Extreme'
+import Chart from '../layouts/Chart'
+
+import chart_heatmap from '../data/chart_heatmap'
 
 import moment from 'moment'
 
@@ -37,10 +39,21 @@ class Archive extends Component {
             >
                 <Container>
                     <Grid>
-                        <Extreme data={! _.isEmpty(storeHeatMap.data) ? storeHeatMap.data.max : []} type='max' />
-                        <Extreme data={! _.isEmpty(storeHeatMap.data) ? storeHeatMap.data.min : []} type='min' />
+                        <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>
+                            <Extreme data={! _.isEmpty(storeHeatMap.data) ? storeHeatMap.data.max : []} type='max' />
+                        </Grid.Column>
+                        <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>
+                            <Extreme data={! _.isEmpty(storeHeatMap.data) ? storeHeatMap.data.min : []} type='min' />
+                        </Grid.Column>
+                        <Grid.Column width={16} className='chart-container'>
+                            <Chart
+                                config={chart_heatmap}
+                                data={{
+                                    heatmap: ! _.isEmpty(storeHeatMap.data) ? storeHeatMap.data.chart : []
+                                }}
+                            />
+                        </Grid.Column>
                     </Grid>
-                    <ChartHeatMap data={! _.isEmpty(storeHeatMap.data) ? storeHeatMap.data.chart : []} />
                 </Container>
             </MainContainer>
         )

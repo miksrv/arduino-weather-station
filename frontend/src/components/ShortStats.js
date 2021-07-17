@@ -398,31 +398,31 @@ class ShortStats extends Component {
     return (
         <section className='chart'>
           <Grid>
+            {/*<Grid.Column computer={8} tablet={16} mobile={16} className='chart-container'>*/}
+            {/*  <HighchartsReact*/}
+            {/*      highcharts={Highcharts}*/}
+            {/*      options={chartTempHumd}*/}
+            {/*  />*/}
+            {/*</Grid.Column>*/}
             <Grid.Column computer={8} tablet={16} mobile={16} className='chart-container'>
-              <HighchartsReact
-                  highcharts={Highcharts}
-                  options={chartTempHumd}
-              />
-            </Grid.Column>
-            <Grid.Column computer={8} tablet={16} mobile={16} className='chart-container'>
-              <HighchartsReact
-                  highcharts={Highcharts}
-                  options={chartWindSpeed}
-              />
+              {/*<HighchartsReact*/}
+              {/*    highcharts={Highcharts}*/}
+              {/*    options={chartWindSpeed}*/}
+              {/*/>*/}
             </Grid.Column>
           </Grid>
           <Grid>
-            <Grid.Column computer={10} tablet={8} mobile={16} className='chart-container'>
-              <HighchartsReact
-                  highcharts={Highcharts}
-                  options={chartLuxPress}
-              />
-            </Grid.Column>
+            {/*<Grid.Column computer={10} tablet={8} mobile={16} className='chart-container'>*/}
+            {/*  <HighchartsReact*/}
+            {/*      highcharts={Highcharts}*/}
+            {/*      options={chartLuxPress}*/}
+            {/*  />*/}
+            {/*</Grid.Column>*/}
             <Grid.Column computer={6} tablet={8} mobile={16} className='chart-container'>
-              <HighchartsReact
-                  highcharts={Highcharts}
-                  options={chartKIndex}
-              />
+              {/*<HighchartsReact*/}
+              {/*    highcharts={Highcharts}*/}
+              {/*    options={chartKIndex}*/}
+              {/*/>*/}
 
               {/*<HighchartsReact*/}
               {/*    highcharts={Highcharts}*/}
