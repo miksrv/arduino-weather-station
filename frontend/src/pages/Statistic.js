@@ -1,10 +1,16 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Dimmer, Loader, Grid, Button, Icon, Message } from 'semantic-ui-react'
+import { Container, Grid, Button, Icon, Message } from 'semantic-ui-react'
 
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 import MainContainer from '../components/MainContainer'
-import FullStats from '../components/FullStats'
+
+import Chart from '../layouts/Chart'
+
+import chart_temphumdwind from '../data/chart_temphumdwind'
+import chart_luxpress from '../data/chart_luxpress'
+import chart_winddir from '../data/chart_winddir'
+import chart_windrose from '../data/chart_windrose'
 
 import moment from 'moment'
 
@@ -103,9 +109,23 @@ class Statistic extends Component {
         })
     }
 
+    createWindRose = data => {
+        let result  = {}
+
+        for (let id in data) {
+            if (id == 6) continue
+
+            result[id] = data[id]
+        }
+
+        return result
+    }
+
     render() {
         const { storeStatistic } = this.props
-        const { loader, rangeStart, rangeEnd } = this.state
+        const { rangeStart, rangeEnd } = this.state
+
+        console.log('storeStatistic.data.wr', ! _.isEmpty(storeStatistic) && this.createWindRose(storeStatistic.data.wr))
 
         return (
             <MainContainer
@@ -147,29 +167,41 @@ class Statistic extends Component {
                             <p>За период с {rangeStart.format('YYYY-MM-DD')} по {rangeEnd.format('YYYY-MM-DD')} метеостанция не зафиксировала никаких данных. Пожалуйста, выберите другой период для вывода статистики.</p>
                         </Message>
                     )}
-                    { (! _.isEmpty(storeStatistic) && ! _.isEmpty(storeStatistic.data) && ! loader) ? (
-                        <FullStats
-                            storeStatistic={storeStatistic}
-                            onChangePeriod={this.changePeriod}
-                        />
-                    ) : (
-                        <Grid>
-                            <Grid.Column computer={16} tablet={16} mobile={16}>
-                                <div className='informer' style={{height: 330}}>
-                                    <Dimmer active>
-                                        <Loader />
-                                    </Dimmer>
-                                </div>
-                            </Grid.Column>
-                            <Grid.Column computer={16} tablet={16} mobile={16}>
-                                <div className='informer' style={{height: 330}}>
-                                    <Dimmer active>
-                                        <Loader />
-                                    </Dimmer>
-                                </div>
-                            </Grid.Column>
-                        </Grid>
-                    )}
+                    <Chart
+                        config={chart_temphumdwind}
+                        data={{
+                            humd: ! _.isEmpty(storeStatistic) ? storeStatistic.data.h : [],
+                            temp: ! _.isEmpty(storeStatistic) ? storeStatistic.data.t2 : [],
+                            dewp: ! _.isEmpty(storeStatistic) ? storeStatistic.data.dp : [],
+                            wind: ! _.isEmpty(storeStatistic) ? storeStatistic.data.ws : []
+                        }}
+                    />
+                    <br />
+                    <Chart
+                        config={chart_luxpress}
+                        data={{
+                            lux: ! _.isEmpty(storeStatistic) ? storeStatistic.data.lux : [],
+                            uv: ! _.isEmpty(storeStatistic) ? storeStatistic.data.uv : [],
+                            press: ! _.isEmpty(storeStatistic) ? storeStatistic.data.p : []
+                        }}
+                    />
+                    <br />
+                    <Grid>
+                        <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>
+                            <Chart
+                                config={chart_winddir}
+                                data={{
+                                    winddir: ! _.isEmpty(storeStatistic) ? storeStatistic.data.wd : [],
+                                }}
+                            />
+                        </Grid.Column>
+                        <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>
+                            <Chart
+                                config={chart_windrose}
+                                data={! _.isEmpty(storeStatistic) ? this.createWindRose(storeStatistic.data.wr) : []}
+                            />
+                        </Grid.Column>
+                    </Grid>
                 </Container>
             </MainContainer>
         )
