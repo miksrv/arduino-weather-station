@@ -185,23 +185,23 @@ class Statistic extends Component {
                             press: ! _.isEmpty(storeStatistic) ? storeStatistic.data.p : []
                         }}
                     />
-                    <br />
-                    <Grid>
-                        <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>
-                            <Chart
-                                config={chart_winddir}
-                                data={{
-                                    winddir: ! _.isEmpty(storeStatistic) ? storeStatistic.data.wd : [],
-                                }}
-                            />
-                        </Grid.Column>
-                        <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>
-                            <Chart
-                                config={chart_windrose}
-                                data={! _.isEmpty(storeStatistic) ? this.createWindRose(storeStatistic.data.wr) : []}
-                            />
-                        </Grid.Column>
-                    </Grid>
+                    {/*<br />*/}
+                    {/*<Grid>*/}
+                    {/*    <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>*/}
+                    {/*        <Chart*/}
+                    {/*            config={chart_winddir}*/}
+                    {/*            data={{*/}
+                    {/*                winddir: ! _.isEmpty(storeStatistic) ? storeStatistic.data.wd : [],*/}
+                    {/*            }}*/}
+                    {/*        />*/}
+                    {/*    </Grid.Column>*/}
+                    {/*    <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>*/}
+                    {/*        <Chart*/}
+                    {/*            config={chart_windrose}*/}
+                    {/*            data={! _.isEmpty(storeStatistic) ? this.createWindRose(storeStatistic.data.wr) : []}*/}
+                    {/*        />*/}
+                    {/*    </Grid.Column>*/}
+                    {/*</Grid>*/}
                 </Container>
             </MainContainer>
         )
