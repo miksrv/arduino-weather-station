@@ -11,7 +11,7 @@ import WeatherIcon from '../data/WeatherIcon'
  * 210, 211, 212
  */
 
-const ForeacstTile = (props) => {
+const ForeacstTile = props => {
     const { data } = props
 
     const breakPoints = [

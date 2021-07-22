@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Grid, Button, Icon, Message } from 'semantic-ui-react'
+import { Container, Button, Icon, Message } from 'semantic-ui-react'
+import { getUrlParameter } from '../data/functions' // createWindRose
 
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 import MainContainer from '../components/MainContainer'
@@ -9,8 +10,8 @@ import Chart from '../layouts/Chart'
 
 import chart_temphumdwind from '../data/chart_temphumdwind'
 import chart_luxpress from '../data/chart_luxpress'
-import chart_winddir from '../data/chart_winddir'
-import chart_windrose from '../data/chart_windrose'
+// import chart_winddir from '../data/chart_winddir'
+// import chart_windrose from '../data/chart_windrose'
 
 import moment from 'moment'
 
@@ -41,8 +42,8 @@ class Statistic extends Component {
     }
 
     getDateFromUrl = () => {
-        let rangeStart = this.getUrlParameter('start'),
-            rangeEnd   = this.getUrlParameter('end'),
+        let rangeStart = getUrlParameter('start'),
+            rangeEnd   = getUrlParameter('end'),
             response   = {
                 urlStart: null,
                 urlEnd: null
@@ -67,14 +68,6 @@ class Statistic extends Component {
         this.setState({rangeStart: response.urlStart, rangeEnd: response.urlEnd})
 
         return response
-    }
-
-    // http://localhost:3000/statistic?start=24.06.2021&end=30.06.2021
-    getUrlParameter = (name) => {
-        name = name.replace(/[\\[]/, '\\[').replace(/[\]]/, '\\]')
-        let regex = new RegExp('[\\?&]' + name + '=([^&#]*)')
-        let results = regex.exec(window.location.search);
-        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '))
     }
 
     changePeriod = period => {
@@ -109,23 +102,9 @@ class Statistic extends Component {
         })
     }
 
-    createWindRose = data => {
-        let result  = {}
-
-        for (let id in data) {
-            if (id == 6) continue
-
-            result[id] = data[id]
-        }
-
-        return result
-    }
-
     render() {
         const { storeStatistic } = this.props
         const { rangeStart, rangeEnd } = this.state
-
-        console.log('storeStatistic.data.wr', ! _.isEmpty(storeStatistic) && this.createWindRose(storeStatistic.data.wr))
 
         return (
             <MainContainer

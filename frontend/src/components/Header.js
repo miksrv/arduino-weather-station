@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import { Container, Button, Icon } from 'semantic-ui-react'
+import { timeAgo } from '../data/functions'
 
 import _ from 'lodash'
 import moment from 'moment'
-
-import timeAgo from '../data/timeAgo'
 
 class Header extends Component {
 

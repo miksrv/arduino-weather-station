@@ -2,8 +2,8 @@ import React from 'react'
 
 import { Dimmer, Grid, Icon, Loader } from 'semantic-ui-react'
 import { WiStrongWind, WiBarometer, WiHumidity } from 'react-icons/wi'
+import { getSeason } from '../data/functions'
 import WeatherIcon from '../data/WeatherIcon'
-import getSeason from '../data/getSeason'
 
 import _ from 'lodash'
 
