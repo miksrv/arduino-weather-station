@@ -46,5 +46,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "jest": "^26.6.0",
+    "jest-html-reporters": "^2.1.6",
+    "jest-playwright-preset": "^1.7.0",
+    "playwright": "^1.13.0"
   }
 }

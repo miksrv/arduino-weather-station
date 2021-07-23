@@ -104,7 +104,7 @@ class Statistic extends Component {
 
     render() {
         const { storeStatistic } = this.props
-        const { rangeStart, rangeEnd } = this.state
+        const { rangeStart, rangeEnd, loader } = this.state
 
         return (
             <MainContainer
@@ -147,6 +147,7 @@ class Statistic extends Component {
                         </Message>
                     )}
                     <Chart
+                        loader={loader}
                         config={chart_temphumdwind}
                         data={{
                             humd: ! _.isEmpty(storeStatistic) ? storeStatistic.data.h : [],
@@ -157,6 +158,7 @@ class Statistic extends Component {
                     />
                     <br />
                     <Chart
+                        loader={loader}
                         config={chart_luxpress}
                         data={{
                             lux: ! _.isEmpty(storeStatistic) ? storeStatistic.data.lux : [],

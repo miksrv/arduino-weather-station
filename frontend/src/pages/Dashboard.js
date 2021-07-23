@@ -22,6 +22,7 @@ import _ from 'lodash'
 class Dashboard extends Component {
 
     componentDidMount() {
+
         const { dispatch, storeStatistic } = this.props
 
         let last_update = (! _.isEmpty(storeStatistic) ? moment().unix() - storeStatistic.update : null)

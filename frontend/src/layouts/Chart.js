@@ -1,4 +1,4 @@
-import React  from 'react'
+import React, { useState } from 'react'
 import { Dimmer, Loader } from 'semantic-ui-react'
 
 import Highcharts from 'highcharts/highmaps'
@@ -18,9 +18,12 @@ Highcharts.setOptions(Highcharts.theme = chart_config)
  * @constructor
  */
 const Chart = params => {
+    const [loader, setLoader] = useState(false)
+
     let isLoaded = false,
         index = 0,
-        height = chart_config.chart.height
+        height = (typeof params.config.chart !== 'undefined' && typeof params.config.chart.height !== 'undefined') ?
+                 params.config.chart.height : chart_config.chart.height
 
     for (let prop in params.data) {
         if (params.data[prop].length) {
@@ -30,10 +33,12 @@ const Chart = params => {
         }
     }
 
+    (typeof params.loader !== 'undefined' && params.loader !== loader) && (setLoader(params.loader))
+
     return (
         <section className='chart'>
-            {! isLoaded ? (
-                <div className='informer' style={{height: height + 30}}>
+            {! isLoaded || loader ? (
+                <div className='informer' style={{height: height}}>
                     <Dimmer active>
                         <Loader />
                     </Dimmer>
