@@ -181,14 +181,17 @@ body
     background: #373737
 
     .date
-        font-size: .8em
         color: $second-color
+        font-size: .9em
+        text-transform: capitalize
 
     .desc
-        font-size: .9em
-        line-height: 1em
         height: 28px
-        color: $second-color
+        line-height: 1em
+        margin: .4em 0 0
+
+        &:first-letter
+            text-transform: capitalize
 
     .image
         margin: -.1em auto -.4em
@@ -198,13 +201,7 @@ body
         font-size: 1.6em
 
         .sign
-            font-size: 13px
-            padding-left: 5px
-            font-weight: 100
-
-    .icon-container
-        text-align: right
-        padding-right: 0 !important
+            padding-left: 0px
 
 .informer
     position: relative

@@ -30,10 +30,7 @@ const ForeacstTile = props => {
             {data.map((item, key) => (
                 <div className='forecast-tile' key={key}>
                     <div className='date'>
-                        {moment.unix(item.dt).format("ddd, DD MMM Y")}
-                    </div>
-                    <div className='time'>
-                        {moment.unix(item.dt).format("H:mm")}
+                        {moment.unix(item.dt).format("ddd, DD MMM, H:mm")}
                     </div>
                     <div className='desc'>
                         {item.weather[0].description}
@@ -42,7 +39,7 @@ const ForeacstTile = props => {
                         <WeatherIcon code={item.weather[0].id} daytime={item.sys.pod}  />
                     </div>
                     <div className='temp'>
-                        {Number((item.main.temp).toFixed(0))}<span className='sign'>°</span>
+                        {(item.main.temp > 0) && ('+')}{Number((item.main.temp).toFixed(0))}<span className='sign'>°</span>
                         {/*{valueColor(Number((item.main.temp).toFixed(0)))}<span className='sign'>℃</span>*/}
                     </div>
                     {/*<div className='wind'>*/}

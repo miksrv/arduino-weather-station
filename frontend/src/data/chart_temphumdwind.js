@@ -38,13 +38,13 @@ const chart_temphumdwind = {
     }],
     yAxis: [{
         labels: {
-            format: '{value}°C',
+            format: '{value}°C',  // Температура
             style: {
                 color: Highcharts.theme.colors[7]
             }
         },
         title: {
-            text: 'Температура', // #TODO: remove
+            text: '',
             style: {
                 color: Highcharts.theme.colors[7]
             }
@@ -53,7 +53,7 @@ const chart_temphumdwind = {
     }, {
         gridLineWidth: 0,
         title: {
-            text: 'Влажность', // #TODO: remove
+            text: '', // Влажность
             style: {
                 color: Highcharts.theme.colors[6]
             }
@@ -70,7 +70,7 @@ const chart_temphumdwind = {
     }, {
         gridLineWidth: 0,
         title: {
-            text: 'Скорость ветра', // #TODO: remove
+            text: '', // Скорость ветра
             style: {
                 color: Highcharts.theme.colors[12]
             }
