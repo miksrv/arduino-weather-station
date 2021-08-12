@@ -6,7 +6,7 @@ import MainContainer from '../components/MainContainer'
 import Extreme from '../layouts/Extreme'
 import Chart from '../layouts/Chart'
 
-import chart_heatmap from '../data/chart_heatmap'
+import heatmap from '../charts/heatmap'
 
 import moment from 'moment'
 
@@ -47,7 +47,7 @@ class Archive extends Component {
                         </Grid.Column>
                         <Grid.Column width={16} className='chart-container'>
                             <Chart
-                                config={chart_heatmap}
+                                config={heatmap}
                                 data={{
                                     heatmap: ! _.isEmpty(storeHeatMap.data) ? storeHeatMap.data.chart : []
                                 }}

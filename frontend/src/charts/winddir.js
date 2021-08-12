@@ -1,7 +1,7 @@
 import Highcharts from 'highcharts'
-import windDirection from './functions'
+import windDirection from '../data/functions'
 
-const chart_winddir = {
+const winddir = {
     chart: {
         polar: true
     },
@@ -48,4 +48,4 @@ const chart_winddir = {
     }]
 }
 
-export default chart_winddir
+export default winddir

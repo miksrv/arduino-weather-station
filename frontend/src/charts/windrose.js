@@ -1,4 +1,4 @@
-const chart_windrose = {
+const windrose = {
     chart: {
         polar: true,
         type: 'column'
@@ -55,4 +55,4 @@ const chart_windrose = {
     ]
 }
 
-export default chart_windrose
+export default windrose

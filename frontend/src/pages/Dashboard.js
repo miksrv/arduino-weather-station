@@ -7,10 +7,10 @@ import MainContainer from '../components/MainContainer'
 import Sensor from '../layouts/Sensor'
 import Chart from '../layouts/Chart'
 
-import chart_temphumd from '../data/chart_temphumd'
-import chart_luxpress from '../data/chart_luxpress'
-import chart_kindex from '../data/chart_kindex'
-import chart_windspeed from '../data/chart_windspeed'
+import temphumd from '../charts/temphumd'
+import luxpress from '../charts/luxpress'
+import kindex from '../charts/kindex'
+import windspeed from '../charts/windspeed'
 
 import moment from 'moment'
 import sensors from '../data/sensors'
@@ -54,7 +54,7 @@ class Dashboard extends Component {
                     <Grid>
                         <Grid.Column computer={8} tablet={16} mobile={16} className='chart-container'>
                             <Chart
-                                config={chart_temphumd}
+                                config={temphumd}
                                 data={{
                                     humd: ! _.isEmpty(storeStatistic) ? storeStatistic.data.h : [],
                                     temp: ! _.isEmpty(storeStatistic) ? storeStatistic.data.t2 : []
@@ -63,7 +63,7 @@ class Dashboard extends Component {
                         </Grid.Column>
                         <Grid.Column computer={8} tablet={16} mobile={16} className='chart-container'>
                             <Chart
-                                config={chart_windspeed}
+                                config={windspeed}
                                 data={{
                                     wspeed: ! _.isEmpty(storeStatistic) ? storeStatistic.data.ws : [],
                                 }}
@@ -73,7 +73,7 @@ class Dashboard extends Component {
                     <Grid>
                         <Grid.Column computer={10} tablet={8} mobile={16} className='chart-container'>
                             <Chart
-                                config={chart_luxpress}
+                                config={luxpress}
                                 data={{
                                     lux: ! _.isEmpty(storeStatistic) ? storeStatistic.data.lux : [],
                                     uv: ! _.isEmpty(storeStatistic) ? storeStatistic.data.uv : [],
@@ -83,7 +83,7 @@ class Dashboard extends Component {
                         </Grid.Column>
                         <Grid.Column computer={6} tablet={8} mobile={16} className='chart-container'>
                             <Chart
-                                config={chart_kindex}
+                                config={kindex}
                                 data={{
                                     kindex: ! _.isEmpty(storeKIndex) ? storeKIndex.data : [],
                                 }}

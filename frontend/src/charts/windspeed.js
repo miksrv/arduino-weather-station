@@ -1,6 +1,6 @@
 import Highcharts from 'highcharts'
 
-const chart_windspeed = {
+const windspeed = {
     xAxis: [{
         type: 'datetime',
         dateTimeLabelFormats: {
@@ -37,4 +37,4 @@ const chart_windspeed = {
     }]
 }
 
-export default chart_windspeed
+export default windspeed

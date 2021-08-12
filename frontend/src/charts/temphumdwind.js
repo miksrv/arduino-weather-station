@@ -1,9 +1,9 @@
 import Highcharts from 'highcharts'
-import chart_config from './chart_config'
+import _config from './_config'
 
-Highcharts.setOptions(Highcharts.theme = chart_config)
+Highcharts.setOptions(Highcharts.theme = _config)
 
-const chart_temphumdwind = {
+const temphumdwind = {
     chart: {
         height: 350,
         // events: {
@@ -126,4 +126,4 @@ const chart_temphumdwind = {
     }]
 }
 
-export default chart_temphumdwind
+export default temphumdwind

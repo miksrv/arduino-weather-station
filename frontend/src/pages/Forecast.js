@@ -58,7 +58,7 @@ class Forecast extends Component {
                                     {storeForecast.data.map((item, key) => (
                                         <Table.Row key={key}>
                                             <Table.Cell>
-                                                <Image src={'http://openweathermap.org/img/wn/' + item.weather[0].icon + '.png'} />
+                                                <Image src={'https://openweathermap.org/img/wn/' + item.weather[0].icon + '.png'} />
                                             </Table.Cell>
                                             <Table.Cell>{moment.unix(item.dt).format("DD.MM.Y H:mm")}</Table.Cell>
                                             <Table.Cell>{item.weather[0].description}</Table.Cell>

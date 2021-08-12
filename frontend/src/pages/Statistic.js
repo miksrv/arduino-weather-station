@@ -8,10 +8,10 @@ import MainContainer from '../components/MainContainer'
 
 import Chart from '../layouts/Chart'
 
-import chart_temphumdwind from '../data/chart_temphumdwind'
-import chart_luxpress from '../data/chart_luxpress'
-// import chart_winddir from '../data/chart_winddir'
-// import chart_windrose from '../data/chart_windrose'
+import temphumdwind from '../charts/temphumdwind'
+import luxpress from '../charts/luxpress'
+// import winddir from '../data/winddir'
+// import windrose from '../data/windrose'
 
 import moment from 'moment'
 
@@ -148,7 +148,7 @@ class Statistic extends Component {
                     )}
                     <Chart
                         loader={loader}
-                        config={chart_temphumdwind}
+                        config={temphumdwind}
                         data={{
                             humd: ! _.isEmpty(storeStatistic) ? storeStatistic.data.h : [],
                             temp: ! _.isEmpty(storeStatistic) ? storeStatistic.data.t2 : [],
@@ -159,7 +159,7 @@ class Statistic extends Component {
                     <br />
                     <Chart
                         loader={loader}
-                        config={chart_luxpress}
+                        config={luxpress}
                         data={{
                             lux: ! _.isEmpty(storeStatistic) ? storeStatistic.data.lux : [],
                             uv: ! _.isEmpty(storeStatistic) ? storeStatistic.data.uv : [],
@@ -170,7 +170,7 @@ class Statistic extends Component {
                     {/*<Grid>*/}
                     {/*    <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>*/}
                     {/*        <Chart*/}
-                    {/*            config={chart_winddir}*/}
+                    {/*            _config={winddir}*/}
                     {/*            data={{*/}
                     {/*                winddir: ! _.isEmpty(storeStatistic) ? storeStatistic.data.wd : [],*/}
                     {/*            }}*/}
@@ -178,7 +178,7 @@ class Statistic extends Component {
                     {/*    </Grid.Column>*/}
                     {/*    <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>*/}
                     {/*        <Chart*/}
-                    {/*            config={chart_windrose}*/}
+                    {/*            _config={windrose}*/}
                     {/*            data={! _.isEmpty(storeStatistic) ? this.createWindRose(storeStatistic.data.wr) : []}*/}
                     {/*        />*/}
                     {/*    </Grid.Column>*/}

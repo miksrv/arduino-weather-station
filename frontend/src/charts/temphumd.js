@@ -1,6 +1,6 @@
 import Highcharts from 'highcharts'
 
-const chart_temphumd = {
+const temphumd = {
     xAxis: [{
         type: 'datetime',
         dateTimeLabelFormats: {
@@ -62,4 +62,4 @@ const chart_temphumd = {
     }]
 }
 
-export default chart_temphumd
+export default temphumd

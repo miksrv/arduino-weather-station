@@ -1,6 +1,6 @@
 import Highcharts from 'highcharts'
 
-const chart_luxpress = {
+const luxpress = {
     xAxis: [{
         type: 'datetime',
         dateTimeLabelFormats: {
@@ -90,4 +90,4 @@ const chart_luxpress = {
     }]
 }
 
-export default chart_luxpress
+export default luxpress

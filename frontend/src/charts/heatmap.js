@@ -1,4 +1,4 @@
-const chart_heatmap = {
+const heatmap = {
     chart: {
         type: 'heatmap',
         height: 400,
@@ -92,4 +92,4 @@ const chart_heatmap = {
     }]
 }
 
-export default chart_heatmap
+export default heatmap

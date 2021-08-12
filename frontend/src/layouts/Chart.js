@@ -5,15 +5,15 @@ import Highcharts from 'highcharts/highmaps'
 import HighchartsReact from 'highcharts-react-official'
 import HighchartsMore from 'highcharts/highcharts-more'
 
-import chart_config from '../data/chart_config'
+import _config from '../charts/_config'
 
 HighchartsMore(Highcharts)
 
-Highcharts.setOptions(Highcharts.theme = chart_config)
+Highcharts.setOptions(Highcharts.theme = _config)
 
 /**
  * The component for displaying the chart
- * @param params {config: {}, data: {}, height: (opt) int}
+ * @param params {_config: {}, data: {}, height: (opt) int}
  * @returns {JSX.Element}
  * @constructor
  */
@@ -23,7 +23,7 @@ const Chart = params => {
     let isLoaded = false,
         index = 0,
         height = (typeof params.config.chart !== 'undefined' && typeof params.config.chart.height !== 'undefined') ?
-                 params.config.chart.height : chart_config.chart.height
+                 params.config.chart.height : _config.chart.height
 
     for (let prop in params.data) {
         if (params.data[prop].length) {

@@ -1,6 +1,6 @@
 import Highcharts from 'highcharts'
 
-const chart_kindex = {
+const kindex = {
     xAxis: [{
         type: 'datetime',
         dateTimeLabelFormats: {
@@ -75,4 +75,4 @@ const chart_kindex = {
     }]
 }
 
-export default chart_kindex
+export default kindex

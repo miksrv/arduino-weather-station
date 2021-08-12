@@ -1,4 +1,4 @@
-const chart_config = {
+const _config = {
     kindex: [
         '#98FB98', // 0
         '#ADFF2F', // 1
@@ -256,4 +256,4 @@ const chart_config = {
     }
 }
 
-export default chart_config
+export default _config
