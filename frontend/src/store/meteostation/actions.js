@@ -83,10 +83,11 @@ export function fetchDataKIndex() {
     }
 }
 
-export function fetchHeatMap() {
+export function fetchHeatMap(start = null, end = null) {
     return async(dispatch) => {
         try {
-            const url   = `${hostAPI}heatmap`
+            const range = (start !== null && end !== null) ? `?date_start=${start}&date_end=${end}` : ``
+            const url   = `${hostAPI}heatmap${range}`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {

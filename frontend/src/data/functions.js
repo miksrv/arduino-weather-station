@@ -1,5 +1,9 @@
 import React from 'react'
 
+export const declOfNum = (number, words) => {
+    return words[(number % 100 > 4 && number % 100 < 20) ? 2 : [2, 0, 1, 1, 1, 2][(number % 10 < 5) ? number % 10 : 5]]
+}
+
 /**
  * Returns the value of the parameter by key from the address bar of the browser
  * @example `?start=24.06.2021&end=30.06.2021`
