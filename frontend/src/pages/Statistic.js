@@ -117,6 +117,7 @@ class Statistic extends Component {
                         changeData={(range) => this.handleDatePicker(range)}
                         rangeStart={rangeStart}
                         rangeEnd={rangeEnd}
+                        csvbutton
                     />
                     {(storeStatistic.update === false) && (
                         <Message negative>

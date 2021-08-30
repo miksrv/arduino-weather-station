@@ -15,6 +15,13 @@ import * as meteoActions from '../store/meteostation/actions'
 
 import _ from 'lodash'
 
+const periodList = [
+    {name: 'Месяц', day: 31},
+    {name: 'Квартал', day: 90},
+    {name: 'Полгода', day: 180},
+    {name: 'Год', day: 365}
+]
+
 class Archive extends Component {
 
     state = {
@@ -40,13 +47,28 @@ class Archive extends Component {
         dispatch(meteoActions.clearHeatMap())
     }
 
-    changePeriod = period => {}
+    changePeriod = period => {
+        const { dispatch } = this.props
+
+        if ( period !== this.state.period ) {
+            let rangeStart = moment().subtract(period,'d'),
+                rangeEnd   = moment()
+
+            this.setState({ loader: true, period, rangeStart, rangeEnd })
+
+            dispatch(meteoActions.fetchHeatMap(rangeStart.format('YYYY-MM-DD'), rangeEnd.format('YYYY-MM-DD'))).then(() => {
+                this.setState({ loader: false })
+            })
+        }
+    }
 
     handleDatePicker = range => {
         const { dispatch } = this.props
 
         let rangeStart = moment(range[0]),
             rangeEnd = moment(range[1])
+
+        if (rangeEnd.diff(rangeStart, 'days') < 31) return
 
         this.setState({
             rangeStart,
@@ -68,7 +90,7 @@ class Archive extends Component {
 
             heatmap.colorAxis.max = storeHeatMap.data.max.val
             heatmap.colorAxis.min = storeHeatMap.data.min.val
-            heatmap.subtitle.text = heatmap.subtitle.text + days + ' ' + declOfNum(days, ['день', 'дня', 'дней'])
+            heatmap.subtitle.text = 'Изменение температуры за ' + days + ' ' + declOfNum(days, ['день', 'дня', 'дней'])
         }
 
         return (
@@ -82,6 +104,8 @@ class Archive extends Component {
                         changeData={(range) => this.handleDatePicker(range)}
                         rangeStart={rangeStart}
                         rangeEnd={rangeEnd}
+                        periods={periodList}
+                        csvbutton
                     />
                     <Grid>
                         <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>

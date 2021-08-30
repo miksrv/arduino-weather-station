@@ -7,12 +7,22 @@ const Toolbar = props => {
     const handleChangePeriod = period => props.changePeriod(period)
     const handleDatePicker = range => props.changeData(range)
 
+    let periods = [
+        {name: 'Сутки', day: 1},
+        {name: 'Неделя', day: 7},
+        {name: 'Месяц', day: 30},
+    ]
+
+    if (props.periods !== undefined && typeof props.periods === "object") {
+        periods = props.periods
+    }
+
     return (
         <div className='toolBar'>
-            <Button.Group size='mini'>
-                <Button color='grey' onClick={() => handleChangePeriod(1)}>Сутки</Button>
-                <Button color='grey' onClick={() => handleChangePeriod(7)}>Неделя</Button>
-                <Button color='grey' onClick={() => handleChangePeriod(30)}>Месяц</Button>
+            <Button.Group size='mini' className='periods'>
+                {(props.periods === undefined || props.periods !== false) && periods.map((item, key) => (
+                    <Button color='grey' key={key} onClick={() => handleChangePeriod(item.day)}>{item.name}</Button>
+                ))}
             </Button.Group>
             <DateRangePicker
                 className='range-calendar'
@@ -28,13 +38,15 @@ const Toolbar = props => {
                     rangeEnd._d
                 ]}
             />&nbsp;
-            <Button
-                size='mini'
-                icon='download'
-                color='grey'
-                as='a'
-                href={`https://api.miksoft.pro/meteo/get/csv/?date_start=${rangeStart.format('YYYY-MM-DD')}&date_end=${rangeEnd.format('YYYY-MM-DD')}`}
-            />
+            {(props.csvbutton !== undefined) && (
+                <Button
+                    size='mini'
+                    icon='download'
+                    color='grey'
+                    as='a'
+                    href={`https://api.miksoft.pro/meteo/get/csv/?date_start=${rangeStart.format('YYYY-MM-DD')}&date_end=${rangeEnd.format('YYYY-MM-DD')}`}
+                />
+            )}
         </div>
     )
 }
