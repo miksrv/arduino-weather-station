@@ -1,7 +1,7 @@
 {
   "name": "frontend",
-  "version": "1.6.19",
-  "update": "30.08.2021",
+  "version": "1.6.20",
+  "update": "05.09.2021",
   "private": true,
   "dependencies": {
     "@wojtekmaj/react-daterange-picker": "^3.2.0",
