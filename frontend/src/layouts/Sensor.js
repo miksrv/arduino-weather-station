@@ -10,6 +10,12 @@ import { IoIosArrowRoundUp, IoIosArrowRoundDown } from 'react-icons/io'
 
 import _ from 'lodash'
 
+/**
+ * Display of data on the weather station sensor: current value, change, maximum and minimum values.
+ * @param params
+ * @returns {JSX.Element}
+ * @constructor
+ */
 const Sensor = (params) => {
     const icons = {
         temp: WiThermometer,

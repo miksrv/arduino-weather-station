@@ -2,6 +2,12 @@ import React from 'react'
 import { Button, Icon } from 'semantic-ui-react'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 
+/**
+ * Toolbar for statistics pages. Adds buttons for displaying the period, calendar, CSV download button.
+ * @param props
+ * @returns {JSX.Element}
+ * @constructor
+ */
 const Toolbar = props => {
     const { rangeStart, rangeEnd } = props
     const handleChangePeriod = period => props.changePeriod(period)

@@ -7,6 +7,12 @@ import WeatherIcon from '../data/WeatherIcon'
 
 import _ from 'lodash'
 
+/**
+ * Displays a summary of the weather of the meteorological station.
+ * @param props
+ * @returns {JSX.Element}
+ * @constructor
+ */
 const Summary = (props) => {
     const { storeSummary, openWeatherData } = props,
           currDate = new Date(),

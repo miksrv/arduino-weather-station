@@ -2,6 +2,11 @@ import React from 'react'
 
 import { Container } from 'semantic-ui-react'
 
+/**
+ * Footer component for all pages.
+ * @returns {JSX.Element}
+ * @constructor
+ */
 const Footer = () => {
     return (
         <Container textAlign='center' className='footer'>

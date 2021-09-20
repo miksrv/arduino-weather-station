@@ -11,6 +11,12 @@ import WeatherIcon from '../data/WeatherIcon'
  * 210, 211, 212
  */
 
+/**
+ * Tile component for displaying one item of weather forecast (on the main page).
+ * @param props
+ * @returns {JSX.Element}
+ * @constructor
+ */
 const ForeacstTile = props => {
     const { data } = props
 

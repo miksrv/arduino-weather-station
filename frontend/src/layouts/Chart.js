@@ -12,7 +12,7 @@ HighchartsMore(Highcharts)
 Highcharts.setOptions(Highcharts.theme = _config)
 
 /**
- * The component for displaying the chart
+ * The component for displaying the chart.
  * @param params {_config: {}, data: {}, height: (opt) int}
  * @returns {JSX.Element}
  * @constructor

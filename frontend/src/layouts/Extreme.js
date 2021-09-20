@@ -10,6 +10,12 @@ import { WiThermometer } from 'react-icons/wi'
 
 import _ from 'lodash'
 
+/**
+ * Component for displaying the minimum and maximum recorded temperature.
+ * @param params
+ * @returns {JSX.Element}
+ * @constructor
+ */
 const Extreme = params => {
     const COLOR = params.type === 'min' ? 'blue' : 'red',
           TITLE = params.type === 'min' ?
