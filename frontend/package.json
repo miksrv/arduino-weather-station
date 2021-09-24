@@ -1,27 +1,27 @@
 {
   "name": "frontend",
-  "version": "1.6.20",
-  "update": "05.09.2021",
+  "version": "1.6.21",
+  "update": "24.09.2021",
   "private": true,
   "dependencies": {
-    "@wojtekmaj/react-daterange-picker": "^3.2.0",
-    "highcharts": "^9.0.0",
+    "@wojtekmaj/react-daterange-picker": "^3.3.0",
+    "highcharts": "^9.2.2",
     "highcharts-react-official": "^3.0.0",
     "moment": "^2.29.1",
-    "node-sass": "^4.14.1",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
+    "node-sass": "^6.0.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-elastic-carousel": "^0.11.5",
     "react-helmet": "^6.1.0",
-    "react-icons": "^3.11.0",
-    "react-redux": "^7.2.4",
-    "react-router-dom": "^5.2.0",
+    "react-icons": "^4.2.0",
+    "react-redux": "^7.2.5",
+    "react-router-dom": "^5.3.0",
     "react-scripts": "^4.0.3",
     "redux": "^4.1.1",
     "redux-thunk": "^2.3.0",
     "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^0.88.2",
-    "styled-components": "^5.3.0"
+    "semantic-ui-react": "^2.0.4",
+    "styled-components": "^5.3.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -46,8 +46,8 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1"
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^12.1.0",
+    "@testing-library/user-event": "^13.2.1"
   }
 }
