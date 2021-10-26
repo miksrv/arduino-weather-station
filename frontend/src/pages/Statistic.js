@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Container, Message } from 'semantic-ui-react'
+import { Container, Message, Grid } from 'semantic-ui-react'
 import { getUrlParameter } from '../data/functions' // createWindRose
 
 import MainContainer from '../components/MainContainer'
@@ -10,8 +10,8 @@ import Toolbar from '../layouts/Toolbar';
 
 import temphumdwind from '../charts/temphumdwind'
 import luxpress from '../charts/luxpress'
-// import winddir from '../data/winddir'
-// import windrose from '../data/windrose'
+import winddir from '../charts/winddir'
+// import windrose from '../charts/windrose'
 
 import moment from 'moment'
 
@@ -145,23 +145,23 @@ class Statistic extends Component {
                             press: ! _.isEmpty(storeStatistic) ? storeStatistic.data.p : []
                         }}
                     />
-                    {/*<br />*/}
-                    {/*<Grid>*/}
-                    {/*    <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>*/}
-                    {/*        <Chart*/}
-                    {/*            _config={winddir}*/}
-                    {/*            data={{*/}
-                    {/*                winddir: ! _.isEmpty(storeStatistic) ? storeStatistic.data.wd : [],*/}
-                    {/*            }}*/}
-                    {/*        />*/}
-                    {/*    </Grid.Column>*/}
-                    {/*    <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>*/}
-                    {/*        <Chart*/}
-                    {/*            _config={windrose}*/}
-                    {/*            data={! _.isEmpty(storeStatistic) ? this.createWindRose(storeStatistic.data.wr) : []}*/}
-                    {/*        />*/}
-                    {/*    </Grid.Column>*/}
-                    {/*</Grid>*/}
+                    <br />
+                    <Grid>
+                        <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>
+                            <Chart
+                                config={winddir}
+                                data={{
+                                    winddir: ! _.isEmpty(storeStatistic) ? storeStatistic.data.wd : [],
+                                }}
+                            />
+                        </Grid.Column>
+                        <Grid.Column computer={8} tablet={8} mobile={16} className='chart-container'>
+                            {/*<Chart*/}
+                            {/*    config={windrose}*/}
+                            {/*    data={! _.isEmpty(storeStatistic) ? createWindRose(storeStatistic.data.wr) : []}*/}
+                            {/*/>*/}
+                        </Grid.Column>
+                    </Grid>
                 </Container>
             </MainContainer>
         )

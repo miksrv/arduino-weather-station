@@ -1,5 +1,5 @@
 import Highcharts from 'highcharts'
-import windDirection from '../data/functions'
+import { windDirection } from '../data/functions'
 
 const winddir = {
     chart: {

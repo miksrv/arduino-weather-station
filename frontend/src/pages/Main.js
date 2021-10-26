@@ -29,7 +29,7 @@ class Main extends Component {
                 updateTime={storeSummary.update}
                 title='Погода в Оренбурге'
             >
-                {(last_update < -180 || last_update > 180) && (
+                {(last_update < -360 || last_update > 360) && (
                     <Container>
                         <Message negative>
                             <Message.Header>Данные устарели</Message.Header>

@@ -99,7 +99,7 @@ class Header extends Component {
                     size='big'
                     onClick={() => onClickMenu()}
                 />
-                <span className={((last_update > -180 && last_update < 180) ? 'online' : 'offline') + (autoUpdate ? ' pulsate' : '')}></span>
+                <span className={((last_update > -360 && last_update < 360) ? 'online' : 'offline') + (autoUpdate ? ' pulsate' : '')}></span>
                 <span className='last-update'>
                     {_.isInteger(lastUpdate) ? (
                         <>
