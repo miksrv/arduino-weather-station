@@ -1,0 +1,47 @@
+.rec-arrow-right, .rec-arrow-left
+  background-color: rgb(55, 55, 55) !important
+  color: $colorMain !important
+  border-radius: 10% !important
+  font-size: 1.3em !important
+  padding: 0 10px !important
+  width: auto !important
+  min-width: initial !important
+
+.rec-arrow-right:disabled, .rec-arrow-left:disabled
+  opacity: .4
+
+.rec-arrow-right:hover:enabled, .rec-arrow-left:focus:enabled
+  background-color: rgb(98, 98, 98) !important
+
+.react-daterange-picker__calendar
+  z-index: 9999 !important
+
+.forecast-tile
+  border-radius: 5px
+  padding: 1em
+  text-align: center
+  width: 340px
+  background: #373737
+
+  .date
+    color: $colorSecond
+    font-size: .9em
+    text-transform: capitalize
+
+  .desc
+    height: 28px
+    line-height: 1em
+    margin: .4em 0 0
+
+    &:first-letter
+      text-transform: capitalize
+
+  .image
+    margin: -.1em auto -.4em
+    font-size: 4em
+
+  .temp, .wind
+    font-size: 1.6em
+
+    .sign
+      padding-left: 0px

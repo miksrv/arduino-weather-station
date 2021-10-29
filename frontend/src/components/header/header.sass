@@ -1,0 +1,40 @@
+.header-toolbar
+  background: #373737
+  padding: .8em 1em
+  margin: 2em 0
+  display: flex !important
+  flex-direction: row
+  align-items: center
+
+  .hamburger
+    cursor: pointer
+    font-size: 33px !important
+
+  .hamburger:hover
+    color: $colorSecond
+
+  .buttons
+    margin-left: 1em
+    font-size: .8em
+    margin-left: auto
+
+    .icon
+      color: $colorMain
+
+  .last-update
+    margin-left: .5vh
+    font-size: .8em
+
+  .online, .offline
+    background: green
+    width: 5px
+    height: 26px
+    margin-left: 1vh
+
+  .online.pulsate
+    -webkit-animation: pulsate 2s infinite
+    -moz-animation: pulsate 2s infinite
+    animation: pulsate 2s infinite
+
+  .offline
+    background: red

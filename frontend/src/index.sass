@@ -1,0 +1,25 @@
+$fontStack: sans-serif
+$colorMain: #FFF
+$colorSecond: #D9D9D9
+$colorBackground: #191b22
+
+
+body
+  font-family: $fontStack
+  font-size: 14px
+  line-height: 1.5
+  background-color: $colorBackground
+  color: $colorMain
+  margin: 0
+
+#root
+  height: 100%
+
+.ui.container
+  max-width: 1200px !important
+
+/* Components */
+@import "components/header/header"
+@import "components/footer/footer"
+@import "components/dashboard/dashboard"
+@import "components/forecast/forecast"
