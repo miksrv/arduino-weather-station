@@ -1,4 +1,4 @@
-import { IRestResponse, ISensorItem } from '../../api/types'
+import { IRestResponse, ISensorItem } from '../../app/types'
 
 const payload: ISensorItem[] = [
     {
@@ -33,6 +33,35 @@ const payload: ISensorItem[] = [
         max: 2.4,
         type: 'dewpoint'
     },
+    {
+        name: 'cl',
+        value: 80,
+        trend: 14,
+        min: 55,
+        max: 80,
+        type: 'clouds'
+    },
+    {
+        name: 'ws',
+        value: 3.1,
+        trend: 2.1,
+        min: 0,
+        max: 5.4,
+        type: 'wind_speed'
+    },
+    {
+        name: 'wd',
+        value: 180,
+        type: 'wind_degree'
+    },
+    {
+        name: 'pr',
+        value: .2,
+        trend: 0,
+        min: 0,
+        max: 2.3,
+        type: 'precipitation'
+    }
 ]
 
 export const response: IRestResponse = {

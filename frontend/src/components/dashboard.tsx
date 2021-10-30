@@ -1,8 +1,7 @@
 import React from 'react'
 import { Dimmer, Grid, Icon, Loader } from 'semantic-ui-react'
 import { WiStrongWind, WiBarometer, WiHumidity } from 'react-icons/wi'
-
-import { useGetSummaryQuery } from '../../api/weather'
+import { useGetSummaryQuery } from '../app/weatherApi'
 
 const Dashboard: React.FC = () => {
     const { data, isLoading, isSuccess } = useGetSummaryQuery(null)

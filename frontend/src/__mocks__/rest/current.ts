@@ -1,4 +1,4 @@
-import {ICurrentWeather, IRestResponse} from '../../api/types'
+import {ICurrentWeather, IRestResponse} from '../../app/types'
 
 const payload: ICurrentWeather = {
     temperature: 12.3,

@@ -5,9 +5,9 @@ import { Provider } from 'react-redux'
 import { store } from './app/store'
 
 import 'semantic-ui-css/semantic.min.css'
-import './index.sass'
+import './styles/index.sass'
 
-import App from './App'
+import App from './app'
 
 if (process.env.NODE_ENV === 'development') {
     const { worker } = require('./__mocks__/browser')

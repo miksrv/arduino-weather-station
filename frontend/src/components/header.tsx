@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Icon } from 'semantic-ui-react'
-import { useAppDispatch } from '../../app/hooks'
-import { toggle } from '../sidebar/sidebarSlice'
+import { useAppDispatch } from '../app/hooks'
+import { toggle } from '../app/sidebarSlice'
 
 const Header: React.FC = () => {
     const dispatch = useAppDispatch()

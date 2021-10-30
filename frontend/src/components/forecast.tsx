@@ -1,9 +1,8 @@
 import React from 'react'
 import Carousel from 'react-elastic-carousel'
 import { Dimmer, Grid, Loader } from 'semantic-ui-react'
-import { IForecastItem } from '../../api/types'
-
-import { useGetForecastQuery } from '../../api/weather'
+import { IForecastItem } from '../app/types'
+import { useGetForecastQuery } from '../app/weatherApi'
 
 const renderCarousel = (data: IForecastItem[]) => {
     const breakPoints = [

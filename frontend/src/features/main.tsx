@@ -1,7 +1,7 @@
 import React from 'react'
 
-import Dashboard from '../../components/dashboard/Dashboard'
-import Carousel from '../../components/forecast/Forecast'
+import Dashboard from '../components/dashboard'
+import Carousel from '../components/forecast'
 
 const Main: React.FC = () => {
     return (

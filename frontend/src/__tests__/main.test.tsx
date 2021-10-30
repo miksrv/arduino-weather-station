@@ -4,7 +4,7 @@ import '@testing-library/jest-dom/extend-expect'
 
 import { store } from '../app/store'
 
-import Main from '../features/main/Main'
+import Index from '../main'
 import { render } from "@testing-library/react";
 
 describe('Test Main', function () {
@@ -13,7 +13,7 @@ describe('Test Main', function () {
             <Provider store={store}>
                 <BrowserRouter>
                     <Switch>
-                        <Main />
+                        <Index />
                     </Switch>
                 </BrowserRouter>
             </Provider>

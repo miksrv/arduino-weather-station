@@ -1,6 +1,3 @@
-/**
- * Common REST response interface
- */
 export interface IRestResponse {
     status: boolean,
     update: number,

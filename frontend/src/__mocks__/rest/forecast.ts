@@ -1,4 +1,4 @@
-import { IRestResponse, IForecastItem } from '../../api/types'
+import { IRestResponse, IForecastItem } from '../../app/types'
 
 const payload: IForecastItem[] = [
     {

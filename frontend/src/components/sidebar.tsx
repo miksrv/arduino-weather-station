@@ -1,8 +1,8 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { Sidebar as SidebarMenu, Menu, Icon } from 'semantic-ui-react'
-import { useAppSelector, useAppDispatch } from '../../app/hooks'
-import { hide } from './sidebarSlice'
+import { useAppSelector, useAppDispatch } from '../app/hooks'
+import { hide } from '../app/sidebarSlice'
 
 const Sidebar: React.FC = () => {
     const dispatch = useAppDispatch()

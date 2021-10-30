@@ -1,0 +1,85 @@
+%flexible
+  display: flex
+  justify-content: space-between
+
+%trend-icons
+  position: absolute
+  font-size: 2em
+  left: -5px
+  bottom: -3px
+
+.sensor
+  padding-bottom: 10px
+
+  .title
+    font-size: .9em
+    color: $text-second
+    border-top: 4px solid transparent
+    padding-top: 5px
+
+  .main
+    @extend %flexible
+    margin: 5px 0 10px
+
+    .value
+      font-size: 1.7em
+      font-weight: 600
+
+      .sign
+        font-size: .5em
+
+    .icon
+      font-size: 2.5em
+
+  .info
+    @extend %flexible
+    font-size: .8em
+
+    .trend
+      padding-left: 1.6em
+      color: $text-second
+      position: relative
+
+    .up
+      @extend %trend-icons
+      color: $green
+
+    .down
+      @extend %trend-icons
+      color: $red
+
+  &.orange
+    .title
+      border-top-color: $orange
+    .icon
+      color: $orange
+
+  &.red
+    .title
+      border-top-color: $red
+    .icon
+      color: $red
+
+  &.blue
+    .title
+      border-top-color: $blue
+    .icon
+      color: $blue
+
+  &.cobalt
+    .title
+      border-top-color: $cobalt
+    .icon
+      color: $cobalt
+
+  &.green
+    .title
+      border-top-color: $lime
+    .icon
+      color: $lime
+
+  &.purple
+    .title
+      border-top-color: $purple
+    .icon
+      color: $purple
