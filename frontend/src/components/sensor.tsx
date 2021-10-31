@@ -97,9 +97,9 @@ const Sensor: React.FC<SensorProps> = (props: SensorProps) => {
                 <SensorIcon className='icon' />
             </div>
             <div className='info'>
-                <div>{data.trend && TrendValue(data.trend)}</div>
-                <div>{data.max && <>max: {data.max}</>}</div>
-                <div>{data.min && <>min: {data.min}</>}</div>
+                <div>{data.trend ? TrendValue(data.trend) : '\u00A0'}</div>
+                <div>{typeof data.max !== 'undefined' ? <>max: {data.max}</> : '\u00A0'}</div>
+                <div>{typeof data.min !== 'undefined' ? <>min: {data.min}</> : '\u00A0'}</div>
             </div>
         </div>
     )
