@@ -40,7 +40,7 @@ char temp1[6], temp2[6], mmHg[6], humd[6], // mlxA[6], mlxO[6],
 
 // Network settings
 byte MAC[] = { 0x38, 0x59, 0xF9, 0x6D, 0xD7, 0xFF }; // MAC-address
-IPAddress IP(10,10,2,9);
+IPAddress IP(10,10,1,70);
 char server[] = "api.miksoft.pro";
 
 EthernetClient LAN;
@@ -49,7 +49,7 @@ int MAXwind = 0;
 int ReadUVintensityPin = A0; //Output from the sensor
 
 // If the variable is not commented out, debug mode is activated, messages are sent to the serial port
-// #define DEBUG
+#define DEBUG
 
 void setup() {
   #ifdef DEBUG
