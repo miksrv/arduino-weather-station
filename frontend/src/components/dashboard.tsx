@@ -1,10 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Dimmer, Grid, Icon, Loader } from 'semantic-ui-react'
 import { WiStrongWind, WiBarometer, WiHumidity } from 'react-icons/wi'
+import { useAppDispatch } from '../app/hooks'
 import { useGetSummaryQuery } from '../app/weatherApi'
+import { degToCompass } from '../functions/helpers'
+import { setUpdate } from '../app/updateSlice'
+
+import { weatherConditions } from '../functions/weatherConditions'
 
 const Dashboard: React.FC = () => {
-    const { data, isLoading, isSuccess } = useGetSummaryQuery(null)
+    const dispatch = useAppDispatch()
+    const { data, isLoading, isSuccess } = useGetSummaryQuery(null, {pollingInterval: 60 * 1000})
+    const conditions = weatherConditions(data?.payload.condition_id)
 
     const getImageByDate = () => {
         const curHours = new Date().getHours()
@@ -12,6 +19,10 @@ const Dashboard: React.FC = () => {
 
         return 'url(/background/autumn-' + dayTimes + '.jpg)'
     }
+
+    useEffect(() => {
+        dispatch(setUpdate(data?.timestamp))
+    }, [data])
 
     return (
         <Grid.Column computer={8} tablet={16} mobile={16}>
@@ -31,10 +42,15 @@ const Dashboard: React.FC = () => {
                             <span className='sign'>℃</span>
                         </div>
                         {isSuccess && (
-                            <div className='info'>
-                                <div>---</div>
-                                <div>Ощущается как <b>{data?.payload.temperature_feels}</b>℃</div>
-                            </div>
+                            <>
+                                <div className='summary-icon'>
+                                    {conditions.icon}
+                                </div>
+                                <div className='info'>
+                                    <div>{conditions.name}</div>
+                                    <div>Ощущается как <b>{data?.payload.temperature_feels}</b>℃</div>
+                                </div>
+                            </>
                         )}
                     </div>
                     <div className='second-info'>
@@ -49,7 +65,7 @@ const Dashboard: React.FC = () => {
                         <div>
                             <WiStrongWind className='icon' />
                             {isSuccess ? (
-                                data?.payload.wind_speed + ' м\\с ' + data?.payload.wind_degree
+                                data?.payload.wind_speed + ' м\\с ' + degToCompass(data?.payload.wind_degree)
                             ) : (<Icon loading name='spinner' />)}
                         </div>
                     </div>

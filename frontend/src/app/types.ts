@@ -1,6 +1,9 @@
 export interface IRestResponse {
     status: boolean,
-    update: number,
+    timestamp: {
+        server: number,
+        update: number,
+    }
     payload?: any,
     errorText?: string,
 }
@@ -18,6 +21,7 @@ export interface IRestSensors extends IRestResponse {
 }
 
 export interface ICurrentWeather {
+    condition_id: number,
     temperature: number,
     temperature_feels: number,
     humidity: number,
@@ -30,6 +34,7 @@ export interface ICurrentWeather {
 
 export interface IForecastItem {
     time: number,
+    condition_id: number,
     temperature: number,
     clouds: number,
     precipitation: number

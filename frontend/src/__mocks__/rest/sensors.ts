@@ -66,7 +66,10 @@ const payload: ISensorItem[] = [
 
 export const response: IRestResponse = {
     status: true,
-    update: Date.now() / 1000 | 0,
+    timestamp: {
+        server: Date.now() / 1000 | 0,
+        update:  (Date.now() / 1000) - 50 | 0
+    },
     payload: payload
 }
 

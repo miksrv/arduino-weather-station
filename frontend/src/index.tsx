@@ -7,7 +7,7 @@ import { store } from './app/store'
 import 'semantic-ui-css/semantic.min.css'
 import './styles/index.sass'
 
-import App from './app'
+import App from './App'
 
 if (process.env.NODE_ENV === 'development') {
     const { worker } = require('./__mocks__/browser')

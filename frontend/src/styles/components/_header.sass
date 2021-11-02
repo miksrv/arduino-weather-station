@@ -1,17 +1,21 @@
-.header-toolbar
-  background: #373737
-  padding: .8em 1em
-  margin: 2em 0
-  display: flex !important
+%online-icons
+  width: 5px
+  height: 26px
+  margin-left: 1vh
+
+.header
+  padding-top: 10px
+  padding-bottom: 10px
+  margin: 20px 0
+  display: flex
   flex-direction: row
   align-items: center
 
   .hamburger
     cursor: pointer
     font-size: 33px !important
-
-  .hamburger:hover
-    color: $text-second
+    &:hover
+      color: $text-second
 
   .buttons
     font-size: .8em
@@ -21,19 +25,41 @@
       color: $text-main
 
   .last-update
-    margin-left: .5vh
-    font-size: .9em
+    margin-left: 10px
+    font-size: .8em
 
-  .online, .offline
-    background: green
-    width: 5px
-    height: 26px
-    margin-left: 1vh
-
-  .online.pulsate
-    -webkit-animation: pulsate 2s infinite
-    -moz-animation: pulsate 2s infinite
-    animation: pulsate 2s infinite
+  .online
+    @extend %online-icons
+    background: $green
+    &.pulsate
+      -webkit-animation: pulsate 2s infinite
+      -moz-animation: pulsate 2s infinite
+      animation: pulsate 2s infinite
 
   .offline
-    background: red
+    @extend %online-icons
+    background: $red
+
+@-webkit-keyframes pulsate
+  0%
+    opacity: 1
+  50%
+    opacity: 0
+  100%
+    opacity: 1
+
+@-moz-keyframes pulsate
+  0%
+    opacity: 1
+  50%
+    opacity: 0
+  100%
+    opacity: 1
+
+@keyframes pulsate
+  0%
+    opacity: 1
+  50%
+    opacity: 0
+  100%
+    opacity: 1

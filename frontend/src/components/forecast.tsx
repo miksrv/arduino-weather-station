@@ -3,6 +3,9 @@ import Carousel from 'react-elastic-carousel'
 import { Dimmer, Grid, Loader } from 'semantic-ui-react'
 import { IForecastItem } from '../app/types'
 import { useGetForecastQuery } from '../app/weatherApi'
+import { weatherConditions } from '../functions/weatherConditions'
+
+import moment from 'moment'
 
 const renderCarousel = (data: IForecastItem[]) => {
     const breakPoints = [
@@ -22,16 +25,16 @@ const renderCarousel = (data: IForecastItem[]) => {
             {data.map((item, key) => (
                 <div className='forecast-tile' key={key}>
                     <div className='date'>
-                        {item.time}
+                        {moment.unix(item.time).format('ddd, DD MMM, H:mm')}
                     </div>
                     <div className='desc'>
-                        {item.clouds}
+                        {weatherConditions(item.condition_id).name}
                     </div>
                     <div className='image'>
-                        ICON
+                        {weatherConditions(item.condition_id).icon}
                     </div>
                     <div className='temp'>
-                        {item.temperature} <span className='sign'>°</span>
+                        {item.temperature}°
                     </div>
                 </div>
             ))}
