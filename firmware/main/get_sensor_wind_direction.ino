@@ -1,5 +1,3 @@
-// Get anemometr data
-
 void get_sensor_wind_direction() {
   String value = "";
 
@@ -7,16 +5,17 @@ void get_sensor_wind_direction() {
     if (expander.digitalRead(i) == 0) {
       value = value + String(i);
     }
-    
-    delay(80);
+    delay(20);
   }
 
-  value.toCharArray(wind_dir, 4);
+  if (value != "") {
+    value.toCharArray(wind_dir, 2);
+  }
 
   #ifdef DEBUG
-    Serial.print("  [Ok] Wind direction: ");
+    Serial.print(" - Wind direction: ");
     Serial.println(wind_dir);
   #endif
   
-  delay(2000);
+  delay(500);
 }
