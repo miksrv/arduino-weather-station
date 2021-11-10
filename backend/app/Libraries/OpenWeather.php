@@ -62,7 +62,7 @@ class OpenWeather {
         $response = $this->_endpoint($endpoint);
 
         try {
-            $data = $this->_mapping($response);
+            $data = $this->_mapping($response, true);
             $this->Current->add($data);
 
             cache()->save('current', time(), self::CACHE_CURRENT);
@@ -77,8 +77,10 @@ class OpenWeather {
         }
     }
 
-    protected function _mapping(object $data): array
+    protected function _mapping(object $data, bool $current = false): array
     {
+        $key = $current ? '1h' : '3h';
+
         return [
             'conditions'    => $data->weather[0]->id,
             'temperature'   => round($data->main->temp, 1),
@@ -86,10 +88,10 @@ class OpenWeather {
             'humidity'      => $data->main->humidity,
             'pressure'      => round($data->main->grnd_level / 1.333, 1),
             'clouds'        => $data->clouds->all,
-            'wind_speed'    => $data->wind->speed,
+            'wind_speed'    => round($data->wind->speed, 1),
             'wind_deg'      => $data->wind->deg,
-            'wind_gust'     => $data->wind->gust,
-            'precipitation' => $data->rain->{'3h'} ?? ($data->snow->{'3h'} ?? 0),
+            'wind_gust'     => round($data->wind->gust, 1),
+            'precipitation' => $data->rain->$key ?? ($data->snow->$key ?? 0),
         ];
     }
 
