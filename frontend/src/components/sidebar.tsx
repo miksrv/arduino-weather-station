@@ -19,19 +19,19 @@ const Sidebar: React.FC = () => {
             visible={visible}
             width='thin'
         >
-            <Menu.Item as={NavLink} exact to='/'>
+            <Menu.Item as={NavLink} onClick={() => dispatch(hide())} exact to='/'>
                 <Icon name='calendar check outline' />
                 Сводка
             </Menu.Item>
-            <Menu.Item as={NavLink} to='/sensors' activeClassName='active'>
+            <Menu.Item as={NavLink} onClick={() => dispatch(hide())} to='/sensors' activeClassName='active'>
                 <Icon name='dashboard' />
                 Датчики
             </Menu.Item>
-            <Menu.Item as={NavLink} to='/statistic' activeClassName='active'>
+            <Menu.Item as={NavLink} onClick={() => dispatch(hide())} to='/statistic' activeClassName='active'>
                 <Icon name='area graph' />
                 Статистика
             </Menu.Item>
-            <Menu.Item as={NavLink} to='/archive' activeClassName='active'>
+            <Menu.Item as={NavLink} onClick={() => dispatch(hide())} to='/archive' activeClassName='active'>
                 <Icon name='map' />
                 Тепловая карта
             </Menu.Item>

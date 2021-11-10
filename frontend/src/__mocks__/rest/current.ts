@@ -1,7 +1,7 @@
 import {ICurrentWeather, IRestResponse} from '../../app/types'
 
 const payload: ICurrentWeather = {
-    condition_id: 800, // See https://openweathermap.org/weather-conditions
+    condition_id: 800,
     temperature: 12.3,
     temperature_feels: 3.4,
     humidity: 45.4,
