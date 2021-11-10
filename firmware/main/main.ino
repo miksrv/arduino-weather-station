@@ -1,7 +1,7 @@
 // ******************************************** //
 //  Name    : WEATHER STATION
 //  Author  : Mik™ <miksoft.tm@gmail.com>
-//  Version : 1.3.0 (07 Nov 2021)
+//  Version : 1.3.0 (10 Nov 2021)
 // ******************************************** //
 // Sensors      Arduino
 //  [R] Red   -> VCC +5V
@@ -25,20 +25,23 @@
 #include "SPI.h"
 #include "Ethernet.h"
 
-const int SEND_DATA_INTERVAL = 15; // Interval to send data (sec)
+// If the variable is not commented out, debug mode is activated, messages are sent to the serial port
+// #define DEBUG
+
+const long SEND_DATA_INTERVAL = 60; // Interval to send data (sec)
 const char API_SERVER[] = "meteo.miksoft.pro";
-const char API_METHOD[] = "/api/set/data";
-const char API_SECRET[] = "A7FE9540D1F5"; // Change this API key
+const char API_METHOD[] = "/api/set/sensors";
+const char API_SECRET[] = ""; // Change this API key
 
-const int PIN_ANEMOMETR = 3; // Leonardo ETH PIN #3
-const int PIN_DHT22 = 4;
-const int PIN_UV_OUT = A0; // Output from the sensor
-const int PIN_UV_REF = A1; // 3.3V power on the Arduino board
-
+const int PIN_ANEMOMETR = 3; // PIN Anemometr (Leonardo ETH PIN #3 for interputs
+const int PIN_DHT22 = 4;     // PIN DHT22
+const int PIN_UV_OUT = A0;   // Output from the UV sensor
+const int PIN_UV_REF = A1;   // 3.3V power on the Arduino board
 
 byte MAC[] = { 0x38, 0x59, 0xF9, 0x6D, 0xD7, 0xFF };
 IPAddress IP(10,10,1,70);
 EthernetClient LAN;
+
 DHT dht(PIN_DHT22, DHT22);
 PCF8574 expander(0x20);
 BMP085 dps = BMP085();
@@ -49,12 +52,11 @@ unsigned long previousMillis;
 char webclient_data[120], temp[6], humd[6], mmHg[6], // mlxA[6], mlxO[6],
      lux[5], uvindex[5], wind_dir[5], wind_speed[5];
 
-// If the variable is not commented out, debug mode is activated, messages are sent to the serial port
-#define DEBUG
-
 void setup() {
   #ifdef DEBUG
+    delay(1000);
     Serial.begin(9600);
+    delay(2000);
     Serial.println("Arduino weather init...");
   #endif
 

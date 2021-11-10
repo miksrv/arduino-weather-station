@@ -12,17 +12,11 @@ void webclient_send_data() {
 
   strcat(webclient_data, "&h=");
   strcat(webclient_data, humd);
-    
-//  strcat(webclient_data, "&ma="); // MLX Ambient
-//  strcat(webclient_data, mlxA);
-  
-//  strcat(webclient_data, "&mo="); // MLX Object
-//  strcat(webclient_data, mlxO);
-    
+
   strcat(webclient_data, "&uv=");
   strcat(webclient_data, uvindex);
 
-  strcat(webclient_data, "&lux=");
+  strcat(webclient_data, "&i=");
   strcat(webclient_data, lux);
 
   strcat(webclient_data, "&wd=");
