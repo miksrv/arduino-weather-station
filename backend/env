@@ -1,0 +1,130 @@
+#--------------------------------------------------------------------
+# Example Environment Configuration file
+#
+# This file can be used as a starting point for your own
+# custom .env files, and contains most of the possible settings
+# available in a default install.
+#
+# By default, all of the settings are commented out. If you want
+# to override the setting, you must un-comment it by removing the '#'
+# at the beginning of the line.
+#--------------------------------------------------------------------
+
+#--------------------------------------------------------------------
+# ENVIRONMENT
+#--------------------------------------------------------------------
+
+# CI_ENVIRONMENT = production
+
+#--------------------------------------------------------------------
+# APP
+#--------------------------------------------------------------------
+
+# app.baseURL = ''
+# app.forceGlobalSecureRequests = false
+
+# app.sessionDriver = 'CodeIgniter\Session\Handlers\FileHandler'
+# app.sessionCookieName = 'ci_session'
+# app.sessionSavePath = NULL
+# app.sessionMatchIP = false
+# app.sessionTimeToUpdate = 300
+# app.sessionRegenerateDestroy = false
+
+# app.cookiePrefix = ''
+# app.cookieDomain = ''
+# app.cookiePath = '/'
+# app.cookieSecure = false
+# app.cookieHTTPOnly = false
+
+# app.CSRFProtection  = false
+# app.CSRFTokenName   = 'csrf_test_name'
+# app.CSRFCookieName  = 'csrf_cookie_name'
+# app.CSRFExpire      = 7200
+# app.CSRFRegenerate  = true
+# app.CSRFExcludeURIs = []
+
+# app.CSPEnabled = false
+
+# Error Logging Threshold (0 - disabled, 9 - all, 3 - default)
+logger.threshold = 6
+
+app.token = TOKEN_EXAMPLE
+
+app.appTimezone = Asia/Yekaterinburg
+app.timezone  = 5
+app.latitude  = 31.0
+app.longitude = 32.0
+
+app.openweather.key  = KEY_EXAMPLE
+app.openweather.city = CITY_ID
+
+app.narodmon.mac = EXAMPLE
+app.narodmon.lat = 31.0
+app.narodmon.lon = 32.0
+app.narodmon.alt = 80
+
+app.observatory.url = http://observatory.local/
+app.observatory.webcam = http://observatory.local/webcamphoto
+
+app.vkapi.token   =
+app.vkapi.domain  =
+app.vkapi.version = 5.145
+
+app.user_login = user
+app.user_passw = password
+app.user_session_time = 60
+
+#--------------------------------------------------------------------
+# DATABASE
+#--------------------------------------------------------------------
+
+# database.default.hostname = localhost
+# database.default.database = ci4
+# database.default.username = root
+# database.default.password = root
+# database.default.DBDriver = MySQLi
+
+# database.tests.hostname = localhost
+# database.tests.database = ci4
+# database.tests.username = root
+# database.tests.password = root
+# database.tests.DBDriver = MySQLi
+
+database.table.users_data = users_data
+database.table.meteo_data = meteo_data
+database.table.astro_data = astro_sensors
+database.table.astro_fits = astro_fits
+database.table.astro_fits = astro_fits
+database.table.astro_photos = astro_photos
+database.table.astro_catalog = astro_catalog
+
+#--------------------------------------------------------------------
+# CONTENT SECURITY POLICY
+#--------------------------------------------------------------------
+
+# contentsecuritypolicy.reportOnly = false
+# contentsecuritypolicy.defaultSrc = 'none'
+# contentsecuritypolicy.scriptSrc = 'self'
+# contentsecuritypolicy.styleSrc = 'self'
+# contentsecuritypolicy.imageSrc = 'self'
+# contentsecuritypolicy.base_uri = null
+# contentsecuritypolicy.childSrc = null
+# contentsecuritypolicy.connectSrc = 'self'
+# contentsecuritypolicy.fontSrc = null
+# contentsecuritypolicy.formAction = null
+# contentsecuritypolicy.frameAncestors = null
+# contentsecuritypolicy.mediaSrc = null
+# contentsecuritypolicy.objectSrc = null
+# contentsecuritypolicy.pluginTypes = null
+# contentsecuritypolicy.reportURI = null
+# contentsecuritypolicy.sandbox = false
+# contentsecuritypolicy.upgradeInsecureRequests = false
+
+#--------------------------------------------------------------------
+# HONEYPOT
+#--------------------------------------------------------------------
+
+#  honeypot.hidden = 'true'
+#  honeypot.label = 'Fill This Field'
+#  honeypot.name = 'honeypot'
+#  honeypot.template = '<label>{label}</label><input type="text" name="{name}" value=""/>'
