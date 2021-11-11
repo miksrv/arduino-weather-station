@@ -20,6 +20,25 @@ class Current extends Model
         $this->table = getenv('database.table.weather_current');
     }
 
+    function get_last()
+    {
+        return $this->db
+            ->table($this->table)
+            ->orderBy($this->key_time, 'DESC')
+            ->get()
+            ->getRow();
+    }
+
+    function get_last_day()
+    {
+        return $this->db
+            ->table($this->table)
+            ->orderBy($this->key_time, 'DESC')
+            ->where($this->key_time . ' > DATE_SUB(NOW(), INTERVAL 12 HOUR)')
+            ->get()
+            ->getResult();
+    }
+
     function add(array $data)
     {
         $meta = [

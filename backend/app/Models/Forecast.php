@@ -20,6 +20,14 @@ class Forecast extends Model
         $this->table = getenv('database.table.weather_forecast');
     }
 
+    function get_last()
+    {
+        return $this->db->table($this->table)
+            ->orderBy($this->key_time, 'ASC')
+            ->getWhere([$this->key_time . '>' => gmdate('Y-m-d H:i:s')], 10)
+            ->getResult();
+    }
+
     function refresh(array $data, int $time)
     {
         if ($this->find_by_time($time)) {
