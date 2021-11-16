@@ -24,7 +24,7 @@ class Forecast extends Model
     {
         return $this->db->table($this->table)
             ->orderBy($this->key_time, 'ASC')
-            ->getWhere([$this->key_time . '>' => gmdate('Y-m-d H:i:s')], 10)
+            ->getWhere([$this->key_time . '>' => gmdate('Y-m-d H:i:s')], 30)
             ->getResult();
     }
 

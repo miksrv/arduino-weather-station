@@ -5,53 +5,7 @@ namespace App\Libraries;
 use App\Models\Sensors;
 use App\Models\Current;
 use App\Models\Forecast;
-
-interface ISensorItem
-{
-    function __construct(array $data, string $type);
-}
-
-class SensorItem implements ISensorItem
-{
-    public float $value;
-    public float $trend = 0;
-    public float $min;
-    public float $max;
-    public string $type;
-
-    function __construct(array $data, string $type)
-    {
-        $this->type = $type;
-        $this->_mapping($data);
-    }
-
-    private function _mapping(array $data) {
-        $type  = $this->type;
-        $count = 0;
-
-        foreach ($data as $item)
-        {
-            if (! property_exists($item, $type))
-                continue;
-
-            $time_diff = round(abs(strtotime($item->item_utc_date . ' UTC') - gmdate('U')) / 60,0);
-
-            if ($count === 0)
-            {
-                $this->min = $this->max = $item->$type;
-                $this->value = $item->$type;
-            }
-
-            if ($item->$type < $this->min) $this->min = $item->$type;
-            if ($item->$type > $this->max) $this->max = $item->$type;
-            if ($time_diff < 60) $this->trend += $item->$type;
-
-            $count++;
-        }
-
-        if ($count !== 0) $this->trend = round($this->value - ($this->trend / $count), 1);
-    }
-}
+use App\Entities\SensorItem;
 
 /**
  * Weather station methods
@@ -79,9 +33,11 @@ class ApiWeather {
 
         $time_diff   = round(abs(strtotime($sensors[0]->item_utc_date) - strtotime($weather[0]->item_utc_date)) / 60,0);
         $data_actual = $time_diff < self::TIME_ACTUAL;
-        $time_update = strtotime($data_actual ? $sensors[0]->item_utc_date : $weather[0]->item_utc_date . ' UTC');
+        $time_update = strtotime(($data_actual ? $sensors[0]->item_utc_date : $weather[0]->item_utc_date) . ' UTC') ;
 
         $result[] = new SensorItem(($data_actual ? $sensors : $weather), 'temperature');
+        $result[] = new SensorItem($weather, 'feels_like');
+        $result[] = new SensorItem($this->_create_dewpoint($data_actual ? $sensors : $weather), 'dewpoint');
         $result[] = new SensorItem(($data_actual ? $sensors : $weather), 'humidity');
         $result[] = new SensorItem(($data_actual ? $sensors : $weather), 'pressure');
         $result[] = new SensorItem(($data_actual ? $sensors : $weather), 'wind_speed');
@@ -114,7 +70,7 @@ class ApiWeather {
             ];
         }
 
-        return (object) ['update' => cache('forecast'), 'payload' => $weather];
+        return (object) ['update' => (cache('forecast') ? cache('forecast') : gmdate('U')), 'payload' => $weather];
     }
 
     function get_last(): object
@@ -127,7 +83,7 @@ class ApiWeather {
         $actual   = $time_diff < self::TIME_ACTUAL;
         $outdated = $time_diff > self::TIME_OUTDATED;
 
-        $update  = strtotime($actual ? $sensors->item_utc_date : $current->item_utc_date . ' UTC');
+        $update  = strtotime(($actual ? $sensors->item_utc_date : $current->item_utc_date) . ' UTC');
         $weather = [
             'condition_id'      => (int) $current->conditions,
             'temperature'       => (float) ($actual ? $sensors->temperature : $current->temperature),
@@ -145,5 +101,20 @@ class ApiWeather {
 
         
         return (object) ['update' => $update, 'payload' => $weather];
+    }
+
+    function _create_dewpoint($data)
+    {
+        $temp = [];
+
+        foreach ($data as $item)
+        {
+            $temp[] = (object) [
+                'item_utc_date' => $item->item_utc_date,
+                'dewpoint' => round(((pow(($item->humidity / 100), 0.125)) * (112 + 0.9 * $item->temperature) + (0.1 * $item->temperature) - 112), 1)
+            ];
+        }
+
+        return $temp;
     }
 }
