@@ -51,5 +51,6 @@ export interface ISensorItem {
 
 export type SensorTypes =
     'temperature' | 'humidity' | 'pressure' |
-    'wind_speed' | 'wind_degree' | 'clouds' |
-    'precipitation' | 'dewpoint'
+    'wind_speed' | 'wind_gust' | 'wind_deg' |
+    'clouds' | 'precipitation' | 'dewpoint' |
+    'illumination' | 'uvindex' | 'feels_like'

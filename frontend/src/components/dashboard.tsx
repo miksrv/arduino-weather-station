@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import translate from '../functions/translate'
 import { Dimmer, Grid, Icon, Loader } from 'semantic-ui-react'
 import { WiStrongWind, WiBarometer, WiHumidity } from 'react-icons/wi'
 import { useAppDispatch } from '../app/hooks'
@@ -7,6 +8,8 @@ import { degToCompass } from '../functions/helpers'
 import { setUpdate } from '../app/updateSlice'
 
 import { weatherConditions } from '../functions/weatherConditions'
+
+const lang = translate().dashboard
 
 const Dashboard: React.FC = () => {
     const dispatch = useAppDispatch()
@@ -22,7 +25,7 @@ const Dashboard: React.FC = () => {
 
     useEffect(() => {
         dispatch(setUpdate(data?.timestamp))
-    }, [data])
+    }, [dispatch, data])
 
     return (
         <Grid.Column computer={8} tablet={16} mobile={16}>
@@ -32,8 +35,8 @@ const Dashboard: React.FC = () => {
                     <div className='background-image' style={{backgroundImage: getImageByDate()}}></div>
                 </div>
                 <div className='content'>
-                    <h1>Погодная станция</h1>
-                    <h4>Оренбургская обл., c. Ивановка, ЖК "Приуралье"</h4>
+                    <h1>{lang.title}</h1>
+                    <h4>{lang.subtitle}</h4>
                     <div className='main-info'>
                         <div className='value'>
                             {isSuccess ? data?.payload.temperature : (
@@ -48,7 +51,7 @@ const Dashboard: React.FC = () => {
                                 </div>
                                 <div className='info'>
                                     <div>{conditions.name}</div>
-                                    <div>Ощущается как <b>{data?.payload.temperature_feels}</b>℃</div>
+                                    <div>{lang.feels_like} <b>{data?.payload.temperature_feels}</b>℃</div>
                                 </div>
                             </>
                         )}
@@ -60,7 +63,7 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div>
                             <WiBarometer className='icon' />
-                            {isSuccess ? (data?.payload.pressure) : (<Icon loading name='spinner' />)} мм.
+                            {isSuccess ? (data?.payload.pressure) : (<Icon loading name='spinner' />)} {lang.pressure_sign}
                         </div>
                         <div>
                             <WiStrongWind className='icon' />

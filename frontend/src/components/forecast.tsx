@@ -18,23 +18,24 @@ const renderCarousel = (data: IForecastItem[]) => {
         <Carousel
             breakPoints={breakPoints}
             itemsToScroll={1}
-            pagination={false}
+            pagination={true}
             itemPadding={[0, 5]}
-            isRTL
+            isRTL={false}
         >
             {data.map((item, key) => (
                 <div className='forecast-tile' key={key}>
                     <div className='date'>
-                        {moment.unix(item.time).format('ddd, DD MMM, H:mm')}
-                    </div>
-                    <div className='desc'>
-                        {weatherConditions(item.condition_id).name}
+                        <div className='day-of-week'>{moment.unix(item.time).format('dddd')}</div>
+                        <div className='date-time'>{moment.unix(item.time).format('DD MMMM, H:mm')}</div>
                     </div>
                     <div className='image'>
                         {weatherConditions(item.condition_id).icon}
                     </div>
                     <div className='temp'>
                         {item.temperature}°
+                    </div>
+                    <div className='desc'>
+                        {weatherConditions(item.condition_id).name}
                     </div>
                 </div>
             ))}

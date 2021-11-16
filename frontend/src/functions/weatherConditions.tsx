@@ -1,7 +1,7 @@
 import React from 'react'
-import { WiThunderstorm, WiRainMix, WiRain, WiSnowWind, WiFog, WiDaySunny, WiCloudy, WiAlien, WiDayCloudy,
-    WiDaySleet, WiDayShowers, WiDayRain, WiDayRainWind, WiSnow, WiNightSleet, WiNightShowers, WiNightRain,
-    WiNightRainWind } from 'react-icons/wi'
+import translate from './translate'
+import { WiThunderstorm, WiRainMix, WiRain, WiSnowWind, WiFog, WiDaySunny, WiCloud, WiCloudy, WiAlien, WiDayCloudy,
+    WiDaySleet, WiDayShowers, WiDayRain, WiDayRainWind, WiSnow, WiNightSleet, WiNightShowers } from 'react-icons/wi'
 
 export const weatherConditions = (id: number | undefined) => {
     let conditions = {icon: <WiAlien />, name: ''}
@@ -9,14 +9,15 @@ export const weatherConditions = (id: number | undefined) => {
     if (typeof id !== 'number') return conditions
 
     const stringID = id.toString()
+    const lang = translate().weather.conditions
 
     switch (stringID[0]) {
         case '2':
-            conditions = {icon: <WiThunderstorm />, name: 'Thunderstorm'}
+            conditions = {name: lang.id200, icon: <WiThunderstorm />}
             break
 
         case '3':
-            conditions = {icon: <WiRainMix />, name: 'Drizzle'}
+            conditions = {name: lang.id300, icon: <WiRainMix />}
             break
 
         case '5': // Rain
@@ -24,81 +25,80 @@ export const weatherConditions = (id: number | undefined) => {
                 case '0':
                     switch (stringID[2]) {
                         case '0':
-                            conditions = {icon: <WiDaySleet />, name: 'Light rain'}
+                            conditions = {name: lang.id500, icon: <WiDaySleet />}
                             break
 
                         case '1':
                         case '2':
-                            conditions = {icon: <WiDayShowers />, name: 'Heavy intensity rain'}
+                            conditions = {name: lang.id502, icon: <WiDayShowers />}
                             break
 
                         case '3':
-                            conditions = {icon: <WiDayRain />, name: 'Very heavy rain'}
+                            conditions = {name: lang.id503, icon: <WiDayRain />}
                             break
 
                         default:
-                            conditions = {icon: <WiDayRainWind />, name: 'Extreme rain'}
+                            conditions = {name: lang.id504, icon: <WiDayRainWind />}
                             break
                     }
                     break
 
                 case '1':
-                    conditions = {icon: <WiSnow />, name: 'Freezing rain'}
+                    conditions = {name: lang.id511, icon: <WiSnow />}
                     break
 
                 case '2':
                     switch (stringID[2]) {
                         case '0':
-                            conditions = {icon: <WiNightSleet />, name: 'Light intensity shower rain'}
-                            break
-
-                        case '1': // shower rain
-                        case '2':
-                            conditions = {icon: <WiNightShowers />, name: 'Heavy intensity shower rain'}
-                            break
-
-                        case '3':
-                            conditions = {icon: <WiNightRain />, name: 'Very heavy rain'}
+                            conditions = {name: lang.id520, icon: <WiNightSleet />}
                             break
 
                         default:
-                            conditions = {icon: <WiNightRainWind />, name: 'Ragged shower rain'}
+                            conditions = conditions = {name: lang.id522, icon: <WiNightShowers />}
                             break
                     }
                     break
 
                 default:
-                    conditions = {icon: <WiRain />, name: 'Rain'}
+                    conditions = {name: lang.id500, icon: <WiRain />}
                     break
             }
             break
 
         case '6':
-            conditions = {icon: <WiSnowWind />, name: 'Snow'}
+            conditions = {name: lang.id600, icon: <WiSnowWind />}
             break
 
         case '7':
-            conditions = {icon: <WiFog />, name: 'Fog'}
+            conditions = {name: lang.id741, icon: <WiFog />}
             break
 
         case '8':
             switch (stringID[2]) {
                 case '0':
-                    conditions = {icon: <WiDaySunny />, name: 'Clear'}
+                    conditions = {name: lang.id800, icon: <WiDaySunny />}
                     break
 
                 case '1':
-                    conditions = {icon: <WiDayCloudy />, name: 'Clouds'}
+                    conditions = {name: lang.id801, icon: <WiDayCloudy />}
+                    break
+
+                case '2':
+                    conditions = {name: lang.id802, icon: <WiCloud />}
+                    break
+
+                case '3':
+                    conditions = {name: lang.id803, icon: <WiCloud />}
                     break
 
                 default:
-                    conditions = {icon: <WiCloudy />, name: 'Clouds'}
+                    conditions = {name: lang.id804, icon: <WiCloudy />}
                     break
             }
             break
 
         default:
-            conditions = {icon: <WiCloudy />, name: 'Clouds'}
+            conditions = {name: lang.id801, icon: <WiDayCloudy />}
             break
     }
 

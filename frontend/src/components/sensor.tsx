@@ -1,14 +1,17 @@
 import React from 'react'
+import translate from '../functions/translate'
 import { ISensorItem, SensorTypes } from '../app/types'
-import { WiThermometer, WiHumidity, WiBarometer } from 'react-icons/wi'
+import { WiThermometer, WiHumidity, WiBarometer, WiDaySunny, WiFlood, WiCloudy, WiWindDeg, WiStrongWind, WiHot, WiNa, WiRaindrop } from 'react-icons/wi'
 import { IoIosArrowRoundUp, IoIosArrowRoundDown } from 'react-icons/io'
+
+const lang = translate().sensors
 
 type SensorProps = {
     data: ISensorItem,
 }
 
 type MetaInfoType = {
-    type: SensorTypes,
+    type: SensorTypes | undefined,
     name: string,
     sign: string,
     icon: React.ElementType,
@@ -18,59 +21,94 @@ type MetaInfoType = {
 const SensorsMeta:MetaInfoType[] = [
     {
         type: 'temperature',
-        name: 'Температура',
-        sign: '℃',
+        name: lang.temperature.name,
+        sign: lang.temperature.sign,
         icon: WiThermometer,
         style: 'red'
     },
     {
         type: 'dewpoint',
-        name: 'Точка росы',
-        sign: '℃',
+        name: lang.dewpoint.name,
+        sign: lang.dewpoint.sign,
+        icon: WiRaindrop,
+        style: 'lightblue'
+    },
+    {
+        type: 'feels_like',
+        name: lang.feels_like.name,
+        sign: lang.feels_like.sign,
         icon: WiThermometer,
-        style: 'orange'
+        style: 'pink'
     },
     {
         type: 'humidity',
-        name: 'Влажность воздуха',
-        sign: '%',
+        name: lang.humidity.name,
+        sign: lang.humidity.sign,
         icon: WiHumidity,
         style: 'blue'
     },
     {
         type: 'pressure',
-        name: 'Атмосферное давление',
-        sign: 'мм. рт. ст.',
+        name: lang.pressure.name,
+        sign: lang.pressure.sign,
         icon: WiBarometer,
-        style: 'cobalt'
+        style: 'purple'
     },
     {
         type: 'clouds',
-        name: 'Облачность',
-        sign: '%',
-        icon: WiBarometer,
-        style: 'cobalt'
+        name: lang.clouds.name,
+        sign: lang.clouds.sign,
+        icon: WiCloudy,
+        style: 'blue'
     },
     {
         type: 'wind_speed',
-        name: 'Скорость ветра',
-        sign: 'м/с',
-        icon: WiBarometer,
-        style: 'cobalt'
+        name: lang.wind_speed.name,
+        sign: lang.wind_speed.sign,
+        icon: WiStrongWind,
+        style: 'lime'
     },
     {
-        type: 'wind_degree',
-        name: 'Направление ветра',
-        sign: 'градусов',
-        icon: WiBarometer,
-        style: 'cobalt'
+        type: 'wind_gust',
+        name: lang.wind_gust.name,
+        sign: lang.wind_gust.sign,
+        icon: WiStrongWind,
+        style: 'lime'
+    },
+    {
+        type: 'wind_deg',
+        name: lang.wind_deg.name,
+        sign: lang.wind_deg.sign,
+        icon: WiWindDeg,
+        style: 'green'
     },
     {
         type: 'precipitation',
-        name: 'Осадки',
-        sign: 'мм',
-        icon: WiBarometer,
-        style: 'cobalt'
+        name: lang.precipitation.name,
+        sign: lang.precipitation.sign,
+        icon: WiFlood,
+        style: 'darkblue'
+    },
+    {
+        type: 'illumination',
+        name: lang.illumination.name,
+        sign: lang.illumination.sign,
+        icon: WiDaySunny,
+        style: 'orange'
+    },
+    {
+        type: 'uvindex',
+        name: lang.uvindex.name,
+        sign: lang.uvindex.sign,
+        icon: WiHot,
+        style: 'yellow'
+    },
+    {
+        type: undefined,
+        name: lang.undefined.name,
+        sign: lang.undefined.sign,
+        icon: WiNa,
+        style: 'brown'
     }
 ]
 
@@ -84,7 +122,7 @@ const TrendValue = (trend: number) => {
 
 const Sensor: React.FC<SensorProps> = (props: SensorProps) => {
     const { data } = props
-    const meta = SensorsMeta.filter(obj => obj.type === data.type).pop()
+    const meta = SensorsMeta.filter(obj => obj.type === data.type).pop() || SensorsMeta.filter(obj => obj.type === undefined).pop()
     const SensorIcon: any = meta?.icon
 
     return (

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import translate from '../functions/translate'
 import { Button, Icon } from 'semantic-ui-react'
 import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { toggle } from '../app/sidebarSlice'
@@ -6,6 +7,7 @@ import { timeAgo } from '../functions/helpers'
 
 import moment from 'moment'
 
+const lang = translate().general
 const OUTDATED_SEC = 180
 
 // #TODO: Добавить обработик даты, если она 01.01.1970 (компонент не обновил дату)
@@ -40,7 +42,7 @@ const Header: React.FC = () => {
                         <div>{moment.unix(timestamp.update).format('DD.MM.Y, H:mm:ss')}</div>
                         <div>{timeAgo(seconds)}</div>
                     </> :
-                    <><Icon loading name='spinner' /> Загрузка...</>}
+                    <><Icon loading name='spinner' /> {lang.loading}...</>}
                 </span>
             </span>
             <span className='buttons'>

@@ -12,7 +12,7 @@ const Sensors: React.FC = () => {
 
     useEffect(() => {
         dispatch(setUpdate(data?.timestamp))
-    }, [data])
+    }, [dispatch, data])
 
     return (
         <Grid>

@@ -52,7 +52,7 @@ const payload: ISensorItem[] = [
     {
         name: 'wd',
         value: 180,
-        type: 'wind_degree'
+        type: 'wind_deg'
     },
     {
         name: 'pr',

@@ -4,7 +4,7 @@ import { IRestCurrent, IRestForecast, IRestSensors } from './types'
 export const weatherApi = createApi({
     reducerPath: 'api',
     baseQuery: fetchBaseQuery(
-        { baseUrl: 'https://api.miksoft.pro/get/' }),
+        { baseUrl: 'https://meteo.miksoft.pro/api/get/' }),
     endpoints: (builder) => ({
         getSummary: builder.query<IRestCurrent, null>({
             query: () => 'current'

@@ -16,28 +16,40 @@
 .react-daterange-picker__calendar
   z-index: 9999 !important
 
+.rec-dot
+  background-color: #ffffff36 !important
+  box-shadow: 0 0 1px 2px rgba(213, 213, 213, 0.5) !important
+
+.rec-dot_active
+  background-color: rgba(162, 162, 162, 0.5) !important
+  box-shadow: 0 0 1px 3px rgb(145, 145, 145) !important
+
 .forecast-tile
-  border-radius: 5px
-  padding: 1em
+  border-radius: $borderRadius
+  padding: 10px
   text-align: center
   width: 340px
-  background: #373737
+  background: $box-background
 
   .date
     color: $text-second
     font-size: .9em
-    text-transform: capitalize
+
+    .day-of-week
+      font-size: 1.3em
+      color: $text-main
+      text-transform: capitalize
+
+    .date-time
+      font-size: .9em
 
   .desc
     height: 28px
-    line-height: 1em
-    margin: .4em 0 0
-
-    &:first-letter
-      text-transform: capitalize
+    color: $text-second
+    font-size: .9em
 
   .image
-    margin: -.1em auto -.4em
+    margin: 0 auto -25px
     font-size: 4em
 
   .temp, .wind
