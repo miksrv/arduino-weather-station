@@ -25,6 +25,7 @@ class Current extends Model
         return $this->db
             ->table($this->table)
             ->orderBy($this->key_time, 'DESC')
+            ->limit(1)
             ->get()
             ->getRow();
     }

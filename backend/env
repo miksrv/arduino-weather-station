@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------
-# Example Environment Configuration file
+# Environment Configuration file
 #
 # This file can be used as a starting point for your own
 # custom .env files, and contains most of the possible settings
@@ -14,7 +14,8 @@
 # ENVIRONMENT
 #--------------------------------------------------------------------
 
-# CI_ENVIRONMENT = production
+# CI_ENVIRONMENT = development
+CI_ENVIRONMENT = development
 
 #--------------------------------------------------------------------
 # APP
@@ -48,55 +49,30 @@
 # Error Logging Threshold (0 - disabled, 9 - all, 3 - default)
 logger.threshold = 6
 
-app.token = TOKEN_EXAMPLE
+app.token = ???
 
-app.appTimezone = Asia/Yekaterinburg
-app.timezone  = 5
-app.latitude  = 31.0
-app.longitude = 32.0
+app.latitude  = 51
+app.longitude = 55
 
-app.openweather.key  = KEY_EXAMPLE
-app.openweather.city = CITY_ID
+app.openweather.key = ???
 
-app.narodmon.mac = EXAMPLE
-app.narodmon.lat = 31.0
-app.narodmon.lon = 32.0
-app.narodmon.alt = 80
-
-app.observatory.url = http://observatory.local/
-app.observatory.webcam = http://observatory.local/webcamphoto
-
-app.vkapi.token   =
-app.vkapi.domain  =
-app.vkapi.version = 5.145
-
-app.user_login = user
-app.user_passw = password
-app.user_session_time = 60
-
+app.narodmon.mac = ???
+app.narodmon.lat = 51
+app.narodmon.lon = 55
+app.narodmon.alt = 120
 #--------------------------------------------------------------------
 # DATABASE
 #--------------------------------------------------------------------
 
-# database.default.hostname = localhost
-# database.default.database = ci4
-# database.default.username = root
-# database.default.password = root
-# database.default.DBDriver = MySQLi
+database.default.hostname = localhost
+database.default.database = ???
+database.default.username = ???
+database.default.password = ???
+database.default.DBDriver = MySQLi
 
-# database.tests.hostname = localhost
-# database.tests.database = ci4
-# database.tests.username = root
-# database.tests.password = root
-# database.tests.DBDriver = MySQLi
-
-database.table.users_data = users_data
-database.table.meteo_data = meteo_data
-database.table.astro_data = astro_sensors
-database.table.astro_fits = astro_fits
-database.table.astro_fits = astro_fits
-database.table.astro_photos = astro_photos
-database.table.astro_catalog = astro_catalog
+database.table.weather_sensors = weather_sensors
+database.table.weather_current = weather_current
+database.table.weather_forecast = weather_forecast
 
 #--------------------------------------------------------------------
 # CONTENT SECURITY POLICY
