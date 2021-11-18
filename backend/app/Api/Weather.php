@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Libraries;
+namespace App\Api;
 
 use App\Models\Sensors;
 use App\Models\Current;
@@ -10,13 +10,13 @@ use App\Entities\SensorItem;
 /**
  * Weather station methods
  */
-class ApiWeather {
+class Weather {
     const TIME_ACTUAL = 15;
     const TIME_OUTDATED = 30;
 
-    protected $Sensors;
-    protected $Current;
-    protected $Forecast;
+    protected Sensors $Sensors;
+    protected Current $Current;
+    protected Forecast $Forecast;
 
     function __construct()
     {
@@ -103,7 +103,7 @@ class ApiWeather {
         return (object) ['update' => $update, 'payload' => $weather];
     }
 
-    function _create_dewpoint($data)
+    function _create_dewpoint($data): array
     {
         $temp = [];
 

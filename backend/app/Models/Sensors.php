@@ -40,6 +40,28 @@ class Sensors extends Model
             ->getResult();
     }
 
+    function get_period(object $period, array $sensors)
+    {
+        $available = ['temperature', 'humidity', 'pressure', 'illumination', 'uvindex', 'wind_speed', 'wind_deg'];
+
+        foreach ($sensors as $key => $item)
+        {
+            if ( ! in_array($item, $available))
+                unset($sensors[$key]);
+        }
+
+        if (empty($sensors))
+            return [];
+
+        return $this->db
+            ->table($this->table)
+            ->select('item_utc_date,' . implode(',', $sensors))
+            ->orderBy($this->key_time, 'DESC')
+            ->where("{$this->key_time} BETWEEN '{$period->start}' AND '{$period->end}'")
+            ->get()
+            ->getResult();
+    }
+
     function add(array $data)
     {
         $meta = [

@@ -9,7 +9,7 @@ use App\Models\Sensors;
  */
 class WeatherStation {
 
-    protected $Sensors;
+    protected Sensors $Sensors;
 
     function __construct()
     {

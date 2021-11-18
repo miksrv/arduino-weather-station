@@ -40,6 +40,16 @@ class Current extends Model
             ->getResult();
     }
 
+    function get_period(object $period)
+    {
+        return $this->db
+            ->table($this->table)
+            ->orderBy($this->key_time, 'DESC')
+            ->where("{$this->key_time} BETWEEN '{$period->start}' AND '{$period->end}'")
+            ->get()
+            ->getResult();
+    }
+
     function add(array $data)
     {
         $meta = [

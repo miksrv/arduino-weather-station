@@ -16,8 +16,8 @@ class OpenWeather {
     const CACHE_FORECAST = 60*60;
     const CACHE_CURRENT = 5*60;
 
-    protected $Current;
-    protected $Forecast;
+    protected Current $Current;
+    protected Forecast $Forecast;
     protected $Service;
 
     function __construct()

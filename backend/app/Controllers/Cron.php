@@ -6,7 +6,7 @@ use App\Libraries\OpenWeather;
 
 class Cron extends BaseController
 {
-    protected $OpenWeather;
+    protected OpenWeather $OpenWeather;
 
     function __construct()
     {

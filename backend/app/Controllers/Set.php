@@ -6,7 +6,7 @@ use App\Libraries\WeatherStation;
 
 class Set extends BaseController
 {
-    protected $WeatherStation;
+    protected WeatherStation $WeatherStation;
 
     protected $source; // GET or POST array data
     protected $data;   // Array data received from device
