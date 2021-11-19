@@ -26,3 +26,17 @@ export const timeAgo = (sec: number) => {
         + (m > 0 ? (m < 10 ? '0' + m : m) + ` ${lang.m} ` : '')
         + (s > 0 ? (s < 10 ? '0' + s : s) + ` ${lang.s}` : '')) + ` ${lang.ago}`
 }
+
+/**
+ * Returns the value of the parameter by key from the address bar of the browser
+ * @example `?start=24.06.2021&end=30.06.2021`
+ * @param name
+ * @returns {string|string}
+ */
+export const getUrlParameter = (name: string) => {
+    name = name.replace(/[\\[]/, '\\[').replace(/[\]]/, '\\]')
+    let regex = new RegExp('[\\?&]' + name + '=([^&#]*)')
+    let results = regex.exec(window.location.search);
+
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '))
+}

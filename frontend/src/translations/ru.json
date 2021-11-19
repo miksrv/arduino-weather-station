@@ -4,7 +4,8 @@
   },
   "sidebar": {
     "dashboard": "Сводка",
-    "sensors": "Датчики"
+    "sensors": "Датчики",
+    "statistic": "Статистика"
   },
   "dashboard": {
     "title": "Погодная станция",

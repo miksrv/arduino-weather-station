@@ -1,7 +1,7 @@
 {
   "name": "weather-frontend",
   "update": "26.10.2021",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.6.2",
@@ -9,6 +9,7 @@
     "@types/node": "^12.20.36",
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
+    "@wojtekmaj/react-daterange-picker": "^3.3.2",
     "highcharts": "^9.3.0",
     "highcharts-react-official": "^3.1.0",
     "lodash": "^4.17.21",

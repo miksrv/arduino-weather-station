@@ -9,6 +9,7 @@ import Sidebar from './components/sidebar'
 
 import Main from './features/main'
 import Sensors from './features/sensors'
+import Statistic from './features/statistic'
 import Error from './features/error'
 
 const App: React.FC = () => {
@@ -24,6 +25,7 @@ const App: React.FC = () => {
                         <Switch>
                             <Route component={Main} path='/' exact />
                             <Route component={Sensors} path='/sensors' exact />
+                            <Route component={Statistic} path='/statistic' exact />
                             <Route component={Error} />
                         </Switch>
                         <Footer />
