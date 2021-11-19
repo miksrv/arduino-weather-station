@@ -34,6 +34,7 @@ const Header: React.FC = () => {
                 name='bars'
                 size='big'
                 onClick={() => dispatch(toggle())}
+                data-testid='open-menu'
             />
             <span className={! seconds || seconds > OUTDATED_SEC ? 'offline' : 'online pulsate'}></span>
             <span className='last-update'>
