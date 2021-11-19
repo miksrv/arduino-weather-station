@@ -42,7 +42,7 @@ const Header: React.FC = () => {
                         <div>{moment.unix(timestamp.update).format('DD.MM.Y, H:mm:ss')}</div>
                         <div>{timeAgo(seconds)}</div>
                     </> :
-                    <><Icon loading name='spinner' /> {lang.loading}...</>}
+                    <><Icon loading name='spinner' /> {lang.loading}</>}
                 </span>
             </span>
             <span className='buttons'>

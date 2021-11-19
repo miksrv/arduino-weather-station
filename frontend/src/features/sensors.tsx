@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react'
 import Sensor from '../components/sensor'
 import { ISensorItem } from '../app/types'
 import { useAppDispatch } from '../app/hooks'

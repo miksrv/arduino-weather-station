@@ -6,7 +6,7 @@ import { IoIosArrowRoundUp, IoIosArrowRoundDown } from 'react-icons/io'
 
 const lang = translate().sensors
 
-type SensorProps = {
+type TSensorProps = {
     data: ISensorItem,
 }
 
@@ -120,7 +120,7 @@ const TrendValue = (trend: number) => {
     </div>
 }
 
-const Sensor: React.FC<SensorProps> = (props: SensorProps) => {
+const Sensor: React.FC<TSensorProps> = (props) => {
     const { data } = props
     const meta = SensorsMeta.filter(obj => obj.type === data.type).pop() || SensorsMeta.filter(obj => obj.type === undefined).pop()
     const SensorIcon: any = meta?.icon

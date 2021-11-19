@@ -30,10 +30,10 @@ const Sidebar: React.FC = () => {
                 <Icon name='dashboard' />
                 {lang.sensors}
             </Menu.Item>
-            {/*<Menu.Item as={NavLink} onClick={() => dispatch(hide())} to='/statistic' activeClassName='active'>*/}
-            {/*    <Icon name='area graph' />*/}
-            {/*    Статистика*/}
-            {/*</Menu.Item>*/}
+            <Menu.Item as={NavLink} onClick={() => dispatch(hide())} to='/statistic' activeClassName='active'>
+                <Icon name='area graph' />
+                {lang.statistic}
+            </Menu.Item>
             {/*<Menu.Item as={NavLink} onClick={() => dispatch(hide())} to='/archive' activeClassName='active'>*/}
             {/*    <Icon name='map' />*/}
             {/*    Тепловая карта*/}

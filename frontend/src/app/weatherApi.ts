@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { IRestCurrent, IRestForecast, IRestSensors } from './types'
+import {IRestCurrent, IRestForecast, IRestSensors, IRestStatistic, IStatisticRequest} from './types'
 
 export const weatherApi = createApi({
     reducerPath: 'api',
     baseQuery: fetchBaseQuery(
-        { baseUrl: 'https://meteo.miksoft.pro/api/get/' }),
+        { baseUrl: process.env.REACT_APP_API_HOST }),
     endpoints: (builder) => ({
         getSummary: builder.query<IRestCurrent, null>({
             query: () => 'current'
@@ -14,9 +14,12 @@ export const weatherApi = createApi({
         }),
         getSensors: builder.query<IRestSensors, null>({
             query: () => 'sensors'
-        })
+        }),
+        getStatistic: builder.query<IRestStatistic, IStatisticRequest>({
+            query: (params: IStatisticRequest) => `statistic?date_start=${params.start}&date_end=${params.end}&sensors=${params.sensors}`
+        }),
     }),
 })
 
 // Export hooks for usage in functional components
-export const { useGetSummaryQuery, useGetForecastQuery, useGetSensorsQuery } = weatherApi
+export const { useGetSummaryQuery, useGetForecastQuery, useGetSensorsQuery, useGetStatisticQuery } = weatherApi

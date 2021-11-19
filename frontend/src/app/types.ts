@@ -20,6 +20,16 @@ export interface IRestSensors extends IRestResponse {
     payload: ISensorItem[]
 }
 
+export interface IRestStatistic extends IRestResponse {
+    payload: any
+}
+
+export interface IStatisticRequest {
+    start: string,
+    end: string,
+    sensors: SensorTypes[]
+}
+
 export interface ICurrentWeather {
     condition_id: number,
     temperature: number,
