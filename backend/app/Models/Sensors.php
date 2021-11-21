@@ -8,8 +8,8 @@ class Sensors extends Model
 {
     protected $table = '';
 
-    protected $key_id   = 'item_id';
-    protected $key_time = 'item_utc_date';
+    protected string $key_id   = 'item_id';
+    protected string $key_time = 'item_utc_date';
 
     protected $db;
 
@@ -61,6 +61,18 @@ class Sensors extends Model
             ->get()
             ->getResult();
     }
+
+    function get_week_count()
+    {
+        return $this->db
+            ->table($this->table)
+            ->selectCount($this->key_id)
+            ->where($this->key_time . ' > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 24 HOUR)')
+            ->get()
+            ->getRow();
+    }
+
+    // var_dump($this->db->getLastQuery());
 
     function add(array $data)
     {

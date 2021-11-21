@@ -99,7 +99,6 @@ class Weather {
             'uvindex'           => ! $outdated ? (float) $sensors->uvindex : null,
         ];
 
-        
         return (object) ['update' => $update, 'payload' => $weather];
     }
 

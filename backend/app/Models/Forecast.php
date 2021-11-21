@@ -8,8 +8,8 @@ class Forecast extends Model
 {
     protected $table = '';
 
-    protected $key_id   = 'item_id';
-    protected $key_time = 'item_utc_date';
+    protected string $key_id   = 'item_id';
+    protected string $key_time = 'item_utc_date';
 
     protected $db;
 

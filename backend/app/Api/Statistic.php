@@ -27,9 +27,10 @@ class Statistic {
     function get_data(object $period, array $sensors)
     {
         $this->period = (object) [
-            'start' => date('Y-m-d H:i:s', strtotime($period->start . ' UTC')),
-            'end'   => date('Y-m-d H:i:s', strtotime($period->end . ' UTC'))
+            'start' => date('Y-m-d H:i:s', strtotime($period->start)), //  . ' UTC'
+            'end'   => date('Y-m-d H:i:s', strtotime($period->end . ' +1 day')) // Включительно дату, на не ДО этой даты  . ' UTC'
         ];
+
         $this->sensors = $sensors;
 
         $this->_get_period_days();
@@ -65,7 +66,15 @@ class Statistic {
 
             // Накидываем значения сенсоров в один массив с текущим временным интервалом, усредняем
             foreach ($this->data_sensors as $sensor_key => $item) {
-                $_item_date = $item->item_utc_date;
+                $_item_date = date('Y-m-d H:i:s', strtotime($item->item_utc_date . ' +5 hours'));
+                //$_item_date = $item->item_utc_date;
+
+        // echo '<pre>';
+        // var_dump($_item_date);
+        // var_dump($tmp_date);
+        // var_dump($item);
+        // echo '</pre>';
+        // exit();
 
                 // Перебираем весь массив значений датчиков, если текущие показания не в промежутке дат, то пропускаем
                 if ($_item_date < $tmp_date || $_item_date > $next_date)
@@ -103,6 +112,12 @@ class Statistic {
             // Вычисляем среднее арифметическое
             if (isset($result[$tmp_date]) && ! empty($result[$tmp_date]))
             {
+            
+        // echo '<pre>';
+        // var_dump($tmp_date);
+        // echo '</pre>';
+
+                
                 foreach ($result[$tmp_date] as $item => $value)
                 {
                     if ($item === 'counter') continue;
@@ -110,7 +125,9 @@ class Statistic {
 
                     // Заполняем значения для графиков
                     $chart->$item[] = [
-                        strtotime($tmp_date) * 1000,
+                        date('U', strtotime($tmp_date . ' UTC')) * 1000,
+                        //$tmp_date,
+                        //strtotime($tmp_date) * 1000,
                         round($value / $result[$tmp_date]->counter, 1)
                     ];
                 }
@@ -119,6 +136,8 @@ class Statistic {
                 unset($result[$tmp_date]);
             }
         }
+        
+        // exit();
 
         return $chart;
     }

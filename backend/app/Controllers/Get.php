@@ -1,9 +1,8 @@
-<?php
-
-namespace App\Controllers;
+<?php namespace App\Controllers;
 
 use App\Api\Weather;
 use App\Api\Statistic;
+use App\Api\Uptime;
 
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, OPTIONS");
@@ -12,6 +11,7 @@ class Get extends BaseController
 {
     protected Weather $Weather;
     protected Statistic $Statistic;
+    protected Uptime $Uptime;
 
     function __construct()
     {
@@ -47,6 +47,14 @@ class Get extends BaseController
         $data    = $this->Statistic->get_data($period, $sensors);
         
         $this->_response(time(), $data);
+    }
+
+    function uptime()
+    {
+        $this->Uptime = new Uptime();
+
+        $data = $this->Uptime->get_uptime();
+        $this->_response($data->update, $data->payload);
     }
 
     protected function _get_sensors()
