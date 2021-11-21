@@ -18,8 +18,10 @@ const Header: React.FC = () => {
     const [seconds, setSeconds] = useState(0)
 
     useEffect(() => {
+        console.log('lastUpdate', lastUpdate)
+
         setSeconds(lastUpdate)
-    }, [lastUpdate])
+    }, [timestamp, lastUpdate])
 
     useEffect(() => {
         const interval = setInterval(() => setSeconds((seconds) => seconds + 1), 1000)
