@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import {IRestCurrent, IRestForecast, IRestSensors, IRestStatistic, IStatisticRequest} from './types'
+import {IRestCurrent, IRestForecast, IRestSensors, IRestStatistic, IRestUptime, IStatisticRequest} from './types'
 
 export const weatherApi = createApi({
     reducerPath: 'api',
@@ -15,6 +15,9 @@ export const weatherApi = createApi({
         getSensors: builder.query<IRestSensors, null>({
             query: () => 'sensors'
         }),
+        getUptime: builder.query<IRestUptime, void>({
+            query: () => 'uptime'
+        }),
         getStatistic: builder.query<IRestStatistic, IStatisticRequest>({
             query: (params: IStatisticRequest) => `statistic?date_start=${params.start}&date_end=${params.end}&sensors=${params.sensors}`
         }),
@@ -22,4 +25,4 @@ export const weatherApi = createApi({
 })
 
 // Export hooks for usage in functional components
-export const { useGetSummaryQuery, useGetForecastQuery, useGetSensorsQuery, useGetStatisticQuery } = weatherApi
+export const { useGetSummaryQuery, useGetForecastQuery, useGetSensorsQuery, useGetStatisticQuery, useGetUptimeQuery } = weatherApi
