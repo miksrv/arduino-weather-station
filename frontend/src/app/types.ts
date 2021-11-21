@@ -20,6 +20,10 @@ export interface IRestSensors extends IRestResponse {
     payload: ISensorItem[]
 }
 
+export interface IRestUptime extends IRestResponse {
+    payload: number
+}
+
 export interface IRestStatistic extends IRestResponse {
     payload: any
 }
