@@ -37,7 +37,7 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         <div className='toolBar'>
             <Button.Group size='mini' className='periods'>
                 {(periods === undefined || periods !== false) && defaultPeriods.map((item, key) => (
-                    <Button color='grey' key={key} onClick={() => handleChangeInterval(item.days)}>{item.name}</Button>
+                    <Button color='grey' key={key} active={key === 0} onClick={() => handleChangeInterval(item.days)}>{item.name}</Button>
                 ))}
             </Button.Group>
             <DateRangePicker

@@ -19,7 +19,8 @@ export const weatherApi = createApi({
             query: () => 'uptime'
         }),
         getStatistic: builder.query<IRestStatistic, IStatisticRequest>({
-            query: (params: IStatisticRequest) => `statistic?date_start=${params.start}&date_end=${params.end}&sensors=${params.sensors}`
+            query: (params: IStatisticRequest) => `statistic?date_start=${params.start}&date_end=${params.end}&sensors=${params.sensors}`,
+            keepUnusedDataFor: 0
         }),
     }),
 })

@@ -1,14 +1,35 @@
 import React, { useEffect } from 'react'
-import Sensor from '../components/sensor'
-import { ISensorItem } from '../app/types'
 import { useAppDispatch } from '../app/hooks'
 import { useGetSensorsQuery } from '../app/weatherApi'
-import { Grid } from 'semantic-ui-react'
+import { Dimmer, Grid, Loader, Message } from 'semantic-ui-react'
 import { setUpdate } from '../app/updateSlice'
+import { ISensorItem } from '../app/types'
+import Sensor from '../components/sensor'
+
+const SensorLoader = () => {
+    return Array(12).fill(1).map((el, i) =>
+        <Grid.Column computer={4} tablet={8} mobile={16}>
+            <div className='box sensor' style={{height: 120}}>
+                <Dimmer active>
+                    <Loader />
+                </Dimmer>
+            </div>
+        </Grid.Column>
+    )
+}
+
+const SensorError = () => {
+    return <Grid.Column width={16}>
+        <Message negative>
+            <Message.Header>Удаленный сервер ответил с ошибкой</Message.Header>
+            <p>На метеостанции возникла какая-то неполадка, в ближайшее время она будет устранена и все заработает, не расстраивайтесь :)</p>
+        </Message>
+    </Grid.Column>
+}
 
 const Sensors: React.FC = () => {
     const dispatch = useAppDispatch()
-    const { data, isSuccess } = useGetSensorsQuery(null, {pollingInterval: 60 * 1000})
+    const { data, isFetching, isSuccess } = useGetSensorsQuery(null, { pollingInterval: 60 * 1000 })
 
     useEffect(() => {
         dispatch(setUpdate(data?.timestamp))
@@ -16,11 +37,14 @@ const Sensors: React.FC = () => {
 
     return (
         <Grid>
-            {isSuccess && data?.payload.map((item: ISensorItem, key: number) =>
-                <Grid.Column computer={4} tablet={8} mobile={16} key={key}>
-                    <Sensor data={item} />
-                </Grid.Column>
-            )}
+            {!isFetching ?
+                isSuccess ? data?.payload.map((item: ISensorItem, key: number) =>
+                    <Grid.Column computer={4} tablet={8} mobile={16} key={key}>
+                        <Sensor data={item}/>
+                    </Grid.Column>
+                ) : SensorError()
+                : SensorLoader()
+            }
         </Grid>
     )
 }
