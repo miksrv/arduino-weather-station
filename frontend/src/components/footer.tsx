@@ -11,8 +11,8 @@ const Footer: React.FC = () => {
     return (
         <div className='footer'>
             <div>Uptime: {
-                isSuccess && (<><b>{data?.payload}%</b> ({moment.unix(uptime).format('DD.MM.Y, H:mm:ss')}</>)
-            })
+                isSuccess && (<><b>{data?.payload}%</b> ({moment.unix(uptime).format('DD.MM.Y, H:mm:ss')})</>)
+            }
             </div>
             <div>Powered by Arduino, PHP + MySQL, ReactJS + Redux RTK.</div>
             <div>Copyright ©

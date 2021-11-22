@@ -18,8 +18,6 @@ const Header: React.FC = () => {
     const [seconds, setSeconds] = useState(0)
 
     useEffect(() => {
-        console.log('lastUpdate', lastUpdate)
-
         setSeconds(lastUpdate)
     }, [timestamp, lastUpdate])
 

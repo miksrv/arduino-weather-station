@@ -13,7 +13,7 @@ const lang = translate().dashboard
 
 const Dashboard: React.FC = () => {
     const dispatch = useAppDispatch()
-    const { data, isLoading, isSuccess } = useGetSummaryQuery(null, {pollingInterval: 60 * 1000})
+    const { data, isLoading, isSuccess } = useGetSummaryQuery(null, { pollingInterval: 60 * 1000 })
     const conditions = weatherConditions(data?.payload.condition_id)
 
     const getImageByDate = () => {

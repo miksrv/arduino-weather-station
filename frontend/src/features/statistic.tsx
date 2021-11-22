@@ -7,6 +7,7 @@ import { SensorTypes } from '../app/types'
 import Toolbar from '../components/toolbar'
 import Chart from '../components/chart'
 
+import humidity_temperature from '../charts/humidity_temperature'
 import moment from 'moment'
 
 // const getDateFromUrl = () => {
@@ -38,11 +39,13 @@ import moment from 'moment'
 //     return response
 // }
 
+
+
 const Statistic: React.FC = () => {
     const dispatch = useAppDispatch()
     const sensors: SensorTypes[] = ['temperature', 'humidity']
-    const [period, onPeriodChange] = useState([moment().subtract(1,'d'), moment()]);
-    const { data, isLoading } = useGetStatisticQuery({
+    const [ period, onPeriodChange ] = useState([moment().subtract(1,'d'), moment()])
+    const { data, isFetching } = useGetStatisticQuery({
         start: moment(period[0]).format('YYYY-MM-DD'),
         end: moment(period[1]).format('YYYY-MM-DD'),
         sensors: sensors
@@ -50,69 +53,7 @@ const Statistic: React.FC = () => {
 
     useEffect(() => {
         dispatch(setUpdate(data?.timestamp))
-    }, [dispatch, data])
-
-    const temphumd = {
-        xAxis: [{
-            type: 'datetime',
-            dateTimeLabelFormats: {
-                month: '%e %b, %Y',
-                year: '%b'
-            },
-            gridLineWidth: 1
-        }],
-        yAxis: [{
-            labels: {
-                format: '{value}°C',
-                style: {
-                    // color: Highcharts.theme.colors[7]
-                }
-            },
-            title: {
-                text: '', // Температура
-                style: {
-                    // color: Highcharts.theme.colors[7]
-                }
-            },
-            opposite: false,
-        }, {
-            gridLineWidth: 0,
-            title: {
-                text: '', // Влажность
-                style: {
-                    // color: Highcharts.theme.colors[6]
-                }
-            },
-            labels: {
-                format: '{value} %',
-                style: {
-                    // color: Highcharts.theme.colors[6]
-                }
-            },
-            opposite: true,
-            min: 0,
-            max: 90,
-        }],
-        series: [{
-            name: 'Влажность',
-            type: 'area',
-            yAxis: 1,
-            // color: Highcharts.theme.colors[6],
-            data: data?.payload.humidity,
-            tooltip: {
-                valueSuffix: ' %'
-            }
-        }, {
-            name: 'Температура',
-            type: 'spline',
-            yAxis: 0,
-            data: data?.payload.temperature,
-            // color: Highcharts.theme.colors[7],
-            tooltip: {
-                valueSuffix: ' °C'
-            }
-        }]
-    }
+    }, [dispatch, data, isFetching])
 
     return (
         <>
@@ -128,8 +69,9 @@ const Statistic: React.FC = () => {
                 download
             />
             <Chart
-                loader={isLoading}
-                config={temphumd}
+                loader={isFetching}
+                config={humidity_temperature}
+                data={[data?.payload.humidity, data?.payload.temperature]}
             />
         </>
     )
