@@ -4,6 +4,7 @@ namespace App\Api;
 
 use App\Models\Sensors;
 use App\Models\Current;
+use App\Models\Hourly;
 
 /**
  * Weather station methods
@@ -11,6 +12,7 @@ use App\Models\Current;
 class Statistic {
     protected Sensors $Sensors;
     protected Current $Current;
+    protected Hourly $Hourly;
 
     protected object $period;
     protected array $sensors;
@@ -38,15 +40,6 @@ class Statistic {
         return $this->_make_chart_data();
     }
 
-    protected function _fetch()
-    {
-        $this->Sensors = new Sensors();
-        $this->Current = new Current();
-
-        $this->data_sensors = $this->Sensors->get_period($this->period, $this->sensors);
-        // $this->data_current = $this->Current->get_period($this->period);
-    }
-
     protected function _make_chart_data()
     {
         $begin = new \DateTime($this->period->start);
@@ -56,6 +49,7 @@ class Statistic {
         $period = new \DatePeriod($begin, $interval, $end);
         $result = [];
         $chart  = (object) [];
+        $update = strtotime($this->data_sensors[0]->item_utc_date . ' UTC');
 
         $this->data_sensors = array_reverse($this->data_sensors);
 
@@ -67,14 +61,6 @@ class Statistic {
             // Накидываем значения сенсоров в один массив с текущим временным интервалом, усредняем
             foreach ($this->data_sensors as $sensor_key => $item) {
                 $_item_date = date('Y-m-d H:i:s', strtotime($item->item_utc_date . ' +5 hours'));
-                //$_item_date = $item->item_utc_date;
-
-        // echo '<pre>';
-        // var_dump($_item_date);
-        // var_dump($tmp_date);
-        // var_dump($item);
-        // echo '</pre>';
-        // exit();
 
                 // Перебираем весь массив значений датчиков, если текущие показания не в промежутке дат, то пропускаем
                 if ($_item_date < $tmp_date || $_item_date > $next_date)
@@ -112,22 +98,12 @@ class Statistic {
             // Вычисляем среднее арифметическое
             if (isset($result[$tmp_date]) && ! empty($result[$tmp_date]))
             {
-            
-        // echo '<pre>';
-        // var_dump($tmp_date);
-        // echo '</pre>';
-
-                
                 foreach ($result[$tmp_date] as $item => $value)
                 {
                     if ($item === 'counter') continue;
-                    // $result[$tmp_date]->$item = round($value / $result[$tmp_date]->counter, 1);
-
                     // Заполняем значения для графиков
                     $chart->$item[] = [
                         date('U', strtotime($tmp_date . ' UTC')) * 1000,
-                        //$tmp_date,
-                        //strtotime($tmp_date) * 1000,
                         round($value / $result[$tmp_date]->counter, 1)
                     ];
                 }
@@ -136,12 +112,29 @@ class Statistic {
                 unset($result[$tmp_date]);
             }
         }
-        
-        // exit();
 
-        return $chart;
+        return (object) ['update' => $update, 'payload' => $chart];
     }
 
+    protected function _fetch()
+    {
+        // Если время обобщения данных 60 минут и более, то будем брать \ заполнять значения из сводной таблицы
+//        if ($this->average_time >= 60)
+//        {
+//            $this->Hourly = new Hourly();
+//            $data = $this->Hourly->get_period($this->period, $this->sensors);
+//        }
+
+        $this->Sensors = new Sensors();
+        $this->Current = new Current();
+
+        $this->data_sensors = $this->Sensors->get_period($this->period, $this->sensors);
+        // $this->data_current = $this->Current->get_period($this->period);
+    }
+
+    /**
+     * Вычисляем количество дней между датами
+     */
     protected function _get_period_days()
     {
         $datetime1 = date_create($this->period->start);
@@ -153,6 +146,10 @@ class Statistic {
         $this->average_time = $this->_get_average_time();
     }
 
+    /**
+     * В зависимости от количества дней между датами, устанавливаем интервал в минутах для обобщения данных
+     * @return int
+     */
     private function _get_average_time(): int {
         if ($this->period_days === 0) return 5; // 5 min
         if ($this->period_days >= 1 && $this->period_days <=2) return 15; // 15 min

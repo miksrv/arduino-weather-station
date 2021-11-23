@@ -45,8 +45,8 @@ class Get extends BaseController
         $period  = $this->_get_period();
         $sensors = $this->_get_sensors();
         $data    = $this->Statistic->get_data($period, $sensors);
-        
-        $this->_response(time(), $data);
+
+        $this->_response($data->update, $data->payload);
     }
 
     function uptime()

@@ -8,7 +8,7 @@ class Sensors extends Model
 {
     protected $table = '';
 
-    protected string $key_id   = 'item_id';
+    protected string $key_id = 'item_id';
     protected string $key_time = 'item_utc_date';
 
     protected $db;
@@ -20,14 +20,38 @@ class Sensors extends Model
         $this->table = getenv('database.table.weather_sensors');
     }
 
+    protected function _get_one(string $order)
+    {
+        return $this->db
+            ->table($this->table)
+            ->orderBy($this->key_time, $order)
+            ->limit(1)
+            ->get()
+            ->getRow();
+    }
+
+    function get_first()
+    {
+        return $this->_get_one('ASC');
+    }
+
     function get_last()
+    {
+        return $this->_get_one('DESC');
+    }
+
+    function get_by_hour($year, $month, $day, $hour)
     {
         return $this->db
             ->table($this->table)
             ->orderBy($this->key_time, 'DESC')
-            ->limit(1)
-            ->get()
-            ->getRow();
+            ->getWhere([
+                "YEAR({$this->key_time})"  => $year,
+                "MONTH({$this->key_time})" => $month,
+                "DAY({$this->key_time})"   => $day,
+                "HOUR({$this->key_time})"  => $hour,
+            ])
+            ->getResult();
     }
 
     function get_last_day()
