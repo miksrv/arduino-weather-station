@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Api;
+<?php namespace App\Api;
 
 use App\Models\Sensors;
 use App\Models\Current;
@@ -23,20 +21,23 @@ class Statistic {
 
     function __construct()
     {
-
+        helper(['calculate']);
     }
 
     function get_data(object $period, array $sensors)
     {
         $this->period = (object) [
-            'start' => date('Y-m-d H:i:s', strtotime($period->start)), //  . ' UTC'
-            'end'   => date('Y-m-d H:i:s', strtotime($period->end . ' +1 day')) // Включительно дату, на не ДО этой даты  . ' UTC'
+            'start' => date('Y-m-d H:i:s', strtotime($period->start)),
+            'end'   => date('Y-m-d H:i:s', strtotime($period->end . ' +1 day')) // Включительно дату, а не ДО этой даты
         ];
 
         $this->sensors = $sensors;
 
-        $this->_get_period_days();
+        $this->period_days = calc_days_in_period($this->period->start, $this->period->end);
+        $this->average_time = get_means_minutes($this->period_days);
+
         $this->_fetch();
+
         return $this->_make_chart_data();
     }
 
@@ -132,32 +133,5 @@ class Statistic {
 
         $this->data_sensors = $this->Sensors->get_period($this->period->start, $this->period->end);
         // $this->data_current = $this->Current->get_period($this->period);
-    }
-
-    /**
-     * Вычисляем количество дней между датами
-     */
-    protected function _get_period_days()
-    {
-        $datetime1 = date_create($this->period->start);
-        $datetime2 = date_create($this->period->end);
-
-        $interval = date_diff($datetime1, $datetime2);
-
-        $this->period_days  = (int) $interval->format('%a');
-        $this->average_time = $this->_get_average_time();
-    }
-
-    /**
-     * В зависимости от количества дней между датами, устанавливаем интервал в минутах для обобщения данных
-     * @return int
-     */
-    private function _get_average_time(): int {
-        if ($this->period_days === 0) return 5; // 5 min
-        if ($this->period_days >= 1 && $this->period_days <=2) return 15; // 15 min
-        if ($this->period_days >= 3 && $this->period_days <=5) return 30; // 30 min
-        if ($this->period_days >= 6 && $this->period_days <= 7) return 60; // 1 hour
-        if ($this->period_days >= 8 && $this->period_days <= 14) return 1*60; // 5 hour
-        return 24*60; // 24 hour
     }
 }

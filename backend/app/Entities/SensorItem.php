@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Entities;
+<?php namespace App\Entities;
 
 interface ISensorItem
 {

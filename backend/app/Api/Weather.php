@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Api;
+<?php namespace App\Api;
 
 use App\Models\Sensors;
 use App\Models\Current;

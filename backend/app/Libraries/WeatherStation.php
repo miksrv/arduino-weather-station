@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Libraries;
+<?php namespace App\Libraries;
 
 use App\Models\Sensors;
 

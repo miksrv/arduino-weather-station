@@ -1,37 +1,27 @@
 <?php
 
 /**
- * Return calculated dew point value by temperature and humidity
- * @param $humidity float
- * @param $temp float
- * @return false|float
+ * Вычисляем количество дней между датами
  */
-function calculate_dew_point($humidity, $temp)
+function calc_days_in_period(string $start, string $stop): int
 {
-    return round(((pow(($humidity / 100), 0.125)) * (112 + 0.9 * $temp) + (0.1 * $temp) - 112),1);
+    $datetime1 = date_create($start);
+    $datetime2 = date_create($stop);
+
+    $interval = date_diff($datetime1, $datetime2);
+
+    return (int) $interval->format('%a');
 }
 
 /**
- * Calculate wind rose
- * @param $_temp_wr
- * @param $_temp_wr_total
- * @return array|null
+ * В зависимости от количества дней между датами, устанавливаем интервал в минутах для обобщения данных
+ * @return int
  */
-function calculate_wind_rose($_temp_wr, $_temp_wr_total)
-{
-    //if ($_temp_wr_total == 0) return null;
-
-    $new_wr_array = [];
-
-    foreach ($_temp_wr as $key_wr_1 => $val_wr_direct) {
-        foreach ($val_wr_direct as $key_wr_2 => $val_wr_speed) {
-            $_tmp = $_temp_wr_total > 0 ? round((($val_wr_speed / $_temp_wr_total) * 100), 1) : 0;
-            $new_wr_array[$key_wr_1][] = [
-                convert_index_to_deegre($key_wr_2),
-                $_tmp
-            ];
-        }
-    }
-
-    return $new_wr_array;
+function get_means_minutes(int $days): int {
+    if ($days === 0) return 5; // 5 min
+    if ($days >= 1 && $days <=2) return 15; // 15 min
+    if ($days >= 3 && $days <=5) return 30; // 30 min
+    if ($days >= 6 && $days <= 7) return 60; // 1 hour
+    if ($days >= 8 && $days <= 14) return 1*60; // 5 hour
+    return 24*60; // 24 hour
 }
