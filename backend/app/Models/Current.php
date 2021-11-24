@@ -4,71 +4,12 @@ use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 use CodeIgniter\Validation\ValidationInterface;
 
-class Current extends Model
+class Current extends ADataModel
 {
-    protected $table = '';
-
-    protected $key_id   = 'item_id';
-    protected $key_time = 'item_utc_date';
-
-    protected $db;
-
     function __construct(ConnectionInterface &$db = null, ValidationInterface $validation = null)
     {
         parent::__construct($db, $validation);
 
-        $this->table = getenv('database.table.weather_current');
-    }
-
-    function get_last()
-    {
-        return $this->db
-            ->table($this->table)
-            ->orderBy($this->key_time, 'DESC')
-            ->limit(1)
-            ->get()
-            ->getRow();
-    }
-
-    function get_last_day()
-    {
-        return $this->db
-            ->table($this->table)
-            ->orderBy($this->key_time, 'DESC')
-            ->where($this->key_time . ' > DATE_SUB(NOW(), INTERVAL 12 HOUR)')
-            ->get()
-            ->getResult();
-    }
-
-    function get_period(object $period, array $sensors)
-    {
-        $available = ['temperature', 'humidity', 'pressure', 'clouds', 'wind_speed', 'wind_deg', 'wind_gust', 'precipitation'];
-
-        foreach ($sensors as $key => $item)
-        {
-            if ( ! in_array($item, $available))
-                unset($sensors[$key]);
-        }
-
-        if (empty($sensors))
-            return [];
-
-        return $this->db
-            ->table($this->table)
-            ->select('item_utc_date,' . implode(',', $sensors))
-            ->orderBy($this->key_time, 'DESC')
-            ->where("{$this->key_time} BETWEEN '{$period->start}' AND '{$period->end}'")
-            ->get()
-            ->getResult();
-    }
-
-    function add(array $data)
-    {
-        $meta = [
-            $this->key_id   => uniqid(),
-            $this->key_time => gmdate('Y-m-d H:i:s')
-        ];
-
-        return $this->db->table($this->table)->insert(array_merge($meta, $data));
+        $this->set_table(getenv('database.table.weather_current'));
     }
 }

@@ -2,9 +2,6 @@
 
 use App\Models\Sensors;
 
-/**
- * Weather station methods
- */
 class Uptime {
     protected Sensors $Sensors;
 
@@ -13,11 +10,11 @@ class Uptime {
         $this->Sensors = new Sensors();
     }
 
-    function get_uptime()
+    function get_uptime(): object
     {
         $should = 1440;
         $count  = (int) $this->Sensors->get_week_count()->item_id;
-        $last   = $this->Sensors->get_last()->item_utc_date;
+        $last   = $this->Sensors->get_last_row()->item_utc_date;
 
         return (object) [
             'update' => strtotime($last . ' UTC'),

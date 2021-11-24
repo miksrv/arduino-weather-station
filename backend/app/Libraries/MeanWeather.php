@@ -14,7 +14,7 @@ class MeanWeather {
     protected Current $Current;
     protected Hourly $Hourly;
 
-    protected $counter = 0;
+    protected int $counter = 0;
 
     function __construct()
     {
@@ -28,29 +28,34 @@ class MeanWeather {
         $this->counter++;
 
         // Берем последнее значение, если пусто - начинаем заполнять с первой даты принятых значений с метеостанции
-        $lastData = $this->Hourly->get_last();
+        $lastData = $this->Hourly->get_last_row();
 
         if (empty($lastData))
-            $lastData = $this->Sensors->get_first();
+            $lastData = $this->Sensors->get_first_row();
 
         // Имея время последнего времени записи, берем данные сенсоров за весь следующий час
-        // $nextHor  = $this->_get_next_date_hour($lastData->item_utc_date);
-        $nextHor  = $this->_get_next_date_hour('2020-04-10 01:00:00');
+        $nextHor  = $this->_get_next_date_hour($lastData->item_utc_date);
+//         $nextHor  = $this->_get_next_date_hour('2020-08-28 14:00:00');
         $meanDate = date('Y-m-d H:30:00', $nextHor);
 
         // Проверяем, не пытаемся ли сделать средние данные за еще не вышедший час
         $this->_check_hours_with_current($meanDate);
 
-        // Получаем данные сенсоров за последний час
-        $sensors  = $this->_get_last_sensor_data($nextHor);
+        // Получаем данные сенсоров и OpenWeatherMap за последний час
+        $sensors = $this->_get_last_data($this->Sensors, $nextHor);
+        $weather = $this->_get_last_data($this->Current, $nextHor);
 
-        // Получаем среднее значение всего массива сенсоров
-        $dataset = $this->_get_average_data($sensors);
+        // Если нет данных ни от метеостанции, ни от OWM (например не работал хост, cron и т.п.)
+        if (empty((array) $sensors) && empty((array) $weather))
+        {
+            $sensors = $this->_get_empty_value($nextHor, 1);
+        }
+
+        // Получаем среднее значение всего массива сенсоров и OWM
+        $dataset = $this->_get_average_data($sensors, $weather);
 
         // Сохраняем средние значения в базе
         $this->Hourly->add($dataset, $meanDate);
-
-        exit();
 
         if ($this->counter >= 100)
         {
@@ -68,15 +73,13 @@ class MeanWeather {
      */
     protected function _check_hours_with_current($date)
     {
-        $date1 = new \DateTime($date);
-        $date2 = new \DateTime();
-        $diff  = $date1->diff($date2);
-        $hours = $diff->h;
-        $hours = $hours + ($diff->days*24);
+        $datetime1 = date_create($date, timezone_open('UTC'));
+        $datetime2 = date_create('now', timezone_open('UTC'));
+        $interval  = date_diff($datetime1, $datetime2);
 
-        if ($hours <= 1)
+        // Еще не прошел 1 час после последнего добавления усредненных данных
+        if ((int) $interval->format('%h') <= 1)
         {
-            echo 'The difference between dates is less than 1 hour';
             exit();
         }
     }
@@ -84,21 +87,14 @@ class MeanWeather {
     /**
      * Получаем данные сенсоров за час по конкретной дате
      */
-    protected function _get_last_sensor_data(int $timestamp): array
+    protected function _get_last_data($Object, int $timestamp): array
     {
-        $data = $this->Sensors->get_by_hour(
+        return $Object->get_array_by_hour(
             date('Y', $timestamp),
             date('m', $timestamp),
             date('d', $timestamp),
             date('H', $timestamp)
         );
-
-        // Если данных за это время в этом день нет, берем теже самые значения днём ранее
-        if (empty($data) || ! is_array($data)) {
-            $data = $this->_get_empty_value($timestamp, 1);
-        }
-
-        return $data;
     }
 
     // Получаем следующий час в UNIX timestamp по полученной string дате
@@ -116,13 +112,13 @@ class MeanWeather {
      */
     protected function _get_empty_value($time, $days) {
         // Если не находим данные за час по погоде за последние 5 дней
-        if ($days >= 5) {
-            echo 'Данные по метеостанции отсутствуют более 5 дней';
+        if ($days >= 10) {
+            echo 'Данные по метеостанции отсутствуют более 10 дней';
             exit();
         }
 
         $prev_time = strtotime(date('Y-m-d H:i:s', $time) . " -$days days");
-        $prev_data = $this->Sensors->get_by_hour(
+        $prev_data = $this->Sensors->get_array_by_hour(
             date('Y', $prev_time),
             date('m', $prev_time),
             date('d', $prev_time),
@@ -138,19 +134,40 @@ class MeanWeather {
     /**
      * Делаем усредненные значения по всему набору полученных данных (предполагается, что это данные за час)
      */
-    protected function _get_average_data($data): array
+    protected function _get_average_data(array $sensors, array $weather): array
+    {
+        $meanSensors = $this->_calc_mean($sensors);
+        $meanWeather = $this->_calc_mean($weather);
+
+        return [
+            'temperature'   => $meanSensors->temperature ?? $meanWeather->temperature,
+            'humidity'      => $meanSensors->humidity ?? $meanWeather->humidity,
+            'pressure'      => $meanSensors->pressure ?? $meanWeather->pressure,
+            'illumination'  => $meanSensors->illumination ?? null,
+            'uvindex'       => $meanSensors->uvindex ?? null,
+            'wind_speed'    => $meanSensors->wind_speed ?? $meanWeather->wind_speed,
+            'wind_deg'      => $meanSensors->wind_deg ?? $meanWeather->wind_deg,
+            'wind_gust'     => $meanWeather->wind_gust ?? null,
+            'clouds'        => $meanWeather->clouds ?? null,
+            'precipitation' => $meanWeather->precipitation ?? null,
+        ];
+    }
+
+    // Вычисляем среднее значение по всему массиву
+    protected function _calc_mean($data): object
     {
         $count  = 0;
         $summary = [];
 
         if (empty($data))
-            return $summary;
+            return (object) $summary;
 
         foreach ($data as $item)
         {
             $count++;
 
-            unset($item->item_id, $item->item_utc_date);
+            // Удаляем не нужные объекты
+            unset($item->item_id, $item->item_utc_date, $item->conditions, $item->feels_like);
 
             foreach ($item as $sensor => $value)
             {
@@ -167,64 +184,6 @@ class MeanWeather {
             $summary[$sensor] = round($value / $count, 1);
         }
 
-        return $summary;
-    }
-
-    /**
-     * @param $dataset
-     * @param $time
-     * @return mixed
-     */
-    protected function _set_total($dataset, $time)
-    {
-        if (empty($dataset->summary) || empty($dataset->extreme))
-        {
-            echo '<pre>';
-            var_dump($dataset);
-            exit();
-        }
-
-        $summary = json_encode($dataset->summary);
-        $extreme = json_encode($dataset->extreme);
-
-        return $this->_dataModel->set_total($summary, $extreme, $time);
-    }
-
-    /**
-     * @return mixed
-     */
-    function get_last_hour() {
-        return $this->_dataModel->get_day_order();
-        //return $this->_dataModel->get_day();
-    }
-
-    /**
-     * @param $year
-     * @param $month
-     * @param $day
-     * @param $hour
-     * @return mixed
-     */
-    function get_day($year, $month, $day, $hour)
-    {
-        return $this->_dataModel->get_hour($year, $month, $day, $hour);
-    }
-
-    /**
-     * @return mixed
-     */
-    function get_last_total()
-    {
-        return $this->_dataModel->get_last_total();
-    }
-
-    /**
-     * @param $data
-     * @param $time
-     * @return mixed
-     */
-    function set_total($data, $time)
-    {
-        return $this->_dataModel->set_total($data, $time);
+        return (object) $summary;
     }
 }

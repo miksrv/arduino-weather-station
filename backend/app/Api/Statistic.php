@@ -128,7 +128,9 @@ class Statistic {
         $this->Sensors = new Sensors();
         $this->Current = new Current();
 
-        $this->data_sensors = $this->Sensors->get_period($this->period, $this->sensors);
+        $this->Sensors->set_key_items($this->sensors);
+
+        $this->data_sensors = $this->Sensors->get_period($this->period->start, $this->period->end);
         // $this->data_current = $this->Current->get_period($this->period);
     }
 
