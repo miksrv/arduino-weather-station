@@ -9,6 +9,8 @@ Highcharts.setOptions(config)
 const Chart: React.FC<any> = (params) => {
     const { loader, config, data } = params
     let dIndex = 0
+    let height = (typeof config.chart !== 'undefined' && typeof config.chart.height) ?
+        config.chart.height : 300
 
     data.forEach((item: any | undefined) => {
         if (typeof item !== 'undefined') {
@@ -20,7 +22,7 @@ const Chart: React.FC<any> = (params) => {
     return (
         <>
             {loader ? (
-                <div className='box' style={{height: 300}}>
+                <div className='box' style={{height: height}}>
                     <Dimmer active>
                         <Loader />
                     </Dimmer>

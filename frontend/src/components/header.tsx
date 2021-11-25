@@ -7,12 +7,12 @@ import { timeAgo } from '../functions/helpers'
 
 import moment from 'moment'
 
-const lang = translate().general
 const OUTDATED_SEC = 180
 
 // #TODO: Добавить обработик даты, если она 01.01.1970 (компонент не обновил дату)
 const Header: React.FC = () => {
     const dispatch = useAppDispatch()
+    const lang = translate().general
     const timestamp = useAppSelector(state => state.update.timestamp)
     const lastUpdate = timestamp ? timestamp.server - timestamp.update : 0
     const [seconds, setSeconds] = useState(0)

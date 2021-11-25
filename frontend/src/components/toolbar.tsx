@@ -1,32 +1,20 @@
 import React from 'react'
+import translate from '../functions/translate'
 import { Button, Icon } from 'semantic-ui-react'
+import { TPeriod, TToolbarProps } from '../app/types'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
-
-type TPeriod = {
-    name: string,
-    days: number
-}
-
-type TToolbarProps = {
-    rangeStart: any,
-    rangeEnd: any,
-    periods?: boolean | TPeriod[],
-    download?: boolean,
-
-    onChangeInterval: any,
-    onChangePeriod: any
-}
 
 const Toolbar: React.FC<TToolbarProps> = (props) => {
     const { rangeStart, rangeEnd, onChangeInterval, onChangePeriod, download, periods } = props
+    const lang = translate().toolbar
 
     const handleChangeInterval = (days: number) => onChangeInterval(days)
     const handleChangePeriod = (range: Date[]) => onChangePeriod(range)
 
     let defaultPeriods: TPeriod[] = [
-        { name: 'Сутки', days: 1 },
-        { name: 'Неделя', days: 7 },
-        { name: 'Месяц', days: 30 },
+        { name: lang.periods.day, days: 1 },
+        { name: lang.periods.week, days: 7 },
+        { name: lang.periods.month, days: 30 }
     ]
 
     if (periods !== undefined && typeof periods === "object") {

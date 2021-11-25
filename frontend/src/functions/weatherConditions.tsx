@@ -80,11 +80,11 @@ export const weatherConditions = (id: number | undefined) => {
                     break
 
                 case '1':
-                    conditions = {name: lang.id801, icon: <WiDayCloudy />}
+                    conditions = {name: lang.id801, icon: <WiDaySunny />}
                     break
 
                 case '2':
-                    conditions = {name: lang.id802, icon: <WiCloud />}
+                    conditions = {name: lang.id802, icon: <WiDayCloudy />}
                     break
 
                 case '3':

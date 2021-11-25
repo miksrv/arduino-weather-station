@@ -5,10 +5,9 @@ import { Sidebar as SidebarMenu, Menu, Icon } from 'semantic-ui-react'
 import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { hide } from '../app/sidebarSlice'
 
-const lang = translate().sidebar
-
 const Sidebar: React.FC = () => {
     const dispatch = useAppDispatch()
+    const lang = translate().sidebar
     const visible = useAppSelector(state => state.sidebar.visible)
 
     return (
@@ -34,10 +33,10 @@ const Sidebar: React.FC = () => {
                 <Icon name='area graph' />
                 {lang.statistic}
             </Menu.Item>
-            {/*<Menu.Item as={NavLink} onClick={() => dispatch(hide())} to='/archive' activeClassName='active'>*/}
-            {/*    <Icon name='map' />*/}
-            {/*    Тепловая карта*/}
-            {/*</Menu.Item>*/}
+            <Menu.Item as={NavLink} onClick={() => dispatch(hide())} to='/heatmap' activeClassName='active'>
+                <Icon name='map' />
+                {lang.heatmap}
+            </Menu.Item>
             {/*<Menu.Item as={NavLink} to='/forecast' activeClassName='active'>*/}
             {/*    <Icon name='clock' />*/}
             {/*    Прогноз*/}

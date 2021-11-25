@@ -68,3 +68,18 @@ export type SensorTypes =
     'wind_speed' | 'wind_gust' | 'wind_deg' |
     'clouds' | 'precipitation' | 'dewpoint' |
     'illumination' | 'uvindex' | 'feels_like'
+
+export type TPeriod = {
+    name: string,
+    days: number
+}
+
+export type TToolbarProps = {
+    rangeStart: any,
+    rangeEnd: any,
+    periods?: boolean | TPeriod[],
+    download?: boolean,
+
+    onChangeInterval: any,
+    onChangePeriod: any
+}
