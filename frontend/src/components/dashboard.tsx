@@ -9,10 +9,9 @@ import { setUpdate } from '../app/updateSlice'
 
 import { weatherConditions } from '../functions/weatherConditions'
 
-const lang = translate().dashboard
-
 const Dashboard: React.FC = () => {
     const dispatch = useAppDispatch()
+    const lang = translate().dashboard
     const { data, isLoading, isSuccess } = useGetSummaryQuery(null, { pollingInterval: 60 * 1000 })
     const conditions = weatherConditions(data?.payload.condition_id)
 

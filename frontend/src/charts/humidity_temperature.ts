@@ -1,4 +1,7 @@
+import translate from '../functions/translate'
 import colors from './colors'
+
+const lang = translate().statistic
 
 const humidity_temperature = {
     xAxis: [{
@@ -36,7 +39,7 @@ const humidity_temperature = {
         max: 90,
     }],
     series: [{
-        name: 'Влажность',
+        name: lang.humidity,
         type: 'area',
         yAxis: 1,
         data: [],
@@ -45,7 +48,7 @@ const humidity_temperature = {
             valueSuffix: ' %'
         }
     }, {
-        name: 'Температура',
+        name: lang.temperature,
         type: 'spline',
         yAxis: 0,
         data: [],

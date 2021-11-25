@@ -22,8 +22,13 @@ export const weatherApi = createApi({
             query: (params: IStatisticRequest) => `statistic?date_start=${params.start}&date_end=${params.end}&sensors=${params.sensors}`,
             keepUnusedDataFor: 0
         }),
+        getHeatmap: builder.query<IRestStatistic, IStatisticRequest>({
+            query: (params: IStatisticRequest) => `heatmap?date_start=${params.start}&date_end=${params.end}&sensors=${params.sensors}`,
+            keepUnusedDataFor: 0
+        }),
     }),
 })
 
 // Export hooks for usage in functional components
-export const { useGetSummaryQuery, useGetForecastQuery, useGetSensorsQuery, useGetStatisticQuery, useGetUptimeQuery } = weatherApi
+export const { useGetSummaryQuery, useGetForecastQuery, useGetSensorsQuery,
+    useGetStatisticQuery, useGetUptimeQuery, useGetHeatmapQuery } = weatherApi

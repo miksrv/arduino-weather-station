@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react'
-
 import translate from '../functions/translate'
-import { Message } from 'semantic-ui-react'
 import { setUpdate } from '../app/updateSlice'
-import { useGetStatisticQuery } from '../app/weatherApi'
+import { useGetHeatmapQuery } from '../app/weatherApi'
 import { useAppDispatch } from '../app/hooks'
-import { SensorTypes } from '../app/types'
+import { SensorTypes, TPeriod } from '../app/types'
+import { declOfNum } from '../functions/helpers'
 // import { getUrlParameter } from '../functions/helpers'
 import Toolbar from '../components/toolbar'
 import Chart from '../components/chart'
 
-import humidity_temperature from '../charts/humidity_temperature'
+import heatmap from '../charts/heatmap'
 import moment from 'moment'
 
 // const getDateFromUrl = () => {
@@ -42,21 +41,31 @@ import moment from 'moment'
 //     return response
 // }
 
-const lang = translate().general.error
-
-const Statistic: React.FC = () => {
+const Heatmap: React.FC = () => {
     const dispatch = useAppDispatch()
-    const sensors: SensorTypes[] = ['temperature', 'humidity']
-    const [ period, onPeriodChange ] = useState([moment().subtract(1,'d'), moment()])
-    const { data, isFetching, isError } = useGetStatisticQuery({
+    const lang = translate()
+    const sensors: SensorTypes[] = ['temperature']
+    const [ period, onPeriodChange ] = useState([moment().subtract(31,'d'), moment()])
+    const { data, isFetching } = useGetHeatmapQuery({
         start: moment(period[0]).format('YYYY-MM-DD'),
         end: moment(period[1]).format('YYYY-MM-DD'),
         sensors: sensors
     })
 
+    let listPeriods: TPeriod[] = [
+        { name: lang.toolbar.periods.month, days: 31 },
+        { name: lang.toolbar.periods.quarter, days: 90 },
+        { name: lang.toolbar.periods.halfyear, days: 180 },
+        { name: lang.toolbar.periods.year, days: 365 }
+    ]
+
+    let days = period[1].diff(period[0], 'days')
+
+    heatmap.subtitle.text = lang.heatmap.subtitle + ' ' + days + ' ' + declOfNum(days, lang.general.declining.days)
+
     useEffect(() => {
         dispatch(setUpdate(data?.timestamp))
-    }, [dispatch, data, isFetching, isError])
+    }, [dispatch, data, isFetching])
 
     return (
         <>
@@ -69,22 +78,16 @@ const Statistic: React.FC = () => {
                 }
                 rangeStart={period[0]}
                 rangeEnd={period[1]}
+                periods={listPeriods}
                 download
             />
-            {!isError ?
-                <Chart
-                    loader={isFetching}
-                    config={humidity_temperature}
-                    data={[data?.payload.humidity, data?.payload.temperature]}
-                />
-                :
-                <Message negative>
-                    <Message.Header>{lang.title}</Message.Header>
-                    <p>{lang.description}</p>
-                </Message>
-            }
+            <Chart
+                loader={isFetching}
+                config={heatmap}
+                data={[data?.payload]}
+            />
         </>
     )
 }
 
-export default Statistic
+export default Heatmap
