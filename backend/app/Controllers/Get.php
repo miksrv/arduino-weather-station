@@ -1,9 +1,9 @@
-<?php
-
-namespace App\Controllers;
+<?php namespace App\Controllers;
 
 use App\Api\Weather;
 use App\Api\Statistic;
+use App\Api\Heatmap;
+use App\Api\Uptime;
 
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, OPTIONS");
@@ -12,6 +12,7 @@ class Get extends BaseController
 {
     protected Weather $Weather;
     protected Statistic $Statistic;
+    protected Uptime $Uptime;
 
     function __construct()
     {
@@ -45,8 +46,29 @@ class Get extends BaseController
         $period  = $this->_get_period();
         $sensors = $this->_get_sensors();
         $data    = $this->Statistic->get_data($period, $sensors);
-        
-        $this->_response(time(), $data);
+
+        $this->_response($data->update, $data->payload);
+    }
+
+    /**
+     * https://meteo.miksoft.pro/api/get/heatmap?date_start=2021-10-01&date_end=2021-10-10&sensors=temperature
+     */
+    function heatmap()
+    {
+        $period  = $this->_get_period();
+        $sensors = $this->_get_sensors();
+        $Heatmap = new Heatmap();
+        $data    = $Heatmap->get_data($period, $sensors);
+
+        $this->_response($data->update, $data->payload);
+    }
+
+    function uptime()
+    {
+        $this->Uptime = new Uptime();
+
+        $data = $this->Uptime->get_uptime();
+        $this->_response($data->update, $data->payload);
     }
 
     protected function _get_sensors()

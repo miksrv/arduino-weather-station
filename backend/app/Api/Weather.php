@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Api;
+<?php namespace App\Api;
 
 use App\Models\Sensors;
 use App\Models\Current;
@@ -28,8 +26,8 @@ class Weather {
     function get_sensors(): object
     {
         $result  = [];
-        $weather = $this->Current->get_last_day();
-        $sensors = $this->Sensors->get_last_day();
+        $weather = $this->Current->get_array_by_last_day();
+        $sensors = $this->Sensors->get_array_by_last_day();
 
         $time_diff   = round(abs(strtotime($sensors[0]->item_utc_date) - strtotime($weather[0]->item_utc_date)) / 60,0);
         $data_actual = $time_diff < self::TIME_ACTUAL;
@@ -75,8 +73,8 @@ class Weather {
 
     function get_last(): object
     {
-        $sensors = $this->Sensors->get_last();
-        $current = $this->Current->get_last();
+        $sensors = $this->Sensors->get_last_row();
+        $current = $this->Current->get_last_row();
 
         $time_diff = round(abs(strtotime($sensors->item_utc_date) - strtotime($current->item_utc_date)) / 60,0);
 
@@ -99,7 +97,6 @@ class Weather {
             'uvindex'           => ! $outdated ? (float) $sensors->uvindex : null,
         ];
 
-        
         return (object) ['update' => $update, 'payload' => $weather];
     }
 

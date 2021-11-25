@@ -1,16 +1,17 @@
-<?php
-
-namespace App\Controllers;
+<?php namespace App\Controllers;
 
 use App\Libraries\OpenWeather;
+use App\Libraries\MeanWeather;
 
 class Cron extends BaseController
 {
     protected OpenWeather $OpenWeather;
+    protected MeanWeather $MeanWeather;
 
     function __construct()
     {
         $this->OpenWeather = new OpenWeather();
+        $this->MeanWeather = new MeanWeather();
     }
 
     function index()
@@ -20,7 +21,9 @@ class Cron extends BaseController
             $this->_response($response, 500);
         }
 
-        $response = ['state' => TRUE, 'data' => 'OpenWeather data updated'];
+        $this->MeanWeather->run();
+
+        $response = ['state' => TRUE, 'data' => 'All data has been updated '];
         $this->_response($response, 200);
     }
 

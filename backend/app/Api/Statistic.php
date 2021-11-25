@@ -1,9 +1,8 @@
-<?php
-
-namespace App\Api;
+<?php namespace App\Api;
 
 use App\Models\Sensors;
 use App\Models\Current;
+use App\Models\Hourly;
 
 /**
  * Weather station methods
@@ -11,6 +10,7 @@ use App\Models\Current;
 class Statistic {
     protected Sensors $Sensors;
     protected Current $Current;
+    protected Hourly $Hourly;
 
     protected object $period;
     protected array $sensors;
@@ -21,29 +21,24 @@ class Statistic {
 
     function __construct()
     {
-
+        helper(['calculate']);
     }
 
     function get_data(object $period, array $sensors)
     {
         $this->period = (object) [
-            'start' => date('Y-m-d H:i:s', strtotime($period->start . ' UTC')),
-            'end'   => date('Y-m-d H:i:s', strtotime($period->end . ' UTC'))
+            'start' => date('Y-m-d H:i:s', strtotime($period->start)),
+            'end'   => date('Y-m-d H:i:s', strtotime($period->end . ' +1 day')) // Включительно дату, а не ДО этой даты
         ];
+
         $this->sensors = $sensors;
 
-        $this->_get_period_days();
+        $this->period_days = calc_days_in_period($this->period->start, $this->period->end);
+        $this->average_time = get_means_minutes($this->period_days);
+
         $this->_fetch();
+
         return $this->_make_chart_data();
-    }
-
-    protected function _fetch()
-    {
-        $this->Sensors = new Sensors();
-        $this->Current = new Current();
-
-        $this->data_sensors = $this->Sensors->get_period($this->period, $this->sensors);
-        // $this->data_current = $this->Current->get_period($this->period);
     }
 
     protected function _make_chart_data()
@@ -55,6 +50,7 @@ class Statistic {
         $period = new \DatePeriod($begin, $interval, $end);
         $result = [];
         $chart  = (object) [];
+        $update = strtotime($this->data_sensors[0]->item_utc_date . ' UTC');
 
         $this->data_sensors = array_reverse($this->data_sensors);
 
@@ -65,7 +61,7 @@ class Statistic {
 
             // Накидываем значения сенсоров в один массив с текущим временным интервалом, усредняем
             foreach ($this->data_sensors as $sensor_key => $item) {
-                $_item_date = $item->item_utc_date;
+                $_item_date = date('Y-m-d H:i:s', strtotime($item->item_utc_date . ' +5 hours'));
 
                 // Перебираем весь массив значений датчиков, если текущие показания не в промежутке дат, то пропускаем
                 if ($_item_date < $tmp_date || $_item_date > $next_date)
@@ -106,11 +102,9 @@ class Statistic {
                 foreach ($result[$tmp_date] as $item => $value)
                 {
                     if ($item === 'counter') continue;
-                    // $result[$tmp_date]->$item = round($value / $result[$tmp_date]->counter, 1);
-
                     // Заполняем значения для графиков
                     $chart->$item[] = [
-                        strtotime($tmp_date) * 1000,
+                        date('U', strtotime($tmp_date . ' UTC')) * 1000,
                         round($value / $result[$tmp_date]->counter, 1)
                     ];
                 }
@@ -120,26 +114,24 @@ class Statistic {
             }
         }
 
-        return $chart;
+        return (object) ['update' => $update, 'payload' => $chart];
     }
 
-    protected function _get_period_days()
+    protected function _fetch()
     {
-        $datetime1 = date_create($this->period->start);
-        $datetime2 = date_create($this->period->end);
+        // Если время обобщения данных 60 минут и более, то будем брать \ заполнять значения из сводной таблицы
+//        if ($this->average_time >= 60)
+//        {
+//            $this->Hourly = new Hourly();
+//            $data = $this->Hourly->get_period($this->period, $this->sensors);
+//        }
 
-        $interval = date_diff($datetime1, $datetime2);
+        $this->Sensors = new Sensors();
+        $this->Current = new Current();
 
-        $this->period_days  = (int) $interval->format('%a');
-        $this->average_time = $this->_get_average_time();
-    }
+        $this->Sensors->set_key_items($this->sensors);
 
-    private function _get_average_time(): int {
-        if ($this->period_days === 0) return 5; // 5 min
-        if ($this->period_days >= 1 && $this->period_days <=2) return 15; // 15 min
-        if ($this->period_days >= 3 && $this->period_days <=5) return 30; // 30 min
-        if ($this->period_days >= 6 && $this->period_days <= 7) return 60; // 1 hour
-        if ($this->period_days >= 8 && $this->period_days <= 14) return 1*60; // 5 hour
-        return 24*60; // 24 hour
+        $this->data_sensors = $this->Sensors->get_period($this->period->start, $this->period->end);
+        // $this->data_current = $this->Current->get_period($this->period);
     }
 }
