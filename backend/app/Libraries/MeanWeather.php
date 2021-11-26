@@ -37,7 +37,8 @@ class MeanWeather {
         $meanDate = date('Y-m-d H:30:00', $nextHor);
 
         // Проверяем, не пытаемся ли сделать средние данные за еще не вышедший час
-        $this->_check_hours_with_current($meanDate);
+        if (! $this->_check_hours_with_current($lastData->item_utc_date))
+            return ;
 
         // Получаем данные сенсоров и OpenWeatherMap за последний час
         $sensors = $this->_get_last_data($this->Sensors, $nextHor);
@@ -45,9 +46,7 @@ class MeanWeather {
 
         // Если нет данных ни от метеостанции, ни от OWM (например не работал хост, cron и т.п.)
         if (empty((array) $sensors) && empty((array) $weather))
-        {
             $sensors = $this->_get_empty_value($nextHor, 1);
-        }
 
         // Получаем среднее значение всего массива сенсоров и OWM
         $dataset = $this->_get_average_data($sensors, $weather);
@@ -56,10 +55,7 @@ class MeanWeather {
         $this->Hourly->add($dataset, $meanDate);
 
         if ($this->counter >= 100)
-        {
-            echo 'Max iteration (' . $this->counter . ') complete';
-            exit();
-        }
+            return ;
 
         $this->run();
     }
@@ -77,9 +73,9 @@ class MeanWeather {
 
         // Еще не прошел 1 час после последнего добавления усредненных данных
         if ((int) $interval->format('%h') <= 1)
-        {
-            exit();
-        }
+            return false;
+
+        return true;
     }
 
     /**

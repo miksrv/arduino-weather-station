@@ -23,7 +23,7 @@ class Cron extends BaseController
 
         $this->MeanWeather->run();
 
-        $response = ['state' => TRUE, 'data' => 'All data has been updated '];
+        $response = ['state' => TRUE, 'data' => 'All data has been updated'];
         $this->_response($response, 200);
     }
 
