@@ -103,12 +103,12 @@ abstract class ADataModel extends Model
      */
     function get_period(string $start, string $stop)
     {
-        $db = $this->db->table($this->table);
+        if (empty($this->key_items))
+            return [];
 
-        if ($this->key_items)
-            $db->select('item_utc_date,' . implode(',', $this->key_items));
-
-        return $db->orderBy($this->key_time, 'DESC')
+        return $this->db->table($this->table)
+            ->select('item_utc_date,' . implode(',', $this->key_items))
+            ->orderBy($this->key_time, 'DESC')
             ->where("{$this->key_time} BETWEEN '{$start}' AND '{$stop}'")
             ->get()
             ->getResult();

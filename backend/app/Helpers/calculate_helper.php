@@ -21,7 +21,7 @@ function get_means_minutes(int $days): int {
     if ($days === 0) return 5; // 5 min
     if ($days >= 1 && $days <=2) return 15; // 15 min
     if ($days >= 3 && $days <=5) return 30; // 30 min
-    if ($days >= 6 && $days <= 7) return 60; // 1 hour
-    if ($days >= 8 && $days <= 14) return 1*60; // 5 hour
-    return 24*60; // 24 hour
+    if ($days >= 6 && $days <= 30) return 60; // 1 hour
+//    if ($days >= 8 && $days <= 14) return 60; // 5 hour
+    return 5*60; // 5 hour
 }
