@@ -94,7 +94,10 @@
   },
   "statistic": {
     "temperature": "Температура",
-    "humidity": "Влажность"
+    "humidity": "Влажность",
+    "clouds": "Облачность",
+    "precipitation": "Осадки",
+    "pressure": "Давление"
   },
   "heatmap": {
     "title": "Тепловая карта",
