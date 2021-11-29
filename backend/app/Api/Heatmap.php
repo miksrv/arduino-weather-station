@@ -38,7 +38,7 @@ class Heatmap {
         $update = strtotime($this->data[0]->item_utc_date . ' UTC');
 
         foreach ($this->data as $key => $item) {
-            $timestamp = strtotime($item->item_utc_date . ' UTC');
+            $timestamp = strtotime($item->item_utc_date . ' +5 hours');
             $result[]  = [
                 date('U', $timestamp) * 1000,
                 (int) date('H', $timestamp),
