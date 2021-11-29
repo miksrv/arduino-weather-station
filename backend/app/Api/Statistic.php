@@ -72,7 +72,7 @@ class Statistic {
                 // Заполняем значения для графиков
                 $chart->$item[] = [
                     date('U', strtotime($tmp_date . ' UTC')) * 1000,
-                    round($value / $result[$tmp_date]->counter, 1)
+                    $value
                 ];
             }
 
@@ -82,22 +82,21 @@ class Statistic {
 
         return (object) ['update' => $update, 'payload' => $chart];
     }
-    
+
     // Создаем массив по временным промежутком с суммой показаний всех запрошенных датчиков
     protected function _make_time_array($tmp_date, $next_date)
     {
-        $result = [];
+        $return = (object) [];
+        $result = (object) [];
+        $counts = (object) [];
 
-        foreach ($this->data as $sensor_key => $item) {
+        foreach ($this->data as $sensor_key => $item)
+        {
             $_item_date = date('Y-m-d H:i:s', strtotime($item->item_utc_date . ' +5 hours'));
 
             // Перебираем весь массив значений датчиков, если текущие показания не в промежутке дат, то пропускаем
             if ($_item_date < $tmp_date || $_item_date > $next_date)
                 continue;
-
-            // Создаем пустой объект показателей для текущего фрагмента даты
-            if (empty($result))
-                $result = (object) ['counter' => 0];
 
             // Удаляем служебные поля
             unset($item->item_utc_date);
@@ -109,18 +108,23 @@ class Statistic {
                 if (!isset($result->$key))
                 {
                     $result->$key = $value;
+                    $counts->$key = 1;
                 } else {
                     $result->$key += $value;
+                    $counts->$key += 1;
                 }
             }
 
             // Удаляем текущие показания из массива датчиков, т.к. мы их уже занесли
             unset($this->data[$sensor_key]);
-
-            $result->counter++;
         }
 
-        return $result;
+        foreach ($result as $item => $value)
+        {
+            $return->$item = round($value / $counts->$item, 1);
+        }
+
+        return $return;
     }
 
     protected function _fetch()
