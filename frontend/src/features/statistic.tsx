@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
 import translate from '../functions/translate'
-import { Message } from 'semantic-ui-react'
+import { Message, Grid } from 'semantic-ui-react'
 import { setUpdate } from '../app/updateSlice'
 import { useGetStatisticQuery } from '../app/weatherApi'
 import { useAppDispatch } from '../app/hooks'
@@ -11,6 +11,7 @@ import Toolbar from '../components/toolbar'
 import Chart from '../components/chart'
 
 import humidity_temperature from '../charts/humidity_temperature'
+import clouds_pressure from '../charts/clouds_pressure'
 import moment from 'moment'
 
 // const getDateFromUrl = () => {
@@ -46,7 +47,7 @@ const lang = translate().general.error
 
 const Statistic: React.FC = () => {
     const dispatch = useAppDispatch()
-    const sensors: SensorTypes[] = ['temperature', 'humidity']
+    const sensors: SensorTypes[] = ['temperature', 'humidity', 'clouds', 'pressure', 'precipitation']
     const [ period, onPeriodChange ] = useState([moment().subtract(1,'d'), moment()])
     const { data, isFetching, isError } = useGetStatisticQuery({
         start: moment(period[0]).format('YYYY-MM-DD'),
@@ -72,11 +73,22 @@ const Statistic: React.FC = () => {
                 download
             />
             {!isError ?
-                <Chart
-                    loader={isFetching}
-                    config={humidity_temperature}
-                    data={[data?.payload.humidity, data?.payload.temperature]}
-                />
+                <Grid>
+                    <Grid.Column width={16}>
+                        <Chart
+                            loader={isFetching}
+                            config={humidity_temperature}
+                            data={[data?.payload.humidity, data?.payload.temperature]}
+                        />
+                    </Grid.Column>
+                    <Grid.Column width={16}>
+                        <Chart
+                            loader={isFetching}
+                            config={clouds_pressure}
+                            data={[data?.payload.clouds, data?.payload.precipitation, data?.payload.pressure]}
+                        />
+                    </Grid.Column>
+                </Grid>
                 :
                 <Message negative>
                     <Message.Header>{lang.title}</Message.Header>
