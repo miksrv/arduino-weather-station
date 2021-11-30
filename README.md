@@ -1,6 +1,7 @@
 Arduino Weather Station
 ===============
-[![Node.js CI](https://github.com/miksrv/arduino-weather-station/actions/workflows/node.js.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/node.js.yml)
+[![master](https://github.com/miksrv/arduino-weather-station/actions/workflows/nodejs-pr-master.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/nodejs-pr-master.yml)
+[![develop](https://github.com/miksrv/arduino-weather-station/actions/workflows/nodejs-pr-develop.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/nodejs-pr-develop.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=miksrv_arduino-weather-station&metric=alert_status)](https://sonarcloud.io/dashboard?id=miksrv_arduino-weather-station)
 
 This project is designed to teach the basic skills and understanding of working with microcontrollers ATmega (Arduino). The project is a working model of an automated weather station, consisting of two the Component: transmitter and receiver. The controller transmits data to a remote web server, and to indicate the current readings uses character.
