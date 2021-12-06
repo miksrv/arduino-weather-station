@@ -48,7 +48,7 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
                     icon='download'
                     color='grey'
                     as='a'
-                    href={`https://api.miksoft.pro/meteo/get/csv/?date_start=${rangeStart.format('YYYY-MM-DD')}&date_end=${rangeEnd.format('YYYY-MM-DD')}`}
+                    href={`${process.env.REACT_APP_API_HOST}export?date_start=${rangeStart.format('YYYY-MM-DD')}&date_end=${rangeEnd.format('YYYY-MM-DD')}`}
                 />
             )}
         </div>
