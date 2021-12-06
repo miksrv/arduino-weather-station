@@ -4,6 +4,7 @@ use App\Api\Weather;
 use App\Api\Statistic;
 use App\Api\Heatmap;
 use App\Api\Uptime;
+use App\Api\Export;
 
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Methods: GET, OPTIONS");
@@ -15,7 +16,6 @@ class Get extends BaseController
 {
     protected Weather $Weather;
     protected Statistic $Statistic;
-    protected Uptime $Uptime;
 
     function __construct()
     {
@@ -61,6 +61,31 @@ class Get extends BaseController
     }
 
     /**
+     * Generates a CSV file for downloading with weather data for a given interval
+     * @example https://meteo.miksoft.pro/api/get/export?date_start=2021-10-01&date_end=2021-10-10
+     */
+    function export()
+    {
+        $Export = new Export();
+
+        $period = $this->_get_period();
+        $data   = $Export->get_data($period);
+
+        header("Content-Description: File Transfer");
+        header("Content-Disposition: attachment; filename=weather_{$period->start}-{$period->end}.csv");
+        header("Content-Type: application/csv; ");
+
+        $file = fopen('php://output', 'w');
+        foreach ($data as $line)
+        {
+            fputcsv($file, $line);
+        }
+
+        fclose($file);
+        exit();
+    }
+
+    /**
      * Returns an array of readings and dynamics of changes for all available sensors
      */
     function sensors()
@@ -70,7 +95,7 @@ class Get extends BaseController
     }
 
     /**
-     * Возвращяет массив данных для формирования диаграмы по запрашиваемым датчикам и в заданном интервале дат
+     * Returns an array of data for forming a chart for the requested sensors and in the specified date interval
      * @example https://meteo.miksoft.pro/api/get/statistic?date_start=2021-10-01&date_end=2021-10-10&sensors=temperature
      */
     function statistic()
@@ -101,9 +126,9 @@ class Get extends BaseController
      */
     function uptime()
     {
-        $this->Uptime = new Uptime();
+        $Uptime = new Uptime();
 
-        $data = $this->Uptime->get_uptime();
+        $data = $Uptime->get_uptime();
         $this->_response($data->update, $data->payload);
     }
 
