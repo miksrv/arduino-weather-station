@@ -79,7 +79,6 @@ const Heatmap: React.FC = () => {
                 rangeStart={period[0]}
                 rangeEnd={period[1]}
                 periods={listPeriods}
-                download
             />
             <Chart
                 loader={isFetching}
