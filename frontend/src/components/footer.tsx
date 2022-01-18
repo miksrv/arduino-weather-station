@@ -18,7 +18,7 @@ const Footer: React.FC = () => {
             <div>Copyright ©
                 <a href='https://miksoft.pro' className='copyright-link' title=''>
                     <img src='https://miksoft.pro/favicon.ico' alt='' /> Mik
-                </a> 2021, Version {version} ({update})
+                </a> 2022, Version {version} ({update})
             </div>
         </div>
     )

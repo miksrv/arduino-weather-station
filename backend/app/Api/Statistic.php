@@ -23,7 +23,26 @@ class Statistic {
         helper(['calculate']);
     }
 
-    function get_data(object $period, array $sensors)
+    function get_chart_data(object $period, array $sensors): object
+    {
+        $this->_init($period, $sensors);
+        return $this->_make_chart_data();
+    }
+
+    function get_sensors_data(object $period, array $sensors): object
+    {
+        $this->_init($period, $sensors);
+
+        foreach ($this->data as $item)
+        {
+            $item->date = strtotime($item->item_utc_date);
+            unset($item->item_utc_date);
+        }
+
+        return (object) ['update' => $this->data[0]->date, 'payload' => $this->data];
+    }
+
+    protected function _init(object $period, array $sensors)
     {
         $this->period = (object) [
             'start' => date('Y-m-d H:i:s', strtotime($period->start)),
@@ -36,11 +55,9 @@ class Statistic {
         $this->average_time = get_means_minutes($this->period_days);
 
         $this->_fetch();
-
-        return $this->_make_chart_data();
     }
 
-    protected function _make_chart_data()
+    protected function _make_chart_data(): object
     {
         $begin = new \DateTime($this->period->start);
         $end   = new \DateTime($this->period->end);
@@ -84,7 +101,7 @@ class Statistic {
     }
 
     // Создаем массив по временным промежутком с суммой показаний всех запрошенных датчиков
-    protected function _make_time_array($tmp_date, $next_date)
+    protected function _make_time_array($tmp_date, $next_date): object
     {
         $return = (object) [];
         $result = (object) [];
@@ -155,7 +172,7 @@ class Statistic {
     }
 
     // Получаем список доступных ключей сенсоров
-    protected function _get_available_keys($list)
+    protected function _get_available_keys($list): array
     {
         $result = [];
 

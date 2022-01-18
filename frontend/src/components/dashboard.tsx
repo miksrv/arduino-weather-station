@@ -17,9 +17,22 @@ const Dashboard: React.FC = () => {
 
     const getImageByDate = () => {
         const curHours = new Date().getHours()
+        const curMonth = new Date().getMonth() + 1
         const dayTimes = (curHours > 7 && curHours < 21) ? 'd' : 'n'
 
-        return 'url(/background/autumn-' + dayTimes + '.jpg)'
+        let strMonth: string
+
+        if (curMonth >= 12 || curMonth <= 2) {
+            strMonth = 'winter'
+        } else if (curMonth >= 3 || curMonth <= 5) {
+            strMonth = 'spring'
+        } else if (curMonth >= 6 || curMonth <= 8) {
+            strMonth = 'summer'
+        } else {
+            strMonth = 'autumn'
+        }
+
+        return `url(/background/${strMonth}-${dayTimes}.jpg)`
     }
 
     useEffect(() => {

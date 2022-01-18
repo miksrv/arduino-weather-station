@@ -95,6 +95,18 @@ class Get extends BaseController
     }
 
     /**
+     * Returns an array of readings and dynamics of changes for all available sensors
+     * @example https://meteo.miksoft.pro/api/get/sensors_period?date_start=2021-12-01&date_end=2021-12-31&sensors=clouds,temperature,wind_speed
+     */
+    function sensors_period()
+    {
+        $period  = $this->_get_period();
+        $sensors = $this->_get_sensors();
+        $data = $this->Statistic->get_sensors_data($period, $sensors);
+        $this->_response($data->update, $data->payload);
+    }
+
+    /**
      * Returns an array of data for forming a chart for the requested sensors and in the specified date interval
      * @example https://meteo.miksoft.pro/api/get/statistic?date_start=2021-10-01&date_end=2021-10-10&sensors=temperature
      */
@@ -102,7 +114,7 @@ class Get extends BaseController
     {
         $period  = $this->_get_period();
         $sensors = $this->_get_sensors();
-        $data    = $this->Statistic->get_data($period, $sensors);
+        $data    = $this->Statistic->get_chart_data($period, $sensors);
 
         $this->_response($data->update, $data->payload);
     }
