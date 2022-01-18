@@ -29,7 +29,10 @@ class Weather {
         $weather = $this->Current->get_array_by_last_day();
         $sensors = $this->Sensors->get_array_by_last_day();
 
-        $time_diff   = round(abs(strtotime($sensors[0]->item_utc_date) - strtotime($weather[0]->item_utc_date)) / 60,0);
+        $time_diff   = (! empty($sensors)) ?
+            round(abs(strtotime($sensors[0]->item_utc_date) - strtotime($weather[0]->item_utc_date)) / 60,0) :
+            round(strtotime($weather[0]->item_utc_date) / 60,0);
+
         $data_actual = $time_diff < self::TIME_ACTUAL;
         $time_update = strtotime(($data_actual ? $sensors[0]->item_utc_date : $weather[0]->item_utc_date) . ' UTC') ;
 

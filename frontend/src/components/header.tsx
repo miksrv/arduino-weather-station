@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import translate from '../functions/translate'
-import { Button, Icon } from 'semantic-ui-react'
+import { Icon } from 'semantic-ui-react'
 import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { toggle } from '../app/sidebarSlice'
 import { timeAgo } from '../functions/helpers'
@@ -45,9 +45,6 @@ const Header: React.FC = () => {
                     </> :
                     <><Icon loading name='spinner' /> {lang.loading}</>}
                 </span>
-            </span>
-            <span className='buttons'>
-                <Button icon='refresh' color='green' size='tiny' />
             </span>
         </div>
     )
