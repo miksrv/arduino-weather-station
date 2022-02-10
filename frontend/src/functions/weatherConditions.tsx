@@ -104,4 +104,3 @@ export const weatherConditions = (id: number | undefined) => {
 
     return conditions
 }
-

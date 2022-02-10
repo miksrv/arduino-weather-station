@@ -1,7 +1,5 @@
 import ru from '../translations/ru.json'
 
-const translate = () => {
-    return ru
-}
+const translate = () => ru
 
 export default translate

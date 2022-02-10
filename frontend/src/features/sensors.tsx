@@ -6,8 +6,8 @@ import { setUpdate } from '../app/updateSlice'
 import { ISensorItem } from '../app/types'
 import Sensor from '../components/sensor'
 
-const SensorLoader = () => {
-    return Array(12).fill(1).map((el, i) =>
+const SensorLoader = () =>
+    Array(12).fill(1).map((el, i) =>
         <Grid.Column computer={4} tablet={8} mobile={16}>
             <div className='box sensor' style={{height: 120}}>
                 <Dimmer active>
@@ -16,16 +16,14 @@ const SensorLoader = () => {
             </div>
         </Grid.Column>
     )
-}
 
-const SensorError = () => {
-    return <Grid.Column width={16}>
+const SensorError = () =>
+    <Grid.Column width={16}>
         <Message negative>
             <Message.Header>Удаленный сервер ответил с ошибкой</Message.Header>
             <p>На метеостанции возникла какая-то неполадка, в ближайшее время она будет устранена и все заработает, не расстраивайтесь :)</p>
         </Message>
     </Grid.Column>
-}
 
 const Sensors: React.FC = () => {
     const dispatch = useAppDispatch()

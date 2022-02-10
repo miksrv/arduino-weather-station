@@ -79,7 +79,7 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div>
                             <WiStrongWind className='icon' />
-                            {isSuccess ? (
+                            {isSuccess && data?.payload.wind_speed ? (
                                 data?.payload.wind_speed + ' м\\с ' + degToCompass(data?.payload.wind_degree)
                             ) : (<Icon loading name='spinner' />)}
                         </div>

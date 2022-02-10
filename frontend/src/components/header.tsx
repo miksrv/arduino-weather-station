@@ -22,10 +22,12 @@ const Header: React.FC = () => {
     }, [timestamp, lastUpdate])
 
     useEffect(() => {
-        const interval = setInterval(() => setSeconds((seconds) => seconds + 1), 1000)
+        if (timestamp && timestamp.server !== 0 && timestamp.update !== 0) {
+            const interval = setInterval(() => setSeconds((seconds) => seconds + 1), 1000)
 
-        return () => clearInterval(interval);
-    }, [seconds])
+            return () => clearInterval(interval);
+        }
+    }, [seconds, timestamp])
 
     return (
         <div className='box header'>
@@ -38,7 +40,7 @@ const Header: React.FC = () => {
             />
             <span className={! seconds || seconds > OUTDATED_SEC ? 'offline' : 'online pulsate'}></span>
             <span className='last-update'>
-                <span>{timestamp ?
+                <span>{timestamp && timestamp.update !== 0 ?
                     <>
                         <div>{moment.unix(timestamp.update).format('DD.MM.Y, H:mm:ss')}</div>
                         <div>{timeAgo(seconds)}</div>

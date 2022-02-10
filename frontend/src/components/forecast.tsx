@@ -7,41 +7,38 @@ import { weatherConditions } from '../functions/weatherConditions'
 
 import moment from 'moment'
 
-const renderCarousel = (data: IForecastItem[]) => {
-    const breakPoints = [
-        { width: 1, itemsToShow: 2},
-        { width: 550, itemsToShow: 3},
-        { width: 850, itemsToShow: 6}
-    ]
+const breakPoints = [
+    { width: 1, itemsToShow: 2},
+    { width: 550, itemsToShow: 3},
+    { width: 850, itemsToShow: 6}
+]
 
-    return (
-        <Carousel
-            breakPoints={breakPoints}
-            itemsToScroll={1}
-            pagination={true}
-            itemPadding={[0, 5]}
-            isRTL={false}
-        >
-            {data.map((item, key) => (
-                <div className='forecast-tile' key={key}>
-                    <div className='date'>
-                        <div className='day-of-week'>{moment.unix(item.time).format('dddd')}</div>
-                        <div className='date-time'>{moment.unix(item.time).format('DD MMMM, H:mm')}</div>
-                    </div>
-                    <div className='image'>
-                        {weatherConditions(item.condition_id).icon}
-                    </div>
-                    <div className='temp'>
-                        {item.temperature}°
-                    </div>
-                    <div className='desc'>
-                        {weatherConditions(item.condition_id).name}
-                    </div>
+const renderCarousel = (data: IForecastItem[]) =>
+    <Carousel
+        breakPoints={breakPoints}
+        itemsToScroll={1}
+        pagination={true}
+        itemPadding={[0, 5]}
+        isRTL={false}
+    >
+        {data.map((item, key) => (
+            <div className='forecast-tile' key={key}>
+                <div className='date'>
+                    <div className='day-of-week'>{moment.unix(item.time).format('dddd')}</div>
+                    <div className='date-time'>{moment.unix(item.time).format('DD MMMM, H:mm')}</div>
                 </div>
-            ))}
-        </Carousel>
-    )
-}
+                <div className='image'>
+                    {weatherConditions(item.condition_id).icon}
+                </div>
+                <div className='temp'>
+                    {item.temperature}°
+                </div>
+                <div className='desc'>
+                    {weatherConditions(item.condition_id).name}
+                </div>
+            </div>
+        ))}
+    </Carousel>
 
 const Forecast: React.FC = () => {
     const { data, isLoading } = useGetForecastQuery(null)

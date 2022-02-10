@@ -112,13 +112,12 @@ const SensorsMeta:MetaInfoType[] = [
     }
 ]
 
-const TrendValue = (trend: number) => {
-    return <div className='trend'>
+const TrendValue = (trend: number) =>
+    <div className='trend'>
         {trend > 0 && <IoIosArrowRoundUp className='up' />}
         {trend < 0 && <IoIosArrowRoundDown className='down' />}
         {trend}
     </div>
-}
 
 const Sensor: React.FC<TSensorProps> = (props) => {
     const { data } = props

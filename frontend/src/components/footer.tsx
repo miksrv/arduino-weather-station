@@ -1,4 +1,5 @@
 import React from 'react'
+import translate from '../functions/translate'
 import { version, update } from '../../package.json'
 import { useGetUptimeQuery } from '../app/weatherApi'
 
@@ -6,13 +7,14 @@ import moment from 'moment'
 
 const Footer: React.FC = () => {
     const { data, isSuccess } = useGetUptimeQuery()
+    const lang = translate().general
     const uptime = data?.timestamp.update || 0
 
     return (
         <div className='footer'>
-            <div>Uptime: {
-                isSuccess && (<><b>{data?.payload}%</b> ({moment.unix(uptime).format('DD.MM.Y, H:mm:ss')})</>)
-            }
+            <div>Uptime: {isSuccess ?
+                (<><b>{data?.payload}%</b> ({moment.unix(uptime).format('DD.MM.Y, H:mm:ss')})</>)
+                : lang.loading}
             </div>
             <div>Powered by Arduino, PHP + MySQL, ReactJS + Redux RTK.</div>
             <div>Copyright ©
