@@ -4,7 +4,11 @@ import { useGetSensorsQuery } from '../app/weatherApi'
 import { Dimmer, Grid, Loader, Message } from 'semantic-ui-react'
 import { setUpdate } from '../app/updateSlice'
 import { ISensorItem } from '../app/types'
+import { Helmet } from 'react-helmet'
+import translate from '../functions/translate'
 import Sensor from '../components/sensor'
+
+const lang = translate()
 
 const SensorLoader = () =>
     Array(12).fill(1).map((el, i) =>
@@ -20,8 +24,8 @@ const SensorLoader = () =>
 const SensorError = () =>
     <Grid.Column width={16}>
         <Message negative>
-            <Message.Header>Удаленный сервер ответил с ошибкой</Message.Header>
-            <p>На метеостанции возникла какая-то неполадка, в ближайшее время она будет устранена и все заработает, не расстраивайтесь :)</p>
+            <Message.Header>{lang.general.error.title}</Message.Header>
+            <p>{lang.general.error.description}</p>
         </Message>
     </Grid.Column>
 
@@ -34,16 +38,22 @@ const Sensors: React.FC = () => {
     }, [dispatch, data])
 
     return (
-        <Grid>
-            {!isFetching ?
-                isSuccess ? data?.payload.map((item: ISensorItem, key: number) =>
-                    <Grid.Column computer={4} tablet={8} mobile={16} key={key}>
-                        <Sensor data={item}/>
-                    </Grid.Column>
-                ) : SensorError()
-                : SensorLoader()
-            }
-        </Grid>
+        <>
+            <Helmet>
+                <title>{lang.pages.sensors.title}</title>
+                <meta name='description' content={lang.pages.sensors.description} />
+            </Helmet>
+            <Grid>
+                {!isFetching ?
+                    isSuccess ? data?.payload.map((item: ISensorItem, key: number) =>
+                        <Grid.Column computer={4} tablet={8} mobile={16} key={key}>
+                            <Sensor data={item}/>
+                        </Grid.Column>
+                    ) : SensorError()
+                    : SensorLoader()
+                }
+            </Grid>
+        </>
     )
 }
 

@@ -52,7 +52,7 @@ const Dashboard: React.FC = () => {
                     <div className='main-info'>
                         <div className='value'>
                             {isSuccess ? data?.payload.temperature : (
-                                <span>00.0</span>
+                                <span>0.0</span>
                             )}
                             <span className='sign'>℃</span>
                         </div>
@@ -79,7 +79,7 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div>
                             <WiStrongWind className='icon' />
-                            {isSuccess && data?.payload.wind_speed ? (
+                            {isSuccess && (data?.payload.wind_speed || data?.payload.wind_speed === 0) ? (
                                 data?.payload.wind_speed + ' м\\с ' + degToCompass(data?.payload.wind_degree)
                             ) : (<Icon loading name='spinner' />)}
                         </div>

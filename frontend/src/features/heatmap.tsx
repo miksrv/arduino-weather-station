@@ -5,6 +5,7 @@ import { useGetHeatmapQuery } from '../app/weatherApi'
 import { useAppDispatch } from '../app/hooks'
 import { SensorTypes, TPeriod } from '../app/types'
 import { declOfNum } from '../functions/helpers'
+import { Helmet } from 'react-helmet'
 // import { getUrlParameter } from '../functions/helpers'
 import Toolbar from '../components/toolbar'
 import Chart from '../components/chart'
@@ -41,9 +42,10 @@ import moment from 'moment'
 //     return response
 // }
 
+const lang = translate()
+
 const Heatmap: React.FC = () => {
     const dispatch = useAppDispatch()
-    const lang = translate()
     const sensors: SensorTypes[] = ['temperature']
     const [ period, onPeriodChange ] = useState([moment().subtract(31,'d'), moment()])
     const { data, isFetching } = useGetHeatmapQuery({
@@ -69,6 +71,10 @@ const Heatmap: React.FC = () => {
 
     return (
         <>
+            <Helmet>
+                <title>{lang.pages.heatmap.title}</title>
+                <meta name='description' content={lang.pages.heatmap.description} />
+            </Helmet>
             <Toolbar
                 onChangeInterval={
                     (days: number) => onPeriodChange([moment().subtract(days,'d'), moment()])
