@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import translate from '../functions/translate'
 import { setUpdate } from '../app/updateSlice'
 import { useGetHeatmapQuery } from '../app/weatherApi'
-import { useAppDispatch } from '../app/hooks'
+import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { SensorTypes, TPeriod } from '../app/types'
 import { declOfNum } from '../functions/helpers'
 import { Helmet } from 'react-helmet'
@@ -42,10 +41,9 @@ import moment from 'moment'
 //     return response
 // }
 
-const lang = translate()
-
 const Heatmap: React.FC = () => {
     const dispatch = useAppDispatch()
+    const language = useAppSelector(state => state.language.translate)
     const sensors: SensorTypes[] = ['temperature']
     const [ period, onPeriodChange ] = useState([moment().subtract(31,'d'), moment()])
     const { data, isFetching } = useGetHeatmapQuery({
@@ -55,15 +53,15 @@ const Heatmap: React.FC = () => {
     })
 
     let listPeriods: TPeriod[] = [
-        { name: lang.toolbar.periods.month, days: 31 },
-        { name: lang.toolbar.periods.quarter, days: 90 },
-        { name: lang.toolbar.periods.halfyear, days: 180 },
-        { name: lang.toolbar.periods.year, days: 365 }
+        { name: language.toolbar.periods.month, days: 31 },
+        { name: language.toolbar.periods.quarter, days: 90 },
+        { name: language.toolbar.periods.halfyear, days: 180 },
+        { name: language.toolbar.periods.year, days: 365 }
     ]
 
     let days = period[1].diff(period[0], 'days')
 
-    heatmap.subtitle.text = lang.heatmap.subtitle + ' ' + days + ' ' + declOfNum(days, lang.general.declining.days)
+    heatmap.subtitle.text = language.heatmap.subtitle + ' ' + days + ' ' + declOfNum(days, language.general.declining.days)
 
     useEffect(() => {
         dispatch(setUpdate(data?.timestamp))
@@ -72,8 +70,8 @@ const Heatmap: React.FC = () => {
     return (
         <>
             <Helmet>
-                <title>{lang.pages.heatmap.title}</title>
-                <meta name='description' content={lang.pages.heatmap.description} />
+                <title>{language.pages.heatmap.title}</title>
+                <meta name='description' content={language.pages.heatmap.description} />
             </Helmet>
             <Toolbar
                 onChangeInterval={

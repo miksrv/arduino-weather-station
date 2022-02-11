@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import translate from '../functions/translate'
-import { Icon } from 'semantic-ui-react'
+import { getLanguage, changeLanguage } from '../functions/translate'
+import { Icon, Dropdown } from 'semantic-ui-react'
 import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { toggle } from '../app/sidebarSlice'
 import { timeAgo } from '../functions/helpers'
@@ -9,13 +9,20 @@ import moment from 'moment'
 
 const OUTDATED_SEC = 180
 
-// #TODO: Добавить обработик даты, если она 01.01.1970 (компонент не обновил дату)
+const countryOptions = [
+    { key: 'ru', value: 'ru', flag: 'ru', text: 'RU' },
+    { key: 'en', value: 'en', flag: 'us', text: 'EN' }
+]
+
 const Header: React.FC = () => {
     const dispatch = useAppDispatch()
-    const lang = translate().general
     const timestamp = useAppSelector(state => state.update.timestamp)
+    const language = useAppSelector(state => state.language.translate)
     const lastUpdate = timestamp ? timestamp.server - timestamp.update : 0
     const [seconds, setSeconds] = useState(0)
+
+    const changeLang = (e: any, { value }: any ) => changeLanguage(value)
+    const currentLang = countryOptions.filter((lang) => lang.key === getLanguage()).pop()
 
     useEffect(() => {
         setSeconds(lastUpdate)
@@ -43,10 +50,19 @@ const Header: React.FC = () => {
                 <span>{timestamp && timestamp.update !== 0 ?
                     <>
                         <div>{moment.unix(timestamp.update).format('DD.MM.Y, H:mm:ss')}</div>
-                        <div>{timeAgo(seconds)}</div>
+                        <div>{timeAgo(seconds, language.timeago)}</div>
                     </> :
-                    <><Icon loading name='spinner' /> {lang.loading}</>}
+                    <><Icon loading name='spinner' /> {language.general.loading}</>}
                 </span>
+            </span>
+            <span className='language'>
+                <Dropdown
+                    fluid
+                    selection
+                    options={countryOptions}
+                    defaultValue={currentLang?.value}
+                    onChange={changeLang}
+                />
             </span>
         </div>
     )

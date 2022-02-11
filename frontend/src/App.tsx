@@ -1,7 +1,9 @@
 import React from 'react'
+import translate from './functions/translate'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { Sidebar as SidebarMenu, Container } from 'semantic-ui-react'
-import { useAppSelector } from './app/hooks'
+import { useAppSelector, useAppDispatch } from './app/hooks'
+import { setLanguage } from './app/languageSlice'
 
 import Header from './components/header'
 import Footer from './components/footer'
@@ -14,7 +16,10 @@ import Heatmap from './features/heatmap'
 import Error from './features/error'
 
 const App: React.FC = () => {
+    const dispatch = useAppDispatch()
     const visible = useAppSelector(state => state.sidebar.visible)
+
+    dispatch(setLanguage(translate()))
 
     return (
         <SidebarMenu.Pushable>

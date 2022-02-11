@@ -1,6 +1,6 @@
 {
   "name": "weather-frontend",
-  "update": "09.02.2022",
+  "update": "11.02.2022",
   "version": "2.0.4",
   "private": true,
   "dependencies": {

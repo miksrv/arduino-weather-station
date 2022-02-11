@@ -1,11 +1,8 @@
-import translate from './translate'
-
 export const declOfNum = (number: number, words: any[]) => {
     return words[(number % 100 > 4 && number % 100 < 20) ? 2 : [2, 0, 1, 1, 1, 2][(number % 10 < 5) ? number % 10 : 5]]
 }
 
-export const degToCompass = (degree: number) => {
-    const lang = translate().weather.wind_direction
+export const degToCompass = (degree: number, lang: any) => {
     const val = Math.floor((degree / 22.5) + 0.5)
     const arr = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
     const res = arr[(val % 16)] as keyof typeof lang
@@ -13,9 +10,7 @@ export const degToCompass = (degree: number) => {
     return lang[res]
 }
 
-export const timeAgo = (sec: number) => {
-    const lang = translate().timeago
-
+export const timeAgo = (sec: number, lang: any) => {
     if (sec === null || sec <= 0)
         return lang.recently
 

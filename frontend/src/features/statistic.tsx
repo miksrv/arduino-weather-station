@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import translate from '../functions/translate'
 import { Message, Grid } from 'semantic-ui-react'
 import { setUpdate } from '../app/updateSlice'
 import { useGetStatisticQuery } from '../app/weatherApi'
-import { useAppDispatch } from '../app/hooks'
+import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { SensorTypes } from '../app/types'
 import { Helmet } from 'react-helmet'
 // import { getUrlParameter } from '../functions/helpers'
@@ -43,10 +42,9 @@ import moment from 'moment'
 //     return response
 // }
 
-const lang = translate()
-
 const Statistic: React.FC = () => {
     const dispatch = useAppDispatch()
+    const language = useAppSelector(state => state.language.translate)
     const sensors: SensorTypes[] = ['temperature', 'humidity', 'clouds', 'pressure', 'precipitation']
     const [ period, onPeriodChange ] = useState([moment().subtract(1,'d'), moment()])
     const { data, isFetching, isError } = useGetStatisticQuery({
@@ -62,8 +60,8 @@ const Statistic: React.FC = () => {
     return (
         <>
             <Helmet>
-                <title>{lang.pages.statistic.title}</title>
-                <meta name='description' content={lang.pages.statistic.description} />
+                <title>{language.pages.statistic.title}</title>
+                <meta name='description' content={language.pages.statistic.description} />
             </Helmet>
             <Toolbar
                 onChangeInterval={
@@ -95,8 +93,8 @@ const Statistic: React.FC = () => {
                 </Grid>
                 :
                 <Message negative>
-                    <Message.Header>{lang.general.error.title}</Message.Header>
-                    <p>{lang.general.error.description}</p>
+                    <Message.Header>{language.general.error.title}</Message.Header>
+                    <p>{language.general.error.description}</p>
                 </Message>
             }
         </>

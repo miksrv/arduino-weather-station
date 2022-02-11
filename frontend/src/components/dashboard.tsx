@@ -1,19 +1,17 @@
 import React, { useEffect } from 'react'
-import translate from '../functions/translate'
 import { Dimmer, Grid, Icon, Loader } from 'semantic-ui-react'
 import { WiStrongWind, WiBarometer, WiHumidity } from 'react-icons/wi'
-import { useAppDispatch } from '../app/hooks'
+import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { useGetSummaryQuery } from '../app/weatherApi'
 import { degToCompass } from '../functions/helpers'
 import { setUpdate } from '../app/updateSlice'
-
 import { weatherConditions } from '../functions/weatherConditions'
 
 const Dashboard: React.FC = () => {
     const dispatch = useAppDispatch()
-    const lang = translate().dashboard
+    const language = useAppSelector(state => state.language.translate)
     const { data, isLoading, isSuccess } = useGetSummaryQuery(null, { pollingInterval: 60 * 1000 })
-    const conditions = weatherConditions(data?.payload.condition_id)
+    const conditions = weatherConditions(data?.payload.condition_id, language.weather.conditions)
 
     const getImageByDate = () => {
         const curHours = new Date().getHours()
@@ -47,8 +45,8 @@ const Dashboard: React.FC = () => {
                     <div className='background-image' style={{backgroundImage: getImageByDate()}}></div>
                 </div>
                 <div className='content'>
-                    <h1>{lang.title}</h1>
-                    <h4>{lang.subtitle}</h4>
+                    <h1>{language.dashboard.title}</h1>
+                    <h4>{language.dashboard.subtitle}</h4>
                     <div className='main-info'>
                         <div className='value'>
                             {isSuccess ? data?.payload.temperature : (
@@ -63,7 +61,7 @@ const Dashboard: React.FC = () => {
                                 </div>
                                 <div className='info'>
                                     <div>{conditions.name}</div>
-                                    <div>{lang.feels_like} <b>{data?.payload.temperature_feels}</b>℃</div>
+                                    <div>{language.dashboard.feels_like} <b>{data?.payload.temperature_feels}</b>℃</div>
                                 </div>
                             </>
                         )}
@@ -75,12 +73,12 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div>
                             <WiBarometer className='icon' />
-                            {isSuccess ? (data?.payload.pressure) : (<Icon loading name='spinner' />)} {lang.pressure_sign}
+                            {isSuccess ? (data?.payload.pressure) : (<Icon loading name='spinner' />)} {language.dashboard.pressure_sign}
                         </div>
                         <div>
                             <WiStrongWind className='icon' />
                             {isSuccess && (data?.payload.wind_speed || data?.payload.wind_speed === 0) ? (
-                                data?.payload.wind_speed + ' м\\с ' + degToCompass(data?.payload.wind_degree)
+                                data?.payload.wind_speed + ' м\\с ' + degToCompass(data?.payload.wind_degree, language.weather.wind_direction)
                             ) : (<Icon loading name='spinner' />)}
                         </div>
                     </div>

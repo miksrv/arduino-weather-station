@@ -1,16 +1,21 @@
 import React from 'react'
+import { useAppSelector } from '../app/hooks'
 import { Dimmer, Loader } from 'semantic-ui-react'
 import Highcharts from 'highcharts/highmaps'
 import HighchartsReact from 'highcharts-react-official'
-import config from '../charts/config'
-
-Highcharts.setOptions(config)
+import chartConfig from '../charts/config'
 
 const Chart: React.FC<any> = (params) => {
     const { loader, config, data } = params
+    const language = useAppSelector(state => state.language.translate)
+
     let dIndex = 0
     let height = (typeof config.chart !== 'undefined' && typeof config.chart.height) ?
         config.chart.height : 300
+
+    chartConfig.lang = language.charts
+
+    Highcharts.setOptions(chartConfig)
 
     data.forEach((item: any | undefined) => {
         if (typeof item !== 'undefined') {
