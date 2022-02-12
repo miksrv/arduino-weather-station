@@ -28,25 +28,24 @@ class MeanWeather {
         // Берем последнее значение, если пусто - начинаем заполнять с первой даты принятых значений с метеостанции
         $lastData = $this->Hourly->get_last_row();
 
-        if (empty($lastData))
-            $lastData = $this->Sensors->get_first_row();
+        if (empty($lastData)) { $lastData = $this->Sensors->get_first_row(); }
 
         // Имея время последнего времени записи, берем данные сенсоров за весь следующий час
         $nextHor  = $this->_get_next_date_hour($lastData->item_utc_date);
-//         $nextHor  = $this->_get_next_date_hour('2020-08-28 14:00:00');
         $meanDate = date('Y-m-d H:30:00', $nextHor);
 
         // Проверяем, не пытаемся ли сделать средние данные за еще не вышедший час
-        if (! $this->_check_hours_with_current($lastData->item_utc_date))
-            return ;
+        if (! $this->_check_hours_with_current($lastData->item_utc_date)) { return ; }
 
         // Получаем данные сенсоров и OpenWeatherMap за последний час
         $sensors = $this->_get_last_data($this->Sensors, $nextHor);
         $weather = $this->_get_last_data($this->Current, $nextHor);
 
         // Если нет данных ни от метеостанции, ни от OWM (например не работал хост, cron и т.п.)
-        if (empty((array) $sensors) && empty((array) $weather))
+        if (empty($sensors) && empty($weather))
+        {
             $sensors = $this->_get_empty_value($nextHor, 1);
+        }
 
         // Получаем среднее значение всего массива сенсоров и OWM
         $dataset = $this->_get_average_data($sensors, $weather);
@@ -54,8 +53,7 @@ class MeanWeather {
         // Сохраняем средние значения в базе
         $this->Hourly->add($dataset, $meanDate);
 
-        if ($this->counter >= 100)
-            return ;
+        if ($this->counter >= 100) { return ; }
 
         $this->run();
     }
@@ -65,15 +63,14 @@ class MeanWeather {
      * Так как средние значения делаются за час, и если между последней усредненными значениями и текущем временем час еще не прошел -
      * завершаем скрипт
      */
-    protected function _check_hours_with_current($date)
+    protected function _check_hours_with_current($date): bool
     {
         $datetime1 = date_create($date, timezone_open('UTC'));
         $datetime2 = date_create('now', timezone_open('UTC'));
         $interval  = date_diff($datetime1, $datetime2);
 
         // Еще не прошел 1 час после последнего добавления усредненных данных
-        if ((int) $interval->format('%h') <= 1)
-            return false;
+        if ((int) $interval->format('%h') <= 1) { return false; }
 
         return true;
     }
@@ -119,8 +116,7 @@ class MeanWeather {
             date('H', $prev_time)
         );
 
-        if (empty($prev_data))
-            return $this->_get_empty_value($time, $days + 1);
+        if (empty($prev_data)) { return $this->_get_empty_value($time, $days + 1); }
 
         return $prev_data;
     }
@@ -153,8 +149,7 @@ class MeanWeather {
         $count  = 0;
         $summary = [];
 
-        if (empty($data))
-            return (object) $summary;
+        if (empty($data)) { return (object) $summary; }
 
         foreach ($data as $item)
         {

@@ -1,0 +1,135 @@
+{
+  "general": {
+    "loading": "Loading... ",
+    "error": {
+      "title": "The remote server responded with an error",
+      "description": "There was some kind of problem at the weather station, it will be fixed in the near future and everything will work, don't worry :)"
+    },
+    "declining":
+    {
+      "days": ["day", "days", "days"]
+    }
+  },
+  "error": {
+    "header": "404 - Page not found",
+    "subtitle": "The page you are looking for might have been removed had its name changed or is temporarily unavailable."
+  },
+  "pages": {
+    "main": {
+      "title": "Weather in Orenburg now",
+      "description": "Weather report in Orenburg right now, weather forecast for today, with data updated every 60 seconds."
+    },
+    "sensors": {
+      "title": "Condition of weather sensors in Orenburg",
+      "description": "Sensor data from the weather station in Orenburg now - temperature, weather severity, dew point, air humidity, atmospheric pressure, wind speed, wind gusts, wind direction, cloudiness, precipitation, illumination, UV radiation."
+    },
+    "statistic": {
+      "title": "Weather statistics in Orenburg",
+      "description": "Weather statistics in Orenburg for a day, a week, a month or for any other selected period of time."
+    },
+    "heatmap": {
+      "title": "Heat map of temperatures in Orenburg",
+      "description": "Statistics of temperature distribution in Orenburg by day and time of day."
+    }
+  },
+  "sidebar": {
+    "dashboard": "Summary",
+    "sensors": "Sensors",
+    "statistic": "Statistics",
+    "heatmap": "Heat map"
+  },
+  "toolbar": {
+    "periods": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "quarter": "Quarter",
+      "halfyear": "Half a year",
+      "year": "Year"
+    }
+  },
+  "dashboard": {
+    "title": "Weather station",
+    "subtitle": "Orenburg region, Ivanovka",
+    "feels_like": "Feels like",
+    "pressure_sign": "mm."
+  },
+  "timeago": {
+    "recently": "updated recently",
+    "h": "h.",
+    "m": "min.",
+    "s": "sec.",
+    "ago": "ago"
+  },
+  "weather": {
+    "wind_direction": {
+      "N": "North",
+      "NNE": "North northeast",
+      "NE": "Northeast",
+      "ENE": "East-Northeast",
+      "E": "East",
+      "ESE": "East-southeast",
+      "SE": "Southeast",
+      "SSE": "South southeast",
+      "S": "South",
+      "SSW": "South southwest",
+      "SW": "Southwest",
+      "WSW": "West-southwest",
+      "W": "West",
+      "WNW": "West-northwest",
+      "NW": "Northwest",
+      "NNW": "North-northwest"
+    },
+    "conditions": {
+      "id200": "Thunderstorm",
+      "id300": "Drizzle",
+      "id500": "Light rain",
+      "id502": "Heavy rain",
+      "id503": "Very heavy rain",
+      "id504": "Shower",
+      "id511": "Freezing rain",
+      "id520": "Heavy rain",
+      "id522": "Heavy rain shower",
+      "id600": "Snow",
+      "id741": "Fog",
+      "id800": "Clear",
+      "id801": "Partly cloudy",
+      "id802": "Individual clouds",
+      "id803": "Torn clouds",
+      "id804": "Mainly cloudy"
+    }
+  },
+  "sensors": {
+    "temperature": {"name": "Temperature", "sign": "℃"},
+    "dewpoint": {"name": "Dew point", "sign": "℃"},
+    "feels_like": {"name": "Severity of the weather", "sign": "℃"},
+    "humidity": {"name": "Humidity", "sign": "%"},
+    "pressure": {"name": "Atmosphere pressure", "sign": "мм. рт. ст."},
+    "clouds": {"name": "Cloudiness", "sign": "%"},
+    "wind_speed": {"name": "Wind speed", "sign": "m/s"},
+    "wind_gust": {"name": "Gusts of wind", "sign": "m/s"},
+    "wind_deg": {"name": "Direction of the wind", "sign": "degrees"},
+    "precipitation": {"name": "Precipitation", "sign": "mm"},
+    "illumination": {"name": "Illumination", "sign": "lux"},
+    "uvindex": {"name": "UV radiation", "sign": "mW/cm2"},
+    "undefined": {"name": "Unknown sensor", "sign": ""}
+  },
+  "statistic": {
+    "temperature": "Temperature",
+    "humidity": "Humidity",
+    "clouds": "Cloudiness",
+    "precipitation": "Precipitation",
+    "pressure": "Pressure"
+  },
+  "heatmap": {
+    "title": "Heat map",
+    "subtitle": "Temperature change over",
+    "legend": "Temperature"
+  },
+  "charts": {
+      "loading": "Loading... ",
+      "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+      "weekdays": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      "shortMonths": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+  }
+}

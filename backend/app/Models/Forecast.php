@@ -4,6 +4,8 @@ use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 use CodeIgniter\Validation\ValidationInterface;
 
+const DATE_FORMAT = 'Y-m-d H:i:s';
+
 class Forecast extends Model
 {
     protected $table = '';
@@ -24,7 +26,7 @@ class Forecast extends Model
     {
         return $this->db->table($this->table)
             ->orderBy($this->key_time, 'ASC')
-            ->getWhere([$this->key_time . '>' => gmdate('Y-m-d H:i:s')], 30)
+            ->getWhere([$this->key_time . '>' => gmdate(DATE_FORMAT)], 30)
             ->getResult();
     }
 
@@ -32,7 +34,7 @@ class Forecast extends Model
     {
         if ($this->find_by_time($time)) {
             return $this->db->table($this->table)
-                ->where($this->key_time, gmdate('Y-m-d H:i:s', $time))
+                ->where($this->key_time, gmdate(DATE_FORMAT, $time))
                 ->update($data);
         }
 
@@ -42,7 +44,7 @@ class Forecast extends Model
     function find_by_time(int $time)
     {
         return $this->db->table($this->table)
-            ->getWhere([$this->key_time => gmdate('Y-m-d H:i:s', $time)])
+            ->getWhere([$this->key_time => gmdate(DATE_FORMAT, $time)])
             ->getRow();
     }
 
@@ -50,7 +52,7 @@ class Forecast extends Model
     {
         $meta = [
             $this->key_id   => uniqid(),
-            $this->key_time => gmdate('Y-m-d H:i:s', $time)
+            $this->key_time => gmdate(DATE_FORMAT, $time)
         ];
 
         return $this->db->table($this->table)->insert(array_merge($meta, $data));

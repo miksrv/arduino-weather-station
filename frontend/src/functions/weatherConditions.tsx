@@ -1,15 +1,13 @@
 import React from 'react'
-import translate from './translate'
 import { WiThunderstorm, WiRainMix, WiRain, WiSnowWind, WiFog, WiDaySunny, WiCloud, WiCloudy, WiAlien, WiDayCloudy,
     WiDaySleet, WiDayShowers, WiDayRain, WiDayRainWind, WiSnow, WiNightSleet, WiNightShowers } from 'react-icons/wi'
 
-export const weatherConditions = (id: number | undefined) => {
+export const weatherConditions = (id: number | undefined, lang: any) => {
     let conditions = {icon: <WiAlien />, name: ''}
 
     if (typeof id !== 'number') return conditions
 
     const stringID = id.toString()
-    const lang = translate().weather.conditions
 
     switch (stringID[0]) {
         case '2':
@@ -104,4 +102,3 @@ export const weatherConditions = (id: number | undefined) => {
 
     return conditions
 }
-

@@ -8,7 +8,6 @@
   padding-bottom: 10px
   margin: 20px 0
   display: flex
-  flex-direction: row
   align-items: center
 
   .hamburger
@@ -39,6 +38,27 @@
   .offline
     @extend %online-icons
     background: $red
+
+  .language
+    margin-left: auto
+
+    .ui.selection.dropdown
+      background-color: #767676
+      font-size: .78571429rem
+      color: #fff
+      border-color: transparent
+
+      .menu
+        background-color: #767676
+        border-color: transparent
+
+        > .item
+          border-top: 0
+          font-size: .78571429rem
+          color: #fff
+
+        .selected.item
+          background-color: #696969
 
 @-webkit-keyframes pulsate
   0%

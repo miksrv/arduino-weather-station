@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { weatherApi } from './weatherApi'
+import languageSlice from './languageSlice'
 import updateSlice from './updateSlice'
 import sidebarSlice from './sidebarSlice'
 
@@ -7,6 +8,7 @@ export const store = configureStore({
     reducer: {
         update: updateSlice,
         sidebar: sidebarSlice,
+        language: languageSlice,
 
         // Add the generated reducer as a specific top-level slice
         [weatherApi.reducerPath]: weatherApi.reducer

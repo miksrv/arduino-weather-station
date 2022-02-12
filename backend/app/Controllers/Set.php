@@ -70,7 +70,10 @@ class Set extends BaseController
      */
     protected function _check_token()
     {
-        if (isset($this->source->id) && $this->source->id === getenv('app.token')) return ;
+        if (isset($this->source->id) && $this->source->id === getenv('app.token'))
+        {
+            return ;
+        }
 
         $response = ['state' => FALSE, 'error' => 'The device identifier is missing or incorrect'];
         $log_data = ['m' => __METHOD__, 'e' => $response['error'], 'd' => json_encode($this->source)];

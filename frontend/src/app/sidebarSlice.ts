@@ -5,7 +5,7 @@ interface ISidebarState {
 }
 
 const initialState: ISidebarState = {
-    visible: false,
+    visible: false
 }
 
 export const sidebarSlice = createSlice({

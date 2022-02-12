@@ -4,6 +4,8 @@ use App\Models\Sensors;
 use App\Models\Current;
 use App\Models\Hourly;
 
+const DATE_FORMAT = 'Y-m-d H:i:s';
+
 /**
  * Weather station methods
  */
@@ -16,7 +18,10 @@ class Statistic {
     protected array $sensors;
     protected int $period_days;
     protected int $average_time;
-    protected array $data;
+
+    protected array $dataMean;
+    protected array $dataBasic;
+    protected array $dataSpare;
 
     function __construct()
     {
@@ -33,20 +38,22 @@ class Statistic {
     {
         $this->_init($period, $sensors);
 
-        foreach ($this->data as $item)
+        $data = $this->isMean() ? $this->dataMean : array_merge($this->dataBasic, $this->dataSpare);
+
+        foreach ($data as $item)
         {
             $item->date = strtotime($item->item_utc_date);
             unset($item->item_utc_date);
         }
 
-        return (object) ['update' => $this->data[0]->date, 'payload' => $this->data];
+        return (object) ['update' => $data[0]->date, 'payload' => $data];
     }
 
     protected function _init(object $period, array $sensors)
     {
         $this->period = (object) [
-            'start' => date('Y-m-d H:i:s', strtotime($period->start)),
-            'end'   => date('Y-m-d H:i:s', strtotime($period->end . ' +1 day')) // Включительно дату, а не ДО этой даты
+            'start' => date(DATE_FORMAT, strtotime($period->start)),
+            'end'   => date(DATE_FORMAT, strtotime($period->end . ' +1 day')) // Включительно дату, а не ДО этой даты
         ];
 
         $this->sensors = $sensors;
@@ -62,30 +69,61 @@ class Statistic {
         $begin = new \DateTime($this->period->start);
         $end   = new \DateTime($this->period->end);
 
-        $interval = \DateInterval::createFromDateString($this->average_time . ' minutes');
-        $period = new \DatePeriod($begin, $interval, $end);
+        $interval  = \DateInterval::createFromDateString($this->average_time . ' minutes');
         $result = [];
         $chart  = (object) [];
-        $update = strtotime($this->data[0]->item_utc_date . ' UTC');
 
-        $this->data = array_reverse($this->data);
+        if ($this->isMean()) {
+            $update = strtotime($this->dataMean[0]->item_utc_date . ' UTC');
+        } else {
+            $basicDate = $this->dataBasic ? strtotime($this->dataBasic[0]->item_utc_date . ' UTC') : 0;
+            $spareDate = $this->dataSpare ? strtotime($this->dataSpare[0]->item_utc_date . ' UTC') : 0;
+            $update = max($basicDate, $spareDate);
+        }
 
-        foreach ($period as $dt)
+        foreach (new \DatePeriod($begin, $interval, $end) as $dt)
         {
-            $tmp_date = $dt->format('Y-m-d H:i:s');
-            $next_date = date('Y-m-d H:i:s', $dt->format('U') + $this->average_time * 60);
+            $tmp_date = $dt->format(DATE_FORMAT);
+            $next_date = date(DATE_FORMAT, $dt->format('U') + $this->average_time * 60);
 
-            $result[$tmp_date] = $this->_make_time_array($tmp_date, $next_date);
+            if ($this->isMean()) {
+                $tmp_array = $this->_make_time_array('dataMean', $tmp_date, $next_date);
+            } else {
+                $basic = $this->_make_time_array('dataBasic', $tmp_date, $next_date);
+                $spare = $this->_make_time_array('dataSpare', $tmp_date, $next_date);
 
-            if (empty($result[$tmp_date]))
+                if (!empty($basic) || !empty($spare))
+                {
+                    foreach ($this->sensors as $sensor)
+                    {
+                        $tmp_array[$sensor] = isset($basic[$sensor]) && !empty($basic[$sensor])
+                            ? $basic[$sensor]
+                            : ($spare[$sensor] ?? null);
+
+                        if ($tmp_array[$sensor] === null)
+                        {
+                            unset($tmp_array[$sensor]);
+                        }
+                    }
+                } else {
+                    $tmp_array = null;
+                }
+            }
+
+            if (empty($tmp_array))
             {
-                unset($result[$tmp_date]);
                 continue;
             }
 
+            $result[$tmp_date] = $tmp_array;
+
             foreach ($result[$tmp_date] as $item => $value)
             {
-                if ($item === 'counter') continue;
+                if ($item === 'counter')
+                {
+                    continue;
+                }
+
                 // Заполняем значения для графиков
                 $chart->$item[] = [
                     date('U', strtotime($tmp_date . ' UTC')) * 1000,
@@ -101,19 +139,21 @@ class Statistic {
     }
 
     // Создаем массив по временным промежутком с суммой показаний всех запрошенных датчиков
-    protected function _make_time_array($tmp_date, $next_date): object
+    protected function _make_time_array($source, $tmp_date, $next_date): array
     {
         $return = (object) [];
         $result = (object) [];
         $counts = (object) [];
 
-        foreach ($this->data as $sensor_key => $item)
+        foreach ($this->$source as $sensor_key => $item)
         {
-            $_item_date = date('Y-m-d H:i:s', strtotime($item->item_utc_date . ' +5 hours'));
+            $_item_date = date(DATE_FORMAT, strtotime($item->item_utc_date . ' +5 hours'));
 
             // Перебираем весь массив значений датчиков, если текущие показания не в промежутке дат, то пропускаем
             if ($_item_date < $tmp_date || $_item_date > $next_date)
+            {
                 continue;
+            }
 
             // Удаляем служебные поля
             unset($item->item_utc_date);
@@ -133,7 +173,7 @@ class Statistic {
             }
 
             // Удаляем текущие показания из массива датчиков, т.к. мы их уже занесли
-            unset($this->data[$sensor_key]);
+            unset($this->$source[$sensor_key]);
         }
 
         foreach ($result as $item => $value)
@@ -141,7 +181,7 @@ class Statistic {
             $return->$item = round($value / $counts->$item, 1);
         }
 
-        return $return;
+        return (array) $return;
     }
 
     protected function _fetch()
@@ -150,13 +190,13 @@ class Statistic {
         $current_available = ['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_deg', 'wind_gust', 'clouds', 'precipitation'];
 
         // Если время обобщения данных 60 минут и более, то будем брать \ заполнять значения из сводной таблицы
-        if ($this->average_time >= 60)
+        if ($this->isMean())
         {
             $keys = $this->_get_available_keys(array_unique(array_merge($sensors_available, $current_available)));
 
             $this->Hourly = new Hourly();
             $this->Hourly->set_key_items($keys);
-            return $this->data = $this->Hourly->get_period($this->period->start, $this->period->end);
+            return $this->dataMean = $this->Hourly->get_period($this->period->start, $this->period->end);
         }
 
         $this->Sensors = new Sensors();
@@ -165,10 +205,13 @@ class Statistic {
         $this->Sensors->set_key_items($this->_get_available_keys($sensors_available));
         $this->Current->set_key_items($this->_get_available_keys($current_available));
 
-        $data_sensors = $this->Sensors->get_period($this->period->start, $this->period->end);
-        $data_current = $this->Current->get_period($this->period->start, $this->period->end);
+        $this->dataBasic = $this->Sensors->get_period($this->period->start, $this->period->end);
+        $this->dataSpare = $this->Current->get_period($this->period->start, $this->period->end);
+    }
 
-        $this->data = array_merge($data_sensors, $data_current);
+    protected function isMean(): bool
+    {
+        return $this->average_time >= 60;
     }
 
     // Получаем список доступных ключей сенсоров
@@ -179,7 +222,9 @@ class Statistic {
         foreach ($this->sensors as $item)
         {
             if (in_array($item, $list))
+            {
                 $result[] = $item;
+            }
         }
 
         return $result;
