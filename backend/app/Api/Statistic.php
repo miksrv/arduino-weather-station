@@ -4,6 +4,8 @@ use App\Models\Sensors;
 use App\Models\Current;
 use App\Models\Hourly;
 
+const DATE_FORMAT = 'Y-m-d H:i:s';
+
 /**
  * Weather station methods
  */
@@ -50,8 +52,8 @@ class Statistic {
     protected function _init(object $period, array $sensors)
     {
         $this->period = (object) [
-            'start' => date('Y-m-d H:i:s', strtotime($period->start)),
-            'end'   => date('Y-m-d H:i:s', strtotime($period->end . ' +1 day')) // Включительно дату, а не ДО этой даты
+            'start' => date(DATE_FORMAT, strtotime($period->start)),
+            'end'   => date(DATE_FORMAT, strtotime($period->end . ' +1 day')) // Включительно дату, а не ДО этой даты
         ];
 
         $this->sensors = $sensors;
@@ -67,8 +69,7 @@ class Statistic {
         $begin = new \DateTime($this->period->start);
         $end   = new \DateTime($this->period->end);
 
-        $interval = \DateInterval::createFromDateString($this->average_time . ' minutes');
-        $period = new \DatePeriod($begin, $interval, $end);
+        $interval  = \DateInterval::createFromDateString($this->average_time . ' minutes');
         $result = [];
         $chart  = (object) [];
 
@@ -80,10 +81,10 @@ class Statistic {
             $update = max($basicDate, $spareDate);
         }
 
-        foreach ($period as $dt)
+        foreach (new \DatePeriod($begin, $interval, $end) as $dt)
         {
-            $tmp_date = $dt->format('Y-m-d H:i:s');
-            $next_date = date('Y-m-d H:i:s', $dt->format('U') + $this->average_time * 60);
+            $tmp_date = $dt->format(DATE_FORMAT);
+            $next_date = date(DATE_FORMAT, $dt->format('U') + $this->average_time * 60);
 
             if ($this->isMean()) {
                 $tmp_array = $this->_make_time_array('dataMean', $tmp_date, $next_date);
@@ -118,7 +119,11 @@ class Statistic {
 
             foreach ($result[$tmp_date] as $item => $value)
             {
-                if ($item === 'counter') continue;
+                if ($item === 'counter')
+                {
+                    continue;
+                }
+
                 // Заполняем значения для графиков
                 $chart->$item[] = [
                     date('U', strtotime($tmp_date . ' UTC')) * 1000,
@@ -142,11 +147,13 @@ class Statistic {
 
         foreach ($this->$source as $sensor_key => $item)
         {
-            $_item_date = date('Y-m-d H:i:s', strtotime($item->item_utc_date . ' +5 hours'));
+            $_item_date = date(DATE_FORMAT, strtotime($item->item_utc_date . ' +5 hours'));
 
             // Перебираем весь массив значений датчиков, если текущие показания не в промежутке дат, то пропускаем
             if ($_item_date < $tmp_date || $_item_date > $next_date)
+            {
                 continue;
+            }
 
             // Удаляем служебные поля
             unset($item->item_utc_date);
@@ -215,7 +222,9 @@ class Statistic {
         foreach ($this->sensors as $item)
         {
             if (in_array($item, $list))
+            {
                 $result[] = $item;
+            }
         }
 
         return $result;

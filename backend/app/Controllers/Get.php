@@ -153,7 +153,10 @@ class Get extends BaseController
         $string = $this->request->getGet('sensors');
         $array  = explode(',', $string);
 
-        if ( ! $string || ! is_array($array)) return null;
+        if ( ! $string || ! is_array($array))
+        {
+            return null;
+        }
 
         return $array;
     }
@@ -168,10 +171,13 @@ class Get extends BaseController
         $date_start = $this->_get_date('date_start');
         $date_end   = $this->_get_date('date_end');
 
-        if ( ! $date_start || ! $date_end) return (object) [
-            'start' => gmdate('Y-m-d'),
-            'end'   => gmdate('Y-m-d')
-        ];
+        if ( ! $date_start || ! $date_end)
+        {
+            return (object) [
+                'start' => gmdate('Y-m-d'),
+                'end'   => gmdate('Y-m-d')
+            ];
+        }
 
         return (object) [
             'start' => $date_start,
@@ -188,12 +194,17 @@ class Get extends BaseController
     {
         $date = $this->request->getGet($param_name);
 
-        if ( ! $date) return null;
+        if ( ! $date)
+        {
+            return null;
+        }
 
         $date = strtotime($date);
 
         if ( ! checkdate(date('m', $date), date('d', $date), date('Y', $date)))
+        {
             return null;
+        }
 
         return gmdate('Y-m-d', $date);
     }

@@ -20,34 +20,46 @@ class SensorItem implements ISensorItem
     }
 
     private function _mapping(array $data) {
-        $type  = $this->type;
-        $count = 0;
-        $trend = 0;
+        $_count = 0;
+        $_trend = 0;
 
         foreach ($data as $item)
         {
-            if (! property_exists($item, $type))
+            if (! property_exists($item, $this->type))
+            {
                 continue;
+            }
 
             $time_diff = round(abs(strtotime($item->item_utc_date . ' UTC') - gmdate('U')) / 60,0);
 
-            if ($count === 0)
+            if ($_count === 0)
             {
-                $this->min = $this->max = $item->$type;
-                $this->value = $item->$type;
+                $this->min = $this->max = $item->{$this->type};
+                $this->value = $item->{$this->type};
             }
 
-            if ($item->$type < $this->min) $this->min = $item->$type;
-            if ($item->$type > $this->max) $this->max = $item->$type;
+            if ($item->{$this->type} < $this->min)
+            {
+                $this->min = $item->{$this->type};
+            }
+
+            if ($item->{$this->type} > $this->max)
+            {
+                $this->max = $item->{$this->type};
+            }
+
             if ($time_diff < 60) 
             {
-                $this->trend += $item->$type;
-                $trend++;
+                $this->trend += $item->{$this->type};
+                $_trend++;
             }
 
-            $count++;
+            $_count++;
         }
 
-        if ($count !== 0) $this->trend = round($this->value - ($this->trend / $trend), 1);
+        if ($_count !== 0)
+        {
+            $this->trend = round($this->value - ($this->trend / $_trend), 1);
+        }
     }
 }

@@ -103,8 +103,7 @@ abstract class ADataModel extends Model
      */
     function get_period(string $start, string $stop)
     {
-        if (empty($this->key_items))
-            return [];
+        if (empty($this->key_items)) { return []; }
 
         return $this->db->table($this->table)
             ->select('item_utc_date,' . implode(',', $this->key_items))
