@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Message, Grid } from 'semantic-ui-react'
 import { setUpdate } from '../app/updateSlice'
-import { useGetStatisticQuery } from '../app/weatherApi'
+import { useGetStatisticQuery, useGetWindRoseQuery } from '../app/weatherApi'
 import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { SensorTypes } from '../app/types'
 import { Helmet } from 'react-helmet'
@@ -11,6 +11,7 @@ import Chart from '../components/chart'
 
 import humidity_temperature from '../charts/humidity_temperature'
 import clouds_pressure from '../charts/clouds_pressure'
+import windrose from '../charts/windrose'
 import moment from 'moment'
 
 // const getDateFromUrl = () => {
@@ -52,6 +53,10 @@ const Statistic: React.FC = () => {
         end: moment(period[1]).format('YYYY-MM-DD'),
         sensors: sensors
     })
+    const { data: DataWR, isFetching: loadWR, isError: errorWR } = useGetWindRoseQuery({
+        start: moment(period[0]).format('YYYY-MM-DD'),
+        end: moment(period[1]).format('YYYY-MM-DD')
+    })
 
     useEffect(() => {
         dispatch(setUpdate(data?.timestamp))
@@ -88,6 +93,14 @@ const Statistic: React.FC = () => {
                             loader={isFetching}
                             config={clouds_pressure}
                             data={[data?.payload.clouds, data?.payload.precipitation, data?.payload.pressure]}
+                        />
+                    </Grid.Column>
+                    <Grid.Column width={7}>
+                        <Chart
+                            loader={loadWR}
+                            config={windrose}
+                            data={[DataWR?.payload]}
+                            windRose
                         />
                     </Grid.Column>
                 </Grid>

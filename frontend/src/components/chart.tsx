@@ -3,10 +3,13 @@ import { useAppSelector } from '../app/hooks'
 import { Dimmer, Loader } from 'semantic-ui-react'
 import Highcharts from 'highcharts/highmaps'
 import HighchartsReact from 'highcharts-react-official'
+import HighchartsMore from 'highcharts/highcharts-more'
 import chartConfig from '../charts/config'
 
+HighchartsMore(Highcharts)
+
 const Chart: React.FC<any> = (params) => {
-    const { loader, config, data } = params
+    const { loader, config, data, windRose } = params
     const language = useAppSelector(state => state.language.translate)
 
     let dIndex = 0
@@ -17,12 +20,22 @@ const Chart: React.FC<any> = (params) => {
 
     Highcharts.setOptions(chartConfig)
 
-    data.forEach((item: any | undefined) => {
-        if (typeof item !== 'undefined') {
-            config.series[dIndex].data = item
-            dIndex++
-        }
-    })
+    if (windRose) {
+        data.forEach((item: any | undefined) => {
+            if (typeof item !== 'undefined') {
+                item.forEach((part: any, index: number) => {
+                    config.series[index].data = part
+                })
+            }
+        })
+    } else {
+        data.forEach((item: any | undefined) => {
+            if (typeof item !== 'undefined') {
+                config.series[dIndex].data = item
+                dIndex++
+            }
+        })
+    }
 
     return (
         <>
