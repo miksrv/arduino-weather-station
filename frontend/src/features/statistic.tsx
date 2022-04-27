@@ -12,6 +12,7 @@ import Chart from '../components/chart'
 import humidity_temperature from '../charts/humidity_temperature'
 import clouds_pressure from '../charts/clouds_pressure'
 import windrose from '../charts/windrose'
+import wind_speed from '../charts/wind_speed'
 import moment from 'moment'
 
 // const getDateFromUrl = () => {
@@ -46,7 +47,7 @@ import moment from 'moment'
 const Statistic: React.FC = () => {
     const dispatch = useAppDispatch()
     const language = useAppSelector(state => state.language.translate)
-    const sensors: SensorTypes[] = ['temperature', 'humidity', 'clouds', 'pressure', 'precipitation']
+    const sensors: SensorTypes[] = ['temperature', 'humidity', 'clouds', 'pressure', 'precipitation', 'wind_speed']
     const [ period, onPeriodChange ] = useState([moment().subtract(1,'d'), moment()])
     const { data, isFetching, isError } = useGetStatisticQuery({
         start: moment(period[0]).format('YYYY-MM-DD'),
@@ -95,12 +96,19 @@ const Statistic: React.FC = () => {
                             data={[data?.payload.clouds, data?.payload.precipitation, data?.payload.pressure]}
                         />
                     </Grid.Column>
-                    <Grid.Column width={7}>
+                    <Grid.Column computer={7} mobile={16}>
                         <Chart
                             loader={loadWR}
                             config={windrose}
                             data={[DataWR?.payload]}
                             windRose
+                        />
+                    </Grid.Column>
+                    <Grid.Column computer={9} mobile={16}>
+                        <Chart
+                            loader={isFetching}
+                            config={wind_speed}
+                            data={[data?.payload.wind_speed]}
                         />
                     </Grid.Column>
                 </Grid>

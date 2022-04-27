@@ -5,7 +5,7 @@ use App\Models\Current;
 use App\Models\Hourly;
 
 /**
- * Weather station methods
+ * Weather station methods for calculate wind rose
  */
 class WindRose {
     protected Sensors $Sensors;
@@ -49,8 +49,6 @@ class WindRose {
 
     protected function _make_chart_data(): object
     {
-        $tmp_array = [];
-        $_temp_val = []; // Array of average values
         $_temp_wd  = [0, 0, 0, 0, 0, 0, 0, 0]; // Array of wind directions (8 bit)
         $_temp_wr  = $this->create_wind_rose_array(); // Wind rose array
         $_temp_wr_total = 0; // Wind rose count items
@@ -65,7 +63,7 @@ class WindRose {
             $tmp_array = !empty($this->dataBasic) ? $this->dataBasic : $this->dataSpare;
         }
 
-        foreach ($tmp_array as $num => $item) {
+        foreach ($tmp_array as $item) {
             if ((int) $item->wind_speed === 0)
             {
                 continue;
@@ -109,7 +107,7 @@ class WindRose {
     }
 
 
-    function create_wind_rose_array()
+    function create_wind_rose_array(): array
     {
         $_array = [];
 
@@ -180,7 +178,6 @@ class WindRose {
      * @param array $_temp_wd
      * @param $_temp_wr
      * @param $_temp_wr_total
-     * @param $_result
      * @return array
      */
     protected function _insert_wind_direction(array $_temp_wd, $_temp_wr, $_temp_wr_total): array
@@ -188,9 +185,6 @@ class WindRose {
         $_tmp = $_temp_wd;
 
         sort($_tmp);
-
-//        foreach ($_temp_wd as $key => $val)
-//            $_result['wd'][$key] = array_search($val, $_tmp);
 
         return $this->calculate_wind_rose($_temp_wr, $_temp_wr_total);
     }
@@ -201,17 +195,15 @@ class WindRose {
      * @param $_temp_wr_total
      * @return array|null
      */
-    function calculate_wind_rose($_temp_wr, $_temp_wr_total)
+    function calculate_wind_rose($_temp_wr, $_temp_wr_total): ?array
     {
-        //if ($_temp_wr_total == 0) return null;
-
         $new_wr_array = [];
 
         foreach ($_temp_wr as $key_wr_1 => $val_wr_direct) {
             foreach ($val_wr_direct as $key_wr_2 => $val_wr_speed) {
                 $_tmp = $_temp_wr_total > 0 ? round((($val_wr_speed / $_temp_wr_total) * 100), 1) : 0;
                 $new_wr_array[$key_wr_1][] = [
-                    $this->convert_index_to_deegre($key_wr_2),
+                    $this->convert_index_to_degree($key_wr_2),
                     $_tmp
                 ];
             }
@@ -225,7 +217,7 @@ class WindRose {
      * @param $key
      * @return int
      */
-    function convert_index_to_deegre($key): int
+    function convert_index_to_degree($key): int
     {
         if ($key == 0) return 0;
 

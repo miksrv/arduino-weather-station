@@ -28,7 +28,7 @@ const clouds_pressure = {
         labels: {
             format: '{value}%',
             style: {
-                color: colors[8]
+                color: colors[13]
             }
         },
         title: {
@@ -54,7 +54,7 @@ const clouds_pressure = {
         type: 'area',
         yAxis: 1,
         data: [],
-        color: colors[8],
+        color: colors[13],
         tooltip: {
             valueSuffix: ' %'
         }

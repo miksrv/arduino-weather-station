@@ -48,7 +48,7 @@ const windrose = {
         }
     },
     series: [
-        { name: '&lt; 1 м/с', _colorIndex: 7 },
+        { name: '&lt; 1 м/с', _colorIndex: 6 },
         { name: '1-3 м/с', _colorIndex: 5 },
         { name: '3-5 м/с', _colorIndex: 4 },
         { name: '5-7 м/с', _colorIndex: 3 },

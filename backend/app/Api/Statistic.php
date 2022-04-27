@@ -3,6 +3,7 @@
 use App\Models\Sensors;
 use App\Models\Current;
 use App\Models\Hourly;
+use Config\Pager;
 
 const DATE_FORMAT = 'Y-m-d H:i:s';
 
@@ -196,7 +197,7 @@ class Statistic {
 
             $this->Hourly = new Hourly();
             $this->Hourly->set_key_items($keys);
-            return $this->dataMean = $this->Hourly->get_period($this->period->start, $this->period->end);
+            $this->dataMean = $this->Hourly->get_period($this->period->start, $this->period->end);
         }
 
         $this->Sensors = new Sensors();
