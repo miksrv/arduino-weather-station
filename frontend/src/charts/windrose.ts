@@ -1,5 +1,3 @@
-import { Options } from 'highcharts'
-
 const windrose = {
     chart: {
         polar: true,

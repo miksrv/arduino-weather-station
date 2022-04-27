@@ -53,7 +53,7 @@ const Statistic: React.FC = () => {
         end: moment(period[1]).format('YYYY-MM-DD'),
         sensors: sensors
     })
-    const { data: DataWR, isFetching: loadWR, isError: errorWR } = useGetWindRoseQuery({
+    const { data: DataWR, isFetching: loadWR } = useGetWindRoseQuery({
         start: moment(period[0]).format('YYYY-MM-DD'),
         end: moment(period[1]).format('YYYY-MM-DD')
     })
