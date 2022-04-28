@@ -31,7 +31,7 @@ export interface IRestStatistic extends IRestResponse {
 export interface IStatisticRequest {
     start: string,
     end: string,
-    sensors: SensorTypes[]
+    sensors?: SensorTypes[]
 }
 
 export interface ICurrentWeather {

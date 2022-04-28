@@ -2,21 +2,28 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { store } from '../app/store'
+import { setLanguage } from '../app/languageSlice'
+import translate from '../functions/translate'
+
 import '@testing-library/jest-dom/extend-expect'
 
 import Main from '../features/main'
 
-describe('Test Main', function () {
+describe('Test Main', () => {
+    const language = translate()
+
     beforeEach(() => {
+        store.dispatch(setLanguage(language))
+
         render(
             <Provider store={store}>
-                <Main />
+                <Main/>
             </Provider>
         )
     })
 
-    it.skip('Expect text on page', () => {
-        // expect(screen.getByText(/Погодная станция/i)).toBeInTheDocument()
-        // expect(screen.getByText(/Оренбургская обл./i)).toBeInTheDocument()
+    it('Check correct text on component', () => {
+        expect(screen.queryByText(language.dashboard.title)).toBeInTheDocument()
+        expect(screen.queryByText(language.dashboard.subtitle)).toBeInTheDocument()
     })
-});
+})

@@ -12,6 +12,7 @@ const colors: string[] = [
     '#2884bc', // 10
     '#bc4cb3', // 11
     '#9A8A7D', // 12
+    '#9f9898', // 13
 ]
 
 export default colors

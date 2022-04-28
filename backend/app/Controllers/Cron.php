@@ -2,16 +2,19 @@
 
 use App\Libraries\OpenWeather;
 use App\Libraries\MeanWeather;
+use App\Libraries\NarodMon;
 
 class Cron extends BaseController
 {
     protected OpenWeather $OpenWeather;
     protected MeanWeather $MeanWeather;
+    protected NarodMon $NarodMon;
 
     function __construct()
     {
         $this->OpenWeather = new OpenWeather();
         $this->MeanWeather = new MeanWeather();
+        $this->NarodMon = new NarodMon();
     }
 
     function index()
@@ -22,6 +25,7 @@ class Cron extends BaseController
         }
 
         $this->MeanWeather->run();
+        $this->NarodMon->report();
 
         $response = ['state' => TRUE, 'data' => 'All data has been updated'];
         $this->_response($response, 200);

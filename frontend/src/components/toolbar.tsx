@@ -8,24 +8,36 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
     const { rangeStart, rangeEnd, onChangeInterval, onChangePeriod, download, periods } = props
     const language = useAppSelector(state => state.language.translate)
 
-    const handleChangeInterval = (days: number) => onChangeInterval(days)
-    const handleChangePeriod = (range: Date[]) => onChangePeriod(range)
-
     let defaultPeriods: TPeriod[] = [
         { name: language.toolbar.periods.day, days: 1 },
         { name: language.toolbar.periods.week, days: 7 },
         { name: language.toolbar.periods.month, days: 30 }
     ]
 
-    if (periods !== undefined && typeof periods === "object") {
+    if (periods !== undefined && typeof periods === 'object') {
         defaultPeriods = periods
+    }
+
+    const [days, setDays] = React.useState<number>(defaultPeriods[0].days)
+
+    const handleChangePeriod = (range: Date[]) => onChangePeriod(range)
+    const handleChangeInterval = (days: number) => {
+        onChangeInterval(days)
+        setDays(days)
     }
 
     return (
         <div className='toolBar'>
             <Button.Group size='mini' className='periods'>
                 {(periods === undefined || periods !== false) && defaultPeriods.map((item, key) => (
-                    <Button color='grey' key={key} active={key === 0} onClick={() => handleChangeInterval(item.days)}>{item.name}</Button>
+                    <Button
+                        color='grey'
+                        key={key}
+                        active={days === item.days}
+                        onClick={() => handleChangeInterval(item.days)}
+                    >
+                        {item.name}
+                    </Button>
                 ))}
             </Button.Group>
             <DateRangePicker

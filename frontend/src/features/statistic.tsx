@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Message, Grid } from 'semantic-ui-react'
 import { setUpdate } from '../app/updateSlice'
-import { useGetStatisticQuery } from '../app/weatherApi'
+import { useGetStatisticQuery, useGetWindRoseQuery } from '../app/weatherApi'
 import { useAppSelector, useAppDispatch } from '../app/hooks'
 import { SensorTypes } from '../app/types'
 import { Helmet } from 'react-helmet'
@@ -11,6 +11,8 @@ import Chart from '../components/chart'
 
 import humidity_temperature from '../charts/humidity_temperature'
 import clouds_pressure from '../charts/clouds_pressure'
+import windrose from '../charts/windrose'
+import wind_speed from '../charts/wind_speed'
 import moment from 'moment'
 
 // const getDateFromUrl = () => {
@@ -45,12 +47,16 @@ import moment from 'moment'
 const Statistic: React.FC = () => {
     const dispatch = useAppDispatch()
     const language = useAppSelector(state => state.language.translate)
-    const sensors: SensorTypes[] = ['temperature', 'humidity', 'clouds', 'pressure', 'precipitation']
+    const sensors: SensorTypes[] = ['temperature', 'humidity', 'clouds', 'pressure', 'precipitation', 'wind_speed', 'wind_deg']
     const [ period, onPeriodChange ] = useState([moment().subtract(1,'d'), moment()])
     const { data, isFetching, isError } = useGetStatisticQuery({
         start: moment(period[0]).format('YYYY-MM-DD'),
         end: moment(period[1]).format('YYYY-MM-DD'),
         sensors: sensors
+    })
+    const { data: DataWR, isFetching: loadWR } = useGetWindRoseQuery({
+        start: moment(period[0]).format('YYYY-MM-DD'),
+        end: moment(period[1]).format('YYYY-MM-DD')
     })
 
     useEffect(() => {
@@ -88,6 +94,21 @@ const Statistic: React.FC = () => {
                             loader={isFetching}
                             config={clouds_pressure}
                             data={[data?.payload.clouds, data?.payload.precipitation, data?.payload.pressure]}
+                        />
+                    </Grid.Column>
+                    <Grid.Column computer={7} mobile={16}>
+                        <Chart
+                            loader={loadWR}
+                            config={windrose}
+                            data={[DataWR?.payload]}
+                            windRose
+                        />
+                    </Grid.Column>
+                    <Grid.Column computer={9} mobile={16}>
+                        <Chart
+                            loader={isFetching}
+                            config={wind_speed}
+                            data={[data?.payload.wind_speed, data?.payload.wind_deg]}
                         />
                     </Grid.Column>
                 </Grid>

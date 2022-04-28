@@ -20,7 +20,7 @@ const clouds_pressure = {
         labels: {
             format: '{value}',
             style: {
-                color: colors[3]
+                color: colors[4]
             }
         },
         opposite: true,
@@ -28,7 +28,7 @@ const clouds_pressure = {
         labels: {
             format: '{value}%',
             style: {
-                color: colors[8]
+                color: colors[13]
             }
         },
         title: {
@@ -53,8 +53,7 @@ const clouds_pressure = {
         name: lang.clouds,
         type: 'area',
         yAxis: 1,
-        data: [],
-        color: colors[8],
+        color: colors[13],
         tooltip: {
             valueSuffix: ' %'
         }
@@ -62,7 +61,6 @@ const clouds_pressure = {
         name: lang.precipitation,
         type: 'column',
         yAxis: 2,
-        data: [],
         color: colors[10],
         tooltip: {
             valueSuffix: ' мм.'
@@ -71,8 +69,7 @@ const clouds_pressure = {
         name: lang.pressure,
         type: 'spline',
         yAxis: 0,
-        data: [],
-        color: colors[3],
+        color: colors[4],
         tooltip: {
             valueSuffix: ' мм.рт.ст.'
         }

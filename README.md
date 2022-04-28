@@ -1,29 +1,32 @@
-Arduino Weather Station
+DYI Arduino Weather Station
 ===============
-[![master](https://github.com/miksrv/arduino-weather-station/actions/workflows/nodejs-pr-master.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/nodejs-pr-master.yml)
-[![develop](https://github.com/miksrv/arduino-weather-station/actions/workflows/nodejs-pr-develop.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/nodejs-pr-develop.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=miksrv_arduino-weather-station&metric=alert_status)](https://sonarcloud.io/dashboard?id=miksrv_arduino-weather-station)
+[![Build & Test](https://github.com/miksrv/arduino-weather-station/actions/workflows/build.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/build.yml)
 
 This project is designed to teach the basic skills and understanding of working with microcontrollers ATmega (Arduino). The project is a working model of an automated weather station, consisting of two the Component: transmitter and receiver. The controller transmits data to a remote web server, and to indicate the current readings uses character.
 
 [ [DEMO](https://meteo.miksoft.pro/) ]
 
-![alt text](./documentation/photo-1.jpg)
+![DIY weather station](./docs/photo-1.jpg)
 
 The weather station is capable of transmitting the following data on the state of the environment: 
 - temperature
 - humidity
+- dewpoint
 - illumination
 - UV intensity
 - wind speed
 - wind direction
 - atmosphere pressure
 
-![alt text](./documentation/ui-screen-1.png)
+![Main interface](./docs/screen1.jpg)
 
 To display data, a web interface was built in ReactJS, which requests data from a remote server. The interface displays not only current indicators, but also archived data, allows you to make a selection for a certain period. 
 
-![alt text](./documentation/ui-screen-2.png)
+![Sensors interface](./docs/screen2.jpg)
+
+The statistics page, which reveals the history of weather changes for the selected observation period.
+
+![Statistic interface](./docs/screen3.jpg)
 
 ----------------------
 
@@ -33,7 +36,7 @@ This project consists of 4 main sections:
 
 1. [ **arduino** ] Firmware for Arduino microcontroller (AVR), weather station control unit.
 2. [ **models** ] 3D model of weather station for printing.
-3. [ **backend** ] Backend server (repository [here](https://github.com/miksrv/api-backend)). 
+3. [ **backend** ] Backend server. 
 4. [ **frontend** ] Interface for displaying current and statistical data from the weather station. Written in ReactJS + Redux (use Node and NPM). To debug an application on a local server, you must first install the necessary dependencies:
   * `npm install` Installing dependencies.
   * `npm update` Update all dependencies.
@@ -59,6 +62,8 @@ The project uses self-made developments, such as the airflow meter (angular velo
 ----------------------
 
 ### Models for 3D printing
+
+![Models for 3D printing](./docs/models.jpg)
 
 - Wind direction
 - Sensors holder

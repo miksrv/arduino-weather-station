@@ -15,10 +15,11 @@ class Uptime {
         $should = 1440;
         $count  = (int) $this->Sensors->get_week_count()->item_id;
         $last   = $this->Sensors->get_last_row()->item_utc_date;
+        $uptime = round(($count / $should) * 100, 1);
 
         return (object) [
             'update' => strtotime($last . ' UTC'),
-            'payload' => round(($count / $should) * 100, 1)
+            'payload' => min($uptime, 99.9)
         ];
     }
 }

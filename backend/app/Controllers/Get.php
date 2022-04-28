@@ -2,6 +2,7 @@
 
 use App\Api\Weather;
 use App\Api\Statistic;
+use App\Api\WindRose;
 use App\Api\Heatmap;
 use App\Api\Uptime;
 use App\Api\Export;
@@ -115,6 +116,19 @@ class Get extends BaseController
         $period  = $this->_get_period();
         $sensors = $this->_get_sensors();
         $data    = $this->Statistic->get_chart_data($period, $sensors);
+
+        $this->_response($data->update, $data->payload);
+    }
+
+    /**
+     * @example https://meteo.miksoft.pro/api/get/wind_rose?date_start=2022-04-25&date_end=2022-04-26
+     */
+    function wind_rose()
+    {
+        $WindRose = new WindRose();
+
+        $period  = $this->_get_period();
+        $data    = $WindRose->get_chart_data($period);
 
         $this->_response($data->update, $data->payload);
     }
