@@ -7,9 +7,6 @@ const windrose = {
     pane: {
         size: '85%'
     },
-    legend: {
-        // x: 10,
-    },
     xAxis: {
         tickInterval: 45,
         tickmarkPlacement: 'on',
@@ -46,6 +43,10 @@ const windrose = {
             pointPlacement: 'on',
             groupPadding: 0,
         }
+    },
+    legend: {
+        x: 10,
+        y: 8,
     },
     series: [
         { name: '&lt; 1 м/с', _colorIndex: 6 },

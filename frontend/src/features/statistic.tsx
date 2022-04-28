@@ -47,7 +47,7 @@ import moment from 'moment'
 const Statistic: React.FC = () => {
     const dispatch = useAppDispatch()
     const language = useAppSelector(state => state.language.translate)
-    const sensors: SensorTypes[] = ['temperature', 'humidity', 'clouds', 'pressure', 'precipitation', 'wind_speed']
+    const sensors: SensorTypes[] = ['temperature', 'humidity', 'clouds', 'pressure', 'precipitation', 'wind_speed', 'wind_deg']
     const [ period, onPeriodChange ] = useState([moment().subtract(1,'d'), moment()])
     const { data, isFetching, isError } = useGetStatisticQuery({
         start: moment(period[0]).format('YYYY-MM-DD'),
@@ -108,7 +108,7 @@ const Statistic: React.FC = () => {
                         <Chart
                             loader={isFetching}
                             config={wind_speed}
-                            data={[data?.payload.wind_speed]}
+                            data={[data?.payload.wind_speed, data?.payload.wind_deg]}
                         />
                     </Grid.Column>
                 </Grid>
