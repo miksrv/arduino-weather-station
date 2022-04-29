@@ -7,9 +7,9 @@ import translate from '../functions/translate'
 
 import '@testing-library/jest-dom/extend-expect'
 
-import Main from '../features/main'
+import Error from '../features/error'
 
-describe('Test Main feature', () => {
+describe('Test Error feature', () => {
     const language = translate()
 
     beforeEach(() => {
@@ -17,13 +17,13 @@ describe('Test Main feature', () => {
 
         render(
             <Provider store={store}>
-                <Main/>
+                <Error/>
             </Provider>
         )
     })
 
     it('Checked correct text', () => {
-        expect(screen.queryByText(language.dashboard.title)).toBeInTheDocument()
-        expect(screen.queryByText(language.dashboard.subtitle)).toBeInTheDocument()
+        expect(screen.queryByText(language.error.header)).toBeInTheDocument()
+        expect(screen.queryByText(language.error.subtitle)).toBeInTheDocument()
     })
 })

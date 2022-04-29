@@ -48,8 +48,8 @@ const Sensors: React.FC = () => {
             </Helmet>
             <Grid>
                 {!isFetching ?
-                    isSuccess ? data?.payload.map((item: ISensorItem, key) =>
-                        <Grid.Column computer={4} tablet={8} mobile={16} key={key}>
+                    isSuccess ? data?.payload.map((item: ISensorItem) =>
+                        <Grid.Column computer={4} tablet={8} mobile={16} key={item.name}>
                             <Sensor data={item} />
                         </Grid.Column>
                     ) : SensorError()
