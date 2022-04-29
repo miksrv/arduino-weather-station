@@ -32,4 +32,12 @@ export const handlers = [
             ctx.json(sensorsData),
         )
     }),
+
+    // rest.get('**/get/statistic', (req, res, ctx) => {
+    //     return res(
+    //         // ctx.delay(1500),
+    //         ctx.status(202, 'Mocked status'),
+    //         ctx.json({ status: false }),
+    //     )
+    // }),
 ]

@@ -31,7 +31,7 @@ describe('Test Heatmap feature', () => {
 
     afterAll(() => server.close())
 
-    it('Checked correct show sensors value', async () => {
+    it('Checked correct toolbar', async () => {
         expect(await screen.findByText(language.toolbar.periods.month)).toBeInTheDocument()
         expect(await screen.findByText(language.toolbar.periods.quarter)).toBeInTheDocument()
         expect(await screen.findByText(language.toolbar.periods.halfyear)).toBeInTheDocument()

@@ -31,8 +31,9 @@ describe('Test Statistic feature', () => {
 
     afterAll(() => server.close())
 
-    it('Checked show error', async () => {
-        expect(await screen.findByText(language.general.error.title)).toBeInTheDocument()
-        expect(await screen.findByText(language.general.error.description)).toBeInTheDocument()
+    it('Checked correct toolbar', async () => {
+        expect(await screen.findByText(language.toolbar.periods.day)).toBeInTheDocument()
+        expect(await screen.findByText(language.toolbar.periods.week)).toBeInTheDocument()
+        expect(await screen.findByText(language.toolbar.periods.month)).toBeInTheDocument()
     })
 })
