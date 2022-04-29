@@ -9,7 +9,7 @@ export const handlers = [
         currentData.timestamp.server = Date.now() / 1000 | 0
         currentData.timestamp.update = (Date.now() / 1000) - (Math.random() * (40 - 10) + 10) | 0
         return res(
-            ctx.delay(1500),
+            // ctx.delay(1500),
             ctx.status(202, 'Mocked status'),
             ctx.json(currentData),
         )
@@ -17,7 +17,7 @@ export const handlers = [
 
     rest.get('**/get/forecast', (req, res, ctx) =>
         res(
-            ctx.delay(1500),
+            // ctx.delay(1500),
             ctx.status(202, 'Mocked status'),
             ctx.json(forecastData),
         )
@@ -27,7 +27,7 @@ export const handlers = [
         sensorsData.timestamp.server = Date.now() / 1000 | 0
         sensorsData.timestamp.update = (Date.now() / 1000) - (Math.random() * (40 - 10) + 10) | 0
         return res(
-            ctx.delay(1500),
+            // ctx.delay(1500),
             ctx.status(202, 'Mocked status'),
             ctx.json(sensorsData),
         )
