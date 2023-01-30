@@ -2,7 +2,8 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { store } from '../app/store'
-import { version, update } from '../../package.json'
+import { update } from 'update';
+import { version } from 'version';
 import { setLanguage } from '../app/languageSlice'
 import translate from '../functions/translate'
 

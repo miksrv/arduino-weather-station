@@ -1,8 +1,8 @@
 import React from 'react'
 import { useAppSelector } from '../app/hooks'
 import { useGetUptimeQuery } from '../app/weatherApi'
-import {update} from 'update';
-import {version} from 'version';
+import { update } from 'update';
+import { version } from 'version';
 
 import moment from 'moment'
 
