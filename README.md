@@ -11,14 +11,14 @@ This project is designed to teach the basic skills and understanding of working 
 ![DIY weather station](./docs/photo-1.jpg)
 
 The weather station is capable of transmitting the following data on the state of the environment: 
-- temperature;
-- humidity;
-- dewpoint;
-- illumination;
-- UV intensity;
-- wind speed;
-- wind direction;
-- atmosphere pressure;
+- temperature
+- humidity
+- dewpoint
+- illumination
+- UV intensity
+- wind speed
+- wind direction
+- atmosphere pressure
 
 ![Main interface](./docs/screen1.jpg)
 
@@ -67,8 +67,8 @@ The project uses self-made developments, such as the airflow meter (angular velo
 
 ![Models for 3D printing](./docs/models.jpg)
 
-- Wind direction;
-- Sensors holder;
-- Radiation shield;
-- DHT22 + BMP085 mount;
-- Anemometr;
+- Wind direction
+- Sensors holder
+- Radiation shield
+- DHT22 + BMP085 mount
+- Anemometr
