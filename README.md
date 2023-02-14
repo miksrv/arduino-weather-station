@@ -1,6 +1,7 @@
 DYI Arduino Weather Station
 ===============
 [![Build & Test](https://github.com/miksrv/arduino-weather-station/actions/workflows/build.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/build.yml)
+[![FTP Deploy](https://github.com/miksrv/arduino-weather-station/actions/workflows/deploy.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/deploy.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=miksrv_arduino-weather-station&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=miksrv_arduino-weather-station)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=miksrv_arduino-weather-station&metric=coverage)](https://sonarcloud.io/summary/new_code?id=miksrv_arduino-weather-station)
 
