@@ -1,15 +1,14 @@
-import React from 'react'
+import '@testing-library/jest-dom/extend-expect'
 import { render, screen } from '@testing-library/react'
+import React from 'react'
 import { Provider } from 'react-redux'
+
+import { setLanguage } from '../app/languageSlice'
 import { store } from '../app/store'
 import { ISensorItem } from '../app/types'
-import { setLanguage } from '../app/languageSlice'
-import translate from '../functions/translate'
-
-import '@testing-library/jest-dom/extend-expect'
 
 import Sensor from '../components/sensor'
-
+import translate from '../functions/translate'
 
 describe('Test Sensor component', () => {
     const language = translate()
@@ -20,12 +19,12 @@ describe('Test Sensor component', () => {
 
     it('Checked correct show sensors value', async () => {
         const sensorData: ISensorItem = {
-            name: 'temp',
-            value: 23,
-            trend: 1,
-            min: 20,
             max: 25,
-            type: 'temperature'
+            min: 20,
+            name: 'temp',
+            trend: 1,
+            type: 'temperature',
+            value: 23
         }
 
         render(
@@ -34,8 +33,12 @@ describe('Test Sensor component', () => {
             </Provider>
         )
 
-        expect(await screen.findByText(sensorData.value)).toBeInTheDocument();
-        expect(await screen.findByText(`max: ${sensorData.max}`)).toBeInTheDocument();
-        expect(await screen.findByText(`min: ${sensorData.min}`)).toBeInTheDocument();
+        expect(await screen.findByText(sensorData.value)).toBeInTheDocument()
+        expect(
+            await screen.findByText(`max: ${sensorData.max}`)
+        ).toBeInTheDocument()
+        expect(
+            await screen.findByText(`min: ${sensorData.min}`)
+        ).toBeInTheDocument()
     })
 })

@@ -1,20 +1,20 @@
+import '@testing-library/jest-dom/extend-expect'
+import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
-import { render, screen, fireEvent } from '@testing-library/react'
-import { store } from '../app/store'
-import { setLanguage } from '../app/languageSlice'
-import translate from '../functions/translate'
 
-import '@testing-library/jest-dom/extend-expect'
+import { setLanguage } from 'app/languageSlice'
+import { store } from 'app/store'
 
-import Header from '../components/header'
-import Sidebar from '../components/sidebar'
+import translate from 'functions/translate'
+
+import Header from 'components/header'
+import Sidebar from 'components/sidebar'
 
 describe('Test Header and Sidebar components', () => {
     const language = translate()
-
-    beforeEach(() => {
+    it('Checked correct show header and sidebar', async () => {
         store.dispatch(setLanguage(language))
 
         render(
@@ -25,15 +25,13 @@ describe('Test Header and Sidebar components', () => {
                 </BrowserRouter>
             </Provider>
         )
-    })
 
-    it('Checked correct show header and sidebar', async () => {
         expect(store.getState().sidebar.visible).toBeFalsy()
-        expect(screen.queryByText(/Loading.../)).toBeInTheDocument()
-        expect(screen.queryByText(language.sidebar.dashboard)).toBeInTheDocument()
-        expect(screen.queryByText(language.sidebar.sensors)).toBeInTheDocument()
-        expect(screen.queryByText(language.sidebar.statistic)).toBeInTheDocument()
-        expect(screen.queryByText(language.sidebar.heatmap)).toBeInTheDocument()
+        expect(screen.getByText(/Loading.../)).toBeInTheDocument()
+        expect(screen.getByText(language.sidebar.dashboard)).toBeInTheDocument()
+        expect(screen.getByText(language.sidebar.sensors)).toBeInTheDocument()
+        expect(screen.getByText(language.sidebar.statistic)).toBeInTheDocument()
+        expect(screen.getByText(language.sidebar.heatmap)).toBeInTheDocument()
 
         fireEvent.click(await screen.findByTestId(/open-menu/))
 

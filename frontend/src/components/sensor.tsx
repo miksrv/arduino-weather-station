@@ -1,98 +1,112 @@
 import React from 'react'
-import { ISensorItem, SensorTypes } from '../app/types'
-import { useAppSelector } from '../app/hooks'
-import { WiThermometer, WiHumidity, WiBarometer, WiDaySunny, WiFlood, WiCloudy, WiWindDeg, WiStrongWind, WiHot, WiNa, WiRaindrop } from 'react-icons/wi'
-import { IoIosArrowRoundUp, IoIosArrowRoundDown } from 'react-icons/io'
+import { IoIosArrowRoundDown, IoIosArrowRoundUp } from 'react-icons/io'
+import {
+    WiBarometer,
+    WiCloudy,
+    WiDaySunny,
+    WiFlood,
+    WiHot,
+    WiHumidity,
+    WiNa,
+    WiRaindrop,
+    WiStrongWind,
+    WiThermometer,
+    WiWindDeg
+} from 'react-icons/wi'
+
+import { useAppSelector } from 'app/hooks'
+import { ISensorItem, SensorTypes } from 'app/types'
 
 type TSensorProps = {
-    data: ISensorItem,
+    data: ISensorItem
 }
 
 type MetaInfoType = {
-    type: SensorTypes | 'undefined',
-    icon: React.ElementType,
-    style: string,
+    type: SensorTypes | 'undefined'
+    icon: React.ElementType
+    style: string
 }
 
-const SensorsMeta:MetaInfoType[] = [
+const SensorsMeta: MetaInfoType[] = [
     {
-        type: 'temperature',
         icon: WiThermometer,
-        style: 'red'
+        style: 'red',
+        type: 'temperature'
     },
     {
-        type: 'dewpoint',
         icon: WiRaindrop,
-        style: 'lightblue'
+        style: 'lightblue',
+        type: 'dewpoint'
     },
     {
-        type: 'feels_like',
         icon: WiThermometer,
-        style: 'pink'
+        style: 'pink',
+        type: 'feels_like'
     },
     {
-        type: 'humidity',
         icon: WiHumidity,
-        style: 'blue'
+        style: 'blue',
+        type: 'humidity'
     },
     {
-        type: 'pressure',
         icon: WiBarometer,
-        style: 'purple'
+        style: 'purple',
+        type: 'pressure'
     },
     {
-        type: 'clouds',
         icon: WiCloudy,
-        style: 'blue'
+        style: 'blue',
+        type: 'clouds'
     },
     {
-        type: 'wind_speed',
         icon: WiStrongWind,
-        style: 'lime'
+        style: 'lime',
+        type: 'wind_speed'
     },
     {
-        type: 'wind_gust',
         icon: WiStrongWind,
-        style: 'lime'
+        style: 'lime',
+        type: 'wind_gust'
     },
     {
-        type: 'wind_deg',
         icon: WiWindDeg,
-        style: 'green'
+        style: 'green',
+        type: 'wind_deg'
     },
     {
-        type: 'precipitation',
         icon: WiFlood,
-        style: 'darkblue'
+        style: 'darkblue',
+        type: 'precipitation'
     },
     {
-        type: 'illumination',
         icon: WiDaySunny,
-        style: 'orange'
+        style: 'orange',
+        type: 'illumination'
     },
     {
-        type: 'uvindex',
         icon: WiHot,
-        style: 'yellow'
+        style: 'yellow',
+        type: 'uvindex'
     },
     {
-        type: 'undefined',
         icon: WiNa,
-        style: 'brown'
+        style: 'brown',
+        type: 'undefined'
     }
 ]
 
-const TrendValue = (trend: number) =>
+const TrendValue = (trend: number) => (
     <div className='trend'>
         {trend > 0 && <IoIosArrowRoundUp className='up' />}
         {trend < 0 && <IoIosArrowRoundDown className='down' />}
         {trend}
     </div>
+)
 
 const Sensor: React.FC<TSensorProps> = (props) => {
     const { data } = props
-    const language = useAppSelector(state => state.language.translate)
-    const meta = SensorsMeta.filter(obj => obj.type === data.type).pop()
+    const language = useAppSelector((state) => state.language.translate)
+    const meta = SensorsMeta.filter((obj) => obj.type === data.type).pop()
     const SensorIcon: any = meta?.icon
 
     return (
@@ -100,14 +114,31 @@ const Sensor: React.FC<TSensorProps> = (props) => {
             <div className='title'>{language.sensors[data.type].name}</div>
             <div className='main'>
                 <div className='value'>
-                    {data.value} {language.sensors[data.type].sign && <span className='sign'>{language.sensors[data.type].sign}</span>}
+                    {data.value}{' '}
+                    {language.sensors[data.type].sign && (
+                        <span className='sign'>
+                            {language.sensors[data.type].sign}
+                        </span>
+                    )}
                 </div>
                 <SensorIcon className='icon' />
             </div>
             <div className='info'>
                 <div>{data.trend ? TrendValue(data.trend) : '\u00A0'}</div>
-                <div>{typeof data.max !== 'undefined' ? <>max: {data.max}</> : '\u00A0'}</div>
-                <div>{typeof data.min !== 'undefined' ? <>min: {data.min}</> : '\u00A0'}</div>
+                <div>
+                    {typeof data.max !== 'undefined' ? (
+                        <>max: {data.max}</>
+                    ) : (
+                        '\u00A0'
+                    )}
+                </div>
+                <div>
+                    {typeof data.min !== 'undefined' ? (
+                        <>min: {data.min}</>
+                    ) : (
+                        '\u00A0'
+                    )}
+                </div>
             </div>
         </div>
     )

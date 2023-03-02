@@ -2,21 +2,21 @@ import { createSlice } from '@reduxjs/toolkit'
 
 interface IUpdateState {
     timestamp: {
-        server: number,
-        update: number,
-    },
+        server: number
+        update: number
+    }
 }
 
 const initialState: IUpdateState = {
     timestamp: {
         server: 0,
-        update: 0,
-    },
+        update: 0
+    }
 }
 
 export const updateSlice = createSlice({
-    name: 'update',
     initialState,
+    name: 'update',
     reducers: {
         setUpdate: (state, action) => {
             state.timestamp = action.payload

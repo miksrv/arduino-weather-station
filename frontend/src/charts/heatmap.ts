@@ -1,65 +1,26 @@
-import translate from '../functions/translate'
+import translate from 'functions/translate'
 
 const lang = translate().heatmap
 
 const heatmap = {
-    chart: {
-        type: 'heatmap',
-        height: 500,
-        marginTop: 70,
-    },
-
     boost: {
         useGPUTranslations: true
     },
 
-    title: {
-        text: lang.title,
-        align: 'left',
-        x: 40,
-        y: 20
-    },
-
-    subtitle: {
-        text: '',
-        align: 'left',
-        x: 40,
-        y: 40
-    },
-
-    xAxis: {
-        type: 'datetime',
-        // min: Date.UTC(2021, 6, 23),
-        // max: Date.UTC(2021, 6, 25),
-        labels: {
-            align: 'left',
-            x: 5,
-            y: 14,
-            format: '{value:%B}' // long month
-        },
-        showLastLabel: false,
-        tickLength: 16
-    },
-
-    yAxis: {
-        title: {
-            text: null
-        },
-        labels: {
-            format: '{value}:00'
-        },
-        minPadding: 0,
-        maxPadding: 0,
-        startOnTick: false,
-        endOnTick: false,
-        tickPositions: [0, 6, 12, 18, 24],
-        tickWidth: 1,
-        min: 0,
-        max: 23,
-        reversed: true
+    chart: {
+        height: 500,
+        marginTop: 70,
+        type: 'heatmap'
     },
 
     colorAxis: {
+        endOnTick: false,
+        labels: {
+            format: '{value}℃'
+        },
+        max: 43,
+        min: -35,
+        startOnTick: false,
         stops: [
             [0, '#0625cf'],
             [0.2, '#3751dc'],
@@ -68,37 +29,79 @@ const heatmap = {
             [0.7, '#e6a241'],
             [0.8, '#d87040'],
             [1, '#B22222']
-        ],
-        min: -35,
-        max: 43,
-        startOnTick: false,
-        endOnTick: false,
-        labels: {
-            format: '{value}℃'
-        }
+        ]
     },
 
     legend: {
-        layout: 'horizontal',
         align: 'right',
-        verticalAlign: 'top',
         floating: false,
+        layout: 'horizontal',
+        verticalAlign: 'top',
         x: 0,
         y: -65
     },
 
-    series: [{
-        boostThreshold: 100,
-        borderWidth: 0,
-        nullColor: '#4e4e4e',
-        colsize: 24 * 36e5, // one day
-        tooltip: {
-            headerFormat: lang.legend + '<br/>',
-            pointFormat: '{point.x:%e %b, %Y} {point.y}:00: <b>{point.value}</b> ℃'
+    series: [
+        {
+            boostThreshold: 100,
+            borderWidth: 0,
+            colsize: 24 * 36e5, // one day
+            data: [],
+            nullColor: '#4e4e4e',
+            tooltip: {
+                headerFormat: lang.legend + '<br/>',
+                pointFormat:
+                    '{point.x:%e %b, %Y} {point.y}:00: <b>{point.value}</b> ℃'
+            },
+            turboThreshold: Number.MAX_VALUE // #3404, remove after 4.0.5 release
+        }
+    ],
+
+    subtitle: {
+        align: 'left',
+        text: '',
+        x: 40,
+        y: 40
+    },
+
+    title: {
+        align: 'left',
+        text: lang.title,
+        x: 40,
+        y: 20
+    },
+
+    xAxis: {
+        // min: Date.UTC(2021, 6, 23),
+        // max: Date.UTC(2021, 6, 25),
+        labels: {
+            align: 'left',
+            format: '{value:%B}', // long month
+            x: 5,
+            y: 14
         },
-        data: [],
-        turboThreshold: Number.MAX_VALUE // #3404, remove after 4.0.5 release
-    }]
+        showLastLabel: false,
+        tickLength: 16,
+        type: 'datetime'
+    },
+
+    yAxis: {
+        endOnTick: false,
+        labels: {
+            format: '{value}:00'
+        },
+        max: 23,
+        maxPadding: 0,
+        min: 0,
+        minPadding: 0,
+        reversed: true,
+        startOnTick: false,
+        tickPositions: [0, 6, 12, 18, 24],
+        tickWidth: 1,
+        title: {
+            text: null
+        }
+    }
 }
 
 export default heatmap

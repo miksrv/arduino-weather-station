@@ -1,14 +1,12 @@
+import App from 'App'
+import 'moment/locale/ru'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-
-import { store } from './app/store'
-
 import 'semantic-ui-css/semantic.min.css'
-import './styles/index.sass'
-import 'moment/locale/ru'
+import 'styles/index.sass'
 
-import App from './App'
+import { store } from 'app/store'
 
 // if (process.env.NODE_ENV === 'development') {
 //     const { worker } = require('./__mocks__/browser')
@@ -22,4 +20,4 @@ ReactDOM.render(
         </Provider>
     </React.StrictMode>,
     document.getElementById('root')
-);
+)

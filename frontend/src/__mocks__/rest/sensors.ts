@@ -2,75 +2,75 @@ import { IRestResponse, ISensorItem } from '../../app/types'
 
 const payload: ISensorItem[] = [
     {
-        name: 't',
-        value: 12.3,
-        trend: -3,
-        min: 12.1,
         max: 12.9,
-        type: 'temperature'
+        min: 12.1,
+        name: 't',
+        trend: -3,
+        type: 'temperature',
+        value: 12.3
     },
     {
-        name: 'p',
-        value: 746.2,
-        trend: 0.4,
-        min: 745.2,
         max: 746.3,
-        type: 'pressure'
+        min: 745.2,
+        name: 'p',
+        trend: 0.4,
+        type: 'pressure',
+        value: 746.2
     },
     {
-        name: 'h',
-        value: 45.4,
-        trend: 7.1,
-        min: 32,
         max: 59.6,
-        type: 'humidity'
+        min: 32,
+        name: 'h',
+        trend: 7.1,
+        type: 'humidity',
+        value: 45.4
     },
     {
-        name: 'dp',
-        value: 3.2,
-        trend: .4,
-        min: -1.8,
         max: 2.4,
-        type: 'dewpoint'
+        min: -1.8,
+        name: 'dp',
+        trend: 0.4,
+        type: 'dewpoint',
+        value: 3.2
     },
     {
-        name: 'cl',
-        value: 80,
-        trend: 14,
-        min: 55,
         max: 80,
-        type: 'clouds'
+        min: 55,
+        name: 'cl',
+        trend: 14,
+        type: 'clouds',
+        value: 80
     },
     {
-        name: 'ws',
-        value: 3.1,
-        trend: 2.1,
-        min: 0,
         max: 5.4,
-        type: 'wind_speed'
+        min: 0,
+        name: 'ws',
+        trend: 2.1,
+        type: 'wind_speed',
+        value: 3.1
     },
     {
         name: 'wd',
-        value: 180,
-        type: 'wind_deg'
+        type: 'wind_deg',
+        value: 180
     },
     {
-        name: 'pr',
-        value: .2,
-        trend: 0,
-        min: 0,
         max: 2.3,
-        type: 'precipitation'
+        min: 0,
+        name: 'pr',
+        trend: 0,
+        type: 'precipitation',
+        value: 0.2
     }
 ]
 
 export const response: IRestResponse = {
+    payload: payload,
     status: true,
     timestamp: {
-        server: Date.now() / 1000 | 0,
-        update:  (Date.now() / 1000) - 50 | 0
-    },
-    payload: payload
+        server: (Date.now() / 1000) | 0,
+        update: (Date.now() / 1000 - 50) | 0
+    }
 }
 
 export default response

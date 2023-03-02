@@ -1,69 +1,77 @@
 import colors from './colors'
 
 const wind_speed = {
-    xAxis: [{
-        type: 'datetime',
-        dateTimeLabelFormats: {
-            month: '%e %b, %Y',
-            year: '%b'
+    series: [
+        {
+            borderWidth: 0.4,
+            color: colors[12],
+            name: 'Скорость ветра',
+            pointWidth: 4,
+            tooltip: {
+                valueSuffix: ' м/с'
+            },
+            type: 'column',
+            yAxis: 0
         },
-        gridLineWidth: 1,
-    }],
-    yAxis: [{
-        gridLineWidth: 1,
-        title: {
-            text: '',
-            style: {
-                color: colors[12]
-            }
-        },
-        labels: {
-            format: '{value} м/с',
-            style: {
-                color: colors[12]
-            }
-        },
-        opposite: false,
-    }, {
-        title: {
-            text: '',
-            style: {
-                color: colors[8]
-            }
-        },
-        labels: {
-            format: '{value} °',
-            style: {
-                color: colors[8]
-            }
-        },
-        opposite: true,
-    }],
-    series: [{
-        yAxis: 0,
-        name: 'Скорость ветра',
-        type: 'column',
-        pointWidth: 4,
-        borderWidth: 0.4,
-        color: colors[12],
-        tooltip: {
-            valueSuffix: ' м/с'
+        {
+            color: colors[8],
+            marker: {
+                radius: 2
+            },
+            name: 'Направление',
+            tooltip: {
+                valueSuffix: ' °'
+            },
+            type: 'line',
+            yAxis: 1
         }
-    }, {
-        yAxis: 1,
-        name: 'Направление',
-        type: 'line',
-        marker: {
-            radius: 2,
-        },
-        color: colors[8],
-        tooltip: {
-            valueSuffix: ' °'
-        }
-    }],
+    ],
     tooltip: {
-        shared: true,
+        shared: true
     },
+    xAxis: [
+        {
+            dateTimeLabelFormats: {
+                month: '%e %b, %Y',
+                year: '%b'
+            },
+            gridLineWidth: 1,
+            type: 'datetime'
+        }
+    ],
+    yAxis: [
+        {
+            gridLineWidth: 1,
+            labels: {
+                format: '{value} м/с',
+                style: {
+                    color: colors[12]
+                }
+            },
+            opposite: false,
+            title: {
+                style: {
+                    color: colors[12]
+                },
+                text: ''
+            }
+        },
+        {
+            labels: {
+                format: '{value} °',
+                style: {
+                    color: colors[8]
+                }
+            },
+            opposite: true,
+            title: {
+                style: {
+                    color: colors[8]
+                },
+                text: ''
+            }
+        }
+    ]
 }
 
 export default wind_speed

@@ -1,11 +1,9 @@
 import type { Config } from '@jest/types'
 
 const config: Config.InitialOptions = {
-    verbose: true,
-    testEnvironment: 'jsdom',
     collectCoverageFrom: [
         '**/src/**/*.{js,jsx,ts,tsx}',
-        '!**/src/*.{js,jsx,ts,tsx}',
+        '!**/src/*.{js,jsx,ts,tsx}'
     ],
     coveragePathIgnorePatterns: [
         './src/*/*.types.{ts,tsx}',
@@ -13,12 +11,13 @@ const config: Config.InitialOptions = {
         './src/App.tsx',
         './src/serviceWorker.ts'
     ],
-    coverageReporters: [
-        'json',
-        'lcov',
-        'text-summary',
-        'clover'
-    ],
+    coverageReporters: ['json', 'lcov', 'text-summary', 'clover'],
+    moduleNameMapper: {
+        '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
+        '^react-native$': 'react-native-web',
+        'src/(.*)$': '<rootDir>/src/$1'
+    },
+    testEnvironment: 'jsdom',
     transform: {
         '^.+\\.(js|jsx|ts|tsx)$': '<rootDir>/node_modules/ts-jest'
     },
@@ -26,11 +25,7 @@ const config: Config.InitialOptions = {
         '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
         '^.+\\.module\\.(css|sass|scss)$'
     ],
-    moduleNameMapper: {
-        '^react-native$': 'react-native-web',
-        '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
-        'src/(.*)$': '<rootDir>/src/$1'
-    }
+    verbose: true
 }
 
 export default config

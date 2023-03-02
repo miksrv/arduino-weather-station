@@ -1,17 +1,22 @@
 import React from 'react'
-import { useAppSelector } from '../app/hooks'
 import { Helmet } from 'react-helmet'
-import Dashboard from '../components/dashboard'
-import Carousel from '../components/forecast'
+
+import { useAppSelector } from 'app/hooks'
+
+import Dashboard from 'components/dashboard'
+import Carousel from 'components/forecast'
 
 const Main: React.FC = () => {
-    const language = useAppSelector(state => state.language.translate)
+    const language = useAppSelector((state) => state.language.translate)
 
     return (
         <>
             <Helmet>
                 <title>{language.pages.main.title}</title>
-                <meta name='description' content={language.pages.main.description} />
+                <meta
+                    name='description'
+                    content={language.pages.main.description}
+                />
             </Helmet>
             <Dashboard />
             <br />
