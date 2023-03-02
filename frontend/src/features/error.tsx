@@ -1,15 +1,19 @@
 import React from 'react'
-import { useAppSelector } from '../app/hooks'
 import { Helmet } from 'react-helmet'
 
+import { useAppSelector } from 'app/hooks'
+
 const Error: React.FC = () => {
-    const language = useAppSelector(state => state.language.translate)
+    const language = useAppSelector((state) => state.language.translate)
 
     return (
         <div className='error404'>
             <Helmet>
                 <title>{language.error.header}</title>
-                <meta name='description' content={language.error.subtitle} />
+                <meta
+                    name='description'
+                    content={language.error.subtitle}
+                />
             </Helmet>
             <h1>Oops!</h1>
             <h2>{language.error.header}</h2>

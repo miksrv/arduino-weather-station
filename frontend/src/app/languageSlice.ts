@@ -9,8 +9,8 @@ const initialState: ILanguageState = {
 }
 
 export const languageSlice = createSlice({
-    name: 'language',
     initialState,
+    name: 'language',
     reducers: {
         setLanguage: (state, action) => {
             state.translate = action.payload

@@ -1,11 +1,11 @@
 export interface IRestResponse {
-    status: boolean,
+    status: boolean
     timestamp: {
-        server: number,
-        update: number,
+        server: number
+        update: number
     }
-    payload?: any,
-    errorText?: string,
+    payload?: any
+    errorText?: string
 }
 
 export interface IRestCurrent extends IRestResponse {
@@ -29,57 +29,65 @@ export interface IRestStatistic extends IRestResponse {
 }
 
 export interface IStatisticRequest {
-    start: string,
-    end: string,
+    start: string
+    end: string
     sensors?: SensorTypes[]
 }
 
 export interface ICurrentWeather {
-    condition_id: number,
-    temperature: number,
-    temperature_feels: number,
-    humidity: number,
-    pressure: number,
-    wind_speed: number,
-    wind_degree: number,
-    clouds: number,
+    condition_id: number
+    temperature: number
+    temperature_feels: number
+    humidity: number
+    pressure: number
+    wind_speed: number
+    wind_degree: number
+    clouds: number
     precipitation: number
 }
 
 export interface IForecastItem {
-    time: number,
-    condition_id: number,
-    temperature: number,
-    clouds: number,
+    time: number
+    condition_id: number
+    temperature: number
+    clouds: number
     precipitation: number
 }
 
 export interface ISensorItem {
-    name: string, // Имя (ID) датчика
-    value: number, // Текущее значение
-    trend?: number, // Изменение за тайминг
-    min?: number,
-    max?: number,
-    type: SensorTypes, // Тип датчика (для стилизации на UI)
+    name: string // Имя (ID) датчика
+    value: number // Текущее значение
+    trend?: number // Изменение за тайминг
+    min?: number
+    max?: number
+    type: SensorTypes // Тип датчика (для стилизации на UI)
 }
 
 export type SensorTypes =
-    'temperature' | 'humidity' | 'pressure' |
-    'wind_speed' | 'wind_gust' | 'wind_deg' |
-    'clouds' | 'precipitation' | 'dewpoint' |
-    'illumination' | 'uvindex' | 'feels_like'
+    | 'temperature'
+    | 'humidity'
+    | 'pressure'
+    | 'wind_speed'
+    | 'wind_gust'
+    | 'wind_deg'
+    | 'clouds'
+    | 'precipitation'
+    | 'dewpoint'
+    | 'illumination'
+    | 'uvindex'
+    | 'feels_like'
 
 export type TPeriod = {
-    name: string,
+    name: string
     days: number
 }
 
 export type TToolbarProps = {
-    rangeStart: any,
-    rangeEnd: any,
-    periods?: boolean | TPeriod[],
-    download?: boolean,
+    rangeStart: any
+    rangeEnd: any
+    periods?: boolean | TPeriod[]
+    download?: boolean
 
-    onChangeInterval: any,
+    onChangeInterval: any
     onChangePeriod: any
 }

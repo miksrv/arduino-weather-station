@@ -9,14 +9,14 @@ const initialState: ISidebarState = {
 }
 
 export const sidebarSlice = createSlice({
-    name: 'sidebar',
     initialState,
+    name: 'sidebar',
     reducers: {
-        show: (state) => {
-            state.visible = true
-        },
         hide: (state) => {
             state.visible = false
+        },
+        show: (state) => {
+            state.visible = true
         },
         toggle: (state) => {
             state.visible = !state.visible

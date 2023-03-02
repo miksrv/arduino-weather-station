@@ -1,20 +1,21 @@
-import React from 'react'
-import { render, screen } from '@testing-library/react'
-import { Provider } from 'react-redux'
-import { store } from '../app/store'
-import { update } from 'update';
-import { version } from 'version';
-import { setLanguage } from '../app/languageSlice'
-import translate from '../functions/translate'
-
 import '@testing-library/jest-dom/extend-expect'
+import { render, screen } from '@testing-library/react'
+import React from 'react'
+import { Provider } from 'react-redux'
+import { update } from 'update'
+import { version } from 'version'
 
-import Footer from '../components/footer'
+import { setLanguage } from 'app/languageSlice'
+import { store } from 'app/store'
+
+import translate from 'functions/translate'
+
+import Footer from 'components/footer'
 
 describe('Test Footer component', () => {
     const language = translate()
 
-    beforeEach(() => {
+    it('Checked correct show version and update', async () => {
         store.dispatch(setLanguage(language))
 
         render(
@@ -22,9 +23,7 @@ describe('Test Footer component', () => {
                 <Footer />
             </Provider>
         )
-    })
 
-    it('Checked correct show version and update', async () => {
         expect(await screen.findByText(version)).toBeInTheDocument()
         expect(await screen.findByText(`(${update})`)).toBeInTheDocument()
     })

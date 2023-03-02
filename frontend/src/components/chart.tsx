@@ -1,20 +1,23 @@
-import React from 'react'
-import { useAppSelector } from '../app/hooks'
-import { Dimmer, Loader } from 'semantic-ui-react'
-import Highcharts from 'highcharts/highmaps'
+import chartConfig from 'charts/config'
 import HighchartsReact from 'highcharts-react-official'
 import HighchartsMore from 'highcharts/highcharts-more'
-import chartConfig from '../charts/config'
+import Highcharts from 'highcharts/highmaps'
+import React from 'react'
+import { Dimmer, Loader } from 'semantic-ui-react'
+
+import { useAppSelector } from 'app/hooks'
 
 HighchartsMore(Highcharts)
 
 const Chart: React.FC<any> = (params) => {
     const { loader, config, data, windRose } = params
-    const language = useAppSelector(state => state.language.translate)
+    const language = useAppSelector((state) => state.language.translate)
 
     let dIndex = 0
-    let height = (typeof config.chart !== 'undefined' && typeof config.chart.height) ?
-        config.chart.height : 300
+    let height =
+        typeof config.chart !== 'undefined' && typeof config.chart.height
+            ? config.chart.height
+            : 300
 
     chartConfig.lang = language.charts
 
@@ -40,7 +43,10 @@ const Chart: React.FC<any> = (params) => {
     return (
         <>
             {loader ? (
-                <div className='box' style={{height: height}}>
+                <div
+                    className='box'
+                    style={{ height: height }}
+                >
                     <Dimmer active>
                         <Loader />
                     </Dimmer>

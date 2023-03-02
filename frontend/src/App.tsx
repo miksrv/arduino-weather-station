@@ -1,23 +1,24 @@
+import Error from 'features/error'
+import Heatmap from 'features/heatmap'
+import Main from 'features/main'
+import Sensors from 'features/sensors'
+import Statistic from 'features/statistic'
 import React from 'react'
-import translate from './functions/translate'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
-import { Sidebar as SidebarMenu, Container } from 'semantic-ui-react'
-import { useAppSelector, useAppDispatch } from './app/hooks'
-import { setLanguage } from './app/languageSlice'
+import { Container, Sidebar as SidebarMenu } from 'semantic-ui-react'
 
-import Header from './components/header'
-import Footer from './components/footer'
-import Sidebar from './components/sidebar'
+import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { setLanguage } from 'app/languageSlice'
 
-import Main from './features/main'
-import Sensors from './features/sensors'
-import Statistic from './features/statistic'
-import Heatmap from './features/heatmap'
-import Error from './features/error'
+import translate from 'functions/translate'
+
+import Footer from 'components/footer'
+import Header from 'components/header'
+import Sidebar from 'components/sidebar'
 
 const App: React.FC = () => {
     const dispatch = useAppDispatch()
-    const visible = useAppSelector(state => state.sidebar.visible)
+    const visible = useAppSelector((state) => state.sidebar.visible)
 
     dispatch(setLanguage(translate()))
 
@@ -29,10 +30,26 @@ const App: React.FC = () => {
                     <Container>
                         <Header />
                         <Switch>
-                            <Route component={Main} path='/' exact />
-                            <Route component={Sensors} path='/sensors' exact />
-                            <Route component={Statistic} path='/statistic' exact />
-                            <Route component={Heatmap} path='/heatmap' exact />
+                            <Route
+                                component={Main}
+                                path='/'
+                                exact
+                            />
+                            <Route
+                                component={Sensors}
+                                path='/sensors'
+                                exact
+                            />
+                            <Route
+                                component={Statistic}
+                                path='/statistic'
+                                exact
+                            />
+                            <Route
+                                component={Heatmap}
+                                path='/heatmap'
+                                exact
+                            />
                             <Route component={Error} />
                         </Switch>
                         <Footer />

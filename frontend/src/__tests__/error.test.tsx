@@ -1,29 +1,27 @@
-import React from 'react'
-import { render, screen } from '@testing-library/react'
-import { Provider } from 'react-redux'
-import { store } from '../app/store'
-import { setLanguage } from '../app/languageSlice'
-import translate from '../functions/translate'
-
 import '@testing-library/jest-dom/extend-expect'
+import { render, screen } from '@testing-library/react'
+import Error from 'features/error'
+import React from 'react'
+import { Provider } from 'react-redux'
 
-import Error from '../features/error'
+import { setLanguage } from 'app/languageSlice'
+import { store } from 'app/store'
+
+import translate from 'functions/translate'
 
 describe('Test Error feature', () => {
     const language = translate()
 
-    beforeEach(() => {
+    it('Checked correct text', () => {
         store.dispatch(setLanguage(language))
 
         render(
             <Provider store={store}>
-                <Error/>
+                <Error />
             </Provider>
         )
-    })
 
-    it('Checked correct text', () => {
-        expect(screen.queryByText(language.error.header)).toBeInTheDocument()
-        expect(screen.queryByText(language.error.subtitle)).toBeInTheDocument()
+        expect(screen.getByText(language.error.header)).toBeInTheDocument()
+        expect(screen.getByText(language.error.subtitle)).toBeInTheDocument()
     })
 })
