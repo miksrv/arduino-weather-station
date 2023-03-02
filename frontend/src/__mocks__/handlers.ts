@@ -4,7 +4,7 @@ import currentData from './rest/current'
 import forecastData from './rest/forecast'
 import sensorsData from './rest/sensors'
 
-const randomVal = Math.random();
+const randomVal = Math.random()
 
 export const handlers = [
     rest.get('**/get/current', (req, res, ctx) => {
