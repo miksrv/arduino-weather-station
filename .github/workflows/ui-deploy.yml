@@ -1,9 +1,10 @@
 name: FTP Deploy
 
 on:
-  push:
+  # push:
+  pull_request:
     branches:
-      - master
+      - main
     paths:
       - 'frontend/**/*'
 
