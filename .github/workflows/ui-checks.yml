@@ -1,0 +1,65 @@
+name: UI Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'frontend/**/*'
+
+jobs:
+  ui-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: cache-npm
+        with:
+          path: |
+            frontend/node_modules
+            ~/.npm
+          key: ${{ runner.os }}-modules-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-modules-
+            ${{ runner.os }}-
+
+      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        name: Install dependencies
+        working-directory: frontend
+        run: npm ci -f
+
+      - name: Linter
+        run: npm run eslint:check
+        working-directory: frontend
+
+      - name: Prettier
+        run: npm run prettier:check
+        working-directory: frontend
+
+      - name: Cache UI build
+        uses: actions/cache@v3
+        id: cache-build
+        with:
+          path: client/out
+          key: ${{ runner.os }}-build-${{ hashFiles('frontend/**/*.ts', 'frontend/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - if: ${{ steps.cache-build.outputs.cache-hit != 'true' }}
+        name: Build UI
+        run: npm run build --if-present
+        working-directory: frontend
+
+      - name: Test
+        run: npm run test:coverage
+        working-directory: frontend
