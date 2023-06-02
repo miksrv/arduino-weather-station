@@ -3,7 +3,7 @@ name: FTP Deploy
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'frontend/**/*'
 
@@ -53,7 +53,10 @@ jobs:
 
       - if: ${{ steps.cache-build.outputs.cache-hit != 'true' }}
         name: Build UI
-        run: npm run build --if-present
+        run: |
+          export dateNow=$(date +"%d.%m.%Y %H:%M")
+          echo "export const update = '$dateNow'" > src/update.ts
+          npm run build --if-present
         working-directory: frontend
 
       - name: Install LFTP client
