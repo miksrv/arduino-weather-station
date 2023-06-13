@@ -18,7 +18,7 @@ DYI Arduino Weather Station
 
 This project is designed to teach the basic skills and understanding of working with microcontrollers ATmega (Arduino). The project is a working model of an automated weather station, consisting of two the Component: transmitter and receiver. The controller transmits data to a remote web server, and to indicate the current readings uses character.
 
-[ [DEMO](https://meteo.miksoft.pro/) ]
+🌐 https://meteo.miksoft.pro
 
 ![DIY weather station](./docs/photo-1.jpg)
 
