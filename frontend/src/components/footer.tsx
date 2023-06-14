@@ -39,8 +39,8 @@ const Footer: React.FC = () => {
                     />{' '}
                     Mik
                 </a>{' '}
-                2023, Version <span>{packageInfo.version}</span>{' '}
-                <span>({update})</span>
+                {moment().format('Y')}, Version{' '}
+                <span>{packageInfo.version}</span> <span>({update})</span>
             </div>
         </div>
     )
