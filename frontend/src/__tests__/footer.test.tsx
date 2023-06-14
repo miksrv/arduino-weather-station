@@ -1,9 +1,9 @@
 import '@testing-library/jest-dom/extend-expect'
 import { render, screen } from '@testing-library/react'
+import packageInfo from '../../package.json'
 import React from 'react'
 import { Provider } from 'react-redux'
 import { update } from 'update'
-import { version } from 'version'
 
 import { setLanguage } from 'app/languageSlice'
 import { store } from 'app/store'
@@ -24,7 +24,7 @@ describe('Test Footer component', () => {
             </Provider>
         )
 
-        expect(await screen.findByText(version)).toBeInTheDocument()
+        expect(await screen.findByText(packageInfo.version)).toBeInTheDocument()
         expect(await screen.findByText(`(${update})`)).toBeInTheDocument()
     })
 })
