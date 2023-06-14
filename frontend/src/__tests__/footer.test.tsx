@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { Provider } from 'react-redux'
 import { update } from 'update'
-import { version } from 'version'
 
 import { setLanguage } from 'app/languageSlice'
 import { store } from 'app/store'
@@ -11,6 +10,8 @@ import { store } from 'app/store'
 import translate from 'functions/translate'
 
 import Footer from 'components/footer'
+
+import packageInfo from '../../package.json'
 
 describe('Test Footer component', () => {
     const language = translate()
@@ -24,7 +25,7 @@ describe('Test Footer component', () => {
             </Provider>
         )
 
-        expect(await screen.findByText(version)).toBeInTheDocument()
+        expect(await screen.findByText(packageInfo.version)).toBeInTheDocument()
         expect(await screen.findByText(`(${update})`)).toBeInTheDocument()
     })
 })

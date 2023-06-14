@@ -1,10 +1,11 @@
 import moment from 'moment'
 import React from 'react'
 import { update } from 'update'
-import { version } from 'version'
 
 import { useAppSelector } from 'app/hooks'
 import { useGetUptimeQuery } from 'app/weatherApi'
+
+import packageInfo from '../../package.json'
 
 const Footer: React.FC = () => {
     const { data, isSuccess } = useGetUptimeQuery()
@@ -38,7 +39,8 @@ const Footer: React.FC = () => {
                     />{' '}
                     Mik
                 </a>{' '}
-                2023, Version <span>{version}</span> <span>({update})</span>
+                {moment().format('Y')}, Version{' '}
+                <span>{packageInfo.version}</span> <span>({update})</span>
             </div>
         </div>
     )

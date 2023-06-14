@@ -9,28 +9,31 @@ import { useGetSensorsQuery } from 'app/weatherApi'
 
 import Sensor from 'components/sensor'
 
-const SensorLoader = () =>
-    Array(12)
-        .fill(1)
-        .map((el) => (
-            <Grid.Column
-                computer={4}
-                tablet={8}
-                mobile={16}
-                key={el}
-            >
-                <div
-                    className='box sensor'
-                    style={{ height: 120 }}
+const SensorLoader: React.FC = () => (
+    <>
+        {Array(12)
+            .fill(1)
+            .map((el) => (
+                <Grid.Column
+                    computer={4}
+                    tablet={8}
+                    mobile={16}
+                    key={el}
                 >
-                    <Dimmer active>
-                        <Loader />
-                    </Dimmer>
-                </div>
-            </Grid.Column>
-        ))
+                    <div
+                        className='box sensor'
+                        style={{ height: 120 }}
+                    >
+                        <Dimmer active>
+                            <Loader />
+                        </Dimmer>
+                    </div>
+                </Grid.Column>
+            ))}
+    </>
+)
 
-const SensorError = () => {
+const SensorError: React.FC = () => {
     const language = useAppSelector((state) => state.language.translate)
 
     return (
@@ -64,20 +67,24 @@ const Sensors: React.FC = () => {
                 />
             </Helmet>
             <Grid>
-                {!isFetching
-                    ? isSuccess
-                        ? data?.payload.map((item: ISensorItem) => (
-                              <Grid.Column
-                                  computer={4}
-                                  tablet={8}
-                                  mobile={16}
-                                  key={item.name}
-                              >
-                                  <Sensor data={item} />
-                              </Grid.Column>
-                          ))
-                        : SensorError()
-                    : SensorLoader()}
+                {!isFetching ? (
+                    isSuccess ? (
+                        data?.payload.map((item: ISensorItem) => (
+                            <Grid.Column
+                                computer={4}
+                                tablet={8}
+                                mobile={16}
+                                key={item.name}
+                            >
+                                <Sensor data={item} />
+                            </Grid.Column>
+                        ))
+                    ) : (
+                        <SensorError />
+                    )
+                ) : (
+                    <SensorLoader />
+                )}
             </Grid>
         </>
     )
