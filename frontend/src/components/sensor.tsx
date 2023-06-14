@@ -95,7 +95,11 @@ const SensorsMeta: MetaInfoType[] = [
     }
 ]
 
-const TrendValue = (trend: number) => (
+type TTrendValueProps = {
+    trend: number
+}
+
+const TrendValue: React.FC<TTrendValueProps> = ({ trend }) => (
     <div className='trend'>
         {trend > 0 && <IoIosArrowRoundUp className='up' />}
         {trend < 0 && <IoIosArrowRoundDown className='down' />}
@@ -124,7 +128,9 @@ const Sensor: React.FC<TSensorProps> = (props) => {
                 <SensorIcon className='icon' />
             </div>
             <div className='info'>
-                <div>{data.trend ? TrendValue(data.trend) : '\u00A0'}</div>
+                <div>
+                    {data.trend ? <TrendValue trend={data.trend} /> : '\u00A0'}
+                </div>
                 <div>
                     {typeof data.max !== 'undefined' ? (
                         <>max: {data.max}</>

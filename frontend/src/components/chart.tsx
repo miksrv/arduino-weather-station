@@ -9,7 +9,14 @@ import { useAppSelector } from 'app/hooks'
 
 HighchartsMore(Highcharts)
 
-const Chart: React.FC<any> = (params) => {
+type TChartProps = {
+    loader?: boolean
+    config?: any
+    data?: any
+    windRose?: any
+}
+
+const Chart: React.FC<TChartProps> = (params) => {
     const { loader, config, data, windRose } = params
     const language = useAppSelector((state) => state.language.translate)
 
