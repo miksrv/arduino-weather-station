@@ -1,3 +1,4 @@
+import moment from 'moment'
 import React, { useEffect } from 'react'
 import { WiBarometer, WiHumidity, WiStrongWind } from 'react-icons/wi'
 import { Dimmer, Grid, Icon, Loader } from 'semantic-ui-react'
@@ -21,9 +22,9 @@ const Dashboard: React.FC = () => {
     )
 
     const getImageByDate = (): string => {
-        const curHours = new Date().getHours()
-        const curMonth = new Date().getMonth() + 1
-        const dayTimes = curHours > 7 && curHours < 21 ? 'd' : 'n'
+        const date = moment().utcOffset(5)
+        const curMonth = date.month() + 1
+        const dayTimes = date.hour() > 7 && date.hour() < 21 ? 'd' : 'n'
 
         let strMonth: string
 
@@ -60,7 +61,7 @@ const Dashboard: React.FC = () => {
                     <div
                         className='background-image'
                         style={{ backgroundImage: getImageByDate() }}
-                    ></div>
+                    />
                 </div>
                 <div className='content'>
                     <h1>{language.dashboard.title}</h1>

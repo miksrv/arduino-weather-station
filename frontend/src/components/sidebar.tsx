@@ -57,10 +57,6 @@ const Sidebar: React.FC = () => {
                 <Icon name='map' />
                 {language.sidebar.heatmap}
             </Menu.Item>
-            {/*<Menu.Item as={NavLink} to='/forecast' activeClassName='active'>*/}
-            {/*    <Icon name='clock' />*/}
-            {/*    Прогноз*/}
-            {/*</Menu.Item>*/}
         </SidebarMenu>
     )
 }
