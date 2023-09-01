@@ -41,8 +41,7 @@ class Statistic {
 
         $data = $this->isMean() ? $this->dataMean : array_merge($this->dataBasic, $this->dataSpare);
 
-        foreach ($data as $item)
-        {
+        foreach ($data as $item) {
             $item->date = strtotime($item->item_utc_date);
             unset($item->item_utc_date);
         }
@@ -82,8 +81,7 @@ class Statistic {
             $update = max($basicDate, $spareDate);
         }
 
-        foreach (new \DatePeriod($begin, $interval, $end) as $dt)
-        {
+        foreach (new \DatePeriod($begin, $interval, $end) as $dt) {
             $tmp_date = $dt->format(DATE_FORMAT);
             $next_date = date(DATE_FORMAT, $dt->format('U') + $this->average_time * 60);
 
@@ -93,16 +91,13 @@ class Statistic {
                 $basic = $this->_make_time_array('dataBasic', $tmp_date, $next_date);
                 $spare = $this->_make_time_array('dataSpare', $tmp_date, $next_date);
 
-                if (!empty($basic) || !empty($spare))
-                {
-                    foreach ($this->sensors as $sensor)
-                    {
+                if (!empty($basic) || !empty($spare)) {
+                    foreach ($this->sensors as $sensor) {
                         $tmp_array[$sensor] = isset($basic[$sensor]) && !empty($basic[$sensor])
                             ? $basic[$sensor]
                             : ($spare[$sensor] ?? null);
 
-                        if ($tmp_array[$sensor] === null)
-                        {
+                        if ($tmp_array[$sensor] === null) {
                             unset($tmp_array[$sensor]);
                         }
                     }
@@ -111,17 +106,14 @@ class Statistic {
                 }
             }
 
-            if (empty($tmp_array))
-            {
+            if (empty($tmp_array)) {
                 continue;
             }
 
             $result[$tmp_date] = $tmp_array;
 
-            foreach ($result[$tmp_date] as $item => $value)
-            {
-                if ($item === 'counter')
-                {
+            foreach ($result[$tmp_date] as $item => $value) {
+                if ($item === 'counter') {
                     continue;
                 }
 
@@ -146,13 +138,11 @@ class Statistic {
         $result = (object) [];
         $counts = (object) [];
 
-        foreach ($this->$source as $sensor_key => $item)
-        {
+        foreach ($this->$source as $sensor_key => $item) {
             $_item_date = date(DATE_FORMAT, strtotime($item->item_utc_date . ' +5 hours'));
 
             // Перебираем весь массив значений датчиков, если текущие показания не в промежутке дат, то пропускаем
-            if ($_item_date < $tmp_date || $_item_date > $next_date)
-            {
+            if ($_item_date < $tmp_date || $_item_date > $next_date) {
                 continue;
             }
 
@@ -160,11 +150,9 @@ class Statistic {
             unset($item->item_utc_date);
 
             // Перебираем объект текущих датчиков
-            foreach ($item as $key => $value)
-            {
+            foreach ($item as $key => $value) {
                 // Если такого датчика нет в массиве текущей даты - то создаем его, иначе плюсуем
-                if (!isset($result->$key))
-                {
+                if (!isset($result->$key)) {
                     $result->$key = $value;
                     $counts->$key = 1;
                 } else {
@@ -177,8 +165,7 @@ class Statistic {
             unset($this->$source[$sensor_key]);
         }
 
-        foreach ($result as $item => $value)
-        {
+        foreach ($result as $item => $value) {
             $return->$item = round($value / $counts->$item, 1);
         }
 
@@ -191,8 +178,7 @@ class Statistic {
         $current_available = ['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_deg', 'wind_gust', 'clouds', 'precipitation'];
 
         // Если время обобщения данных 60 минут и более, то будем брать \ заполнять значения из сводной таблицы
-        if ($this->isMean())
-        {
+        if ($this->isMean()) {
             $keys = $this->_get_available_keys(array_unique(array_merge($sensors_available, $current_available)));
 
             $this->Hourly = new Hourly();
@@ -220,10 +206,8 @@ class Statistic {
     {
         $result = [];
 
-        foreach ($this->sensors as $item)
-        {
-            if (in_array($item, $list))
-            {
+        foreach ($this->sensors as $item) {
+            if (in_array($item, $list)) {
                 $result[] = $item;
             }
         }

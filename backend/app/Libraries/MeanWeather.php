@@ -28,22 +28,25 @@ class MeanWeather {
         // Берем последнее значение, если пусто - начинаем заполнять с первой даты принятых значений с метеостанции
         $lastData = $this->Hourly->get_last_row();
 
-        if (empty($lastData)) { $lastData = $this->Sensors->get_first_row(); }
+        if (empty($lastData)) {
+            $lastData = $this->Sensors->get_first_row();
+        }
 
         // Имея время последнего времени записи, берем данные сенсоров за весь следующий час
         $nextHor  = $this->_get_next_date_hour($lastData->item_utc_date);
         $meanDate = date('Y-m-d H:30:00', $nextHor);
 
         // Проверяем, не пытаемся ли сделать средние данные за еще не вышедший час
-        if (! $this->_check_hours_with_current($lastData->item_utc_date)) { return ; }
+        if (! $this->_check_hours_with_current($lastData->item_utc_date)) {
+            return ;
+        }
 
         // Получаем данные сенсоров и OpenWeatherMap за последний час
         $sensors = $this->_get_last_data($this->Sensors, $nextHor);
         $weather = $this->_get_last_data($this->Current, $nextHor);
 
         // Если нет данных ни от метеостанции, ни от OWM (например не работал хост, cron и т.п.)
-        if (empty($sensors) && empty($weather))
-        {
+        if (empty($sensors) && empty($weather)) {
             $sensors = $this->_get_empty_value($nextHor, 1);
         }
 
@@ -53,7 +56,9 @@ class MeanWeather {
         // Сохраняем средние значения в базе
         $this->Hourly->add($dataset, $meanDate);
 
-        if ($this->counter >= 100) { return ; }
+        if ($this->counter >= 100) {
+            return ;
+        }
 
         $this->run();
     }
@@ -70,7 +75,9 @@ class MeanWeather {
         $interval  = date_diff($datetime1, $datetime2);
 
         // Еще не прошел 1 час после последнего добавления усредненных данных
-        if ((int) $interval->format('%h') <= 1) { return false; }
+        if ((int) $interval->format('%h') <= 1 && (int) $interval->format('%d') === 0) {
+            return false;
+        }
 
         return true;
     }
@@ -149,19 +156,18 @@ class MeanWeather {
         $count  = 0;
         $summary = [];
 
-        if (empty($data)) { return (object) $summary; }
+        if (empty($data)) {
+            return (object) $summary;
+        }
 
-        foreach ($data as $item)
-        {
+        foreach ($data as $item) {
             $count++;
 
             // Удаляем не нужные объекты
             unset($item->item_id, $item->item_utc_date, $item->conditions, $item->feels_like);
 
-            foreach ($item as $sensor => $value)
-            {
-                if ( ! isset($summary[$sensor]))
-                {
+            foreach ($item as $sensor => $value) {
+                if ( ! isset($summary[$sensor])) {
                     $summary[$sensor] = (float) $value;
                 } else {
                     $summary[$sensor] += (float) $value;
