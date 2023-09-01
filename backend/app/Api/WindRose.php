@@ -64,8 +64,7 @@ class WindRose {
         }
 
         foreach ($tmp_array as $item) {
-            if ((int) $item->wind_speed === 0)
-            {
+            if ((int) $item->wind_speed === 0) {
                 continue;
             }
 
@@ -84,8 +83,7 @@ class WindRose {
     protected function _fetch()
     {
         // Если время обобщения данных 60 минут и более, то будем брать \ заполнять значения из сводной таблицы
-        if ($this->isMean())
-        {
+        if ($this->isMean()) {
             $this->Hourly = new Hourly();
             $this->Hourly->set_key_items($this->sensors);
             return $this->dataMean = $this->Hourly->get_period($this->period->start, $this->period->end);
@@ -112,11 +110,9 @@ class WindRose {
         $_array = [];
 
         // Wind speed
-        for ($i = 0; $i <= 6; $i++)
-        {
+        for ($i = 0; $i <= 6; $i++) {
             // Wind direction
-            for ($k = 0; $k <= 7; $k++)
-            {
+            for ($k = 0; $k <= 7; $k++) {
                 $_array[$i][$k] = 0;
             }
         }
@@ -139,10 +135,8 @@ class WindRose {
             '7' => ['min' => 292, 'max' => 337],
         ];
 
-        foreach ($_range as $index => $group)
-        {
-            if ($degree >= $group['min'] && $degree < $group['max'])
-            {
+        foreach ($_range as $index => $group) {
+            if ($degree >= $group['min'] && $degree < $group['max']) {
                 return $index;
             }
         }

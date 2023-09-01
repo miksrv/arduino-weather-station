@@ -30,8 +30,7 @@ class Heatmap {
 
     protected function _make_chart_data()
     {
-        if (empty($this->data))
-        {
+        if (empty($this->data)) {
             return false;
         }
 

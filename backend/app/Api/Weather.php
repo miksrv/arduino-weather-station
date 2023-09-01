@@ -47,8 +47,7 @@ class Weather {
         $result[] = new SensorItem($weather, 'clouds');
         $result[] = new SensorItem($weather, 'precipitation');
 
-        if ($data_actual)
-        {
+        if ($data_actual) {
             $result[] = new SensorItem($sensors, 'illumination');
             $result[] = new SensorItem($sensors, 'uvindex');
         }
@@ -107,8 +106,7 @@ class Weather {
     {
         $temp = [];
 
-        foreach ($data as $item)
-        {
+        foreach ($data as $item) {
             $temp[] = (object) [
                 'item_utc_date' => $item->item_utc_date,
                 'dewpoint' => round(((pow(($item->humidity / 100), 0.125)) * (112 + 0.9 * $item->temperature) + (0.1 * $item->temperature) - 112), 1)

@@ -51,8 +51,7 @@ class Get extends BaseController
         $data = $this->Weather->get_last();
         $text = "dataGMTTime=" . gmdate('Y/m/d H:i:s') . PHP_EOL;
 
-        foreach ($data->payload as $key => $value)
-        {
+        foreach ($data->payload as $key => $value) {
             $text .= "{$key}={$value}" . PHP_EOL;
         }
 
@@ -77,8 +76,7 @@ class Get extends BaseController
         header("Content-Type: application/csv; ");
 
         $file = fopen('php://output', 'w');
-        foreach ($data as $line)
-        {
+        foreach ($data as $line) {
             fputcsv($file, $line);
         }
 
@@ -167,8 +165,7 @@ class Get extends BaseController
         $string = $this->request->getGet('sensors');
         $array  = explode(',', $string);
 
-        if ( ! $string || ! is_array($array))
-        {
+        if ( ! $string || ! is_array($array)) {
             return null;
         }
 
@@ -185,8 +182,7 @@ class Get extends BaseController
         $date_start = $this->_get_date('date_start');
         $date_end   = $this->_get_date('date_end');
 
-        if ( ! $date_start || ! $date_end)
-        {
+        if ( ! $date_start || ! $date_end) {
             return (object) [
                 'start' => gmdate('Y-m-d'),
                 'end'   => gmdate('Y-m-d')
@@ -208,15 +204,13 @@ class Get extends BaseController
     {
         $date = $this->request->getGet($param_name);
 
-        if ( ! $date)
-        {
+        if ( ! $date) {
             return null;
         }
 
         $date = strtotime($date);
 
-        if ( ! checkdate(date('m', $date), date('d', $date), date('Y', $date)))
-        {
+        if ( ! checkdate(date('m', $date), date('d', $date), date('Y', $date))) {
             return null;
         }
 

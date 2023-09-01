@@ -51,15 +51,13 @@ class Export {
     {
         $result  = [['UTC Datetime']];
 
-        foreach ($this->data as $key => $item)
-        {
+        foreach ($this->data as $key => $item) {
             $_tmp_result = [$item->item_utc_date];
 
             unset($item->item_utc_date, $item->item_id);
 
             foreach ($item as $sensor => $value) {
-                if ($key === 0)
-                {
+                if ($key === 0) {
                     $result[$key][] = $sensor;
                 }
 
@@ -82,12 +80,12 @@ class Export {
         $current_available = ['temperature', 'humidity', 'pressure', 'wind_speed', 'wind_deg', 'wind_gust', 'clouds', 'precipitation'];
 
         // Если время обобщения данных 60 минут и более, то будем брать \ заполнять значения из сводной таблицы
-        if ($this->average_time >= 60)
-        {
+        if ($this->average_time >= 60) {
             $keys = array_unique(array_merge($sensors_available, $current_available));
 
             $Hourly = new Hourly();
             $Hourly->set_key_items($keys);
+
             return $this->data = $Hourly->get_period($this->period->start, $this->period->end);
         }
 

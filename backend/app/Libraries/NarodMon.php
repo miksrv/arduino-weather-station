@@ -36,12 +36,13 @@ class NarodMon {
      */
     function report(): bool
     {
-        if (cache(self::CACHE_NAME)) { return true; }
+        if (cache(self::CACHE_NAME)) {
+            return true;
+        }
 
         $weatherData = $this->Weather->get_last();
 
-        if (!$weatherData->payload)
-        {
+        if (!$weatherData->payload) {
             $log_data = ['m' => __METHOD__, 'e' => 'Last weather error'];
             log_message('error', '[{m}] {e}', $log_data);
 
@@ -78,7 +79,9 @@ class NarodMon {
         try {
             $response = $this->Client->request('POST', self::API_URL, ['form_params' => $report]);
 
-            if ($response->getBody() === 'OK') { return true; }
+            if ($response->getBody() === 'OK') {
+                return true;
+            }
 
             return false;
 

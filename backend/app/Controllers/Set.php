@@ -38,8 +38,7 @@ class Set extends BaseController
         $this->query = '?';
         $this->data  = (object) [];
 
-        foreach ($this->source as $key => $val)
-        {
+        foreach ($this->source as $key => $val) {
             $this->query .= $key . '=' . $val . (end($this->source) != $val ? '&' : NULL);
             $this->data->{$key} = $val;
         }
@@ -70,8 +69,7 @@ class Set extends BaseController
      */
     protected function _check_token()
     {
-        if (isset($this->source->id) && $this->source->id === getenv('app.token'))
-        {
+        if (isset($this->source->id) && $this->source->id === getenv('app.token')) {
             return ;
         }
 

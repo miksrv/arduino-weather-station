@@ -103,7 +103,9 @@ abstract class ADataModel extends Model
      */
     function get_period(string $start, string $stop)
     {
-        if (empty($this->key_items)) { return []; }
+        if (empty($this->key_items)) {
+            return [];
+        }
 
         return $this->db->table($this->table)
             ->select('item_utc_date,' . implode(',', $this->key_items))
@@ -125,15 +127,6 @@ abstract class ADataModel extends Model
             ->where($this->key_time . ' > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 24 HOUR)')
             ->get()
             ->getRow();
-    }
-
-    /**
-     * Get the last request (for debugging)
-     * @return mixed
-     */
-    function get_last_query()
-    {
-        return $this->db->getLastQuery();
     }
 
     /**

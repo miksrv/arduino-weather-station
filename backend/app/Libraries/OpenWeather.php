@@ -30,13 +30,14 @@ class OpenWeather {
      */
     function forecast(): bool
     {
-        if (cache('forecast')) { return TRUE; }
+        if (cache('forecast')) {
+            return TRUE;
+        }
 
         $endpoint = 'forecast?lat=' . getenv('app.latitude') . '&lon=' . getenv('app.longitude');
         $response = $this->_endpoint($endpoint);
 
-        foreach ($response->list as $item)
-        {
+        foreach ($response->list as $item) {
             $time = $item->dt;
             $data = $this->_mapping($item);
 
@@ -54,7 +55,9 @@ class OpenWeather {
      */
     function current(): bool
     {
-        if (cache('current')) { return TRUE; }
+        if (cache('current')) {
+            return TRUE;
+        }
 
         $endpoint = 'weather?lat=' . getenv('app.latitude') . '&lon=' . getenv('app.longitude');
         $response = $this->_endpoint($endpoint);
