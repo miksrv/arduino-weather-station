@@ -23,7 +23,6 @@ class DailyWeatherDataEntity extends Entity
         'avg_wind_gust'  => null,
         'weather_id'     => null,
         'weather_main'   => null,
-        'weather_desc'   => null,
         'weather_icon'   => null,
         'created_at'     => null,
         'updated_at'     => null,
@@ -47,7 +46,6 @@ class DailyWeatherDataEntity extends Entity
         'avg_wind_gust'  => 'float',
         'weather_id'     => 'integer',
         'weather_main'   => 'string',
-        'weather_desc'   => 'string',
         'weather_icon'   => 'string',
     ];
 }

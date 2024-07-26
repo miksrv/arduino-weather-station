@@ -72,11 +72,6 @@ class CreateHourlyAveragesTable extends Migration
                 'constraint' => '50',
                 'null'       => true,
             ],
-            'weather_description' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '100',
-                'null'       => true,
-            ],
             'weather_icon' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '10',

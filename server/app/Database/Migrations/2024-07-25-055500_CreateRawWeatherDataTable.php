@@ -15,9 +15,9 @@ class CreateRawWeatherDataTable extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
-            'timestamp' => [
-                'type'       => 'DATETIME',
-                'null'       => false,
+            'date' => [
+                'type' => 'DATETIME',
+                'null' => false,
             ],
             'source' => [
                 'type'       => 'ENUM',
@@ -26,69 +26,64 @@ class CreateRawWeatherDataTable extends Migration
                 'null'       => false,
             ],
             'sunrise' => [
-                'type'       => 'DATETIME',
-                'null'       => true,
+                'type' => 'DATETIME',
+                'null' => true,
             ],
             'sunset' => [
-                'type'       => 'DATETIME',
-                'null'       => true,
+                'type' => 'DATETIME',
+                'null' => true,
             ],
             'temperature' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+                'type' => 'FLOAT',
+                'null' => true,
             ],
             'feels_like' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+                'type' => 'FLOAT',
+                'null' => true,
             ],
             'pressure' => [
-                'type'       => 'INT',
-                'null'       => true,
+                'type' => 'INT',
+                'null' => true,
             ],
             'humidity' => [
-                'type'       => 'INT',
-                'null'       => true,
+                'type' => 'INT',
+                'null' => true,
             ],
             'dew_point' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+                'type' => 'FLOAT',
+                'null' => true,
             ],
             'uvi' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+                'type' => 'FLOAT',
+                'null' => true,
             ],
             'clouds' => [
-                'type'       => 'INT',
-                'null'       => true,
+                'type' => 'INT',
+                'null' => true,
             ],
             'visibility' => [
-                'type'       => 'INT',
-                'null'       => true,
+                'type' => 'INT',
+                'null' => true,
             ],
             'wind_speed' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+                'type' => 'FLOAT',
+                'null' => true,
             ],
             'wind_deg' => [
-                'type'       => 'INT',
-                'null'       => true,
+                'type' => 'INT',
+                'null' => true,
             ],
             'wind_gust' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+                'type' => 'FLOAT',
+                'null' => true,
             ],
             'weather_id' => [
-                'type'       => 'INT',
-                'null'       => true,
+                'type' => 'INT',
+                'null' => true,
             ],
             'weather_main' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '50',
-                'null'       => true,
-            ],
-            'weather_description' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '100',
                 'null'       => true,
             ],
             'weather_icon' => [

@@ -25,7 +25,6 @@ class DailyAveragesModel extends Model
         'average_wind_gust',
         'weather_id',
         'weather_main',
-        'weather_description',
         'weather_icon'
     ];
 
@@ -45,7 +44,6 @@ class DailyAveragesModel extends Model
         'average_wind_gust'   => 'permit_empty|decimal',
         'weather_id'          => 'permit_empty|integer',
         'weather_main'        => 'permit_empty|max_length[50]',
-        'weather_description' => 'permit_empty|max_length[100]',
         'weather_icon'        => 'permit_empty|max_length[10]',
     ];
 
@@ -69,7 +67,6 @@ class DailyAveragesModel extends Model
         'average_wind_gust'   => '?float',
         'weather_id'          => '?int',
         'weather_main'        => '?string',
-        'weather_description' => '?string',
         'weather_icon'        => '?string',
     ];
 }
