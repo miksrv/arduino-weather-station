@@ -1,0 +1,60 @@
+{
+    "name": "codeigniter4/appstarter",
+    "type": "project",
+    "description": "CodeIgniter4 starter app",
+    "homepage": "https://codeigniter.com",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "codeigniter4/framework": "^4.4",
+        "firebase/php-jwt": "^6.9",
+        "geocoder-php/nominatim-provider": "^5.7",
+        "geocoder-php/yandex-provider": "^4.5",
+        "guzzlehttp/guzzle": "^7.8",
+        "nyholm/psr7": "^1.8",
+        "symfony/http-client": "^6.4"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.9",
+        "mikey179/vfsstream": "^1.6",
+        "phpunit/phpunit": "^9.1"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "autoload": {
+        "exclude-from-classmap": [
+            "**/Database/Migrations/**"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Support\\": "tests/_support"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "php spark serve"
+        ],
+        "kill": "pkill -9 php",
+        "migration:status": "php spark migrate:status",
+        "migration:rollback": "php spark migrate:rollback",
+        "migration:run": "php spark migrate",
+        "seed:create": "php spark make:seeder UserLevels --suffix",
+        "seed:run": "php spark db:seed ManageSeeder",
+        "model:create": "php spark make:model Places",
+        "routes": "php spark routes"
+    },
+    "support": {
+        "forum": "https://forum.codeigniter.com/",
+        "source": "https://github.com/codeigniter4/CodeIgniter4",
+        "slack": "https://codeigniterchat.slack.com"
+    }
+}
