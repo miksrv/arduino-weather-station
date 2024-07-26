@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Entities\RawWeatherDataEntity;
+use App\Entities\WeatherDataEntity;
 use CodeIgniter\Model;
 
 class RawWeatherDataModel extends Model
@@ -14,7 +14,7 @@ class RawWeatherDataModel extends Model
     protected $table         = 'raw_weather_data';
     protected $primaryKey    = 'id';
     protected $useTimestamps = false;
-    protected $returnType    = RawWeatherDataEntity::class;
+    protected $returnType    = WeatherDataEntity::class;
     protected $allowedFields = [
         'date',
         'source',
@@ -40,7 +40,7 @@ class RawWeatherDataModel extends Model
         'temperature'  => 'permit_empty|decimal',
         'feels_like'   => 'permit_empty|decimal',
         'pressure'     => 'permit_empty|integer',
-        'humidity'     => 'permit_empty|integer',
+        'humidity'     => 'permit_empty|decimal',
         'dew_point'    => 'permit_empty|decimal',
         'uvi'          => 'permit_empty|decimal',
         'clouds'       => 'permit_empty|integer',
@@ -64,7 +64,7 @@ class RawWeatherDataModel extends Model
         'temperature'  => '?float',
         'feels_like'   => '?float',
         'pressure'     => '?int',
-        'humidity'     => '?int',
+        'humidity'     => '?float',
         'dew_point'    => '?float',
         'uvi'          => '?float',
         'clouds'       => '?int',

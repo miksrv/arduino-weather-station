@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Entities\RawWeatherDataEntity;
+use App\Entities\WeatherDataEntity;
 use App\Libraries\OpenWeatherLibrary;
 use App\Models\RawWeatherDataModel;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -33,7 +33,7 @@ class System extends ResourceController {
         }
 
         try {
-            $weatherDataEntity = new RawWeatherDataEntity();
+            $weatherDataEntity = new WeatherDataEntity();
             $weatherDataEntity->fill($data);
 
             $this->weatherDataModel->save($weatherDataEntity);

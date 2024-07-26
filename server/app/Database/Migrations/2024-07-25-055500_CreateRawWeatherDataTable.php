@@ -38,7 +38,7 @@ class CreateRawWeatherDataTable extends Migration
                 'null' => true,
             ],
             'humidity' => [
-                'type' => 'INT',
+                'type' => 'FLOAT',
                 'null' => true,
             ],
             'dew_point' => [
@@ -46,6 +46,10 @@ class CreateRawWeatherDataTable extends Migration
                 'null' => true,
             ],
             'uvi' => [
+                'type' => 'FLOAT',
+                'null' => true,
+            ],
+            'precipitation' => [
                 'type' => 'FLOAT',
                 'null' => true,
             ],

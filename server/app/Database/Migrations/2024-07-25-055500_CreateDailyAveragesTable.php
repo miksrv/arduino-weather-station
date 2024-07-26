@@ -16,56 +16,60 @@ class CreateDailyAveragesTable extends Migration
                 'auto_increment' => true,
             ],
             'date' => [
-                'type'       => 'DATE',
-                'null'       => false,
+                'type' => 'DATE',
+                'null' => false,
             ],
-            'average_temperature' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+            'temperature' => [
+                'type' => 'FLOAT',
+                'null' => true,
             ],
-            'average_feels_like' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+            'feels_like' => [
+                'type' => 'FLOAT',
+                'null' => true,
             ],
-            'average_pressure' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+            'pressure' => [
+                'type' => 'FLOAT',
+                'null' => true,
             ],
-            'average_humidity' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+            'humidity' => [
+                'type' => 'FLOAT',
+                'null' => true,
             ],
-            'average_dew_point' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+            'dew_point' => [
+                'type' => 'FLOAT',
+                'null' => true,
             ],
-            'average_uvi' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+            'uvi' => [
+                'type' => 'FLOAT',
+                'null' => true,
             ],
-            'average_clouds' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+            'precipitation' => [
+                'type' => 'FLOAT',
+                'null' => true,
             ],
-            'average_visibility' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+            'clouds' => [
+                'type' => 'FLOAT',
+                'null' => true,
             ],
-            'average_wind_speed' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+            'visibility' => [
+                'type' => 'FLOAT',
+                'null' => true,
             ],
-            'average_wind_deg' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+            'wind_speed' => [
+                'type' => 'FLOAT',
+                'null' => true,
             ],
-            'average_wind_gust' => [
-                'type'       => 'FLOAT',
-                'null'       => true,
+            'wind_deg' => [
+                'type' => 'FLOAT',
+                'null' => true,
+            ],
+            'wind_gust' => [
+                'type' => 'FLOAT',
+                'null' => true,
             ],
             'weather_id' => [
-                'type'       => 'INT',
-                'null'       => true,
+                'type' => 'INT',
+                'null' => true,
             ],
             'weather_main' => [
                 'type'       => 'VARCHAR',

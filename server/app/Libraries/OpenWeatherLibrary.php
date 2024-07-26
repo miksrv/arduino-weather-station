@@ -72,19 +72,21 @@ class OpenWeatherLibrary
     protected function mapWeatherData(array $data): array
     {
         return [
-            'temperature'  => $data['main']['temp'] ?? null,
-            'feels_like'   => $data['main']['feels_like'] ?? null,
-            'pressure'     => $data['main']['pressure'] ?? null,
-            'humidity'     => $data['main']['humidity'] ?? null,
-            'visibility'   => $data['visibility'] ?? null,
-            'wind_speed'   => $data['wind']['speed'] ?? null,
-            'wind_deg'     => $data['wind']['deg'] ?? null,
-            'clouds'       => $data['clouds']['all'] ?? null,
-            'weather_id'   => $data['weather'][0]['id'] ?? null,
-            'weather_main' => $data['weather'][0]['main'] ?? null,
-            'weather_icon' => $data['weather'][0]['icon'] ?? null,
-            'date'         => !empty($data['dt']) ? Time::createFromTimestamp($data['dt']) : null,
-            'source'       => RawWeatherDataModel::SOURCE_OPENWEATHERMAP
+            'temperature'   => $data['main']['temp'] ?? null,
+            'feels_like'    => $data['main']['feels_like'] ?? null,
+            'pressure'      => $data['main']['pressure'] ?? null,
+            'humidity'      => $data['main']['humidity'] ?? null,
+            'visibility'    => $data['visibility'] ?? null,
+            'wind_speed'    => $data['wind']['speed'] ?? null,
+            'wind_gust'     => $data['wind']['gust'] ?? null,
+            'wind_deg'      => $data['wind']['deg'] ?? null,
+            'clouds'        => $data['clouds']['all'] ?? null,
+            'precipitation' => $data['rain']['1h'] ?? ($data['snow']['1h'] ?? null),
+            'weather_id'    => $data['weather'][0]['id'] ?? null,
+            'weather_main'  => $data['weather'][0]['main'] ?? null,
+            'weather_icon'  => $data['weather'][0]['icon'] ?? null,
+            'date'          => !empty($data['dt']) ? Time::createFromTimestamp($data['dt']) : null,
+            'source'        => RawWeatherDataModel::SOURCE_OPENWEATHERMAP
         ];
     }
 }

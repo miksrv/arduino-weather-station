@@ -2,69 +2,73 @@
 
 namespace App\Models;
 
+use App\Entities\WeatherDataEntity;
 use CodeIgniter\Model;
 
 class HourlyAveragesModel extends Model
 {
-    protected $table          = 'hourly_averages';
-    protected $primaryKey     = 'id';
-    protected $useTimestamps  = false;
-    protected $returnType     = 'array';
-    protected $allowedFields  = [
-        'hour',
-        'average_temperature',
-        'average_feels_like',
-        'average_pressure',
-        'average_humidity',
-        'average_dew_point',
-        'average_uvi',
-        'average_clouds',
-        'average_visibility',
-        'average_wind_speed',
-        'average_wind_deg',
-        'average_wind_gust',
+    protected $table         = 'hourly_averages';
+    protected $primaryKey    = 'id';
+    protected $useTimestamps = false;
+    protected $returnType    = WeatherDataEntity::class;
+    protected $allowedFields = [
+        'date',
+        'temperature',
+        'feels_like',
+        'pressure',
+        'humidity',
+        'dew_point',
+        'uvi',
+        'precipitation',
+        'clouds',
+        'visibility',
+        'wind_speed',
+        'wind_deg',
+        'wind_gust',
         'weather_id',
         'weather_main',
         'weather_icon'
     ];
 
     protected $validationRules = [
-        'hour'                => 'required|valid_date',
-        'average_temperature' => 'permit_empty|decimal',
-        'average_feels_like'  => 'permit_empty|decimal',
-        'average_pressure'    => 'permit_empty|decimal',
-        'average_humidity'    => 'permit_empty|decimal',
-        'average_dew_point'   => 'permit_empty|decimal',
-        'average_uvi'         => 'permit_empty|decimal',
-        'average_clouds'      => 'permit_empty|decimal',
-        'average_visibility'  => 'permit_empty|decimal',
-        'average_wind_speed'  => 'permit_empty|decimal',
-        'average_wind_deg'    => 'permit_empty|decimal',
-        'average_wind_gust'   => 'permit_empty|decimal',
-        'weather_id'          => 'permit_empty|integer',
-        'weather_main'        => 'permit_empty|max_length[50]',
-        'weather_icon'        => 'permit_empty|max_length[10]',
+        'date'          => 'required|valid_date',
+        'temperature'   => 'permit_empty|decimal',
+        'feels_like'    => 'permit_empty|decimal',
+        'pressure'      => 'permit_empty|decimal',
+        'humidity'      => 'permit_empty|decimal',
+        'dew_point'     => 'permit_empty|decimal',
+        'uvi'           => 'permit_empty|decimal',
+        'precipitation' => 'permit_empty|decimal',
+        'clouds'        => 'permit_empty|decimal',
+        'visibility'    => 'permit_empty|decimal',
+        'wind_speed'    => 'permit_empty|decimal',
+        'wind_deg'      => 'permit_empty|decimal',
+        'wind_gust'     => 'permit_empty|decimal',
+        'weather_id'    => 'permit_empty|integer',
+        'weather_main'  => 'permit_empty|max_length[50]',
+        'weather_icon'  => 'permit_empty|max_length[10]',
     ];
 
     protected $validationMessages = [
 
     ];
 
-    protected $casts = [
-        'hour'                => 'datetime',
-        'average_temperature' => '?float',
-        'average_feels_like'  => '?float',
-        'average_pressure'    => '?float',
-        'average_humidity'    => '?float',
-        'average_dew_point'   => '?float',
-        'average_uvi'         => '?float',
-        'average_clouds'      => '?float',
-        'average_visibility'  => '?float',
-        'average_wind_speed'  => '?float',
-        'average_wind_deg'    => '?float',
-        'average_wind_gust'   => '?float',
-        'weather_id'          => '?int',
-        'weather_main'        => '?string',
-        'weather_icon'        => '?string',
+    protected array $casts = [
+        'date'          => 'datetime',
+        'temperature'   => '?float',
+        'feels_like'    => '?float',
+        'pressure'      => '?float',
+        'humidity'      => '?float',
+        'dew_point'     => '?float',
+        'uvi'           => '?float',
+        'precipitation' => '?float',
+        'clouds'        => '?float',
+        'visibility'    => '?float',
+        'wind_speed'    => '?float',
+        'wind_deg'      => '?float',
+        'wind_gust'     => '?float',
+        'weather_id'    => '?int',
+        'weather_main'  => '?string',
+        'weather_icon'  => '?string',
     ];
 }
