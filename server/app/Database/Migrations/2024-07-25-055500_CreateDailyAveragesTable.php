@@ -16,7 +16,7 @@ class CreateDailyAveragesTable extends Migration
                 'auto_increment' => true,
             ],
             'date' => [
-                'type' => 'DATE',
+                'type' => 'DATETIME',
                 'null' => false,
             ],
             'temperature' => [

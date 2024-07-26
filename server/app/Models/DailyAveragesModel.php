@@ -30,7 +30,6 @@ class DailyAveragesModel extends Model
         'weather_icon'
     ];
 
-    // Валидационные правила
     protected $validationRules = [
         'date'          => 'required|valid_date',
         'temperature'   => 'permit_empty|decimal',
@@ -55,7 +54,7 @@ class DailyAveragesModel extends Model
     ];
 
     protected array $casts = [
-        'date'          => 'date',
+        'date'          => 'datetime',
         'temperature'   => '?float',
         'feels_like'    => '?float',
         'pressure'      => '?float',
@@ -69,7 +68,5 @@ class DailyAveragesModel extends Model
         'wind_deg'      => '?float',
         'wind_gust'     => '?float',
         'weather_id'    => '?int',
-        'weather_main'  => '?string',
-        'weather_icon'  => '?string',
     ];
 }

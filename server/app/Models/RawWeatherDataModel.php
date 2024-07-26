@@ -74,4 +74,59 @@ class RawWeatherDataModel extends Model
         'wind_gust'    => '?float',
         'weather_id'   => '?int',
     ];
+
+    public function getHourlyAverages($allTime = false): array
+    {
+        $result = $this->select($this->_getAverageSelect('hour'));
+
+        if (!$allTime) {
+            $result
+                ->where('date >= DATE_FORMAT(NOW(), \'%Y-%m-%d %H:00:00\')')
+                ->where('date < DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 HOUR), \'%Y-%m-%d %H:00:00\')');
+        }
+
+        return $result
+            ->groupBy('hour')
+            ->get()
+            ->getResultArray();
+    }
+
+    public function getDailyAverages($allTime = false): array
+    {
+        $result = $this->select($this->_getAverageSelect('day'));
+
+        if (!$allTime) {
+            $result
+                ->where('date >= DATE_FORMAT(NOW(), \'%Y-%m-%d 00:00:00\')')
+                ->where('date < DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), \'%Y-%m-%d 00:00:00\')');
+        }
+
+        return $result
+            ->groupBy('day')
+            ->get()
+            ->getResultArray();
+    }
+
+    private function _getAverageSelect(string $groupBy): string
+    {
+        $formatHours = $groupBy === 'hour' ? '%H:00:00' : '00:00:00';
+
+        return 'DATE_FORMAT(date, "%Y-%m-%d ' . $formatHours . '") as ' . $groupBy . ',
+                DATE_FORMAT(date, "%Y-%m-%d ' . $formatHours . '") AS date,
+                AVG(temperature) as temperature,
+                AVG(feels_like) as feels_like,
+                AVG(pressure) as pressure,
+                AVG(humidity) as humidity,
+                AVG(dew_point) as dew_point,
+                AVG(uvi) as uvi,
+                AVG(precipitation) as precipitation,
+                AVG(clouds) as clouds,
+                AVG(visibility) as visibility,
+                AVG(wind_speed) as wind_speed,
+                AVG(wind_deg) as wind_deg,
+                AVG(wind_gust) as wind_gust,
+                MAX(weather_id) as weather_id,
+                MAX(weather_main) as weather_main,
+                MAX(weather_icon) as weather_icon';
+    }
 }

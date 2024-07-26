@@ -68,7 +68,5 @@ class HourlyAveragesModel extends Model
         'wind_deg'      => '?float',
         'wind_gust'     => '?float',
         'weather_id'    => '?int',
-        'weather_main'  => '?string',
-        'weather_icon'  => '?string',
     ];
 }
