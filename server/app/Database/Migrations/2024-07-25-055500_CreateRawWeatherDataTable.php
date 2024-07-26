@@ -25,14 +25,6 @@ class CreateRawWeatherDataTable extends Migration
                 'default'    => 'OpenWeatherMap',
                 'null'       => false,
             ],
-            'sunrise' => [
-                'type' => 'DATETIME',
-                'null' => true,
-            ],
-            'sunset' => [
-                'type' => 'DATETIME',
-                'null' => true,
-            ],
             'temperature' => [
                 'type' => 'FLOAT',
                 'null' => true,

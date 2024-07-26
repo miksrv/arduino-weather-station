@@ -17,8 +17,6 @@ class WeatherData
     public ?string $weather_main;
     public ?string $weather_icon;
     public ?object $date;
-    public ?object $sunrise;
-    public ?object $sunset;
 
     /**
      * @throws Exception
@@ -36,8 +34,6 @@ class WeatherData
         $this->weather_id   = $data['weather_id'] ?? null;
         $this->weather_main = $data['weather_main'] ?? null;
         $this->weather_icon = $data['weather_icon'] ?? null;
-        $this->sunrise      = !empty($data['sunrise']) ? Time::createFromTimestamp($data['sunrise']) : null;
-        $this->sunset       = !empty($data['sunset']) ? Time::createFromTimestamp($data['sunset']) : null;
         $this->date         = !empty($data['date']) ? Time::createFromTimestamp($data['date']) : null;
     }
 }

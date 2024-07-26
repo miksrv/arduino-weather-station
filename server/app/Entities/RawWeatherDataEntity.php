@@ -9,10 +9,8 @@ class RawWeatherDataEntity extends Entity
     protected $attributes = [
         'id'             => null,
         'source'         => null,
-        'timestamp'      => null,
-        'sunrise'        => null,
-        'sunset'         => null,
-        'temp'           => null,
+        'date'           => null,
+        'temperature'    => null,
         'feels_like'     => null,
         'pressure'       => null,
         'humidity'       => null,
@@ -26,18 +24,14 @@ class RawWeatherDataEntity extends Entity
         'weather_id'     => null,
         'weather_main'   => null,
         'weather_icon'   => null,
-        'created_at'     => null,
-        'updated_at'     => null,
     ];
 
-    protected $dates = ['created_at', 'updated_at'];
+    protected $dates = ['date'];
     protected $casts = [
-        'id'             => 'string',
+        'id'             => 'integer',
         'source'         => 'string',
-        'timestamp'      => 'datetime',
-        'sunrise'        => 'datetime',
-        'sunset'         => 'datetime',
-        'temp'           => 'float',
+        'date'           => 'datetime',
+        'temperature'    => 'float',
         'feels_like'     => 'float',
         'pressure'       => 'integer',
         'humidity'       => 'integer',

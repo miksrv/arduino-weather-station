@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
+use App\Entities\RawWeatherDataEntity;
 use CodeIgniter\Model;
 
 class RawWeatherDataModel extends Model
 {
+    const SOURCE_OPENWEATHERMAP = 'OpenWeatherMap';
+    const SOURCE_CUSTOMSTATION = 'CustomStation';
+    const SOURCE_OTHERSOURCE = 'OtherSource';
+
     protected $table         = 'raw_weather_data';
     protected $primaryKey    = 'id';
     protected $useTimestamps = false;
-    protected $returnType    = 'array';
+    protected $returnType    = RawWeatherDataEntity::class;
     protected $allowedFields = [
-        'timestamp',
+        'date',
         'source',
-        'sunrise',
-        'sunset',
         'temperature',
         'feels_like',
         'pressure',
@@ -34,8 +37,6 @@ class RawWeatherDataModel extends Model
     protected $validationRules = [
         'date'         => 'required|valid_date',
         'source'       => 'required|in_list[OpenWeatherMap,CustomStation,OtherSource]',
-        'sunrise'      => 'permit_empty|valid_date',
-        'sunset'       => 'permit_empty|valid_date',
         'temperature'  => 'permit_empty|decimal',
         'feels_like'   => 'permit_empty|decimal',
         'pressure'     => 'permit_empty|integer',
@@ -58,11 +59,8 @@ class RawWeatherDataModel extends Model
         ],
     ];
 
-    protected $casts = [
+    protected array $casts = [
         'date'         => 'datetime',
-        'source'       => 'string',
-        'sunrise'      => '?datetime',
-        'sunset'       => '?datetime',
         'temperature'  => '?float',
         'feels_like'   => '?float',
         'pressure'     => '?int',
@@ -75,7 +73,5 @@ class RawWeatherDataModel extends Model
         'wind_deg'     => '?int',
         'wind_gust'    => '?float',
         'weather_id'   => '?int',
-        'weather_main' => '?string',
-        'weather_icon' => '?string',
     ];
 }
