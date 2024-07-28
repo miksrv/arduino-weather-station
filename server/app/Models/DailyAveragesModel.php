@@ -46,7 +46,7 @@ class DailyAveragesModel extends Model
         'wind_gust'     => 'permit_empty|decimal',
         'weather_id'    => 'permit_empty|integer',
         'weather_main'  => 'permit_empty|max_length[50]',
-        'weather_icon'  => 'permit_empty|max_length[10]',
+        'weather_icon'  => 'permit_empty|max_length[50]',
     ];
 
     protected $validationMessages = [

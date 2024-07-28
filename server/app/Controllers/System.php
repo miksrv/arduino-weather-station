@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Entities\WeatherDataEntity;
 use App\Libraries\OpenWeatherLibrary;
+use App\Libraries\WeatherAPILibrary;
 use App\Models\DailyAveragesModel;
 use App\Models\HourlyAveragesModel;
 use App\Models\RawWeatherDataModel;
@@ -14,6 +15,7 @@ use ReflectionException;
 
 class System extends ResourceController {
     protected OpenWeatherLibrary $openWeather;
+    protected WeatherAPILibrary $weatherApi;
     protected RawWeatherDataModel $weatherDataModel;
     protected HourlyAveragesModel $hourlyAveragesModel;
     protected DailyAveragesModel $dailyAveragesModel;
@@ -21,6 +23,7 @@ class System extends ResourceController {
     public function __construct()
     {
         $this->openWeather         = new OpenWeatherLibrary();
+        $this->weatherApi          = new WeatherAPILibrary();
         $this->weatherDataModel    = new RawWeatherDataModel();
         $this->hourlyAveragesModel = new HourlyAveragesModel();
         $this->dailyAveragesModel  = new DailyAveragesModel();
@@ -33,21 +36,27 @@ class System extends ResourceController {
      */
     public function getCurrentWeather(): ResponseInterface
     {
-        $data = $this->openWeather->getWeatherData();
-
-        if ($data === false) {
-            return $this->failServerError('Failed to retrieve weather data.');
-        }
-
         try {
-            if ($this->weatherDataModel->select('id')->where('date', $data['date'])->first()) {
-                return $this->respond();
+            foreach ([$this->weatherApi, $this->openWeather] as $weatherClient) {
+                $data = $weatherClient->getWeatherData();
+
+                if ($data === false) {
+                    return $this->failServerError('Failed to retrieve weather data.');
+                }
+
+                if ($this->weatherDataModel->select('id')->where('date', $data['date'])->first()) {
+                    continue;
+                }
+
+                $weatherDataEntity = new WeatherDataEntity();
+                $weatherDataEntity->fill($data);
+
+                if ($this->weatherDataModel->save($weatherDataEntity)) {
+                    log_message('info', 'Weather data saved from ' . get_class($weatherClient));
+                } else {
+                    log_message('error', 'Failed to save weather data from ' . get_class($weatherClient));
+                }
             }
-
-            $weatherDataEntity = new WeatherDataEntity();
-            $weatherDataEntity->fill($data);
-
-            $this->weatherDataModel->save($weatherDataEntity);
 
             // Calculate and save hourly averages
             $this->saveHourlyAverages();

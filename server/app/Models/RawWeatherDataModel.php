@@ -8,6 +8,7 @@ use CodeIgniter\Model;
 class RawWeatherDataModel extends Model
 {
     const SOURCE_OPENWEATHERMAP = 'OpenWeatherMap';
+    const SOURCE_WEATHERAPI = 'WeatherAPI';
     const SOURCE_CUSTOMSTATION = 'CustomStation';
     const SOURCE_OTHERSOURCE = 'OtherSource';
 
@@ -36,7 +37,7 @@ class RawWeatherDataModel extends Model
 
     protected $validationRules = [
         'date'         => 'required|valid_date',
-        'source'       => 'required|in_list[OpenWeatherMap,CustomStation,OtherSource]',
+        'source'       => 'required|in_list[OpenWeatherMap,WeatherAPI,CustomStation,OtherSource]',
         'temperature'  => 'permit_empty|decimal',
         'feels_like'   => 'permit_empty|decimal',
         'pressure'     => 'permit_empty|integer',
@@ -50,12 +51,12 @@ class RawWeatherDataModel extends Model
         'wind_gust'    => 'permit_empty|decimal',
         'weather_id'   => 'permit_empty|integer',
         'weather_main' => 'permit_empty|max_length[50]',
-        'weather_icon' => 'permit_empty|max_length[10]',
+        'weather_icon' => 'permit_empty|max_length[50]',
     ];
 
     protected $validationMessages = [
         'source' => [
-            'in_list' => 'The source must be one of: OpenWeatherMap, CustomStation, OtherSource.',
+            'in_list' => 'The source must be one of: OpenWeatherMap, WeatherAPI, CustomStation, OtherSource.',
         ],
     ];
 

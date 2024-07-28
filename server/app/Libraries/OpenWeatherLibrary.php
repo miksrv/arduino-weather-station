@@ -19,7 +19,7 @@ class OpenWeatherLibrary
     }
 
     /**
-     * We receive current weather data
+     * Receive current weather data
      * @return array|false
      * @throws Exception
      */
@@ -47,9 +47,9 @@ class OpenWeatherLibrary
     protected function request(string $endpoint, array $additionalParams = []): false|array
     {
         $params = [
-            'lat'   => getenv('app.openweather.lat'),
-            'lon'   => getenv('app.openweather.lon'),
             'appid' => getenv('app.openweather.key'),
+            'lat'   => getenv('app.lat'),
+            'lon'   => getenv('app.lon'),
             'units' => 'metric',
             'lang'  => 'ru'
         ];

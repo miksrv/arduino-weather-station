@@ -21,7 +21,7 @@ class CreateRawWeatherDataTable extends Migration
             ],
             'source' => [
                 'type'       => 'ENUM',
-                'constraint' => ['OpenWeatherMap', 'CustomStation', 'OtherSource'],
+                'constraint' => ['OpenWeatherMap', 'WeatherAPI', 'CustomStation', 'OtherSource'],
                 'default'    => 'OpenWeatherMap',
                 'null'       => false,
             ],
@@ -84,7 +84,7 @@ class CreateRawWeatherDataTable extends Migration
             ],
             'weather_icon' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '10',
+                'constraint' => '50',
                 'null'       => true,
             ],
         ]);
