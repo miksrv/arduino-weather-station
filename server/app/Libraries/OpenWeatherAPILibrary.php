@@ -6,7 +6,7 @@ use CodeIgniter\I18n\Time;
 use Config\Services;
 use Exception;
 
-class OpenWeatherLibrary
+class OpenWeatherAPILibrary
 {
     const API_VERSION = 2.5;
     const API_URL     = 'https://api.openweathermap.org/data/' . self::API_VERSION . '/';

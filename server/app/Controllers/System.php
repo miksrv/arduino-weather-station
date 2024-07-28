@@ -3,7 +3,8 @@
 namespace App\Controllers;
 
 use App\Entities\WeatherDataEntity;
-use App\Libraries\OpenWeatherLibrary;
+use App\Libraries\OpenWeatherAPILibrary;
+use App\Libraries\VisualCrossingAPILibrary;
 use App\Libraries\WeatherAPILibrary;
 use App\Models\DailyAveragesModel;
 use App\Models\HourlyAveragesModel;
@@ -14,16 +15,19 @@ use Exception;
 use ReflectionException;
 
 class System extends ResourceController {
-    protected OpenWeatherLibrary $openWeather;
+    protected OpenWeatherAPILibrary $openWeatherApi;
     protected WeatherAPILibrary $weatherApi;
+    protected VisualCrossingAPILibrary $visualCrossingApi;
     protected RawWeatherDataModel $weatherDataModel;
     protected HourlyAveragesModel $hourlyAveragesModel;
     protected DailyAveragesModel $dailyAveragesModel;
 
     public function __construct()
     {
-        $this->openWeather         = new OpenWeatherLibrary();
-        $this->weatherApi          = new WeatherAPILibrary();
+        $this->openWeatherApi    = new OpenWeatherAPILibrary();
+        $this->weatherApi        = new WeatherAPILibrary();
+        $this->visualCrossingApi = new VisualCrossingAPILibrary();
+
         $this->weatherDataModel    = new RawWeatherDataModel();
         $this->hourlyAveragesModel = new HourlyAveragesModel();
         $this->dailyAveragesModel  = new DailyAveragesModel();
@@ -37,7 +41,7 @@ class System extends ResourceController {
     public function getCurrentWeather(): ResponseInterface
     {
         try {
-            foreach ([$this->weatherApi, $this->openWeather] as $weatherClient) {
+            foreach ([$this->visualCrossingApi, $this->weatherApi, $this->openWeatherApi] as $weatherClient) {
                 $data = $weatherClient->getWeatherData();
 
                 if ($data === false) {
@@ -51,10 +55,8 @@ class System extends ResourceController {
                 $weatherDataEntity = new WeatherDataEntity();
                 $weatherDataEntity->fill($data);
 
-                if ($this->weatherDataModel->save($weatherDataEntity)) {
-                    log_message('info', 'Weather data saved from ' . get_class($weatherClient));
-                } else {
-                    log_message('error', 'Failed to save weather data from ' . get_class($weatherClient));
+                if (!$this->weatherDataModel->save($weatherDataEntity)) {
+                    log_message('error', 'Failed to save weather data from ' . get_class($weatherClient) . ', errors: [' . print_r($this->weatherDataModel->errors(), true) . ']');
                 }
             }
 

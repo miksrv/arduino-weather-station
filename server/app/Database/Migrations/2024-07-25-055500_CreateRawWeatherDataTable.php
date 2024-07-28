@@ -21,7 +21,7 @@ class CreateRawWeatherDataTable extends Migration
             ],
             'source' => [
                 'type'       => 'ENUM',
-                'constraint' => ['OpenWeatherMap', 'WeatherAPI', 'CustomStation', 'OtherSource'],
+                'constraint' => ['OpenWeatherMap', 'WeatherAPI', 'VisualCrossing', 'CustomStation', 'OtherSource'],
                 'default'    => 'OpenWeatherMap',
                 'null'       => false,
             ],
