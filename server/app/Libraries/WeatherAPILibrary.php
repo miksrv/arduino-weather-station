@@ -78,11 +78,11 @@ class WeatherAPILibrary
             'wind_gust'     => !empty($data['current']['gust_mph']) ? kmh_to_ms($data['current']['gust_mph']) : null,
             'wind_deg'      => (int) $data['current']['wind_degree'] ?? null,
             'clouds'        => $data['current']['cloud'] ?? null,
-            'uvi'           => $data['current']['uv'] ?? null,
+            'uv_index'      => $data['current']['uv'] ?? null,
             'precipitation' => $data['current']['precip_mm'] ?? null,
             'weather_id'    => (int) $data['current']['condition']['code'] ?? null,
             'weather_main'  => $data['current']['condition']['text'] ?? null,
-//            'weather_icon'  => $data['current']['condition']['icon'] ?? null,
+            // 'weather_icon'  => $data['current']['condition']['icon'] ?? null,
             'date'          => !empty($data['current']['last_updated_epoch']) ? Time::createFromTimestamp($data['current']['last_updated_epoch']) : null,
             'source'        => RawWeatherDataModel::SOURCE_WEATHERAPI
         ];

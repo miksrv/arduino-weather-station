@@ -45,7 +45,15 @@ class CreateRawWeatherDataTable extends Migration
                 'type' => 'FLOAT',
                 'null' => true,
             ],
-            'uvi' => [
+            'uv_index' => [
+                'type' => 'FLOAT',
+                'null' => true,
+            ],
+            'sol_energy' => [
+                'type' => 'FLOAT',
+                'null' => true,
+            ],
+            'sol_radiation' => [
                 'type' => 'FLOAT',
                 'null' => true,
             ],

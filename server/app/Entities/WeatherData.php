@@ -10,7 +10,9 @@ class WeatherData
     public ?int $humidity;
     public ?float $dewPoint;
     public ?int $visibility;
-    public ?int $uvi;
+    public ?float $uvIndex;
+    public ?float $solEnergy;
+    public ?float $solRadiation;
     public ?int $clouds;
     public ?float $precipitation;
     public ?float $windSpeed;
@@ -32,7 +34,9 @@ class WeatherData
         $this->humidity      = $data['humidity'] ?? null;
         $this->dewPoint      = $data['dew_point'] ?? null;
         $this->visibility    = $data['visibility'] ?? null;
-        $this->uvi           = $data['uvi'] ?? null;
+        $this->uvIndex       = $data['uv_index'] ?? null;
+        $this->solEnergy     = $data['sol_energy'] ?? null;
+        $this->solRadiation  = $data['sol_radiation'] ?? null;
         $this->clouds        = $data['clouds'] ?? null;
         $this->precipitation = $data['precipitation'] ?? null;
         $this->windSpeed     = $data['wind_speed'] ?? null;
