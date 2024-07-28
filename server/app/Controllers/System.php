@@ -3,10 +3,12 @@
 namespace App\Controllers;
 
 use App\Entities\WeatherDataEntity;
+use App\Entities\WeatherForecastEntity;
 use App\Libraries\OpenWeatherAPILibrary;
 use App\Libraries\VisualCrossingAPILibrary;
 use App\Libraries\WeatherAPILibrary;
 use App\Models\DailyAveragesModel;
+use App\Models\ForecastWeatherDataModel;
 use App\Models\HourlyAveragesModel;
 use App\Models\RawWeatherDataModel;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -21,6 +23,7 @@ class System extends ResourceController {
     protected RawWeatherDataModel $weatherDataModel;
     protected HourlyAveragesModel $hourlyAveragesModel;
     protected DailyAveragesModel $dailyAveragesModel;
+    protected ForecastWeatherDataModel $forecastWeatherDataModel;
 
     public function __construct()
     {
@@ -31,10 +34,12 @@ class System extends ResourceController {
         $this->weatherDataModel    = new RawWeatherDataModel();
         $this->hourlyAveragesModel = new HourlyAveragesModel();
         $this->dailyAveragesModel  = new DailyAveragesModel();
+
+        $this->forecastWeatherDataModel = new ForecastWeatherDataModel();
     }
 
     /**
-     * Get current weather data for given coordinates
+     * Get current weather data
      * @return ResponseInterface
      * @throws Exception
      */
@@ -70,6 +75,75 @@ class System extends ResourceController {
         } catch (Exception $e) {
             log_message('error', 'Error saving weather data: {e}', ['e' => $e->getMessage()]);
             return $this->failServerError('Failed to save weather data.');
+        }
+    }
+
+    /**
+     * Get forecast weather data
+     * @return ResponseInterface
+     * @throws Exception
+     */
+    public function getForecastWeather(): ResponseInterface
+    {
+        try {
+            foreach ([/*$this->visualCrossingApi, $this->weatherApi,*/ $this->openWeatherApi] as $weatherClient) {
+                $dataArray = $weatherClient->getForecastWeatherData();
+
+                if ($dataArray === false) {
+                    return $this->failServerError('Failed to retrieve forecast weather data.');
+                }
+
+                // Get the minimum and maximum forecast_time values ​​from the data array
+                $times = array_column($dataArray, 'forecast_time');
+                $minTime = min($times);
+                $maxTime = max($times);
+
+                // Get all existing forecast_time records within the range
+                $existingRecords = $this->forecastWeatherDataModel
+                    ->select('id, forecast_time')
+                    ->where('forecast_time >=', $minTime)
+                    ->where('forecast_time <=', $maxTime)
+                    ->findAll();
+
+                // Convert existing records into an array for quick searching
+                $existingMap = [];
+                foreach ($existingRecords as $record) {
+                    $existingMap[$record->forecast_time->toDateTimeString()] = $record->id;
+                }
+
+                // Split data into insert and update
+                $insertData = [];
+                $updateData = [];
+                foreach ($dataArray as $data) {
+                    $currentTimeString = $data['forecast_time']->toDateTimeString();
+
+                    if (isset($existingMap[$currentTimeString])) {
+                        $data['id']   = $existingMap[$currentTimeString];
+                        $updateData[] = array_merge($data, ['forecast_time' => $currentTimeString]);
+                    } else {
+                        $insertData[] = $data;
+                    }
+                }
+
+                // Perform a bulk insert
+                if (!empty($insertData)) {
+                    if (!$this->forecastWeatherDataModel->insertBatch($insertData)) {
+                        log_message('error', 'Failed to insert forecast weather data from ' . get_class($weatherClient) . ', errors: [' . print_r($this->forecastWeatherDataModel->errors(), true) . ']');
+                    }
+                }
+
+                // Perform a bulk update
+                if (!empty($updateData)) {
+                    if (!$this->forecastWeatherDataModel->updateBatch($updateData, 'id')) {
+                        log_message('error', 'Failed to update forecast weather data from ' . get_class($weatherClient) . ', errors: [' . print_r($this->forecastWeatherDataModel->errors(), true) . ']');
+                    }
+                }
+            }
+
+            return $this->respondCreated();
+        } catch (Exception $e) {
+            log_message('error', 'Error saving forecast weather data: {e}', ['e' => $e->getMessage()]);
+            return $this->failServerError('Failed to save forecast weather data.');
         }
     }
 

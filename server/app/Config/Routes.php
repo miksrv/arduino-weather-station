@@ -6,6 +6,7 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->cli('system/current', 'System::getCurrentWeather'); // php index.php system current
+$routes->cli('system/forecast', 'System::getForecastWeather'); // php index.php system forecast
 
 $routes->get('poi', 'Poi::list');
 $routes->get('poi/photos', 'Poi::photos');
