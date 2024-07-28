@@ -86,14 +86,14 @@ class System extends ResourceController {
     public function getForecastWeather(): ResponseInterface
     {
         try {
-            foreach ([/*$this->visualCrossingApi, $this->weatherApi,*/ $this->openWeatherApi] as $weatherClient) {
+            foreach ([/*$this->visualCrossingApi,*/ $this->weatherApi, $this->openWeatherApi] as $weatherClient) {
                 $dataArray = $weatherClient->getForecastWeatherData();
 
                 if ($dataArray === false) {
                     return $this->failServerError('Failed to retrieve forecast weather data.');
                 }
 
-                // Get the minimum and maximum forecast_time values ​​from the data array
+                // Get the minimum and maximum forecast_time values from the data array
                 $times = array_column($dataArray, 'forecast_time');
                 $minTime = min($times);
                 $maxTime = max($times);
