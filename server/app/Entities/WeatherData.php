@@ -1,5 +1,6 @@
 <?php namespace App\Entities;
 
+use CodeIgniter\I18n\Time;
 use Exception;
 
 class WeatherData
@@ -18,7 +19,7 @@ class WeatherData
     public ?float $windSpeed;
     public ?float $windGust;
     public ?int $windDeg;
-    public ?int $weatherID;
+    public ?int $weatherId;
     public ?string $weatherMain;
     public ?string $weatherIcon;
     public ?object $date;
@@ -28,22 +29,25 @@ class WeatherData
      */
     public function __construct(array $data)
     {
-        $this->temperature   = $data['temperature'] ?? null;
-        $this->feelsLike     = $data['feels_like'] ?? null;
-        $this->pressure      = $data['pressure'] ?? null;
-        $this->humidity      = $data['humidity'] ?? null;
-        $this->dewPoint      = $data['dew_point'] ?? null;
-        $this->visibility    = $data['visibility'] ?? null;
-        $this->uvIndex       = $data['uv_index'] ?? null;
-        $this->solEnergy     = $data['sol_energy'] ?? null;
-        $this->solRadiation  = $data['sol_radiation'] ?? null;
-        $this->clouds        = $data['clouds'] ?? null;
-        $this->precipitation = $data['precipitation'] ?? null;
-        $this->windSpeed     = $data['wind_speed'] ?? null;
-        $this->windGust      = $data['wind_gust'] ?? null;
-        $this->windDeg       = $data['wind_deg'] ?? null;
-        $this->weatherID     = $data['weather_id'] ?? null;
-        $this->weatherMain   = $data['weather_main'] ?? null;
-        $this->weatherIcon   = $data['weather_icon'] ?? null;
+        // Initialize class properties based on data from an array
+        foreach ($data as $key => $value) {
+            $property = $this->camelCase($key); // Convert the array key to camelCase
+            if (property_exists($this, $property)) {
+                if (!empty($value)) {
+                    $this->$property = $value;
+                }
+            }
+        }
+
+        // Date conversion
+        if (!empty($data['forecast_time'])) {
+            $this->date = new Time($data['forecast_time']);
+        }
+    }
+
+    // Method to convert a string with underscores to camelCase
+    private function camelCase(string $string): string
+    {
+        return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $string))));
     }
 }

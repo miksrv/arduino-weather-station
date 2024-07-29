@@ -126,27 +126,26 @@ class RawWeatherDataModel extends Model
     }
 
     /**
-     * A method that gets data for the last 20 minutes.
+     * A method that gets data for the last 3 records.
      *
      * @return array
      */
     public function getRecentAverages(): array
     {
-        $builder = $this->db->table($this->table);
-        $builder->select($this->_getSelectAverageSQL());
-        $builder->limit(3);
-
-        $query = $builder->get();
-        return $query->getRowArray();
+        return $this->select($this->_getSelectAverageSQL())->limit(3)->get()->getRowArray();
     }
 
     /**
      * A method that gets the latest data for fields that are updated less frequently.
-     * @param $fields
+     * @param array $fields
      * @return array
      */
-    public function getLatestWeatherData($fields): array
+    public function getLatestWeatherData(array $fields): array
     {
+        if (empty($fields)) {
+            return [];
+        }
+
         $result = [];
         foreach ($fields as $field) {
             $data = $this->select($field)
