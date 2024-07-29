@@ -2,22 +2,39 @@
 
 namespace App\Controllers;
 
+use App\Entities\WeatherDataEntity;
+use App\Models\DailyAveragesModel;
+use App\Models\HourlyAveragesModel;
 use App\Models\MigrateWeatherDataModel;
 use App\Models\RawWeatherDataModel;
+use CodeIgniter\RESTful\ResourceController;
+use ReflectionException;
 
-class MigrationController extends BaseController
+class MigrationController extends ResourceController
 {
     private const BATCH_SIZE = 1000; // Количество записей для обработки за один раз
 
+    protected RawWeatherDataModel $weatherDataModel;
+    protected HourlyAveragesModel $hourlyAveragesModel;
+    protected DailyAveragesModel $dailyAveragesModel;
+
+    public function __construct() {
+        $this->weatherDataModel    = new RawWeatherDataModel();
+        $this->hourlyAveragesModel = new HourlyAveragesModel();
+        $this->dailyAveragesModel  = new DailyAveragesModel();
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
     public function migrateWeatherData()
     {
-        $migrateModel = new MigrateWeatherDataModel();
-        $rawWeatherModel = new RawWeatherDataModel();
+        $migrateModel    = new MigrateWeatherDataModel();
 
         $offset = 0;
         while (true) {
             // Получаем порцию данных
-            $oldData = $migrateModel->orderBy('id', 'asc')->findAll(self::BATCH_SIZE, $offset);
+            $oldData = $migrateModel->orderBy('item_utc_date', 'asc')->findAll(self::BATCH_SIZE, $offset);
 
             // Если данных больше нет, выходим из цикла
             if (empty($oldData)) {
@@ -30,23 +47,29 @@ class MigrationController extends BaseController
                     'date'          => $item->item_utc_date->toDateTimeString(),
                     'temperature'   => $item->temperature,
                     'feels_like'    => $item->feels_like,
-                    'pressure'      => $this->convertPressureToPascals($item->pressure),
+                    'pressure'      => (int) $this->convertPressureToPascals($item->pressure),
                     'humidity'      => $item->humidity,
                     'clouds'        => $item->clouds,
                     'wind_speed'    => $item->wind_speed,
                     'wind_deg'      => $item->wind_deg,
                     'wind_gust'     => $item->wind_gust,
                     'precipitation' => $item->precipitation,
-                    'source'        => 'Migration'
+                    'source'        => RawWeatherDataModel::SOURCE_WEATHERAPI
                 ];
             }
 
             // Вставляем порцию данных в новую таблицу
-            $rawWeatherModel->insertBatch($newData);
+            $this->weatherDataModel->insertBatch($newData);
 
             // Увеличиваем смещение для следующей порции данных
             $offset += self::BATCH_SIZE;
         }
+
+        // Calculate and save hourly averages
+        $this->saveHourlyAverages();
+
+        // Calculate and save daily averages
+        $this->saveDailyAverages();
 
         return $this->respond(['message' => 'Migration completed successfully']);
     }
@@ -58,5 +81,46 @@ class MigrationController extends BaseController
         }
         // 1 мм рт. ст. = 133.322 Па
         return $pressure * 133.322;
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    protected function saveHourlyAverages(): void
+    {
+        $hourlyData = $this->weatherDataModel->getHourlyAverages();
+
+        foreach ($hourlyData as $data) {
+            $existingRecordData  = $this->hourlyAveragesModel->select('id')->where('date', $data['date'])->first();
+            $hourlyAverageEntity = new WeatherDataEntity();
+            $hourlyAverageEntity->fill($data);
+
+            if ($existingRecordData) {
+                $hourlyAverageEntity->id = $existingRecordData->id;
+            }
+
+            $this->hourlyAveragesModel->save($hourlyAverageEntity);
+        }
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws Exception
+     */
+    protected function saveDailyAverages(): void
+    {
+        $hourlyData = $this->weatherDataModel->getDailyAverages();
+
+        foreach ($hourlyData as $data) {
+            $existingRecordData = $this->dailyAveragesModel->select('id')->where('date', $data['date'])->first();
+            $dailyAverageEntity = new WeatherDataEntity();
+            $dailyAverageEntity->fill($data);
+
+            if ($existingRecordData) {
+                $dailyAverageEntity->id = $existingRecordData->id;
+            }
+
+            $this->dailyAveragesModel->save($dailyAverageEntity);
+        }
     }
 }

@@ -90,7 +90,8 @@ class CreateDailyAveragesTable extends Migration
                 'null'       => true,
             ],
         ]);
-        $this->forge->addKey('id', true);
+        $this->forge->addKey('id', true, true);
+        $this->forge->addKey('date');
         $this->forge->createTable('daily_averages');
     }
 

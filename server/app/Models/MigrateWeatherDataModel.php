@@ -7,10 +7,10 @@ use CodeIgniter\Model;
 
 class MigrateWeatherDataModel extends Model
 {
-    protected $table         = 'migrate_weather_data';
+    protected $table         = 'weather_current';
     protected $primaryKey    = 'id';
     protected $useTimestamps = false;
-    protected $returnType    = WeatherDataEntity::class;
+    protected $returnType    = 'object';
     protected $allowedFields = [];
 
     protected array $casts = [

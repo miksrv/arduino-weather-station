@@ -101,7 +101,8 @@ class CreateForecastWeatherDataTable extends Migration
                 'default' => 1,
             ],
         ]);
-        $this->forge->addKey('id', true);
+        $this->forge->addKey('id', true, true);
+        $this->forge->addKey('forecast_time');
         $this->forge->createTable('forecast_weather_data');
     }
 

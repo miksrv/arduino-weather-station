@@ -96,7 +96,8 @@ class CreateRawWeatherDataTable extends Migration
                 'null'       => true,
             ],
         ]);
-        $this->forge->addKey('id', true);
+        $this->forge->addKey('id', true, true);
+        $this->forge->addKey('date');
         $this->forge->createTable('raw_weather_data');
     }
 
