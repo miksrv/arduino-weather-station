@@ -8,6 +8,7 @@ use App\Models\HourlyAveragesModel;
 use App\Models\MigrateWeatherDataModel;
 use App\Models\RawWeatherDataModel;
 use CodeIgniter\RESTful\ResourceController;
+use Exception;
 use ReflectionException;
 
 class MigrationController extends ResourceController
@@ -29,7 +30,9 @@ class MigrationController extends ResourceController
      */
     public function migrateWeatherData()
     {
-        $migrateModel    = new MigrateWeatherDataModel();
+        helper('weather');
+
+        $migrateModel = new MigrateWeatherDataModel();
 
         $offset = 0;
         while (true) {
@@ -47,12 +50,13 @@ class MigrationController extends ResourceController
                     'date'          => $item->item_utc_date->toDateTimeString(),
                     'temperature'   => $item->temperature,
                     'feels_like'    => $item->feels_like,
-                    'pressure'      => (int) $this->convertPressureToPascals($item->pressure),
+                    'pressure'      => mmHg_to_hPa($item->pressure),
                     'humidity'      => $item->humidity,
                     'clouds'        => $item->clouds,
                     'wind_speed'    => $item->wind_speed,
                     'wind_deg'      => $item->wind_deg,
                     'wind_gust'     => $item->wind_gust,
+                    'dew_point'     => calculateDewPoint($item->temperature, $item->humidity),
                     'precipitation' => $item->precipitation,
                     'source'        => RawWeatherDataModel::SOURCE_WEATHERAPI
                 ];
@@ -74,21 +78,12 @@ class MigrationController extends ResourceController
         return $this->respond(['message' => 'Migration completed successfully']);
     }
 
-    private function convertPressureToPascals($pressure): ?float
-    {
-        if ($pressure === null) {
-            return null;
-        }
-        // 1 мм рт. ст. = 133.322 Па
-        return $pressure * 133.322;
-    }
-
     /**
      * @throws ReflectionException
      */
     protected function saveHourlyAverages(): void
     {
-        $hourlyData = $this->weatherDataModel->getHourlyAverages();
+        $hourlyData = $this->weatherDataModel->getHourlyAverages(true);
 
         foreach ($hourlyData as $data) {
             $existingRecordData  = $this->hourlyAveragesModel->select('id')->where('date', $data['date'])->first();
@@ -109,7 +104,7 @@ class MigrationController extends ResourceController
      */
     protected function saveDailyAverages(): void
     {
-        $hourlyData = $this->weatherDataModel->getDailyAverages();
+        $hourlyData = $this->weatherDataModel->getDailyAverages(true);
 
         foreach ($hourlyData as $data) {
             $existingRecordData = $this->dailyAveragesModel->select('id')->where('date', $data['date'])->first();
