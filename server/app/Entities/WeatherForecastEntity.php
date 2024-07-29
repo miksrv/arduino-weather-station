@@ -26,8 +26,7 @@ class WeatherForecastEntity extends Entity
         'wind_gust'      => null,
         'weather_id'     => null,
         'weather_main'   => null,
-        'weather_icon'   => null,
-        'interval_hours' => null,
+        'weather_icon'   => null
     ];
 
     protected $dates = ['forecast_time'];
@@ -51,7 +50,6 @@ class WeatherForecastEntity extends Entity
         'wind_gust'      => 'float',
         'weather_id'     => 'integer',
         'weather_main'   => 'string',
-        'weather_icon'   => 'string',
-        'interval_hours' => 'integer',
+        'weather_icon'   => 'string'
     ];
 }

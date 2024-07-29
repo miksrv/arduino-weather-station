@@ -22,6 +22,7 @@ class ForecastWeatherDataModel extends Model
         'uv_index',
         'sol_energy',
         'sol_radiation',
+        'precipitation',
         'clouds',
         'visibility',
         'wind_speed',
@@ -29,8 +30,7 @@ class ForecastWeatherDataModel extends Model
         'wind_gust',
         'weather_id',
         'weather_main',
-        'weather_icon',
-        'interval_hours'
+        'weather_icon'
     ];
 
     protected $validationRules = [
@@ -44,6 +44,7 @@ class ForecastWeatherDataModel extends Model
         'uv_index'       => 'permit_empty|decimal',
         'sol_energy'     => 'permit_empty|decimal',
         'sol_radiation'  => 'permit_empty|decimal',
+        'precipitation'  => 'permit_empty|decimal',
         'clouds'         => 'permit_empty|integer',
         'visibility'     => 'permit_empty|integer',
         'wind_speed'     => 'permit_empty|decimal',
@@ -51,8 +52,7 @@ class ForecastWeatherDataModel extends Model
         'wind_gust'      => 'permit_empty|decimal',
         'weather_id'     => 'permit_empty|integer',
         'weather_main'   => 'permit_empty|max_length[50]',
-        'weather_icon'   => 'permit_empty|max_length[50]',
-        'interval_hours' => 'permit_empty|integer',
+        'weather_icon'   => 'permit_empty|max_length[50]'
     ];
 
     protected $validationMessages = [
@@ -76,8 +76,7 @@ class ForecastWeatherDataModel extends Model
         'wind_speed'     => '?float',
         'wind_deg'       => '?int',
         'wind_gust'      => '?float',
-        'weather_id'     => '?int',
-        'interval_hours' => '?int',
+        'weather_id'     => '?int'
     ];
 
     public function getHourlyAverages($allTime = false): array

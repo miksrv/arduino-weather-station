@@ -94,12 +94,7 @@ class CreateForecastWeatherDataTable extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => '50',
                 'null'       => true,
-            ],
-            'interval_hours' => [
-                'type'    => 'INT',
-                'null'    => false,
-                'default' => 1,
-            ],
+            ]
         ]);
         $this->forge->addKey('id', true, true);
         $this->forge->addKey('forecast_time');
