@@ -9,9 +9,11 @@ $routes->cli('system/current', 'System::getCurrentWeather'); // php index.php sy
 $routes->cli('system/forecast', 'System::getForecastWeather'); // php index.php system forecast
 $routes->cli('system/migrate', 'MigrationController::migrateWeatherData'); // php index.php system migrate
 
-$routes->get('poi', 'Poi::list');
-$routes->get('poi/photos', 'Poi::photos');
-$routes->get('poi/users', 'Poi::users');
-$routes->get('poi/(:alphanum)', 'Poi::show/$1');
-$routes->options('poi', 'Poi');
-$routes->options('poi/(:alphanum)', 'Poi');
+$routes->get('current', 'Current::getCurrentWeather');
+$routes->options('current', 'Current');
+
+$routes->get('history', 'History::index');
+$routes->options('history', 'History');
+
+$routes->get('charts', 'Charts::index');
+$routes->options('charts', 'Charts');

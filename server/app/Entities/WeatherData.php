@@ -45,6 +45,5 @@ class WeatherData
         $this->weatherID     = $data['weather_id'] ?? null;
         $this->weatherMain   = $data['weather_main'] ?? null;
         $this->weatherIcon   = $data['weather_icon'] ?? null;
-        $this->date          = $data['date'] ?? null;
     }
 }
