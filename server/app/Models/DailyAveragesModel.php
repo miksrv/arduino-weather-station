@@ -75,4 +75,15 @@ class DailyAveragesModel extends Model
         'wind_gust'     => '?float',
         'weather_id'    => '?int',
     ];
+
+    public function getWeatherHistoryGrouped($startDate, $endDate, $groupInterval): array
+    {
+        return $this
+            ->select('DATE_FORMAT(date, "%Y-%m-%d %H:%i:00") as date,' . RawWeatherDataModel::getSelectAverageSQL())
+            ->where('date >=', $startDate)
+            ->where('date <=', $endDate)
+            ->groupBy("FLOOR(UNIX_TIMESTAMP(date)/" . (strtotime('+' . $groupInterval) - strtotime('now')) . ")")
+            ->orderBy('date', 'ASC')
+            ->findAll();
+    }
 }

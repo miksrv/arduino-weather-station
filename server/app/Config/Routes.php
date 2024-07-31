@@ -16,7 +16,7 @@ $routes->get('forecast/daily', 'Forecast::getForecastDaily');
 $routes->get('forecast/hourly', 'Forecast::getForecastHourly');
 $routes->options('forecast/(:alphanum)', 'Forecast');
 
-$routes->get('history', 'History::index');
+$routes->get('history', 'History::getHistoryWeather');
 $routes->options('history', 'History');
 
 $routes->get('charts', 'Charts::index');

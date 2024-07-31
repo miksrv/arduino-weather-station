@@ -52,4 +52,18 @@ class WeatherDataEntity extends Entity
         'weather_main'  => 'string',
         'weather_icon'  => 'string',
     ];
+
+    protected $datamap = [
+        'feelsLike'    => 'feels_like',
+        'dewPoint'     => 'dew_point',
+        'uvIndex'      => 'uv_index',
+        'solEnergy'    => 'sol_energy',
+        'solRadiation' => 'sol_radiation',
+        'windSpeed'    => 'wind_speed',
+        'windDeg'      => 'wind_deg',
+        'windGust'     => 'wind_gust',
+        'weatherId'    => 'weather_id',
+        'weatherMain'  => 'weather_main',
+        'weatherIcon'  => 'weather_icon',
+    ];
 }

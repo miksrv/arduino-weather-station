@@ -21,6 +21,7 @@ class MigrationController extends ResourceController
     protected RawWeatherDataModel $weatherDataModel;
     protected HourlyAveragesModel $hourlyAveragesModel;
     protected DailyAveragesModel $dailyAveragesModel;
+    protected ForecastWeatherDataModel $forecastWeatherData;
 
     public function __construct() {
         $this->weatherDataModel    = new RawWeatherDataModel();

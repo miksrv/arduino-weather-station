@@ -136,7 +136,7 @@ class RawWeatherDataModel extends Model
     public function getRecentAverages(DateTime $startDateTime, DateTime $currentDateTime): array
     {
         return $this
-            ->select($this->_getSelectAverageSQL())
+            ->select(RawWeatherDataModel::getSelectAverageSQL())
             ->where('date >=', $startDateTime->format('Y-m-d H:i:s'))
             ->where('date <=', $currentDateTime->format('Y-m-d H:i:s'))
             ->limit(3)
@@ -184,22 +184,21 @@ class RawWeatherDataModel extends Model
         return $data?->date;
     }
 
-    /**
-     * @param string $groupBy
-     * @return string
-     */
-    private function _getAverageSelect(string $groupBy): string
+    public function getWeatherHistoryGrouped($startDate, $endDate, $groupInterval): array
     {
-        $formatHours = $groupBy === 'hour' ? '%H:00:00' : '00:00:00';
-
-        return 'DATE_FORMAT(date, "%Y-%m-%d ' . $formatHours . '") as ' . $groupBy . ',
-                DATE_FORMAT(date, "%Y-%m-%d ' . $formatHours . '") AS date, ' . $this->_getSelectAverageSQL();
+        return $this
+            ->select('DATE_FORMAT(date, "%Y-%m-%d %H:%i:00") as date,' . RawWeatherDataModel::getSelectAverageSQL())
+            ->where('date >=', $startDate)
+            ->where('date <=', $endDate)
+            ->groupBy("FLOOR(UNIX_TIMESTAMP(date)/" . (strtotime('+' . $groupInterval) - strtotime('now')) . ")")
+            ->orderBy('date', 'ASC')
+            ->findAll();
     }
 
     /**
      * @return string
      */
-    private function _getSelectAverageSQL(): string
+    static public function getSelectAverageSQL(): string
     {
         return 'ROUND(AVG(temperature), 2) as temperature,' .
             'ROUND(AVG(feels_like), 2) as feels_like,' .
@@ -218,5 +217,17 @@ class RawWeatherDataModel extends Model
             'MAX(weather_id) as weather_id,' .
             'MAX(weather_main) as weather_main,' .
             'MAX(weather_icon) as weather_icon';
+    }
+
+    /**
+     * @param string $groupBy
+     * @return string
+     */
+    private function _getAverageSelect(string $groupBy): string
+    {
+        $formatHours = $groupBy === 'hour' ? '%H:00:00' : '00:00:00';
+
+        return 'DATE_FORMAT(date, "%Y-%m-%d ' . $formatHours . '") as ' . $groupBy . ',
+                DATE_FORMAT(date, "%Y-%m-%d ' . $formatHours . '") AS date, ' . RawWeatherDataModel::getSelectAverageSQL();
     }
 }
