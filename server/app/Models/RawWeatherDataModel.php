@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Entities\WeatherDataEntity;
 use CodeIgniter\Model;
+use DateTime;
 
 class RawWeatherDataModel extends Model
 {
@@ -128,11 +129,19 @@ class RawWeatherDataModel extends Model
     /**
      * A method that gets data for the last 3 records.
      *
+     * @param DateTime $startDateTime
+     * @param DateTime $currentDateTime
      * @return array
      */
-    public function getRecentAverages(): array
+    public function getRecentAverages(DateTime $startDateTime, DateTime $currentDateTime): array
     {
-        return $this->select($this->_getSelectAverageSQL())->limit(3)->get()->getRowArray();
+        return $this
+            ->select($this->_getSelectAverageSQL())
+            ->where('date >=', $startDateTime->format('Y-m-d H:i:s'))
+            ->where('date <=', $currentDateTime->format('Y-m-d H:i:s'))
+            ->limit(3)
+            ->get()
+            ->getRowArray();
     }
 
     /**
@@ -149,6 +158,8 @@ class RawWeatherDataModel extends Model
         $result = [];
         foreach ($fields as $field) {
             $data = $this->select($field)
+                ->where($field . ' is NOT NULL')
+                ->where('date >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 3 HOUR)')
                 ->orderBy('date', 'DESC')
                 ->limit(1)
                 ->first();

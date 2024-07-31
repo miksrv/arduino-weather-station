@@ -6,6 +6,9 @@ use CodeIgniter\I18n\Time;
 use Config\Services;
 use Exception;
 
+/**
+ * CODES: https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
+ */
 class OpenWeatherAPILibrary
 {
     const API_VERSION = 2.5;

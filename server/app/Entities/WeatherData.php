@@ -33,7 +33,7 @@ class WeatherData
         foreach ($data as $key => $value) {
             $property = $this->camelCase($key); // Convert the array key to camelCase
             if (property_exists($this, $property)) {
-                if (!empty($value)) {
+                if ($value !== null) {
                     $this->$property = $value;
                 }
             }

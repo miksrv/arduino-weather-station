@@ -53,7 +53,12 @@ class System extends ResourceController {
                     return $this->failServerError('Failed to retrieve weather data.');
                 }
 
-                if ($this->weatherDataModel->select('id')->where('date', $data['date'])->first()) {
+                if ($this->weatherDataModel
+                    ->select('id')
+                    ->where('date', $data['date'])
+                    ->where('source', $data['source'])
+                    ->first()
+                ) {
                     continue;
                 }
 

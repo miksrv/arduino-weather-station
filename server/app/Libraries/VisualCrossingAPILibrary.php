@@ -3,6 +3,7 @@
 namespace App\Libraries;
 
 // https://www.visualcrossing.com/weather/weather-data-services/
+// CODES: https://www.weatherapi.com/docs/weather_conditions.json
 // 1000 records/day
 use App\Models\RawWeatherDataModel;
 use CodeIgniter\HTTP\CURLRequest;
