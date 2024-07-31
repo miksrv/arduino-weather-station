@@ -86,17 +86,17 @@ class RawWeatherDataModel extends Model
     ];
 
     /**
-     * @param $allTime
+     * @param false $allTime
      * @return array
      */
-    public function getHourlyAverages($allTime = false): array
+    public function getHourlyAverages(bool $allTime = false): array
     {
         $result = $this->select($this->_getAverageSelect('hour'));
 
         if (!$allTime) {
             $result
-                ->where('date >= DATE_FORMAT(NOW(), \'%Y-%m-%d %H:00:00\')')
-                ->where('date < DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 HOUR), \'%Y-%m-%d %H:00:00\')');
+                ->where('date >= DATE_FORMAT(UTC_TIMESTAMP(), \'%Y-%m-%d %H:00:00\')')
+                ->where('date < DATE_FORMAT(DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 HOUR), \'%Y-%m-%d %H:00:00\')');
         }
 
         return $result
@@ -115,8 +115,8 @@ class RawWeatherDataModel extends Model
 
         if (!$allTime) {
             $result
-                ->where('date >= DATE_FORMAT(NOW(), \'%Y-%m-%d 00:00:00\')')
-                ->where('date < DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), \'%Y-%m-%d 00:00:00\')');
+                ->where('date >= DATE_FORMAT(UTC_TIMESTAMP(), \'%Y-%m-%d 00:00:00\')')
+                ->where('date < DATE_FORMAT(DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 DAY), \'%Y-%m-%d 00:00:00\')');
         }
 
         return $result

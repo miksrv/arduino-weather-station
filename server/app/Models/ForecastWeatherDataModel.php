@@ -83,8 +83,8 @@ class ForecastWeatherDataModel extends Model
     {
         return $this
             ->select($this->_getAverageSelect('hour'))
-            ->where('forecast_time >= DATE_FORMAT(NOW(), \'%Y-%m-%d %H:00:00\')')
-            ->where('forecast_time < DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 DAY), \'%Y-%m-%d %H:00:00\')')
+            ->where('forecast_time >= DATE_FORMAT(UTC_TIMESTAMP(), \'%Y-%m-%d %H:00:00\')')
+            ->where('forecast_time < DATE_FORMAT(DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 DAY), \'%Y-%m-%d %H:00:00\')')
             ->groupBy('hour')
             ->get()
             ->getResultArray();
@@ -94,7 +94,7 @@ class ForecastWeatherDataModel extends Model
     {
         return $this
             ->select($this->_getAverageSelect('day'))
-            ->where('forecast_time >= DATE_FORMAT(NOW(), \'%Y-%m-%d 00:00:00\')')
+            ->where('forecast_time >= DATE_FORMAT(UTC_TIMESTAMP(), \'%Y-%m-%d 00:00:00\')')
             ->groupBy('day')
             ->get()
             ->getResultArray();
