@@ -5,6 +5,7 @@ import NextNProgress from 'nextjs-progressbar'
 import Menu from './Menu'
 import styles from './styles.module.sass'
 
+import { API } from '@/api/api'
 import { useAppSelector } from '@/api/store'
 import AppBar from '@/components/app-bar'
 import Footer from '@/components/footer'

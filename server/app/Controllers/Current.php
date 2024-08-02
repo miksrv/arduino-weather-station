@@ -37,8 +37,8 @@ class Current extends ResourceController {
         $latestData = $this->weatherDataModel->getLatestWeatherData(['precipitation', 'sol_energy', 'sol_radiation']); // 'sol_energy', 'sol_radiation', 'uv_index',
 
         return $this->respond([
-            'data'   => new WeatherData(array_merge($recentAverages, $latestData)),
-            'update' => $this->weatherDataModel->getLastUpdateTime()
+            'conditions' => new WeatherData(array_merge($recentAverages, $latestData)),
+            'update'     => $this->weatherDataModel->getLastUpdateTime()
         ]);
     }
 }

@@ -4,9 +4,9 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
 
+import { API } from '@/api'
 import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
-import { ApiTypes } from '@/api/types'
 import AppLayout from '@/components/app-layout'
 
 interface IndexPageProps {
@@ -15,6 +15,8 @@ interface IndexPageProps {
 
 const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n } = useTranslation()
+
+    const { data: current } = API.useGetCurrentQuery(undefined, {pollingInterval: 60 * 1000})
 
     return (
         <AppLayout>
@@ -39,6 +41,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 }}
             />
 
+            <div>{current?.conditions?.temperature}</div>
 
         </AppLayout>
     )
@@ -47,7 +50,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context): Promise<GetServerSidePropsResult<IndexPageProps>> => {
-            const locale = (context.locale ?? 'en') as ApiTypes.LocaleType
+            const locale = (context.locale ?? 'en')
             const translations = await serverSideTranslations(locale)
 
             store.dispatch(setLocale(locale))

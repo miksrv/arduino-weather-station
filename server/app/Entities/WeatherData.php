@@ -22,7 +22,6 @@ class WeatherData
     public ?int $weatherId;
     public ?string $weatherMain;
     public ?string $weatherIcon;
-    public ?object $date;
 
     /**
      * @throws Exception
