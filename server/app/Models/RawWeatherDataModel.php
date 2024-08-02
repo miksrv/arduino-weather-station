@@ -29,6 +29,7 @@ class RawWeatherDataModel extends Model
         'uv_index',
         'sol_energy',
         'sol_radiation',
+        'precipitation',
         'clouds',
         'visibility',
         'wind_speed',

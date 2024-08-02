@@ -50,7 +50,7 @@ class System extends ResourceController {
                 $data = $weatherClient->getWeatherData();
 
                 if ($data === false) {
-                    return $this->failServerError('Failed to retrieve weather data.');
+                    continue;
                 }
 
                 if ($this->weatherDataModel
@@ -95,7 +95,7 @@ class System extends ResourceController {
                 $dataArray = $weatherClient->getForecastWeatherData();
 
                 if ($dataArray === false) {
-                    return $this->failServerError('Failed to retrieve forecast weather data.');
+                    continue;
                 }
 
                 // Get the minimum and maximum forecast_time values from the data array

@@ -56,7 +56,9 @@ class History extends ResourceController {
         }
 
         // Calculating the range
-        $dateDiff = ($endTimestamp - $startTimestamp) / (60 * 60 * 24); // difference in days
+        $dateDiff  = ($endTimestamp - $startTimestamp) / (60 * 60 * 24); // difference in days
+        $startDate = date('Y-m-d 00:00:00', strtotime($startDate));
+        $endDate   = date('Y-m-d 23:59:59', strtotime($endDate));
 
         // Selecting a model and grouping
         if ($dateDiff <= 1) {

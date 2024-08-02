@@ -18,6 +18,3 @@ $routes->options('forecast/(:alphanum)', 'Forecast');
 
 $routes->get('history', 'History::getHistoryWeather');
 $routes->options('history', 'History');
-
-$routes->get('charts', 'Charts::index');
-$routes->options('charts', 'Charts');
