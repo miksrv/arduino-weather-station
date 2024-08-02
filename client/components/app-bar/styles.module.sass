@@ -1,0 +1,163 @@
+@import ../../styles/variables
+
+.appBar
+    z-index: 450
+    color: var(--text-color-primary)
+    background-color: var(--container-background)
+    padding: 0 14px
+    box-shadow: $boxShadow1
+    height: 50px
+    position: fixed
+    width: 100%
+    top: 0
+
+    .wrapper
+        display: flex
+        max-width: var(--width-max)
+        margin: 0 auto
+        align-items: center
+        width: 100%
+        height: 100%
+
+    &.fullSize
+        .wrapper
+            max-width: 100%
+
+    .hamburgerButton
+        border: none
+        background: transparent
+        padding: 0
+        line-height: 10px
+        margin-right: 10px
+        cursor: pointer
+        opacity: .7
+        transition: opacity .3s
+        display: none
+
+        &:hover
+            opacity: 1
+
+        svg
+            width: 30px
+            height: 30px
+            fill: var(--text-color-primary)
+
+    .logo
+        width: var(--width-menu)
+        display: block
+        align-items: center
+        background-image: url(/images/geometki-light.png)
+        height: 32px
+        background-size: contain
+        background-repeat: no-repeat
+        margin-left: 6px
+        margin-right: -7px
+
+        &.dark
+            background-image: url(/images/geometki-dark.png)
+
+        @media only screen and (max-width: $mobileMaxWidth)
+            display: none
+
+    @media only screen and (max-width: $mobileMaxWidth)
+        .hamburgerButton
+            display: block
+
+    .rightSection
+        margin-left: auto
+        display: flex
+        align-items: center
+        justify-content: center
+        padding-left: 10px
+
+        & > div, .loginButton
+            margin-left: 10px
+            white-space: nowrap
+
+        svg
+            margin-top: 5px
+            height: 24px
+            width: 24px
+            fill: var(--icon-color-primary)
+
+            &:hover, &:focus
+                opacity: .7
+
+    .userInfo
+        padding: 10px
+        font-size: $fontSizeHeadline
+        min-width: 220px
+
+        .userName
+            font-weight: 600
+
+        .levelImage
+            vertical-align: middle
+
+    .notificationsButton
+        position: relative
+        border: none
+        background: transparent
+        padding: 0
+        line-height: 10px
+        cursor: pointer
+
+        .notifyCounter
+            position: absolute
+            top: -3px
+            right: -3px
+
+    .notifyFooter
+        padding: 4px
+
+    .noData
+        text-align: center
+        color: var(--text-color-secondary)
+        height: 140px
+        min-width: 260px
+        display: flex
+        align-items: center
+        justify-content: center
+
+    .loader
+        height: 140px
+        min-width: 260px
+        display: flex
+        align-items: center
+        justify-content: center
+
+        svg
+            width: 32px
+            height: 32px
+            fill: var(--icon-color-secondary)
+
+    .notificationsContent
+        min-height: 140px
+        max-height: 280px
+        min-width: 260px
+        padding: 0
+        overflow: hidden
+        overflow-y: scroll
+        font-size: $fontSizeHeadline
+
+        & > div
+            border-bottom: var(--container-border-separator)
+            margin-bottom: 0
+            padding: 2px 10px 5px
+
+            &:last-of-type
+                border-bottom: 0
+
+    .search
+        flex: .7
+
+        & > div > div
+            border: none !important
+
+        ul
+            top: 34px !important
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 -2px 2px rgba(0, 0, 0, 0) !important
+            border: none !important
+
+        @media only screen and (max-width: $mobileMaxWidth)
+            flex: 1

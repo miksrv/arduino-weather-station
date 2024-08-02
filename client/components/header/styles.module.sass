@@ -1,0 +1,60 @@
+@import ../../styles/variables
+
+.header
+    display: flex
+    padding: 8px 12px !important
+    align-items: center
+    max-width: 870px
+
+    &.attachedBottom
+        margin-top: 0
+        border-top-right-radius: 0
+        border-top-left-radius: 0
+
+    header
+        white-space: nowrap
+        overflow: hidden
+
+        h1
+            text-overflow: ellipsis
+            overflow: hidden
+
+        ul
+            li
+                &:last-of-type
+                    text-overflow: ellipsis
+                    overflow: hidden
+
+    .backLink
+        padding: 4px 6px
+        margin-right: 10px
+
+        svg
+            opacity: .6
+            height: 26px
+            width: 26px
+            fill: var(--icon-color-primary)
+            margin: 0 -5px 0 -5px !important
+
+    .userAvatar
+        margin-right: 10px
+
+    .actions
+        display: flex
+        align-items: center
+        margin-left: auto
+
+        @media only screen and (max-width: $mobileMaxWidth)
+            & > div
+                display: none
+
+            & > button, & > a > button
+                div
+                    display: none
+
+        button
+            margin-left: 10px
+
+            @media only screen and (max-width: $mobileMaxWidth)
+                svg
+                    margin: 0

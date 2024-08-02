@@ -1,0 +1,28 @@
+@import ../../styles/variables
+
+.radioButton
+  display: flex
+  align-items: center
+
+  .formField
+    margin-right: 5px
+    margin-bottom: -3px
+
+    input
+      display: none
+
+    svg
+      fill: #aeb7c2
+      width: 16px
+      height: 16px
+      margin-bottom: -1.1px
+
+    &.checked
+      svg
+        fill: #447bba
+
+  label
+    cursor: pointer
+    color: var(--text-color-primary)
+    font-size: $fontSizeParagraph
+    width: 100%

@@ -1,0 +1,177 @@
+@import ../../styles/variables
+@import ../../styles/animations
+
+$sideBarWidth: 220px
+
+@keyframes animation-sideBar-slideIn
+    0%
+        left: -$sideBarWidth
+
+    100%
+        left: 0
+
+@keyframes animation-sideBar-slideOut
+    0%
+        left: 0
+
+    100%
+        left: -$sideBarWidth
+
+.noAnimation
+    animation: none !important
+    transition: none !important
+
+.menu
+    list-style: none
+    padding: 8px
+    margin: 15px 0 0 0
+
+    a
+        padding: 8px 16px
+        width: 100%
+        display: flex
+        min-height: 32px
+        align-items: center
+        border-radius: var(--border-radius)
+        color: var(--text-color-primary)
+        text-decoration: none
+        font-weight: 400
+        transition: background-color .15s ease-out,opacity .15s ease-out
+
+        &:hover
+            background-color: var(--body-background)
+
+        svg
+            fill: var(--link-color)
+            margin: -10px 10px -10px 0
+            width: 22px
+            height: 22px
+
+.appLayout
+    width: 100%
+    min-height: 100vh
+    margin: 0 auto
+    position: relative
+
+    .scrollArea
+        display: none
+        position: absolute
+        top: 0
+        left: 0
+        height: 100%
+        cursor: pointer
+
+        .buttonToTop
+            height: 100%
+            width: 100%
+            max-width: 120px
+            position: fixed
+            z-index: 1
+            display: flex
+            align-items: flex-end
+            transition: background-color 0.5s ease
+            padding-bottom: 20px
+            color: var(--text-color-secondary)
+            justify-content: center
+            font-size: $fontSizeHeadline
+
+            svg
+                width: 24px
+                height: 24px
+                margin-bottom: -2px
+                margin-left: -10px
+                fill: var(--icon-color-secondary)
+
+        &:hover
+            .buttonToTop
+                background-color: var(--menu-background-hover)
+
+        @media only screen and (max-width: $mobileMaxWidth)
+            display: none !important
+
+    .mainContainer
+        display: flex
+        max-width: var(--width-max)
+        margin: 0 auto
+        padding-top: 50px
+
+        .menubar
+            width: var(--width-menu)
+            min-width: var(--width-menu)
+
+            .rails
+                position: fixed
+
+            .menu
+                margin: 15px 10px 20px 0
+                padding: 0
+
+                a
+                    padding: 0 10px
+
+                    &:hover
+                        background-color: var(--menu-background-hover)
+
+            .switchers
+                display: flex
+                padding-left: 12px
+
+        .main
+            width: 100%
+            max-width: 870px
+            margin-bottom: 20px
+
+        @media only screen and (max-width: $mobileMaxWidth)
+            .menubar
+                display: none
+
+            .main
+                padding: 0 10px
+
+    &.fullSize
+        .mainContainer
+            max-width: 100%
+
+    .overlay
+        position: absolute
+        min-height: 100vh
+        height: 100%
+        width: 100%
+        z-index: 500
+        background: $overlayBackground
+        transition: opacity 167ms ease-out
+
+        &.hidden
+            opacity: 0
+            visibility: hidden
+            //animation: animation-fadeOut .32s ease
+
+        &.displayed
+            opacity: 1
+            visibility: visible
+            //animation: animation-fadeIn .32s ease
+
+    .sidebar
+        position: fixed
+        background-color: var(--modal-background)
+        width: $sideBarWidth
+        height: 100vh
+        z-index: 600
+        top: 0
+        left: -$sideBarWidth
+        transition: left 167ms ease-out
+
+        &.opened
+            left: 0
+            //animation: animation-sideBar-slideIn .32s ease
+
+        &.closed
+            left: -$sideBarWidth
+            //animation: animation-sideBar-slideOut .32s ease
+
+        .content
+            padding: 20px
+
+        .switchers
+            display: flex
+            padding-left: 12px
