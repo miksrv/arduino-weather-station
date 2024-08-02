@@ -41,7 +41,7 @@ export const API = createApi({
             query: () => 'current',
             transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
         }),
-        getHistory: builder.query<any, Maybe<any>>({
+        getHistory: builder.query<ApiType.History.Response, Maybe<ApiType.History.Request>>({
             providesTags: ['History'],
             query: (params) => `history${encodeQueryData(params)}`,
             transformErrorResponse: (response) => (response.data as APIErrorType).messages.error

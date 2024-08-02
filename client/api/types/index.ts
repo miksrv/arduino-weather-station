@@ -1,4 +1,5 @@
-export * as Current from './weather'
+export * as Current from './current'
+export * as History from './history'
 
 export interface ResError {
     status?: number

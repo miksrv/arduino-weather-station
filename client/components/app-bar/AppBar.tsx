@@ -2,9 +2,9 @@ import React from 'react'
 
 import styles from './styles.module.sass'
 
+import { API } from '@/api'
 import { concatClassNames as cn } from '@/tools/helpers'
 import Icon from '@/ui/icon'
-import { API } from '@/api'
 
 interface HeaderProps {
     fullSize?: boolean
