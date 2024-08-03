@@ -5,12 +5,20 @@ import ReactECharts from 'echarts-for-react'
 import { ApiModel } from '@/api'
 import { DateTime } from '@/api/types'
 
+type Colors = 'orange' | 'blue'
+
 interface Props {
+    color?: Colors
     data?: (ApiModel.Weather & {date: DateTime})[];
     yAxisField?: keyof (ApiModel.Weather & {date: DateTime});
 }
 
-const WeatherChart: React.FC<Props> = ({ data, yAxisField }) => {
+const colors = {
+    orange: ['#e75a02', '#e78702'],
+    blue: ['#3454f2', '#346cf2']
+}
+
+const WeatherChart: React.FC<Props> = ({ color, data, yAxisField }) => {
     const formatData = () => {
         return data?.map(item => ({
             date: new Date(item.date.date).toLocaleString(),
@@ -19,6 +27,7 @@ const WeatherChart: React.FC<Props> = ({ data, yAxisField }) => {
     }
 
     const chartData = formatData()
+    const colorsData = color ? colors[color] : colors['orange']
 
     const option = {
         tooltip: {
@@ -68,21 +77,21 @@ const WeatherChart: React.FC<Props> = ({ data, yAxisField }) => {
                 type: 'line',
                 smooth: false,
                 lineStyle: {
-                    color: '#4caf50',
+                    color: colorsData[0],
                     width: 2
                 },
                 itemStyle: {
-                    color: '#4caf50'
+                    color: colorsData[0]
                 },
                 areaStyle: {
                     color: new graphic.LinearGradient(0, 0, 0, 1, [
                         {
                             offset: 0,
-                            color: '#4caf50'
+                            color: colorsData[0]
                         },
                         {
                             offset: 1,
-                            color: '#acaf4c'
+                            color: colorsData[1]
                         }])
                 }
             }

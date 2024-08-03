@@ -2,36 +2,42 @@ import React from 'react'
 
 import styles from './styles.module.sass'
 
+import { formatDate } from '@/tools/helpers'
+import { MinMaxResult } from '@/tools/weather'
+import Icon from '@/ui/icon'
+import { IconTypes } from '@/ui/icon/types'
+
 interface WidgetProps {
-    title: string;
+    title?: string;
+    icon?: IconTypes
     currentValue?: string | number;
-    minValue?: string | number;
-    maxValue?: string | number;
-    minTime?: string;
-    maxTime?: string;
+    minMax?: MinMaxResult
     unit?: string;
     chart?: React.ReactNode;
 }
 
-const Widget: React.FC<WidgetProps> = ({ title, currentValue, minValue, maxValue, minTime, maxTime, unit, chart }) => {
+const Widget: React.FC<WidgetProps> = ({ title, icon, currentValue, minMax, unit, chart }) => {
     return (
         <div className={styles.widget}>
             <div className={styles.header}>
                 <h3>{title}</h3>
-                <span>{currentValue || '??'}{unit && <span>{unit}</span>}</span>
+                {icon && <Icon name={icon} />}
             </div>
-            <div className={styles.stats}>
-                <div className={styles.stat}>
-                    <span>Min</span>
-                    <span>{minValue}{unit && <span>{unit}</span>}</span>
-                    <span>{minTime}</span>
+            <div className={styles.value}>{currentValue || '??'}{unit && <span>{unit}</span>}</div>
+            {minMax && (
+                <div className={styles.statsContainer}>
+                    <div className={styles.block}>
+                        <span className={styles.title}>Min</span>
+                        <span>{minMax?.min?.value}{unit && <span>{unit}</span>}</span>
+                        <span>{formatDate(minMax?.min?.date, 'HH:mm')}</span>
+                    </div>
+                    <div className={styles.block}>
+                        <span className={styles.title}>Max</span>
+                        <span>{minMax?.max?.value}{unit && <span>{unit}</span>}</span>
+                        <span>{formatDate(minMax?.min?.date, 'HH:mm')}</span>
+                    </div>
                 </div>
-                <div className={styles.stat}>
-                    <span>Max</span>
-                    <span>{maxValue}{unit && <span>{unit}</span>}</span>
-                    <span>{maxTime}</span>
-                </div>
-            </div>
+            )}
             {chart && <div className={styles.chart}>{chart}</div>}
         </div>
     )

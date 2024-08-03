@@ -3,7 +3,6 @@ import React from 'react'
 import styles from './styles.module.sass'
 
 import { API } from '@/api'
-import { concatClassNames as cn } from '@/tools/helpers'
 import Icon from '@/ui/icon'
 
 interface HeaderProps {
@@ -11,11 +10,11 @@ interface HeaderProps {
     onMenuClick?: () => void
 }
 
-const AppBar: React.FC<HeaderProps> = ({ fullSize, onMenuClick }) => {
+const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
     const { data: current } = API.useGetCurrentQuery(undefined, {pollingInterval: 60 * 1000})
 
     return (
-        <header className={cn(styles.appBar, fullSize && styles.fullSize)}>
+        <header className={styles.appBar}>
             <div className={styles.wrapper}>
                 <button
                     className={styles.hamburgerButton}

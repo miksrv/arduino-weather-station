@@ -12,6 +12,7 @@ import AppLayout from '@/components/app-layout'
 import Widget from '@/components/widget'
 import WeatherChart from '@/components/widget/WeatherChart'
 import { formatDate } from '@/tools/helpers'
+import { getMinMaxValues } from '@/tools/weather'
 
 interface IndexPageProps {
 
@@ -26,7 +27,6 @@ const filterRecentData = (data?: ApiModel.History[]): ApiModel.History[] | [] =>
         return itemDate.isAfter(twelveHoursAgo)
     }) || []
 }
-
 
 const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n } = useTranslation()
@@ -60,29 +60,37 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 }}
             />
 
-            <Widget
-                title={'Температура'}
-                unit={'C'}
-                currentValue={current?.conditions?.temperature}
-                chart={
-                    <WeatherChart
-                        data={filterRecentData(history)}
-                        yAxisField='temperature'
-                    />
-                }
-            />
+            <div className={'widgets-list'}>
+                <Widget
+                    unit={'°C'}
+                    title={'Температура'}
+                    icon={'Thermometer'}
+                    minMax={getMinMaxValues(history, 'temperature')}
+                    currentValue={current?.conditions?.temperature}
+                    chart={
+                        <WeatherChart
+                            color={'orange'}
+                            yAxisField={'temperature'}
+                            data={filterRecentData(history)}
+                        />
+                    }
+                />
 
-            <Widget
-                title={'Влажность'}
-                unit={'%'}
-                currentValue={current?.conditions?.humidity}
-                chart={
-                    <WeatherChart
-                        data={filterRecentData(history)}
-                        yAxisField='humidity'
-                    />
-                }
-            />
+                <Widget
+                    unit={'%'}
+                    title={'Влажность'}
+                    icon={'Water'}
+                    minMax={getMinMaxValues(history, 'humidity')}
+                    currentValue={current?.conditions?.humidity}
+                    chart={
+                        <WeatherChart
+                            color={'blue'}
+                            yAxisField={'humidity'}
+                            data={filterRecentData(history)}
+                        />
+                    }
+                />
+            </div>
         </AppLayout>
     )
 }

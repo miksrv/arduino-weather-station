@@ -14,11 +14,10 @@ export type MenuItemType = {
 }
 
 interface MenuProps {
-    type?: 'mobile' | 'desktop'
     onClick?: () => void
 }
 
-const Menu: React.FC<MenuProps> = ({ type, onClick }) => {
+const Menu: React.FC<MenuProps> = ({ onClick }) => {
     const { t } = useTranslation('common')
 
     const menuItems: MenuItemType[] = [
@@ -34,7 +33,7 @@ const Menu: React.FC<MenuProps> = ({ type, onClick }) => {
             {menuItems
                 .filter(({ link }) => !!link)
                 .map((item, i) => (
-                    <li key={`menu${type}${i}`}>
+                    <li key={`menu${i}`}>
                         <Link
                             href={item.link!}
                             title={item.text}
