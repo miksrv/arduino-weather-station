@@ -3,6 +3,7 @@ import React from 'react'
 import styles from './styles.module.sass'
 
 import { API } from '@/api'
+import { formatDate } from '@/tools/helpers'
 import Icon from '@/ui/icon'
 
 interface HeaderProps {
@@ -24,11 +25,7 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     <Icon name={'Menu'} />
                 </button>
 
-                {current?.update?.date}
-
-                <div className={styles.rightSection}>
-                    theme switch
-                </div>
+                {formatDate(current?.update?.date)}
             </div>
         </header>
     )

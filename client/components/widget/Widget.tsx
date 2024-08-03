@@ -9,10 +9,10 @@ import { IconTypes } from '@/ui/icon/types'
 
 interface WidgetProps {
     title?: string;
+    unit?: string;
     icon?: IconTypes
     currentValue?: string | number;
     minMax?: MinMaxResult
-    unit?: string;
     chart?: React.ReactNode;
 }
 

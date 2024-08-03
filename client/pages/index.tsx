@@ -13,6 +13,7 @@ import Widget from '@/components/widget'
 import WeatherChart from '@/components/widget/WeatherChart'
 import { formatDate } from '@/tools/helpers'
 import { getMinMaxValues } from '@/tools/weather'
+import { IconTypes } from '@/ui/icon/types'
 
 interface IndexPageProps {
 
@@ -28,6 +29,14 @@ const filterRecentData = (data?: ApiModel.History[]): ApiModel.History[] | [] =>
     }) || []
 }
 
+type WidgetType = {
+    title?: string
+    unit?: string
+    color?: string
+    icon?: IconTypes
+    source: keyof ApiModel.Weather
+}
+
 const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n } = useTranslation()
 
@@ -36,6 +45,44 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         start_date: formatDate(dayjs().subtract(1, 'day').format(), 'YYYY-MM-DD'),
         end_date: formatDate(new Date(), 'YYYY-MM-DD')
     }, {pollingInterval: 60 * 1000})
+
+    const widgets: WidgetType[] = [
+        {
+            title: 'Температура',
+            unit: '°C',
+            color: 'orange',
+            icon: 'Thermometer',
+            source: 'temperature'
+        },
+        {
+            title: 'Точка росы',
+            unit: '°C',
+            color: 'orange',
+            icon: 'Thermometer',
+            source: 'dewPoint'
+        },
+        {
+            title: 'Влажность',
+            unit: '%',
+            color: 'blue',
+            icon: 'Water',
+            source: 'humidity'
+        },
+        {
+            title: 'Скорость ветра',
+            unit: 'м/с',
+            color: 'blue',
+            icon: 'Water',
+            source: 'windSpeed'
+        },
+        {
+            title: 'Порывы ветра',
+            unit: 'м/с',
+            color: 'blue',
+            icon: 'Water',
+            source: 'windGust'
+        }
+    ]
 
     return (
         <AppLayout>
@@ -61,35 +108,23 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             />
 
             <div className={'widgets-list'}>
-                <Widget
-                    unit={'°C'}
-                    title={'Температура'}
-                    icon={'Thermometer'}
-                    minMax={getMinMaxValues(history, 'temperature')}
-                    currentValue={current?.conditions?.temperature}
-                    chart={
-                        <WeatherChart
-                            color={'orange'}
-                            yAxisField={'temperature'}
-                            data={filterRecentData(history)}
-                        />
-                    }
-                />
-
-                <Widget
-                    unit={'%'}
-                    title={'Влажность'}
-                    icon={'Water'}
-                    minMax={getMinMaxValues(history, 'humidity')}
-                    currentValue={current?.conditions?.humidity}
-                    chart={
-                        <WeatherChart
-                            color={'blue'}
-                            yAxisField={'humidity'}
-                            data={filterRecentData(history)}
-                        />
-                    }
-                />
+                {widgets?.map((widget) => (
+                    <Widget
+                        key={`widget-${widget.source}`}
+                        unit={widget.unit}
+                        title={widget.title}
+                        icon={widget.icon}
+                        minMax={getMinMaxValues(history, widget.source)}
+                        currentValue={current?.conditions?.[widget.source]}
+                        chart={
+                            <WeatherChart
+                                color={widget.color as any}
+                                yAxisField={widget.source}
+                                data={filterRecentData(history)}
+                            />
+                        }
+                    />
+                ))}
             </div>
         </AppLayout>
     )

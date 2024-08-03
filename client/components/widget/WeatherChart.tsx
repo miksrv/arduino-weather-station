@@ -14,8 +14,8 @@ interface Props {
 }
 
 const colors = {
-    orange: ['#e75a02', '#e78702'],
-    blue: ['#3454f2', '#346cf2']
+    orange: ['#f5a03e', '#f3bf80'],
+    blue: ['#487eff', '#7097f1']
 }
 
 const WeatherChart: React.FC<Props> = ({ color, data, yAxisField }) => {
