@@ -1,0 +1,59 @@
+$fontSizeTitleH1: 1.2em
+$fontSizeTitleH2: 1.1em
+$fontSizeHeadline: 0.9em
+$fontSizeParagraph: 0.95em
+$fontSizeCaption: 0.8em
+
+$mobileMaxWidth: 768px
+
+$boxShadow1: 0 0 2px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.08)
+$boxShadow2: 0 0 2px rgba(0,0,0,0), 0 4px 16px rgba(0,0,0,.08)
+$boxShadow4: 0 0 8px rgba(0,0,0,.12), 0 16px 16px rgba(0,0,0,.16)
+$boxShadow5: 0 0 2px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.08)
+
+$overlayBackground: rgba(0,0,0,.4)
+
+.placeBottomPanel
+    position: absolute
+    padding: 20px 10px 10px
+    width: 100%
+    bottom: 0
+    background: -moz-linear-gradient(bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.89) 100%)
+    background: -webkit-gradient(linear, left bottom, left bottom, color-stop(0%,rgba(0,0,0,0.65)), color-stop(100%,rgba(0,0,0,0)))
+    background: -webkit-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.89) 100%)
+    background: -o-linear-gradient(bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.89) 100%)
+    background: -ms-linear-gradient(bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.89) 100%)
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.89) 100%)
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#e3000000',GradientType=0 )
+
+.contextListMenu
+    li
+        &:first-of-type
+            border-radius: var(--border-radius) var(--border-radius) 0 0
+
+        &:last-of-type
+            border-radius: 0 0 var(--border-radius) var(--border-radius)
+
+        a
+            text-decoration: none
+            height: 100%
+            width: 100%
+            padding: 10px 20px
+            white-space: nowrap
+            font-size: $fontSizeHeadline
+            color: var(--text-color-primary)
+            cursor: pointer
+            background: transparent
+            border: none
+            text-align: left
+            display: flex
+            align-items: center
+
+            svg
+                fill: var(--link-color) !important
+                margin: -10px 10px -10px 0 !important
+                width: 22px
+                height: 22px
+
+        &:hover, &.active
+            background-color: var(--input-background-color)
