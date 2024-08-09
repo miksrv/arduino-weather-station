@@ -53,16 +53,9 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('temperature'),
             unit: '°C',
-            color: 'orange',
+            color: 'fire',
             icon: 'Thermometer',
             source: 'temperature'
-        },
-        {
-            title: t('dewPoint'),
-            unit: '°C',
-            color: 'peach',
-            icon: 'Thermometer',
-            source: 'dewPoint'
         },
         {
             title: t('humidity'),
