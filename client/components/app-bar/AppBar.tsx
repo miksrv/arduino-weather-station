@@ -1,18 +1,23 @@
 import React from 'react'
+import { useTranslation } from 'next-i18next'
 
 import styles from './styles.module.sass'
 
 import { API } from '@/api'
-import { formatDate } from '@/tools/helpers'
+import { formatDate, minutesAgo, timeAgo } from '@/tools/helpers'
 import Icon from '@/ui/icon'
+import Spinner from '@/ui/spinner'
 
 interface HeaderProps {
     fullSize?: boolean
     onMenuClick?: () => void
 }
 
+const OFFLINE_TIME = 30
+
 const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
-    const { data: current } = API.useGetCurrentQuery(undefined, {pollingInterval: 60 * 1000})
+    const {t} = useTranslation()
+    const { data: current, isLoading } = API.useGetCurrentQuery(undefined, {pollingInterval: 60 * 1000})
 
     return (
         <header className={styles.appBar}>
@@ -25,7 +30,17 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     <Icon name={'Menu'} />
                 </button>
 
-                {formatDate(current?.update?.date)}
+                {!isLoading && <div className={minutesAgo(current?.update?.date) <= OFFLINE_TIME ? styles.online : styles.offline} />}
+
+                {isLoading ? (
+                    <div className={styles.loading}><Spinner /> {t('please-wait-loading')}</div>
+                ) : (
+                    <div>
+                        <div>{formatDate(current?.update?.date)}</div>
+                        <div className={styles.timeAgo}>{timeAgo(current?.update?.date)}</div>
+                    </div>
+                )}
+
             </div>
         </header>
     )

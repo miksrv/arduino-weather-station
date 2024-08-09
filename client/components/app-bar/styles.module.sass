@@ -11,6 +11,15 @@
     width: 100%
     top: 0
 
+    .loading
+        display: flex
+        align-items: center
+
+        svg
+            width: 20px
+            height: 20px
+            margin-right: 10px
+
     .wrapper
         display: flex
         max-width: var(--width-max)
@@ -33,6 +42,48 @@
             opacity: 1
 
         svg
-            width: 30px
-            height: 30px
+            width: 34px
+            height: 34px
             fill: var(--text-color-primary)
+
+    .timeAgo
+        font-size: $fontSizeCaption
+        color: var(--text-color-secondary)
+
+    .online, .offline
+        width: 5px
+        height: 32px
+        margin: 0 10px
+
+    .online
+        background: var(--color-green)
+        -webkit-animation: pulsate 2s infinite
+        -moz-animation: pulsate 2s infinite
+        animation: pulsate 2s infinite
+
+    .offline
+        background: var(--color-red)
+
+@-webkit-keyframes pulsate
+    0%
+        opacity: 1
+    50%
+        opacity: 0
+    100%
+        opacity: 1
+
+@-moz-keyframes pulsate
+    0%
+        opacity: 1
+    50%
+        opacity: 0
+    100%
+        opacity: 1
+
+@keyframes pulsate
+    0%
+        opacity: 1
+    50%
+        opacity: 0
+    100%
+        opacity: 1
