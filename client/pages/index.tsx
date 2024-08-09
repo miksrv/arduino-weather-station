@@ -38,7 +38,7 @@ type WidgetType = {
 }
 
 const IndexPage: NextPage<IndexPageProps> = () => {
-    const { i18n } = useTranslation()
+    const { i18n, t } = useTranslation()
 
     const { data: current } = API.useGetCurrentQuery(undefined, { pollingInterval: 60 * 1000 })
     const { data: history } = API.useGetHistoryQuery(
@@ -51,35 +51,35 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
     const widgets: WidgetType[] = [
         {
-            title: 'Температура',
+            title: t('temperature'),
             unit: '°C',
             color: 'orange',
             icon: 'Thermometer',
             source: 'temperature'
         },
         {
-            title: 'Точка росы',
+            title: t('dewPoint'),
             unit: '°C',
             color: 'peach',
             icon: 'Thermometer',
             source: 'dewPoint'
         },
         {
-            title: 'Влажность',
+            title: t('humidity'),
             unit: '%',
             color: 'blue',
             icon: 'Water',
             source: 'humidity'
         },
         {
-            title: 'Скорость ветра',
+            title: t('windSpeed'),
             unit: 'м/с',
             color: 'purple',
             icon: 'Wind',
             source: 'windSpeed'
         },
         {
-            title: 'Облачность',
+            title: t('cloudiness'),
             unit: '%',
             color: 'violet',
             icon: 'Cloud',

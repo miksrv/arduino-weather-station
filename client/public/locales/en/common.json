@@ -1,3 +1,8 @@
 {
+    "temperature": "Temperature",
+    "dewPoint": "Dew Point",
+    "humidity": "Humidity",
+    "windSpeed": "Wind Speed",
+    "cloudiness": "Cloudiness",
     "please-wait-loading": "Please wait, loading..."
 }

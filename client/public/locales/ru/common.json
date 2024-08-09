@@ -1,3 +1,8 @@
 {
+    "temperature": "Температура",
+    "dewPoint": "Точка росы",
+    "humidity": "Влажность",
+    "windSpeed": "Скорость ветра",
+    "cloudiness": "Облачность",
     "please-wait-loading": "Подождите, идет загрузка..."
 }
