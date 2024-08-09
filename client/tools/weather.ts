@@ -2,13 +2,13 @@ import { ApiModel } from '@/api'
 
 export interface MinMaxResult {
     min?: {
-        value: number;
-        date: string;
-    };
+        value: number
+        date: string
+    }
     max?: {
-        value: number;
-        date: string;
-    };
+        value: number
+        date: string
+    }
 }
 
 export const getMinMaxValues = (data?: ApiModel.History[], parameter?: keyof ApiModel.History): MinMaxResult => {
@@ -21,7 +21,7 @@ export const getMinMaxValues = (data?: ApiModel.History[], parameter?: keyof Api
     let maxValue = data[0][parameter] as number
     let maxDate = data[0].date.date
 
-    data.forEach(item => {
+    data.forEach((item) => {
         const value = item[parameter] as number
         const date = item.date.date
 

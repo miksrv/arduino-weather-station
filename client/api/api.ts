@@ -58,9 +58,5 @@ export const API = createApi({
         }
     },
     reducerPath: 'api',
-    tagTypes: [
-        'Current',
-        'History',
-        'Forecast'
-    ]
+    tagTypes: ['Current', 'History', 'Forecast']
 })

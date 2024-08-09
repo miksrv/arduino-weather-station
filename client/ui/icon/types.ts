@@ -1,6 +1,1 @@
-export type IconTypes =
-    | 'Menu'
-    | 'Light'
-    | 'Dark'
-    | 'Water'
-    | 'Thermometer'
+export type IconTypes = 'Menu' | 'Light' | 'Dark' | 'Water' | 'Thermometer' | 'Wind' | 'Cloud'

@@ -15,18 +15,18 @@ import { formatDate } from '@/tools/helpers'
 import { getMinMaxValues } from '@/tools/weather'
 import { IconTypes } from '@/ui/icon/types'
 
-interface IndexPageProps {
-
-}
+interface IndexPageProps {}
 
 const filterRecentData = (data?: ApiModel.History[]): ApiModel.History[] | [] => {
     const now = dayjs.utc()
     const twelveHoursAgo = now.subtract(12, 'hours')
 
-    return data?.filter(item => {
-        const itemDate = dayjs.utc(item.date.date)
-        return itemDate.isAfter(twelveHoursAgo)
-    }) || []
+    return (
+        data?.filter((item) => {
+            const itemDate = dayjs.utc(item.date.date)
+            return itemDate.isAfter(twelveHoursAgo)
+        }) || []
+    )
 }
 
 type WidgetType = {
@@ -40,11 +40,14 @@ type WidgetType = {
 const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n } = useTranslation()
 
-    const { data: current } = API.useGetCurrentQuery(undefined, {pollingInterval: 60 * 1000})
-    const { data: history } = API.useGetHistoryQuery({
-        start_date: formatDate(dayjs().subtract(1, 'day').format(), 'YYYY-MM-DD'),
-        end_date: formatDate(new Date(), 'YYYY-MM-DD')
-    }, {pollingInterval: 60 * 1000})
+    const { data: current } = API.useGetCurrentQuery(undefined, { pollingInterval: 60 * 1000 })
+    const { data: history } = API.useGetHistoryQuery(
+        {
+            start_date: formatDate(dayjs().subtract(1, 'day').format(), 'YYYY-MM-DD'),
+            end_date: formatDate(new Date(), 'YYYY-MM-DD')
+        },
+        { pollingInterval: 60 * 1000 }
+    )
 
     const widgets: WidgetType[] = [
         {
@@ -57,7 +60,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: 'Точка росы',
             unit: '°C',
-            color: 'orange',
+            color: 'peach',
             icon: 'Thermometer',
             source: 'dewPoint'
         },
@@ -71,16 +74,16 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: 'Скорость ветра',
             unit: 'м/с',
-            color: 'blue',
-            icon: 'Water',
+            color: 'purple',
+            icon: 'Wind',
             source: 'windSpeed'
         },
         {
-            title: 'Порывы ветра',
-            unit: 'м/с',
-            color: 'blue',
-            icon: 'Water',
-            source: 'windGust'
+            title: 'Облачность',
+            unit: '%',
+            color: 'violet',
+            icon: 'Cloud',
+            source: 'clouds'
         }
     ]
 
@@ -133,7 +136,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context): Promise<GetServerSidePropsResult<IndexPageProps>> => {
-            const locale = (context.locale ?? 'en')
+            const locale = context.locale ?? 'en'
             const translations = await serverSideTranslations(locale)
 
             store.dispatch(setLocale(locale))

@@ -7,4 +7,4 @@ export interface Request {
     end_date: string
 }
 
-export type Response = (ApiModel.Weather & {date: DateTime})[]
+export type Response = (ApiModel.Weather & { date: DateTime })[]

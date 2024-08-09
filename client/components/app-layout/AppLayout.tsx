@@ -19,8 +19,6 @@ interface AppLayoutProps {
 }
 
 const AppLayout: React.FC<AppLayoutProps> = ({ className, fullSize, children }) => {
-    const { t } = useTranslation()
-
     const application = useAppSelector((store) => store.application)
 
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)

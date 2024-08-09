@@ -16,8 +16,8 @@ interface HeaderProps {
 const OFFLINE_TIME = 30
 
 const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
-    const {t} = useTranslation()
-    const { data: current, isLoading } = API.useGetCurrentQuery(undefined, {pollingInterval: 60 * 1000})
+    const { t } = useTranslation()
+    const { data: current, isLoading } = API.useGetCurrentQuery(undefined, { pollingInterval: 60 * 1000 })
 
     return (
         <header className={styles.appBar}>
@@ -30,17 +30,22 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     <Icon name={'Menu'} />
                 </button>
 
-                {!isLoading && <div className={minutesAgo(current?.update?.date) <= OFFLINE_TIME ? styles.online : styles.offline} />}
+                {!isLoading && (
+                    <div
+                        className={minutesAgo(current?.update?.date) <= OFFLINE_TIME ? styles.online : styles.offline}
+                    />
+                )}
 
                 {isLoading ? (
-                    <div className={styles.loading}><Spinner /> {t('please-wait-loading')}</div>
+                    <div className={styles.loading}>
+                        <Spinner /> {t('please-wait-loading')}
+                    </div>
                 ) : (
                     <div>
                         <div>{formatDate(current?.update?.date)}</div>
                         <div className={styles.timeAgo}>{timeAgo(current?.update?.date)}</div>
                     </div>
                 )}
-
             </div>
         </header>
     )
