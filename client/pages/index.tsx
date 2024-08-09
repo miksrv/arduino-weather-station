@@ -40,8 +40,8 @@ type WidgetType = {
 const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n, t } = useTranslation()
 
-    const { data: current } = API.useGetCurrentQuery(undefined, { pollingInterval: 60 * 1000 })
-    const { data: history } = API.useGetHistoryQuery(
+    const { data: current, isLoading } = API.useGetCurrentQuery(undefined, { pollingInterval: 60 * 1000 })
+    const { data: history, isLoading: chartLoading } = API.useGetHistoryQuery(
         {
             start_date: formatDate(dayjs().subtract(1, 'day').format(), 'YYYY-MM-DD'),
             end_date: formatDate(new Date(), 'YYYY-MM-DD')
@@ -110,6 +110,8 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         unit={widget.unit}
                         title={widget.title}
                         icon={widget.icon}
+                        loading={isLoading}
+                        chartLoading={chartLoading}
                         minMax={getMinMaxValues(history, widget.source)}
                         currentValue={current?.conditions?.[widget.source]}
                         chart={

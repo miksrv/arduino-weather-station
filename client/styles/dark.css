@@ -46,6 +46,7 @@
     --link-color-active: #60a6f5;
 
     --overlay-background: rgba(35, 35, 36, 0.57);
+    --overlay-background-animation: linear-gradient( 90deg, transparent, rgba(255, 255, 255, 0.04), transparent );
 
     --button-default-background: transparent;
     --button-default-color: var(--text-color-primary);
