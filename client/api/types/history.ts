@@ -5,4 +5,4 @@ export interface Request {
     end_date: string
 }
 
-export type Response = ApiModel.History[]
+export type Response = ApiModel.Weather[]

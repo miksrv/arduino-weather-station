@@ -1,4 +1,5 @@
 export type Weather = {
+    date?: string
     temperature?: number
     feelsLike?: number
     pressure?: number

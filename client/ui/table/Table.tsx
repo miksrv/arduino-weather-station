@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import styles from './styles.module.sass'
 
-interface Column<T> {
+export interface Column<T> {
     header: string
     accessor: keyof T
     isSortable?: boolean
@@ -74,7 +74,7 @@ const Table = <T,>({ columns, data }: TableProps<T>) => {
                     {sortedData?.map((row, index) => (
                         <tr key={`tr${index}`}>
                             {columns?.map((column) => (
-                                <td key={String(column.accessor)}>{row[column.accessor]}</td>
+                                <td key={String(column.accessor)}>{row[column.accessor] as any}</td>
                             ))}
                         </tr>
                     ))}

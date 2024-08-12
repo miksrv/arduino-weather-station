@@ -1,3 +1,3 @@
 import { ApiModel } from '@/api'
 
-export type Response = ApiModel.Forecast[]
+export type Response = ApiModel.Weather[]

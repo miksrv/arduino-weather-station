@@ -35,10 +35,10 @@ class Current extends ResourceController {
 
         // Get the latest data for fields that are updated less frequently
         $latestData = $this->weatherDataModel->getLatestWeatherData(['precipitation', 'sol_energy', 'sol_radiation']); // 'sol_energy', 'sol_radiation', 'uv_index',
+        $latestDate = $this->weatherDataModel->getLastUpdateTime();
 
-        return $this->respond([
-            'conditions' => new WeatherData(array_merge($recentAverages, $latestData)),
-            'update'     => $this->weatherDataModel->getLastUpdateTime()
-        ]);
+        return $this->respond(
+            new WeatherData(array_merge(['date' => $latestDate], $recentAverages, $latestData))
+        );
     }
 }
