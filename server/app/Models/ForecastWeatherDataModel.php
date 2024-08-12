@@ -79,6 +79,9 @@ class ForecastWeatherDataModel extends Model
         'weather_id'    => '?int'
     ];
 
+    /**
+     * @return array
+     */
     public function getHourlyAverages(): array
     {
         return $this
@@ -90,6 +93,10 @@ class ForecastWeatherDataModel extends Model
             ->getResultArray();
     }
 
+    /**
+     * @param $allTime
+     * @return array
+     */
     public function getDailyAverages($allTime = false): array
     {
         return $this

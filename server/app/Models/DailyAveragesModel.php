@@ -76,6 +76,12 @@ class DailyAveragesModel extends Model
         'weather_id'    => '?int',
     ];
 
+    /**
+     * @param $startDate
+     * @param $endDate
+     * @param $groupInterval
+     * @return array
+     */
     public function getWeatherHistoryGrouped($startDate, $endDate, $groupInterval): array
     {
         return $this
