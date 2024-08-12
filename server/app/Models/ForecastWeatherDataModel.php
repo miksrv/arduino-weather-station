@@ -94,10 +94,9 @@ class ForecastWeatherDataModel extends Model
     }
 
     /**
-     * @param $allTime
      * @return array
      */
-    public function getDailyAverages($allTime = false): array
+    public function getDailyAverages(): array
     {
         return $this
             ->select($this->_getAverageSelect('day'))

@@ -18,15 +18,12 @@ import { IconTypes } from '@/ui/icon/types'
 
 interface IndexPageProps {}
 
-const filterRecentData = (data?: ApiModel.History[]): ApiModel.History[] | [] => {
+const filterRecentData = (data?: ApiModel.Weather[]): ApiModel.Weather[] | [] => {
     const now = dayjs.utc()
     const twelveHoursAgo = now.subtract(12, 'hours')
 
     return (
-        data?.filter((item) => {
-            const itemDate = dayjs.utc(item.date.date)
-            return itemDate.isAfter(twelveHoursAgo)
-        }) || []
+        data?.filter((item) => dayjs.utc(item.date).isAfter(twelveHoursAgo)) || []
     )
 }
 
@@ -123,7 +120,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         loading={currentLoading}
                         chartLoading={chartLoading}
                         minMax={getMinMaxValues(history, widget.source)}
-                        currentValue={current?.conditions?.[widget.source]}
+                        currentValue={current?.[widget.source]}
                         chart={
                             <WeatherChart
                                 color={widget.color as any}

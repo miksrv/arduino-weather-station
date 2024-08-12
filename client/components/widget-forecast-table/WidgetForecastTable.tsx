@@ -3,21 +3,15 @@ import React from 'react'
 import styles from './styles.module.sass'
 
 import { ApiModel } from '@/api'
-import { Forecast } from '@/api/models'
-import { formatDate } from '@/tools/helpers'
-import { MinMaxResult } from '@/tools/weather'
-import Icon from '@/ui/icon'
-import { IconTypes } from '@/ui/icon/types'
-import Skeleton from '@/ui/skeleton'
 import Table, { Column } from '@/ui/table'
 
 interface WidgetProps {
-    data?: ApiModel.Forecast[]
+    data?: ApiModel.Weather[]
     loading?: boolean
 }
 
 const WidgetForecastTable: React.FC<WidgetProps> = ({ data, loading }) => {
-    const columns: Column<ApiModel.Forecast>[] = [
+    const columns: Column<ApiModel.Weather>[] = [
         { header: 'Time', accessor: 'date', isSortable: true },
         { header: 'Temp', accessor: 'temperature', isSortable: true },
         { header: 'Conditions', accessor: 'weatherMain' },
@@ -30,7 +24,7 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ data, loading }) => {
     return (
         <div className={styles.widgetForecastTable}>
             <div className={styles.content}>
-                <Table<ApiModel.Forecast>
+                <Table<ApiModel.Weather>
                     columns={columns}
                     data={data}
                 />

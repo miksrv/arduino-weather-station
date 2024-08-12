@@ -72,6 +72,12 @@ class History extends ResourceController {
             $historyData = $this->dailyAveragesModel->getWeatherHistoryGrouped($startDate, $endDate, '1 DAY');
         }
 
-        return $this->respond($historyData);
+        $result = [];
+
+        foreach ($historyData as $data) {
+            $result[] = new WeatherData($data);
+        }
+
+        return $this->respond($result);
     }
 }

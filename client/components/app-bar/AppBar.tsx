@@ -32,7 +32,7 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
                 {!isLoading && (
                     <div
-                        className={minutesAgo(current?.update?.date) <= OFFLINE_TIME ? styles.online : styles.offline}
+                        className={minutesAgo(current?.date) <= OFFLINE_TIME ? styles.online : styles.offline}
                     />
                 )}
 
@@ -42,8 +42,8 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     </div>
                 ) : (
                     <div>
-                        <div>{formatDate(current?.update?.date)}</div>
-                        <div className={styles.timeAgo}>{timeAgo(current?.update?.date)}</div>
+                        <div>{formatDate(current?.date)}</div>
+                        <div className={styles.timeAgo}>{timeAgo(current?.date)}</div>
                     </div>
                 )}
             </div>

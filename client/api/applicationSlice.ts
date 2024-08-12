@@ -6,6 +6,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 type ApplicationStateProps = {
     locale?: 'ru' | 'en' | string
+    showOverlay?: boolean
 }
 
 export const getStorageLocale = (): string | undefined =>
@@ -21,10 +22,13 @@ const applicationSlice = createSlice({
     reducers: {
         setLocale: (state, { payload }: PayloadAction<'ru' | 'en' | string>) => {
             state.locale = payload
+        },
+        toggleOverlay: (state, { payload }: PayloadAction<boolean>) => {
+            state.showOverlay = payload
         }
     }
 })
 
-export const { setLocale } = applicationSlice.actions
+export const { setLocale, toggleOverlay } = applicationSlice.actions
 
 export default applicationSlice.reducer

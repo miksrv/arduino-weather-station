@@ -1,7 +1,5 @@
 <?php namespace App\Entities;
 
-use AllowDynamicProperties;
-use CodeIgniter\I18n\Time;
 use Exception;
 
 class WeatherData
@@ -40,14 +38,7 @@ class WeatherData
             }
         }
 
-
-
-        // Date conversion
-        if (!empty($data['forecast_time'])) {
-            $this->date = new Time($data['forecast_time']);
-        }
-
-        if (!empty($data['date'])) {
+        if (!empty($data['date']) && !is_string($data['date'])) {
             $this->date = $data['date']?->toDateTimeString();
         }
     }

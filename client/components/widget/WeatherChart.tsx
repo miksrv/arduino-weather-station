@@ -3,14 +3,13 @@ import { graphic } from 'echarts'
 import ReactECharts from 'echarts-for-react'
 
 import { ApiModel } from '@/api'
-import { DateTime } from '@/api/types'
 
 type Colors = 'orange' | 'blue'
 
 interface Props {
     color?: Colors
-    data?: (ApiModel.Weather & { date: DateTime })[]
-    yAxisField?: keyof (ApiModel.Weather & { date: DateTime })
+    data?: ApiModel.Weather[]
+    yAxisField?: keyof ApiModel.Weather
 }
 
 const colors = {
@@ -27,7 +26,7 @@ const colors = {
 const WeatherChart: React.FC<Props> = ({ color, data, yAxisField }) => {
     const formatData = () => {
         return data?.map((item) => ({
-            date: new Date(item.date.date).toLocaleString(),
+            date: new Date(item?.date || '').toLocaleString(),
             value: yAxisField ? item?.[yAxisField] : ''
         }))
     }

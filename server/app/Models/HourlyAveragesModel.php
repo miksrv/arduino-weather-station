@@ -90,6 +90,7 @@ class HourlyAveragesModel extends Model
             ->where('date <=', $endDate)
             ->groupBy("FLOOR(UNIX_TIMESTAMP(date)/" . (strtotime('+' . $groupInterval) - strtotime('now')) . ")")
             ->orderBy('date', 'ASC')
-            ->findAll();
+            ->get()
+            ->getResultArray();
     }
 }
