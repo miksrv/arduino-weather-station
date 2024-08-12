@@ -1,0 +1,27 @@
+@import ../../styles/variables
+@import ../../styles/animations
+
+.tableContainer
+    overflow-x: auto
+
+    .table
+        width: 100%
+        border-collapse: collapse
+
+        th, td
+            padding: 8px 12px
+            border: 1px solid #ddd
+            text-align: left
+
+        th.sortable
+            cursor: pointer
+
+            &:hover
+                background-color: #f0f0f0
+
+        thead th
+            position: sticky
+            top: 0
+            background: #333
+            color: white
+            z-index: 1
