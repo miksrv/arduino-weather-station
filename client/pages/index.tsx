@@ -11,6 +11,7 @@ import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import Widget from '@/components/widget'
 import WeatherChart from '@/components/widget/WeatherChart'
+import WidgetForecastTable from '@/components/widget-forecast-table'
 import { formatDate } from '@/tools/helpers'
 import { getMinMaxValues } from '@/tools/weather'
 import { IconTypes } from '@/ui/icon/types'
@@ -40,7 +41,16 @@ type WidgetType = {
 const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n, t } = useTranslation()
 
-    const { data: current, isLoading } = API.useGetCurrentQuery(undefined, { pollingInterval: 60 * 1000 })
+    const { data: forecastHourly, isLoading: hourlyLoading } = API.useGetForecastQuery('hourly', {
+        pollingInterval: 10 * 60 * 1000
+    })
+    const { data: forecastDaily, isLoading: dailyLoading } = API.useGetForecastQuery('daily', {
+        pollingInterval: 10 * 60 * 1000
+    })
+
+    const { data: current, isLoading: currentLoading } = API.useGetCurrentQuery(undefined, {
+        pollingInterval: 5 * 60 * 1000
+    })
     const { data: history, isLoading: chartLoading } = API.useGetHistoryQuery(
         {
             start_date: formatDate(dayjs().subtract(1, 'day').format(), 'YYYY-MM-DD'),
@@ -110,7 +120,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         unit={widget.unit}
                         title={widget.title}
                         icon={widget.icon}
-                        loading={isLoading}
+                        loading={currentLoading}
                         chartLoading={chartLoading}
                         minMax={getMinMaxValues(history, widget.source)}
                         currentValue={current?.conditions?.[widget.source]}
@@ -123,6 +133,11 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         }
                     />
                 ))}
+
+                <WidgetForecastTable
+                    loading={dailyLoading}
+                    data={forecastDaily}
+                />
             </div>
         </AppLayout>
     )

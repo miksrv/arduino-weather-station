@@ -5,7 +5,7 @@ import * as LocalStorage from '@/tools/localstorage'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 type ApplicationStateProps = {
-    locale?: 'ru' | 'en'
+    locale?: 'ru' | 'en' | string
 }
 
 export const getStorageLocale = (): string | undefined =>
@@ -19,7 +19,7 @@ const applicationSlice = createSlice({
     } as ApplicationStateProps,
     name: 'application',
     reducers: {
-        setLocale: (state, { payload }: PayloadAction<'ru' | 'en'>) => {
+        setLocale: (state, { payload }: PayloadAction<'ru' | 'en' | string>) => {
             state.locale = payload
         }
     }

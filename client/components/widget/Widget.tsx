@@ -27,7 +27,11 @@ const Widget: React.FC<WidgetProps> = ({ title, icon, loading, chartLoading, cur
                 {icon && <Icon name={icon} />}
             </div>
             <div className={styles.value}>
-                {loading ? <Skeleton style={{ width: 100, height: 35, marginTop: 10, marginBottom: 5 }} /> : (currentValue || '??')}
+                {loading ? (
+                    <Skeleton style={{ width: 100, height: 35, marginTop: 10, marginBottom: 5 }} />
+                ) : (
+                    currentValue || '??'
+                )}
                 {unit && !loading && <span>{unit}</span>}
             </div>
             {minMax && (
@@ -46,10 +50,10 @@ const Widget: React.FC<WidgetProps> = ({ title, icon, loading, chartLoading, cur
                         </span>
                         <span>
                             {chartLoading ? (
-                                    <Skeleton style={{ width: 40, height: 15, marginTop: 5 }} />
-                            ) :
+                                <Skeleton style={{ width: 40, height: 15, marginTop: 5 }} />
+                            ) : (
                                 formatDate(minMax?.min?.date, 'HH:mm')
-                            }
+                            )}
                         </span>
                     </div>
                     <div className={styles.block}>
@@ -67,14 +71,18 @@ const Widget: React.FC<WidgetProps> = ({ title, icon, loading, chartLoading, cur
                         <span>
                             {chartLoading ? (
                                 <Skeleton style={{ width: 40, height: 15, marginTop: 5 }} />
-                            ) :
+                            ) : (
                                 formatDate(minMax?.max?.date, 'HH:mm')
-                            }
+                            )}
                         </span>
                     </div>
                 </div>
             )}
-            {chart && <div className={styles.chart}>{chartLoading ? <Skeleton style={{ width: '100%', height: 54 }} /> : chart}</div>}
+            {chart && (
+                <div className={styles.chart}>
+                    {chartLoading ? <Skeleton style={{ width: '100%', height: 54 }} /> : chart}
+                </div>
+            )}
         </div>
     </div>
 )

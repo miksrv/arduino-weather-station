@@ -46,9 +46,9 @@ export const API = createApi({
             query: (params) => `history${encodeQueryData(params)}`,
             transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
         }),
-        getForecast: builder.query<any, Maybe<any>>({
+        getForecast: builder.query<ApiType.Forecast.Response, 'hourly' | 'daily'>({
             providesTags: ['Forecast'],
-            query: () => 'forecast',
+            query: (period) => `forecast/${period}`,
             transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
         })
     }),
