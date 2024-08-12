@@ -111,7 +111,7 @@ class ForecastWeatherDataModel extends Model
         $formatHours = $groupBy === 'hour' ? '%H:00:00' : '00:00:00';
 
         return 'DATE_FORMAT(forecast_time, "%Y-%m-%d ' . $formatHours . '") as ' . $groupBy . ',' .
-            'DATE_FORMAT(forecast_time, "%Y-%m-%d ' . $formatHours . '") AS forecast_time,' .
+            'DATE_FORMAT(forecast_time, "%Y-%m-%d ' . $formatHours . '") AS date,' .
             'ROUND(AVG(temperature), 2) as temperature,' .
             'ROUND(AVG(feels_like), 2) as feels_like,' .
             'ROUND(AVG(pressure), 2) as pressure,' .

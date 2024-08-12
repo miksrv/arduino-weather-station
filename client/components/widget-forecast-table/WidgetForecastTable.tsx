@@ -18,17 +18,15 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ data, loading }) => {
         { header: 'Wind', accessor: 'windSpeed', isSortable: true },
         { header: 'Humidity', accessor: 'humidity', isSortable: true },
         { header: 'Pressure', accessor: 'pressure', isSortable: true },
-        { header: 'UV', accessor: 'uvIndex', isSortable: true }
+        { header: 'Precipitation', accessor: 'precipitation', isSortable: true }
     ]
 
     return (
         <div className={styles.widgetForecastTable}>
-            <div className={styles.content}>
-                <Table<ApiModel.Weather>
-                    columns={columns}
-                    data={data}
-                />
-            </div>
+            <Table<ApiModel.Weather>
+                columns={columns}
+                data={data}
+            />
         </div>
     )
 }

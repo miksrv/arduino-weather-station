@@ -135,6 +135,11 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     loading={dailyLoading}
                     data={forecastDaily}
                 />
+
+                <WidgetForecastTable
+                    loading={hourlyLoading}
+                    data={forecastHourly}
+                />
             </div>
         </AppLayout>
     )
