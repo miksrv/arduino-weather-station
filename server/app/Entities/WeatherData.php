@@ -1,4 +1,6 @@
-<?php namespace App\Entities;
+<?php
+
+namespace App\Entities;
 
 use Exception;
 
@@ -19,8 +21,6 @@ class WeatherData
     public ?float $windGust;
     public ?int $windDeg;
     public ?int $weatherId;
-    public ?string $weatherMain;
-    public ?string $weatherIcon;
     public ?string $date;
 
     /**

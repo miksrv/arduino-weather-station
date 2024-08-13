@@ -14,7 +14,6 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ data, loading }) => {
     const columns: Column<ApiModel.Weather>[] = [
         { header: 'Date', accessor: 'date', isSortable: true },
         { header: 'ID', accessor: 'weatherId' },
-        { header: 'Conditions', accessor: 'weatherMain' },
         { header: 'Temp', accessor: 'temperature', isSortable: true },
         { header: 'Clouds', accessor: 'clouds', isSortable: true }
     ]

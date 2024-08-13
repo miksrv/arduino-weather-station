@@ -15,6 +15,4 @@ export type Weather = {
     windGust?: number
     windDeg?: number
     weatherId?: number
-    weatherMain?: number
-    weatherIcon?: number
 }
