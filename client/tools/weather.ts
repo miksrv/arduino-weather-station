@@ -11,19 +11,19 @@ export interface MinMaxResult {
     }
 }
 
-export const getMinMaxValues = (data?: ApiModel.History[], parameter?: keyof ApiModel.History): MinMaxResult => {
+export const getMinMaxValues = (data?: ApiModel.Weather[], parameter?: keyof ApiModel.Weather): MinMaxResult => {
     if (!data?.length || !parameter) {
         return {}
     }
 
     let minValue = data[0][parameter] as number
-    let minDate = data[0].date.date
+    let minDate = data[0].date
     let maxValue = data[0][parameter] as number
-    let maxDate = data[0].date.date
+    let maxDate = data[0].date
 
     data.forEach((item) => {
         const value = item[parameter] as number
-        const date = item.date.date
+        const date = item.date
 
         if (value < minValue) {
             minValue = value
@@ -39,11 +39,11 @@ export const getMinMaxValues = (data?: ApiModel.History[], parameter?: keyof Api
     return {
         min: {
             value: minValue,
-            date: minDate
+            date: minDate ?? ''
         },
         max: {
             value: maxValue,
-            date: maxDate
+            date: maxDate ?? ''
         }
     }
 }

@@ -22,9 +22,7 @@ const filterRecentData = (data?: ApiModel.Weather[]): ApiModel.Weather[] | [] =>
     const now = dayjs.utc()
     const twelveHoursAgo = now.subtract(12, 'hours')
 
-    return (
-        data?.filter((item) => dayjs.utc(item.date).isAfter(twelveHoursAgo)) || []
-    )
+    return data?.filter((item) => dayjs.utc(item.date).isAfter(twelveHoursAgo)) || []
 }
 
 type WidgetType = {
@@ -133,7 +131,10 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
                 <WidgetForecastTable
                     loading={dailyLoading}
-                    data={forecastDaily?.map((forecast) => ({ ...forecast, date: formatDate(forecast.date, 'dd, MMM D') }))}
+                    data={forecastDaily?.map((forecast) => ({
+                        ...forecast,
+                        date: formatDate(forecast.date, 'dd, MMM D')
+                    }))}
                 />
 
                 <WidgetForecastTable

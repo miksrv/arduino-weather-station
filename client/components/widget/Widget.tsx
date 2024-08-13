@@ -29,7 +29,7 @@ const Widget: React.FC<WidgetProps> = ({ title, icon, loading, chartLoading, cur
             {loading ? (
                 <Skeleton style={{ width: 100, height: 35, marginTop: 10, marginBottom: 5 }} />
             ) : (
-                currentValue || '??'
+                (currentValue ?? '??')
             )}
             {unit && !loading && <span>{unit}</span>}
         </div>
@@ -38,42 +38,42 @@ const Widget: React.FC<WidgetProps> = ({ title, icon, loading, chartLoading, cur
                 <div className={styles.block}>
                     <span className={styles.title}>Min</span>
                     <span>
-                            {chartLoading ? (
-                                <Skeleton style={{ width: 40, height: 15, marginTop: 2 }} />
-                            ) : (
-                                <>
-                                    {minMax?.min?.value}
-                                    {unit && <span>{unit}</span>}
-                                </>
-                            )}
-                        </span>
+                        {chartLoading ? (
+                            <Skeleton style={{ width: 40, height: 15, marginTop: 2 }} />
+                        ) : (
+                            <>
+                                {minMax?.min?.value}
+                                {unit && <span>{unit}</span>}
+                            </>
+                        )}
+                    </span>
                     <span>
-                            {chartLoading ? (
-                                <Skeleton style={{ width: 40, height: 15, marginTop: 5 }} />
-                            ) : (
-                                formatDate(minMax?.min?.date, 'HH:mm')
-                            )}
-                        </span>
+                        {chartLoading ? (
+                            <Skeleton style={{ width: 40, height: 15, marginTop: 5 }} />
+                        ) : (
+                            formatDate(minMax?.min?.date, 'HH:mm')
+                        )}
+                    </span>
                 </div>
                 <div className={styles.block}>
                     <span className={styles.title}>Max</span>
                     <span>
-                            {chartLoading ? (
-                                <Skeleton style={{ width: 40, height: 15, marginTop: 2 }} />
-                            ) : (
-                                <>
-                                    {minMax?.max?.value}
-                                    {unit && <span>{unit}</span>}
-                                </>
-                            )}
-                        </span>
+                        {chartLoading ? (
+                            <Skeleton style={{ width: 40, height: 15, marginTop: 2 }} />
+                        ) : (
+                            <>
+                                {minMax?.max?.value}
+                                {unit && <span>{unit}</span>}
+                            </>
+                        )}
+                    </span>
                     <span>
-                            {chartLoading ? (
-                                <Skeleton style={{ width: 40, height: 15, marginTop: 5 }} />
-                            ) : (
-                                formatDate(minMax?.max?.date, 'HH:mm')
-                            )}
-                        </span>
+                        {chartLoading ? (
+                            <Skeleton style={{ width: 40, height: 15, marginTop: 5 }} />
+                        ) : (
+                            formatDate(minMax?.max?.date, 'HH:mm')
+                        )}
+                    </span>
                 </div>
             </div>
         )}

@@ -26,7 +26,7 @@ const Table = <T,>({ columns, data }: TableProps<T>) => {
             return data
         }
 
-        return [...data || []]?.sort((a, b) => {
+        return [...(data || [])]?.sort((a, b) => {
             if (a[sortConfig.key] < b[sortConfig.key]) {
                 return sortConfig.direction === 'asc' ? -1 : 1
             }
