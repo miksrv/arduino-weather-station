@@ -191,7 +191,7 @@ class WeatherAPILibrary
      * @return int|null
      * @link https://www.weatherapi.com/docs/weather_conditions.json
      */
-    protected static function convertWeatherCondition(int $weatherId): ?int {
+    public static function convertWeatherCondition(int $weatherId): ?int {
         return self::$conditionMapping[$weatherId] ?? null;
     }
 }

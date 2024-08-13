@@ -139,7 +139,7 @@ class VisualCrossingAPILibrary
      * @return int|null
      * @link https://www.visualcrossing.com/resources/documentation/weather-api/weather-condition-fields/
      */
-    protected static function convertWeatherCondition(string $conditions): ?int {
+    public static function convertWeatherCondition(string $conditions): ?int {
         $conditions = explode(',', $conditions);
         return self::$conditionMapping[trim($conditions[0])] ?? null;
     }

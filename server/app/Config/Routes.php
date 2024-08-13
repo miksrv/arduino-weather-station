@@ -7,7 +7,6 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->cli('system/current', 'System::getCurrentWeather'); // php index.php system current
 $routes->cli('system/forecast', 'System::getForecastWeather'); // php index.php system forecast
-$routes->cli('system/migrate', 'MigrationController::migrateWeatherData'); // php index.php system migrate
 
 $routes->get('current', 'Current::getCurrentWeather');
 $routes->options('current', 'Current');

@@ -133,7 +133,7 @@ class OpenWeatherAPILibrary
      * @return int
      * @link https://openweathermap.org/weather-conditions
      */
-    protected static function convertWeatherCondition(int $weatherId): int {
+    public static function convertWeatherCondition(int $weatherId): int {
         return (int) $weatherId;
     }
 }
