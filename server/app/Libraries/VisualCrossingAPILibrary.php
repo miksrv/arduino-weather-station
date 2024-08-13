@@ -17,6 +17,57 @@ class VisualCrossingAPILibrary
 
     protected CURLRequest $httpClient;
 
+    /**
+     * @lnk https://docs.google.com/spreadsheets/d/1cc-jQIap7ZToVaEgiXEk_Aa6YVYjSObLV9PMe4oHrFg/edit?gid=2045823731#gid=2045823731
+     * @var array|int[]
+     */
+    protected static array $conditionMapping = [
+        // Текстовое состояние => Custom ID
+        'Blowing Or Drifting Snow'             => 621, // Shower snow
+        'Heavy Freezing Drizzle/Freezing Rain' => 511, // Heavy freezing drizzle
+        'Light Freezing Drizzle/Freezing Rain' => 511, // Light freezing drizzle
+        'Freezing Fog'                         => 741, // Freezing fog
+        'Heavy Freezing Rain'                  => 511, // Heavy freezing rain
+        'Light Freezing Rain'                  => 511, // Light freezing rain
+        'Funnel Cloud/Tornado'                 => 781, // Tornado
+        'Hail Showers'                         => 621, // Shower snow (альтернативный вариант)
+        'Ice'                                  => 611, // Sleet
+        'Lightning Without Thunder'            => 211, // Thunderstorm
+        'Mist'                                 => 701, // Mist
+        'Drizzle'                              => 301, // Drizzle
+        'Precipitation In Vicinity'            => 520, // Light intensity shower rain
+        'Rain'                                 => 501, // Moderate rain
+        'Heavy Rain And Snow'                  => 616, // Rain and snow
+        'Light Rain And Snow'                  => 615, // Light rain and snow
+        'Rain Showers'                         => 521, // Shower rain
+        'Heavy Rain'                           => 502, // Heavy intensity rain
+        'Light Rain'                           => 500, // Light rain
+        'Sky Coverage Decreasing'              => 801, // Few clouds
+        'Sky Coverage Increasing'              => 802, // Scattered clouds
+        'Sky Unchanged'                        => 800, // Clear sky
+        'Heavy Drizzle'                        => 302, // Heavy intensity drizzle
+        'Smoke Or Haze'                        => 711, // Smoke
+        'Snow'                                 => 601, // Snow
+        'Snow And Rain Showers'                => 616, // Rain and snow
+        'Snow Showers'                         => 621, // Shower snow
+        'Heavy Snow'                           => 602, // Heavy snow
+        'Light Snow'                           => 600, // Light snow
+        'Squalls'                              => 771, // Squalls
+        'Thunderstorm'                         => 211, // Thunderstorm
+        'Thunderstorm Without Precipitation'   => 211, // Thunderstorm
+        'Diamond Dust'                         => 741, // Mist (альтернативный вариант)
+        'Light Drizzle'                        => 300, // Light intensity drizzle
+        'Hail'                                 => 621, // Shower snow (альтернативный вариант)
+        'Overcast'                             => 804, // Overcast clouds
+        'Partially cloudy'                     => 802, // Scattered clouds
+        'Clear'                                => 800, // Clear sky
+        'Heavy Drizzle/Rain'                   => 302, // Heavy intensity drizzle
+        'Light Drizzle/Rain'                   => 300, // Light intensity drizzle
+        'Dust storm'                           => 761, // Dust
+        'Fog'                                  => 741, // Fog
+        'Freezing Drizzle/Freezing Rain'       => 511, // Freezing drizzle
+    ];
+
     public function __construct()
     {
         $this->httpClient = Services::curlrequest();
@@ -77,11 +128,19 @@ class VisualCrossingAPILibrary
             'sol_energy'    => (float) $data['currentConditions']['solarenergy'] ?? null,
             'sol_radiation' => (float) $data['currentConditions']['solarradiation'] ?? null,
             'precipitation' => (float) $data['currentConditions']['precip'] ?? null,
-            // 'weather_id'    => (int) $data['currentConditions']['condition']['code'] ?? null,
-            'weather_main'  => $data['currentConditions']['conditions'] ?? null,
-            'weather_icon'  => $data['currentConditions']['icon'] ?? null,
+            'weather_id'    => !empty($data['currentConditions']['conditions']) ? self::convertWeatherCondition($data['currentConditions']['conditions']) : null,
             'date'          => !empty($data['currentConditions']['datetimeEpoch']) ? Time::createFromTimestamp($data['currentConditions']['datetimeEpoch']) : null,
             'source'        => RawWeatherDataModel::SOURCE_VISUALCROSSING
         ];
+    }
+
+    /**
+     * @param string $conditions
+     * @return int|null
+     * @link https://www.visualcrossing.com/resources/documentation/weather-api/weather-condition-fields/
+     */
+    protected static function convertWeatherCondition(string $conditions): ?int {
+        $conditions = explode(',', $conditions);
+        return self::$conditionMapping[trim($conditions[0])] ?? null;
     }
 }

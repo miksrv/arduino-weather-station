@@ -24,9 +24,7 @@ class WeatherDataEntity extends Entity
         'wind_speed'    => null,
         'wind_deg'      => null,
         'wind_gust'     => null,
-        'weather_id'    => null,
-        'weather_main'  => null,
-        'weather_icon'  => null,
+        'weather_id'    => null
     ];
 
     protected $dates = ['date'];
@@ -48,9 +46,7 @@ class WeatherDataEntity extends Entity
         'wind_speed'    => 'float',
         'wind_deg'      => 'integer',
         'wind_gust'     => 'float',
-        'weather_id'    => 'integer',
-        'weather_main'  => 'string',
-        'weather_icon'  => 'string',
+        'weather_id'    => 'integer'
     ];
 
     protected $datamap = [
@@ -62,8 +58,6 @@ class WeatherDataEntity extends Entity
         'windSpeed'    => 'wind_speed',
         'windDeg'      => 'wind_deg',
         'windGust'     => 'wind_gust',
-        'weatherId'    => 'weather_id',
-        'weatherMain'  => 'weather_main',
-        'weatherIcon'  => 'weather_icon',
+        'weatherId'    => 'weather_id'
     ];
 }

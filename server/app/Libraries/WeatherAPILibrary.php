@@ -15,6 +15,62 @@ class WeatherAPILibrary
 
     protected CURLRequest $httpClient;
 
+    /**
+     * @lnk https://www.weatherapi.com/docs/weather_conditions.json
+     * @var array|int[]
+     */
+    protected static array $conditionMapping = [
+        // WeatherAPI ID => Custom ID
+        1000 => 800, // Clear sky
+        1003 => 801, // Partly cloudy
+        1006 => 802, // Cloudy
+        1009 => 804, // Overcast
+        1030 => 741, // Mist
+        1063 => 500, // Patchy rain possible
+        1066 => 600, // Patchy snow possible
+        1069 => 611, // Patchy sleet possible
+        1072 => 615, // Patchy freezing drizzle possible
+        1087 => 211, // Thunderstorm
+        1114 => 621, // Blowing snow
+        1117 => 602, // Blizzard
+        1135 => 741, // Fog
+        1147 => 741, // Freezing fog
+        1150 => 511, // Patchy light drizzle
+        1153 => 511, // Light drizzle
+        1168 => 511, // Freezing drizzle
+        1171 => 511, // Heavy freezing drizzle
+        1180 => 520, // Patchy light rain
+        1183 => 500, // Light rain
+        1186 => 501, // Moderate rain at times
+        1189 => 501, // Moderate rain
+        1192 => 502, // Heavy rain at times
+        1195 => 502, // Heavy rain
+        1198 => 511, // Light freezing rain
+        1201 => 511, // Moderate or heavy freezing rain
+        1204 => 611, // Light sleet
+        1207 => 611, // Moderate or heavy sleet
+        1210 => 600, // Patchy light snow
+        1213 => 600, // Light snow
+        1216 => 601, // Patchy moderate snow
+        1219 => 601, // Moderate snow
+        1222 => 602, // Patchy heavy snow
+        1225 => 602, // Heavy snow
+        1237 => 611, // Ice pellets
+        1240 => 520, // Light rain shower
+        1243 => 522, // Moderate or heavy rain shower
+        1246 => 522, // Torrential rain shower
+        1249 => 611, // Light sleet showers
+        1252 => 611, // Moderate or heavy sleet showers
+        1255 => 620, // Light snow showers
+        1258 => 621, // Moderate or heavy snow showers
+        1261 => 611, // Light showers of ice pellets
+        1264 => 611, // Moderate or heavy showers of ice pellets
+        1273 => 211, // Patchy light rain with thunder
+        1276 => 211, // Moderate or heavy rain with thunder
+        1279 => 212, // Patchy light snow with thunder
+        1282 => 212, // Moderate or heavy snow with thunder
+    ];
+
     public function __construct()
     {
         helper('weather');
@@ -53,11 +109,6 @@ class WeatherAPILibrary
 
         return $return;
     }
-
-//    public function getHistoricalWeather(string $location, string $date): array
-//    {
-//        return $this->request('/history.json', ['q' => $location, 'dt' => $date]);
-//    }
 
     /**
      * Makes a request to the WeatherAPI.com
@@ -102,9 +153,7 @@ class WeatherAPILibrary
             'clouds'        => $data['current']['cloud'] ?? null,
             'uv_index'      => $data['current']['uv'] ?? null,
             'precipitation' => $data['current']['precip_mm'] ?? null,
-            'weather_id'    => (int) $data['current']['condition']['code'] ?? null,
-            'weather_main'  => $data['current']['condition']['text'] ?? null,
-            // 'weather_icon'  => $data['current']['condition']['icon'] ?? null,
+            'weather_id'    => !empty($data['current']['condition']['code']) ? self::convertWeatherCondition((int) $data['current']['condition']['code']) : null,
             'date'          => !empty($data['current']['last_updated_epoch']) ? Time::createFromTimestamp($data['current']['last_updated_epoch']) : null,
             'source'        => RawWeatherDataModel::SOURCE_WEATHERAPI
         ];
@@ -131,11 +180,18 @@ class WeatherAPILibrary
             'clouds'        => $data['cloud'] ?? null,
             'uv_index'      => $data['uv'] ?? null,
             'precipitation' => $data['precip_mm'] ?? null,
-            'weather_id'    => (int) $data['condition']['code'] ?? null,
-            'weather_main'  => $data['condition']['text'] ?? null,
-            // 'weather_icon'  => $data['condition']['icon'] ?? null,
+            'weather_id'    => !empty($data['condition']['code']) ? self::convertWeatherCondition((int) $data['condition']['code']) : null,
             'forecast_time' => !empty($data['time_epoch']) ? Time::createFromTimestamp($data['time_epoch']) : null,
             'source'        => RawWeatherDataModel::SOURCE_WEATHERAPI
         ];
+    }
+
+    /**
+     * @param int $weatherId
+     * @return int|null
+     * @link https://www.weatherapi.com/docs/weather_conditions.json
+     */
+    protected static function convertWeatherCondition(int $weatherId): ?int {
+        return self::$conditionMapping[$weatherId] ?? null;
     }
 }

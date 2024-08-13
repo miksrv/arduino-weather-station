@@ -97,9 +97,7 @@ class OpenWeatherAPILibrary
             'wind_deg'      => $data['wind']['deg'] ?? null,
             'clouds'        => $data['clouds']['all'] ?? null,
             'precipitation' => $data['rain']['1h'] ?? ($data['snow']['1h'] ?? null),
-            'weather_id'    => $data['weather'][0]['id'] ?? null,
-            'weather_main'  => $data['weather'][0]['main'] ?? null,
-            'weather_icon'  => $data['weather'][0]['icon'] ?? null,
+            'weather_id'    => !empty($data['weather'][0]['id']) ? self::convertWeatherCondition($data['weather'][0]['id']) : null,
             'date'          => !empty($data['dt']) ? Time::createFromTimestamp($data['dt']) : null,
             'source'        => RawWeatherDataModel::SOURCE_OPENWEATHERMAP
         ];
@@ -124,11 +122,18 @@ class OpenWeatherAPILibrary
             'wind_deg'      => $data['wind']['deg'] ?? null,
             'clouds'        => $data['clouds']['all'] ?? null,
             'precipitation' => $data['rain']['1h'] ?? ($data['snow']['1h'] ?? null),
-            'weather_id'    => $data['weather'][0]['id'] ?? null,
-            'weather_main'  => $data['weather'][0]['main'] ?? null,
-            'weather_icon'  => $data['weather'][0]['icon'] ?? null,
+            'weather_id'    => !empty($data['weather'][0]['id']) ? self::convertWeatherCondition($data['weather'][0]['id']) : null,
             'forecast_time' => !empty($data['dt']) ? Time::createFromTimestamp($data['dt']) : null,
             'source'        => RawWeatherDataModel::SOURCE_OPENWEATHERMAP
         ];
+    }
+
+    /**
+     * @param int $weatherId
+     * @return int
+     * @link https://openweathermap.org/weather-conditions
+     */
+    protected static function convertWeatherCondition(int $weatherId): int {
+        return (int) $weatherId;
     }
 }
