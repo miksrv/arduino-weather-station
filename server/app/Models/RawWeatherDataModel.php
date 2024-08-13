@@ -35,9 +35,7 @@ class RawWeatherDataModel extends Model
         'wind_speed',
         'wind_deg',
         'wind_gust',
-        'weather_id',
-        'weather_main',
-        'weather_icon'
+        'weather_id'
     ];
 
     protected $validationRules = [
@@ -58,8 +56,6 @@ class RawWeatherDataModel extends Model
         'wind_deg'      => 'permit_empty|integer',
         'wind_gust'     => 'permit_empty|decimal',
         'weather_id'    => 'permit_empty|integer',
-        'weather_main'  => 'permit_empty|max_length[50]',
-        'weather_icon'  => 'permit_empty|max_length[50]',
     ];
 
     protected $validationMessages = [
@@ -216,9 +212,7 @@ class RawWeatherDataModel extends Model
             'ROUND(AVG(wind_speed), 2) as wind_speed,' .
             'ROUND(AVG(wind_deg), 2) as wind_deg,' .
             'ROUND(AVG(wind_gust), 2) as wind_gust,' .
-            'MAX(weather_id) as weather_id,' .
-            'MAX(weather_main) as weather_main,' .
-            'MAX(weather_icon) as weather_icon';
+            'MAX(weather_id) as weather_id,';
     }
 
     /**

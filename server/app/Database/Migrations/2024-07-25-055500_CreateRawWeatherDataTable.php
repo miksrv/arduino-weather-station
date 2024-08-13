@@ -84,17 +84,7 @@ class CreateRawWeatherDataTable extends Migration
             'weather_id' => [
                 'type' => 'INT',
                 'null' => true,
-            ],
-            'weather_main' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '50',
-                'null'       => true,
-            ],
-            'weather_icon' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '50',
-                'null'       => true,
-            ],
+            ]
         ]);
         $this->forge->addKey('id', true, true);
         $this->forge->addKey('date');

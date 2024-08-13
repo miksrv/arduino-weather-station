@@ -27,9 +27,7 @@ class DailyAveragesModel extends Model
         'wind_speed',
         'wind_deg',
         'wind_gust',
-        'weather_id',
-        'weather_main',
-        'weather_icon'
+        'weather_id'
     ];
 
     protected $validationRules = [
@@ -48,9 +46,7 @@ class DailyAveragesModel extends Model
         'wind_speed'    => 'permit_empty|decimal',
         'wind_deg'      => 'permit_empty|decimal',
         'wind_gust'     => 'permit_empty|decimal',
-        'weather_id'    => 'permit_empty|integer',
-        'weather_main'  => 'permit_empty|max_length[50]',
-        'weather_icon'  => 'permit_empty|max_length[50]',
+        'weather_id'    => 'permit_empty|integer'
     ];
 
     protected $validationMessages = [
@@ -73,7 +69,7 @@ class DailyAveragesModel extends Model
         'wind_speed'    => '?float',
         'wind_deg'      => '?float',
         'wind_gust'     => '?float',
-        'weather_id'    => '?int',
+        'weather_id'    => '?int'
     ];
 
     /**
