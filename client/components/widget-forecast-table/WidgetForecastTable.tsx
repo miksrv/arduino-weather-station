@@ -12,13 +12,11 @@ interface WidgetProps {
 
 const WidgetForecastTable: React.FC<WidgetProps> = ({ data, loading }) => {
     const columns: Column<ApiModel.Weather>[] = [
-        { header: 'Time', accessor: 'date', isSortable: true },
-        { header: 'Temp', accessor: 'temperature', isSortable: true },
+        { header: 'Date', accessor: 'date', isSortable: true },
+        { header: 'ID', accessor: 'weatherId' },
         { header: 'Conditions', accessor: 'weatherMain' },
-        { header: 'Wind', accessor: 'windSpeed', isSortable: true },
-        { header: 'Humidity', accessor: 'humidity', isSortable: true },
-        { header: 'Pressure', accessor: 'pressure', isSortable: true },
-        { header: 'Precipitation', accessor: 'precipitation', isSortable: true }
+        { header: 'Temp', accessor: 'temperature', isSortable: true },
+        { header: 'Clouds', accessor: 'clouds', isSortable: true }
     ]
 
     return (

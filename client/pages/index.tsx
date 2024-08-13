@@ -133,12 +133,12 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
                 <WidgetForecastTable
                     loading={dailyLoading}
-                    data={forecastDaily}
+                    data={forecastDaily?.map((forecast) => ({ ...forecast, date: formatDate(forecast.date, 'dd, MMM D') }))}
                 />
 
                 <WidgetForecastTable
                     loading={hourlyLoading}
-                    data={forecastHourly}
+                    data={forecastHourly?.map((forecast) => ({ ...forecast, date: formatDate(forecast.date, 'HH A') }))}
                 />
             </div>
         </AppLayout>
