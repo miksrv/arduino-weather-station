@@ -2,7 +2,6 @@
 
 .appBar
     color: var(--text-color-primary)
-    padding: 0 14px
     height: 50px
     width: 100%
     margin-top: 10px
@@ -15,6 +14,9 @@
             width: 20px
             height: 20px
             margin-right: 10px
+
+    @media only screen and (max-width: $mobileMaxWidth)
+        padding: 0 10px
 
     .wrapper
         display: flex

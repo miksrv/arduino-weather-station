@@ -12,5 +12,25 @@
     overflow-y: auto
     height: 250px
 
+    @media only screen and (max-width: $mobileMaxWidth)
+        flex-basis: 100%
+        width: 100%
+
     table
         border-radius: var(--border-radius)
+
+    .cellIcon
+        padding: 0 !important
+        text-align: center !important
+
+        svg
+            height: 30px
+            width: 100%
+            display: flex
+            justify-content: center
+
+    .cellDate
+        width: 140px
+
+    .cellTemperature, .cellClouds
+        width: 70px
