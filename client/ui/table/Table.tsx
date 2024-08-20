@@ -5,7 +5,9 @@ import styles from './styles.module.sass'
 export interface Column<T> {
     header: string
     accessor: keyof T
+    className?: string
     isSortable?: boolean
+    formatter?: (value: T[keyof T], row: T) => React.ReactNode
 }
 
 interface SortConfig<T> {
@@ -74,7 +76,14 @@ const Table = <T,>({ columns, data }: TableProps<T>) => {
                     {sortedData?.map((row, index) => (
                         <tr key={`tr${index}`}>
                             {columns?.map((column) => (
-                                <td key={String(column.accessor)}>{row[column.accessor] as any}</td>
+                                <td
+                                    key={String(column.accessor)}
+                                    className={column.className}
+                                >
+                                    {column.formatter
+                                        ? column.formatter(row[column.accessor], row)
+                                        : (row[column.accessor] as any)}
+                                </td>
                             ))}
                         </tr>
                     ))}
