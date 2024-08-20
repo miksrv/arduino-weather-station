@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Entities\WeatherDataEntity;
-use App\Entities\WeatherForecastEntity;
 use App\Libraries\OpenWeatherAPILibrary;
 use App\Libraries\VisualCrossingAPILibrary;
 use App\Libraries\WeatherAPILibrary;

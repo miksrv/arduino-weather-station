@@ -10,6 +10,10 @@
     box-shadow: var(--container-shadow)
     overflow: hidden
 
+    @media only screen and (max-width: $mobileMaxWidth)
+        flex-basis: calc(50% - 5px)
+        width: calc(50% - 5px)
+
     .header
         padding: 16px 16px 0
         display: flex
