@@ -9,12 +9,15 @@ import { API, ApiModel } from '@/api'
 import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
+import WeatherIcon from '@/components/weather-icon'
 import Widget from '@/components/widget'
 import WeatherChart from '@/components/widget/WeatherChart'
 import WidgetForecastTable from '@/components/widget-forecast-table'
+import styles from '@/components/widget-forecast-table/styles.module.sass'
 import { formatDate } from '@/tools/helpers'
-import { getMinMaxValues } from '@/tools/weather'
+import { convertHpaToMmHg, getMinMaxValues } from '@/tools/weather'
 import { IconTypes } from '@/ui/icon/types'
+import { Column } from '@/ui/table'
 
 interface IndexPageProps {}
 
@@ -85,6 +88,22 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         }
     ]
 
+    const tableColumnsDaily: Column<ApiModel.Weather>[] = [
+        { header: t('date'), accessor: 'date', className: styles.cellDate, isSortable: true },
+        { header: '', accessor: 'weatherId', className: styles.cellIcon, formatter: (weatherId) => <WeatherIcon weatherId={weatherId as number} /> },
+        { header: t('celsius'), accessor: 'temperature', className: styles.cellTemperature, isSortable: true },
+        { header: t('clouds'), accessor: 'clouds', className: styles.cellClouds, isSortable: true }
+    ]
+
+    const tableColumnsHourly: Column<ApiModel.Weather>[] = [
+        { header: t('time'), accessor: 'date', className: styles.cellDate, isSortable: true },
+        { header: '', accessor: 'weatherId', className: styles.cellIcon, formatter: (weatherId) => <WeatherIcon weatherId={weatherId as number} /> },
+        { header: t('celsius'), accessor: 'temperature', className: styles.cellTemperature, isSortable: true },
+        { header: t('clouds'), accessor: 'clouds', className: styles.cellClouds, isSortable: true },
+        { header: t('pressure'), accessor: 'pressure', className: styles.cellPressure, formatter: (pressure) => convertHpaToMmHg(pressure), isSortable: true },
+        { header: t('wind'), accessor: 'windSpeed', className: styles.cellWind, isSortable: true }
+    ]
+
     return (
         <AppLayout>
             <NextSeo
@@ -131,6 +150,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
                 <WidgetForecastTable
                     loading={dailyLoading}
+                    columns={tableColumnsDaily}
                     data={forecastDaily?.map((forecast) => ({
                         ...forecast,
                         date: formatDate(forecast.date, 'dd, MMM D')
@@ -139,6 +159,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
                 <WidgetForecastTable
                     loading={hourlyLoading}
+                    columns={tableColumnsHourly}
                     data={forecastHourly?.map((forecast) => ({ ...forecast, date: formatDate(forecast.date, 'HH A') }))}
                 />
             </div>

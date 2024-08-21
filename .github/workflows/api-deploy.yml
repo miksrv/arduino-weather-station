@@ -55,10 +55,10 @@
 
        - name: Upload Folder
          run: |
-            lftp -e "put -O / .htaccess" ${{ secrets.FTP_HOSTNAME }}
-            lftp -e "rm -r app" ${{ secrets.FTP_HOSTNAME }}
-            lftp -e "mirror --parallel=100 -R app" ${{ secrets.FTP_HOSTNAME }}
-            lftp -e "mirror --parallel=100 -R vendor" ${{ secrets.FTP_HOSTNAME }}
-            lftp -e "mirror --parallel=100 -R public" ${{ secrets.FTP_HOSTNAME }}
-            lftp -e "mirror --parallel=100 -R writable" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "put -O / .htaccess" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "rm -rf app" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "mirror --parallel=100 -R app" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "mirror --parallel=100 -R vendor" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "mirror --parallel=100 -R public" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "mirror --parallel=100 -R writable" ${{ secrets.FTP_HOSTNAME }}
          working-directory: server
