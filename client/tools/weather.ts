@@ -11,6 +11,11 @@ export interface MinMaxResult {
     }
 }
 
+/**
+ *
+ * @param data Array<ApiModel.Weather>
+ * @param parameter keyof ApiModel.Weather
+ */
 export const getMinMaxValues = (data?: ApiModel.Weather[], parameter?: keyof ApiModel.Weather): MinMaxResult => {
     if (!data?.length || !parameter) {
         return {}
@@ -46,4 +51,33 @@ export const getMinMaxValues = (data?: ApiModel.Weather[], parameter?: keyof Api
             date: maxDate ?? ''
         }
     }
+}
+
+/**
+ * Converts pressure from hectopascals (hPa) to millimeters of mercury (mmHg).
+ * @param hPa Pressure in hectopascals (hPa).
+ * @returns Pressure in millimeters of mercury (mmHg).
+ */
+export const convertHpaToMmHg = (hPa?: number | string): number => {
+    if (!hPa) {
+        return 0
+    }
+
+    const mmHg = Number(hPa) * (760 / 1013.25)
+    return parseFloat(mmHg.toFixed(2))
+}
+
+/**
+ * Converts wind direction (0 to 360 degrees) to an 8-point direction.
+ * @param degrees Wind direction in degrees (0 to 360).
+ * @returns One of 8 directions (0, 45, 90, 135, 180, 225, 270, 315 degrees).
+ */
+export const convertWindDirection = (degrees: number): 0 | 45 | 90 | 135 | 180 | 225 | 270 | 315 => {
+    const normalizedDegrees = degrees % 360
+
+    const directions: (0 | 45 | 90 | 135 | 180 | 225 | 270 | 315)[] = [0, 45, 90, 135, 180, 225, 270, 315]
+
+    const index = Math.round(normalizedDegrees / 45) % 8
+
+    return directions[index]
 }
