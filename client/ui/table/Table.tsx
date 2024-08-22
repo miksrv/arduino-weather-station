@@ -2,11 +2,15 @@ import React, { useState } from 'react'
 
 import styles from './styles.module.sass'
 
+import Icon from '@/ui/icon'
+import Skeleton from '@/ui/skeleton'
+
 export interface Column<T> {
     header: string
     accessor: keyof T
     className?: string
     isSortable?: boolean
+    background?: (value: T[keyof T], row: T) => string
     formatter?: (value: T[keyof T], row: T) => React.ReactNode
 }
 
@@ -15,12 +19,13 @@ interface SortConfig<T> {
     direction: 'asc' | 'desc'
 }
 
-interface TableProps<T> {
+export interface TableProps<T> {
+    loading?: boolean
     columns?: Column<T>[]
     data?: T[]
 }
 
-const Table = <T,>({ columns, data }: TableProps<T>) => {
+const Table = <T,>({ loading, columns, data }: TableProps<T>) => {
     const [sortConfig, setSortConfig] = useState<SortConfig<T> | null>(null)
 
     const sortedData = React.useMemo(() => {
@@ -63,30 +68,56 @@ const Table = <T,>({ columns, data }: TableProps<T>) => {
                                 className={column.isSortable ? styles.sortable : undefined}
                             >
                                 {column.header}
-                                {sortConfig?.key === column.accessor
-                                    ? sortConfig.direction === 'asc'
-                                        ? ' 🔼'
-                                        : ' 🔽'
-                                    : ''}
+                                {sortConfig?.key === column.accessor ? (
+                                    sortConfig.direction === 'asc' ? (
+                                        <Icon name={'ArrowDown'} />
+                                    ) : (
+                                        <Icon name={'ArrowUp'} />
+                                    )
+                                ) : (
+                                    ''
+                                )}
                             </th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedData?.map((row, index) => (
-                        <tr key={`tr${index}`}>
-                            {columns?.map((column) => (
-                                <td
-                                    key={String(column.accessor)}
-                                    className={column.className}
-                                >
-                                    {column.formatter
-                                        ? column.formatter(row[column.accessor], row)
-                                        : (row[column.accessor] as any)}
-                                </td>
+                    {loading &&
+                        Array(10)
+                            .fill(0)
+                            .map((_, index) => (
+                                <tr key={`tr${index}`}>
+                                    {columns?.map((column) => (
+                                        <td
+                                            key={String(column.accessor)}
+                                            className={column.className}
+                                        >
+                                            <Skeleton style={{ width: '80%', height: 16, margin: '0 auto' }} />
+                                        </td>
+                                    ))}
+                                </tr>
                             ))}
-                        </tr>
-                    ))}
+
+                    {!loading &&
+                        sortedData?.map((row, index) => (
+                            <tr key={`tr${index}`}>
+                                {columns?.map((column) => (
+                                    <td
+                                        key={String(column.accessor)}
+                                        className={column.className}
+                                        style={
+                                            column?.background
+                                                ? { background: column?.background(row[column.accessor], row) }
+                                                : {}
+                                        }
+                                    >
+                                        {column.formatter
+                                            ? column.formatter(row[column.accessor], row)
+                                            : (row[column.accessor] as any)}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
                 </tbody>
             </table>
         </div>

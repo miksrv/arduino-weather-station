@@ -12,20 +12,29 @@ import AppLayout from '@/components/app-layout'
 import WeatherIcon from '@/components/weather-icon'
 import Widget from '@/components/widget'
 import WeatherChart from '@/components/widget/WeatherChart'
+import WidgetChart from '@/components/widget-chart'
 import WidgetForecastTable from '@/components/widget-forecast-table'
 import styles from '@/components/widget-forecast-table/styles.module.sass'
-import { formatDate } from '@/tools/helpers'
-import { convertHpaToMmHg, getMinMaxValues } from '@/tools/weather'
+import WindDirectionIcon from '@/components/wind-direction-icon'
+import { getWeatherI18nKey } from '@/tools/conditions'
+import { formatDate, round } from '@/tools/helpers'
+import {
+    convertHpaToMmHg,
+    convertWindDirection,
+    getCloudinessColor,
+    getMinMaxValues,
+    getTemperatureColor
+} from '@/tools/weather'
 import { IconTypes } from '@/ui/icon/types'
 import { Column } from '@/ui/table'
 
 interface IndexPageProps {}
 
-const filterRecentData = (data?: ApiModel.Weather[]): ApiModel.Weather[] | [] => {
+const filterRecentData = (data?: ApiModel.Weather[], hours: number = 12): ApiModel.Weather[] | [] => {
     const now = dayjs.utc()
-    const twelveHoursAgo = now.subtract(12, 'hours')
+    const hoursAgo = now.subtract(hours, 'hours')
 
-    return data?.filter((item) => dayjs.utc(item.date).isAfter(twelveHoursAgo)) || []
+    return data?.filter((item) => dayjs.utc(item.date).isAfter(hoursAgo)) || []
 }
 
 type WidgetType = {
@@ -90,26 +99,88 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
     const tableColumnsDaily: Column<ApiModel.Weather>[] = [
         { header: t('date'), accessor: 'date', className: styles.cellDate, isSortable: true },
-        { header: '', accessor: 'weatherId', className: styles.cellIcon, formatter: (weatherId) => <WeatherIcon weatherId={weatherId as number} /> },
-        { header: t('celsius'), accessor: 'temperature', className: styles.cellTemperature, isSortable: true },
-        { header: t('clouds'), accessor: 'clouds', className: styles.cellClouds, isSortable: true }
+        {
+            header: t('weather'),
+            accessor: 'weatherId',
+            className: styles.cellIcon,
+            formatter: (weatherId) => <WeatherIcon weatherId={weatherId as number} />
+        },
+        {
+            header: t('weather-conditions'),
+            accessor: 'weatherId',
+            className: styles.cellConditions,
+            formatter: (weatherId) => t(getWeatherI18nKey(weatherId || ''))
+        },
+        {
+            header: t('temperature-short'),
+            accessor: 'temperature',
+            className: styles.cellTemperature,
+            background: (temperature) => getTemperatureColor(temperature),
+            formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>,
+            isSortable: true
+        },
+        {
+            header: t('clouds'),
+            accessor: 'clouds',
+            className: styles.cellClouds,
+            background: (clouds) => getCloudinessColor(clouds),
+            formatter: (clouds) => <>{clouds}%</>,
+            isSortable: true
+        }
     ]
 
     const tableColumnsHourly: Column<ApiModel.Weather>[] = [
         { header: t('time'), accessor: 'date', className: styles.cellDate, isSortable: true },
-        { header: '', accessor: 'weatherId', className: styles.cellIcon, formatter: (weatherId) => <WeatherIcon weatherId={weatherId as number} /> },
-        { header: t('celsius'), accessor: 'temperature', className: styles.cellTemperature, isSortable: true },
-        { header: t('clouds'), accessor: 'clouds', className: styles.cellClouds, isSortable: true },
-        { header: t('pressure'), accessor: 'pressure', className: styles.cellPressure, formatter: (pressure) => convertHpaToMmHg(pressure), isSortable: true },
-        { header: t('wind'), accessor: 'windSpeed', className: styles.cellWind, isSortable: true }
+        {
+            header: t('weather'),
+            accessor: 'weatherId',
+            className: styles.cellIcon,
+            formatter: (weatherId) => <WeatherIcon weatherId={weatherId as number} />
+        },
+        {
+            header: t('temperature-short'),
+            accessor: 'temperature',
+            className: styles.cellTemperature,
+            background: (temperature) => getTemperatureColor(temperature),
+            formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>,
+            isSortable: true
+        },
+        {
+            header: t('clouds'),
+            accessor: 'clouds',
+            className: styles.cellClouds,
+            background: (clouds) => getCloudinessColor(clouds),
+            formatter: (clouds) => <>{clouds}%</>,
+            isSortable: true
+        },
+        {
+            header: t('pressure'),
+            accessor: 'pressure',
+            className: styles.cellPressure,
+            formatter: (pressure) => round(convertHpaToMmHg(pressure), 1),
+            isSortable: true
+        },
+        {
+            header: t('wind'),
+            accessor: 'windSpeed',
+            className: styles.cellWind,
+            formatter: (windSpeed) => <>{round(Number(windSpeed), 1)} м/с</>,
+            isSortable: true
+        },
+        {
+            header: t('direction'),
+            accessor: 'windDeg',
+            className: styles.windDeg,
+            formatter: (windDeg) => <WindDirectionIcon direction={convertWindDirection(Number(windDeg))} />
+        }
     ]
 
     return (
         <AppLayout>
             <NextSeo
-                title={''}
-                description={''}
-                canonical={''}
+                title={t('weather-orenburg-now', { date: formatDate(current?.date) })}
+                description={t('main-page-description')}
+                canonical={'https://meteo.miksoft.pro'}
                 openGraph={{
                     description: '',
                     images: [
@@ -149,6 +220,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 ))}
 
                 <WidgetForecastTable
+                    title={'Прогноз погоды - По дням'}
                     loading={dailyLoading}
                     columns={tableColumnsDaily}
                     data={forecastDaily?.map((forecast) => ({
@@ -158,9 +230,20 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 />
 
                 <WidgetForecastTable
+                    title={'Прогноз погоды - По часам'}
                     loading={hourlyLoading}
                     columns={tableColumnsHourly}
                     data={forecastHourly?.map((forecast) => ({ ...forecast, date: formatDate(forecast.date, 'HH A') }))}
+                />
+
+                <WidgetChart
+                    type={'temperature'}
+                    data={filterRecentData(history, 24)}
+                />
+
+                <WidgetChart
+                    type={'light'}
+                    data={filterRecentData(history, 24)}
                 />
             </div>
         </AppLayout>

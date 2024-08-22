@@ -16,9 +16,18 @@
 
         th.sortable
             cursor: pointer
+            white-space: nowrap
+
+            svg
+                width: 14px
+                height: 14px
+                fill: var(--icon-color-secondary)
+                vertical-align: middle
+                margin-left: 5px
+                margin-top: -3px
 
             &:hover
-                background-color: #f0f0f0
+                background-color: var(--menu-background-hover)
 
         thead th
             position: sticky
