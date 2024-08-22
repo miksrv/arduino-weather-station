@@ -1,0 +1,15 @@
+@import ../../styles/variables
+
+/* styles.css */
+.widget
+    flex-basis: calc(50% - 5px)
+    width: calc(50% - 5px)
+    background: var(--modal-background)
+    color: var(--text-color-primary)
+    border-radius: var(--border-radius)
+    box-shadow: var(--container-shadow)
+    overflow: hidden
+
+    @media only screen and (max-width: $mobileMaxWidth)
+        flex-basis: calc(50% - 5px)
+        width: calc(50% - 5px)
