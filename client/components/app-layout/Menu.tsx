@@ -22,9 +22,9 @@ const Menu: React.FC<MenuProps> = ({ onClick }) => {
 
     const menuItems: MenuItemType[] = [
         {
-            icon: 'Feed',
+            icon: 'Cloud',
             link: '/',
-            text: t('geotags')
+            text: t('current-weather')
         }
     ]
 

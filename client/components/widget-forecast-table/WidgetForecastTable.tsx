@@ -3,20 +3,16 @@ import React from 'react'
 import styles from './styles.module.sass'
 
 import { ApiModel } from '@/api'
-import Table, { Column } from '@/ui/table'
+import Table, { TableProps } from '@/ui/table'
 
-interface WidgetProps {
-    data?: ApiModel.Weather[]
-    columns?: Column<ApiModel.Weather>[]
-    loading?: boolean
+interface WidgetProps extends TableProps<ApiModel.Weather> {
+    title?: string
 }
 
-const WidgetForecastTable: React.FC<WidgetProps> = ({ data, columns, loading }) =>(
+const WidgetForecastTable: React.FC<WidgetProps> = ({ title, ...props }) => (
     <div className={styles.widgetForecastTable}>
-        <Table<ApiModel.Weather>
-            columns={columns}
-            data={data}
-        />
+        {title && <div className={styles.title}>{title}</div>}
+        <Table<ApiModel.Weather> {...props} />
     </div>
 )
 
