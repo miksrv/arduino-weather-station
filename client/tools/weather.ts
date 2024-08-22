@@ -72,7 +72,11 @@ export const convertHpaToMmHg = (hPa?: number | string): number => {
  * @param degrees Wind direction in degrees (0 to 360).
  * @returns One of 8 directions (0, 45, 90, 135, 180, 225, 270, 315 degrees).
  */
-export const convertWindDirection = (degrees: number): 0 | 45 | 90 | 135 | 180 | 225 | 270 | 315 => {
+export const convertWindDirection = (degrees?: number): 0 | 45 | 90 | 135 | 180 | 225 | 270 | 315 | undefined => {
+    if (!degrees) {
+        return
+    }
+
     const normalizedDegrees = degrees % 360
 
     const directions: (0 | 45 | 90 | 135 | 180 | 225 | 270 | 315)[] = [0, 45, 90, 135, 180, 225, 270, 315]
@@ -80,4 +84,64 @@ export const convertWindDirection = (degrees: number): 0 | 45 | 90 | 135 | 180 |
     const index = Math.round(normalizedDegrees / 45) % 8
 
     return directions[index]
+}
+
+/**
+ * Converts a temperature value to a color.
+ * Temperature in degrees Celsius, where cold temperatures are displayed in blue and hot temperatures are displayed in red.
+ * @param temperature Temperature in degrees Celsius.
+ * @returns A string with the color in HEX format.
+ */
+export const getTemperatureColor = (temperature?: number | string): string => {
+    if (!temperature) {
+        return ''
+    }
+
+    const temp = Number(temperature)
+
+    // Temperature limits
+    const minTemp = -30 // Minimum temperature for blue
+    const maxTemp = 40 // Maximum temperature for red
+
+    // Limit temperature between minTemp and maxTemp
+    const clampedTemp = Math.max(minTemp, Math.min(maxTemp, temp))
+
+    // Calculate temperature percentage between 0 and 1
+    const tempPercent = (clampedTemp - minTemp) / (maxTemp - minTemp)
+
+    // Linear color interpolation (from blue to red)
+    const r = Math.round(255 * tempPercent) // Red channel
+    const g = Math.round(0) // Green channel (not used)
+    const b = Math.round(255 * (1 - tempPercent)) // Blue channel
+
+    // Return color in HEX format
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`
+}
+
+/**
+ * Converts cloudiness value to color.
+ * Cloudiness percentage, where 0% is dark sky and 100% is light sky.
+ * @param cloudiness Cloudiness percentage from 0 to 100.
+ * @returns String with color in HEX format.
+ */
+export const getCloudinessColor = (cloudiness?: number | string): string => {
+    if (!cloudiness) {
+        return ''
+    }
+
+    const clouds = Number(cloudiness)
+
+    // Clamp cloudiness value between 0 and 100%
+    const clampedCloudiness = Math.max(0, Math.min(100, clouds))
+
+    // Calculate cloudiness percentage between 0 and 1
+    const cloudinessPercent = clampedCloudiness / 100
+
+    // Linear interpolation of colors (from dark to light)
+    const r = Math.round(30 + (225 - 30) * cloudinessPercent) // Red channel
+    const g = Math.round(30 + (225 - 30) * cloudinessPercent) // Green channel
+    const b = Math.round(40 + (235 - 40) * cloudinessPercent) // Blue channel
+
+    // Return color in HEX format
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`
 }
