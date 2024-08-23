@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import { EChartsOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
+import { useTheme } from 'next-themes'
 
 import styles from './styles.module.sass'
 
@@ -16,6 +17,136 @@ interface Props {
 }
 
 const Chart: React.FC<Props> = ({ type, data }) => {
+    const { theme } = useTheme()
+
+    const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff' // --modal-background
+    const borderColor = theme === 'dark' ? '#444546' : '#cbcccd' // --input-border-color
+    const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99' // --text-color-secondary
+
+    const baseConfig: EChartsOption = {
+        backgroundColor: backgroundColor,
+        grid: {
+            left: 10,
+            right: 10,
+            top: 15,
+            bottom: 25,
+            containLabel: true,
+            borderColor: borderColor
+        },
+        legend: {
+            type: 'plain',
+            orient: 'horizontal', // Горизонтальное расположение легенды
+            left: 5, // Выравнивание по левому краю
+            bottom: 0, // Размещение легенды под графиком
+            itemWidth: 20, // Ширина значка линии в легенде
+            itemHeight: 2, // Высота значка линии в легенде (делает линию тоньше)
+            textStyle: {
+                color: textSecondaryColor // Цвет текста легенды
+            },
+            icon: 'rect' // Используем короткую линию в качестве значка
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross'
+            },
+            backgroundColor: backgroundColor,
+            borderColor: borderColor,
+            formatter: function (params: any) {
+                // Массив строк, который будет объединен и возвращен как содержимое tooltip
+                const tooltipContent: string[] = []
+
+                // Форматирование заголовка - предположим, что это дата (xAxis)
+                if (params.length > 0) {
+                    const header = `<div class="${styles.chartTooltipTitle}">${formatDate(params[0].axisValueLabel, 'dddd, DD MMM YYYY, HH:mm')}</div>`
+                    tooltipContent.push(header)
+                }
+
+                // Перебор каждого элемента в params для отображения значений (yAxis)
+                params.forEach((item: any) => {
+                    const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
+                    const seriesValue = `<span class="${styles.value}">${item.value?.[1]}</span>`
+                    const seriesName = `<span class="${styles.label}">${item.seriesName}${seriesValue}</span>`
+
+                    const row = `<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`
+                    tooltipContent.push(row)
+                })
+
+                // Возврат объединенного содержимого tooltip
+                return tooltipContent.join('')
+            }
+        },
+        xAxis: {
+            type: 'time',
+            axisLabel: {
+                show: true,
+                color: textSecondaryColor, // Цвет меток оси X
+                formatter: function (value: string) {
+                    return formatDate(value, 'HH:mm')
+                }
+            },
+            date: data?.map(({ date }) => new Date(date || '').getTime()),
+            axisTick: {
+                show: true
+            },
+            axisLine: {
+                show: true,
+                lineStyle: {
+                    color: borderColor // Цвет оси X
+                }
+            },
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    width: 1,
+                    color: borderColor // Цвет линий сетки
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            nameGap: 50,
+            axisTick: {
+                show: true
+            },
+            axisLine: {
+                show: true,
+                lineStyle: {
+                    color: borderColor // Цвет оси Y
+                }
+            },
+            axisLabel: {
+                show: true,
+                formatter: '{value}%',
+                color: textSecondaryColor // Цвет меток оси Y
+            },
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    width: 1,
+                    color: borderColor // Цвет линий сетки
+                }
+            }
+        },
+        series: [
+            {
+                type: 'line',
+                showSymbol: false,
+                smooth: false,
+                lineStyle: {
+                    color: '#3a80d3',
+                    width: 1
+                },
+                itemStyle: {
+                    color: '#3a80d3'
+                },
+                areaStyle: {
+                    color: '#6aa7ef'
+                }
+            }
+        ]
+    }
+
     const config: EChartsOption = useMemo(() => {
         switch (type) {
             default:
@@ -120,7 +251,8 @@ const Chart: React.FC<Props> = ({ type, data }) => {
                         },
                         axisLabel: {
                             show: true,
-                            color: '#76787a' // Цвет меток оси Y
+                            color: '#76787a', // Цвет меток оси Y
+                            formatter: '{value}°C'
                         },
                         splitLine: {
                             show: true,
@@ -467,167 +599,38 @@ const Chart: React.FC<Props> = ({ type, data }) => {
 
             case 'clouds':
                 return {
-                    backgroundColor: '#2c2d2e',
-                    grid: {
-                        left: 10,
-                        right: 10,
-                        top: 15,
-                        bottom: 25,
-                        containLabel: true,
-                        borderColor: '#ccc'
-                    },
-                    legend: {
-                        type: 'plain',
-                        orient: 'horizontal', // Горизонтальное расположение легенды
-                        left: 5, // Выравнивание по левому краю
-                        bottom: 0, // Размещение легенды под графиком
-                        itemWidth: 20, // Ширина значка линии в легенде
-                        itemHeight: 2, // Высота значка линии в легенде (делает линию тоньше)
-                        textStyle: {
-                            color: '#76787a' // Цвет текста легенды
-                        },
-                        icon: 'rect' // Используем короткую линию в качестве значка
-                    },
-                    tooltip: {
-                        trigger: 'axis',
-                        axisPointer: {
-                            type: 'cross'
-                        },
-                        backgroundColor: '#2c2d2e',
-                        borderColor: '#1b1b1b',
-                        formatter: function (params: any) {
-                            // Массив строк, который будет объединен и возвращен как содержимое tooltip
-                            const tooltipContent: string[] = []
-
-                            // Форматирование заголовка - предположим, что это дата (xAxis)
-                            if (params.length > 0) {
-                                const header = `<div class="${styles.chartTooltipTitle}">${formatDate(params[0].axisValueLabel, 'dddd, DD MMM YYYY, HH:mm')}</div>`
-                                tooltipContent.push(header)
-                            }
-
-                            // Перебор каждого элемента в params для отображения значений (yAxis)
-                            params.forEach((item: any) => {
-                                const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
-                                const seriesValue = `<span class="${styles.value}">${item.value?.[1]}</span>`
-                                const seriesName = `<span class="${styles.label}">${item.seriesName}${seriesValue}</span>`
-
-                                const row = `<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`
-                                tooltipContent.push(row)
-                            })
-
-                            // Возврат объединенного содержимого tooltip
-                            return tooltipContent.join('')
-                        }
-                    },
-                    xAxis: {
-                        type: 'time',
-                        axisLabel: {
-                            show: true,
-                            color: '#76787a', // Цвет меток оси X
-                            formatter: function (value: string) {
-                                return formatDate(value, 'HH:mm')
-                            }
-                        },
-                        date: data?.map(({ date }) => new Date(date || '').getTime()),
-                        axisTick: {
-                            show: true
-                        },
-                        axisLine: {
-                            show: true,
-                            lineStyle: {
-                                color: '#444546' // Цвет оси X
-                            }
-                        },
-                        splitLine: {
-                            show: true,
-                            lineStyle: {
-                                width: 1,
-                                color: '#444546' // Цвет линий сетки
-                            }
-                        }
-                    },
+                    ...baseConfig,
                     yAxis: [
                         {
-                            type: 'value',
-                            nameGap: 50,
-                            axisTick: {
-                                show: true
-                            },
-                            axisLine: {
-                                show: true,
-                                lineStyle: {
-                                    color: '#444546' // Цвет оси Y
-                                }
-                            },
+                            ...baseConfig.yAxis,
                             axisLabel: {
-                                show: true,
-                                formatter: '{value}%',
-                                color: '#76787a' // Цвет меток оси Y
-                            },
-                            splitLine: {
-                                show: true,
-                                lineStyle: {
-                                    width: 1,
-                                    color: '#444546' // Цвет линий сетки
-                                }
+                                ...(baseConfig.yAxis as any).axisLabel,
+                                formatter: '{value}%'
                             }
                         },
                         {
-                            type: 'value',
-                            axisTick: {
-                                show: true
-                            },
-                            axisLine: {
-                                show: true,
-                                lineStyle: {
-                                    color: '#444546' // Цвет оси Y
-                                }
-                            },
+                            ...baseConfig.yAxis,
                             axisLabel: {
-                                show: true,
-                                formatter: '{value}м/с',
-                                color: '#76787a' // Цвет меток оси Y
-                            },
-                            splitLine: {
-                                show: true,
-                                lineStyle: {
-                                    width: 1,
-                                    color: '#444546' // Цвет линий сетки
-                                }
+                                ...(baseConfig.yAxis as any).axisLabel,
+                                formatter: '{value}м/с'
                             }
                         }
                     ],
                     series: [
                         {
+                            ...(baseConfig.series as any)[0],
                             data: data?.map(({ date, clouds }) => [date, clouds]),
-                            type: 'line',
-                            name: 'Облачность',
-                            showSymbol: false,
-                            smooth: false,
-                            lineStyle: {
-                                color: '#3a80d3',
-                                width: 1
-                            },
-                            itemStyle: {
-                                color: '#3a80d3'
-                            },
-                            areaStyle: {
-                                color: '#5295e5'
-                            }
+                            name: 'Облачность'
                         },
                         {
+                            ...(baseConfig.series as any)[0],
                             yAxisIndex: 1,
                             data: data?.map(({ date, windSpeed }) => [date, windSpeed]),
-                            type: 'line',
                             name: 'Скорость ветра',
-                            showSymbol: false,
-                            smooth: false,
+                            areaStyle: undefined,
                             lineStyle: {
-                                color: '#45a64a',
+                                color: '#4bb34b',
                                 width: 1
-                            },
-                            itemStyle: {
-                                color: '#45a64a'
                             }
                         }
                     ]
