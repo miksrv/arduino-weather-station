@@ -549,8 +549,6 @@ const Chart: React.FC<Props> = ({ type, data }) => {
                     yAxis: [
                         {
                             type: 'value',
-                            name: 'Y-Axis',
-                            nameLocation: 'middle',
                             nameGap: 50,
                             axisTick: {
                                 show: true
@@ -563,7 +561,7 @@ const Chart: React.FC<Props> = ({ type, data }) => {
                             },
                             axisLabel: {
                                 show: true,
-                                formatter: '{value} °C',
+                                formatter: '{value}%',
                                 color: '#76787a' // Цвет меток оси Y
                             },
                             splitLine: {
@@ -587,6 +585,7 @@ const Chart: React.FC<Props> = ({ type, data }) => {
                             },
                             axisLabel: {
                                 show: true,
+                                formatter: '{value}м/с',
                                 color: '#76787a' // Цвет меток оси Y
                             },
                             splitLine: {
@@ -624,11 +623,11 @@ const Chart: React.FC<Props> = ({ type, data }) => {
                             showSymbol: false,
                             smooth: false,
                             lineStyle: {
-                                color: '#f9b54f',
+                                color: '#45a64a',
                                 width: 1
                             },
                             itemStyle: {
-                                color: '#f9b54f'
+                                color: '#45a64a'
                             }
                         }
                     ]
