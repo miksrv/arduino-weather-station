@@ -13,3 +13,35 @@
     @media only screen and (max-width: $mobileMaxWidth)
         flex-basis: calc(50% - 5px)
         width: calc(50% - 5px)
+
+.chartTooltipTitle
+    font-family: (--font-family), sans-serif
+    font-size: 12px
+    color: var(--text-color-primary)
+    margin-bottom: 10px
+
+    &:first-letter
+        text-transform: uppercase
+
+.chartTooltipItem
+    margin-top: 0
+
+    .icon
+        float: left
+        display: inline-block
+        margin-right: 5px
+        margin-top: 7px
+        border-radius: 2px
+        width: 6px
+        height: 6px
+
+    .label
+        font-size: 12px
+        display: flex
+        justify-content: space-between
+        align-items: center
+        color: var(--text-color-secondary)
+
+    .value
+        font-weight: 600
+        color: var(--text-color-primary)

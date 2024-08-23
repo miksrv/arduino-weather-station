@@ -100,8 +100,8 @@ export const getTemperatureColor = (temperature?: number | string): string => {
     const temp = Number(temperature)
 
     // Temperature limits
-    const minTemp = -30 // Minimum temperature for blue
-    const maxTemp = 40 // Maximum temperature for red
+    const minTemp = -35 // Minimum temperature for blue
+    const maxTemp = 35 // Maximum temperature for red
 
     // Limit temperature between minTemp and maxTemp
     const clampedTemp = Math.max(minTemp, Math.min(maxTemp, temp))

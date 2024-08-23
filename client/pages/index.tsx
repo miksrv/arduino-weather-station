@@ -242,7 +242,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 />
 
                 <WidgetChart
-                    type={'light'}
+                    type={'clouds'}
                     data={filterRecentData(history, 24)}
                 />
             </div>

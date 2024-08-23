@@ -81,6 +81,7 @@ const WeatherChart: React.FC<Props> = ({ color, data, yAxisField }) => {
                 data: chartData?.map((item) => item.value),
                 type: 'line',
                 smooth: false,
+                showSymbol: false,
                 lineStyle: {
                     color: colorsData[0],
                     width: 2

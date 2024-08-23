@@ -9,7 +9,7 @@ import Skeleton from '@/ui/skeleton'
 interface WidgetProps {
     loading?: boolean
     data?: ApiModel.Weather[]
-    type: 'temperature' | 'light'
+    type: 'temperature' | 'light' | 'clouds'
 }
 
 const WidgetChart: React.FC<WidgetProps> = ({ loading, data, type }) => (
