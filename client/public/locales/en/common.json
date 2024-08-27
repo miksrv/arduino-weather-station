@@ -4,8 +4,9 @@
     "date": "Date",
     "time": "Time",
     "temperature": "Temperature",
+    "feels-like": "Feels like",
     "temperature-short": "Temp",
-    "dewPoint": "Dew Point",
+    "dew-point": "Dew Point",
     "humidity": "Humidity",
     "pressure": "Pressure",
     "wind": "Wind",
@@ -16,6 +17,7 @@
     "current-weather": "Current weather",
     "please-wait-loading": "Please wait, loading...",
     "weather-conditions": "Conditions",
+    "meters-per-second": "m/s",
     "conditions": {
         "thunderstorm_with_light_rain": "Thunderstorm with light rain",
         "thunderstorm_with_rain": "Thunderstorm with rain",

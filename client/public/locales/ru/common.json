@@ -4,8 +4,9 @@
     "date": "Дата",
     "time": "Время",
     "temperature": "Температура",
+    "feels-like": "Ощущается как",
     "temperature-short": "Темп",
-    "dewPoint": "Точка росы",
+    "dew-point": "Точка росы",
     "humidity": "Влажность",
     "pressure": "Давление",
     "wind": "Ветер",
@@ -17,6 +18,7 @@
     "current-weather": "Текущая погода",
     "please-wait-loading": "Подождите, идет загрузка...",
     "weather-conditions": "Условия",
+    "meters-per-second": "м/с",
     "conditions": {
         "thunderstorm_with_light_rain": "Гроза с небольшим дождем",
         "thunderstorm_with_rain": "Гроза с дождем",
