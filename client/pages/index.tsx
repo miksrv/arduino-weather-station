@@ -82,7 +82,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             source: 'humidity'
         },
         {
-            title: t('windSpeed'),
+            title: t('wind-speed'),
             unit: 'м/с',
             color: 'purple',
             icon: 'Wind',
@@ -168,7 +168,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             isSortable: true
         },
         {
-            header: t('direction'),
+            header: '',
             accessor: 'windDeg',
             className: styles.windDeg,
             formatter: (windDeg) => <WindDirectionIcon direction={convertWindDirection(Number(windDeg))} />

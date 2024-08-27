@@ -9,6 +9,7 @@
     "humidity": "Влажность",
     "pressure": "Давление",
     "wind": "Ветер",
+    "wind-speed": "Скорость ветра",
     "direction": "Направление",
     "cloudiness": "Облачность",
     "clouds": "Облака",

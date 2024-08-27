@@ -16,6 +16,24 @@ interface Props {
     color?: Colors
 }
 
+const colors = {
+    'green': '#4bb34b',
+    'orange': '#ea5d2e',
+    'red': '#e64646',
+    'blue': '#4a90e2',
+    'purple': '#8e44ad',
+    'amber': '#f39c12',
+    'emerald': '#27ae60',
+    'navy': '#2c3e50',
+    'pumpkin': '#d35400',
+    'aqua': '#16a085',
+    'royal': '#2980b9',
+    'garnet': '#e74c3c',
+    'raspberry': '#c0392b',
+    'evening': '#34495e',
+    'gray': '#7f8c8d'
+}
+
 const Chart: React.FC<Props> = ({ type, data }) => {
     const { theme } = useTheme()
 
@@ -53,16 +71,16 @@ const Chart: React.FC<Props> = ({ type, data }) => {
             backgroundColor: backgroundColor,
             borderColor: borderColor,
             formatter: function (params: any) {
-                // Массив строк, который будет объединен и возвращен как содержимое tooltip
+                // An array of strings that will be concatenated and returned as the contents of the tooltip
                 const tooltipContent: string[] = []
 
-                // Форматирование заголовка - предположим, что это дата (xAxis)
+                //Format the header - let's assume it's a date (xAxis)
                 if (params.length > 0) {
                     const header = `<div class="${styles.chartTooltipTitle}">${formatDate(params[0].axisValueLabel, 'dddd, DD MMM YYYY, HH:mm')}</div>`
                     tooltipContent.push(header)
                 }
 
-                // Перебор каждого элемента в params для отображения значений (yAxis)
+                // Loop through each element in params to display the values (yAxis)
                 params.forEach((item: any) => {
                     const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
                     const seriesValue = `<span class="${styles.value}">${item.value?.[1]}</span>`
@@ -72,7 +90,7 @@ const Chart: React.FC<Props> = ({ type, data }) => {
                     tooltipContent.push(row)
                 })
 
-                // Возврат объединенного содержимого tooltip
+                // Return the merged contents of the tooltip
                 return tooltipContent.join('')
             }
         },
@@ -80,26 +98,25 @@ const Chart: React.FC<Props> = ({ type, data }) => {
             type: 'time',
             axisLabel: {
                 show: true,
-                color: textSecondaryColor, // Цвет меток оси X
-                formatter: function (value: string) {
-                    return formatDate(value, 'HH:mm')
+                color: textSecondaryColor, // Color of X-axis labels
+                formatter: function (value: number) {
+                    return formatDate(value.toString(), 'HH:mm')
                 }
             },
-            date: data?.map(({ date }) => new Date(date || '').getTime()),
             axisTick: {
                 show: true
             },
             axisLine: {
                 show: true,
                 lineStyle: {
-                    color: borderColor // Цвет оси X
+                    color: borderColor // X axis color
                 }
             },
             splitLine: {
                 show: true,
                 lineStyle: {
                     width: 1,
-                    color: borderColor // Цвет линий сетки
+                    color: borderColor // Grid line color
                 }
             }
         },
@@ -112,19 +129,19 @@ const Chart: React.FC<Props> = ({ type, data }) => {
             axisLine: {
                 show: true,
                 lineStyle: {
-                    color: borderColor // Цвет оси Y
+                    color: borderColor // Y axis color
                 }
             },
             axisLabel: {
                 show: true,
                 formatter: '{value}%',
-                color: textSecondaryColor // Цвет меток оси Y
+                color: textSecondaryColor // Color of Y axis labels
             },
             splitLine: {
                 show: true,
                 lineStyle: {
                     width: 1,
-                    color: borderColor // Цвет линий сетки
+                    color: borderColor // Grid line color
                 }
             }
         },
@@ -629,8 +646,11 @@ const Chart: React.FC<Props> = ({ type, data }) => {
                             name: 'Скорость ветра',
                             areaStyle: undefined,
                             lineStyle: {
-                                color: '#4bb34b',
+                                color: colors.green,
                                 width: 1
+                            },
+                            itemStyle: {
+                                color: colors.green
                             }
                         }
                     ]

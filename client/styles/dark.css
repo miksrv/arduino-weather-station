@@ -71,22 +71,6 @@
     --color-orange: #ea5d2e;
     --color-red: #e64646;
 
-    --color-1: #4bb34b;  /* Зеленый */
-    --color-2: #ea5d2e;  /* Оранжевый */
-    --color-3: #e64646;  /* Красный */
-    --color-4: #4a90e2;  /* Синий */
-    --color-5: #8e44ad;  /* Фиолетовый */
-    --color-6: #f39c12;  /* Янтарный */
-    --color-7: #27ae60;  /* Изумрудный */
-    --color-8: #2c3e50;  /* Тёмно-синий */
-    --color-9: #d35400;  /* Тыковый */
-    --color-10: #16a085; /* Морской волны */
-    --color-11: #2980b9; /* Ярко-синий */
-    --color-12: #e74c3c; /* Гранатовый */
-    --color-13: #c0392b; /* Малиновый */
-    --color-14: #34495e; /* Вечерний синий */
-    --color-15: #7f8c8d; /* Серый асфальт */
-
     .leaflet-layer,
     .leaflet-control-attribution {
         filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
