@@ -19,6 +19,8 @@
     "please-wait-loading": "Подождите, идет загрузка...",
     "weather-conditions": "Условия",
     "meters-per-second": "м/с",
+    "weather-forecast-by-days": "Прогноз погоды - По дням",
+    "weather-forecast-hourly": "Прогноз погоды - По часам",
     "conditions": {
         "thunderstorm_with_light_rain": "Гроза с небольшим дождем",
         "thunderstorm_with_rain": "Гроза с дождем",

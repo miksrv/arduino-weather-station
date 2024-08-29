@@ -221,7 +221,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 ))}
 
                 <WidgetForecastTable
-                    title={'Прогноз погоды - По дням'}
+                    title={t('weather-forecast-by-days')}
                     loading={dailyLoading}
                     columns={tableColumnsDaily}
                     data={forecastDaily?.map((forecast) => ({
@@ -231,7 +231,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 />
 
                 <WidgetForecastTable
-                    title={'Прогноз погоды - По часам'}
+                    title={t('weather-forecast-hourly')}
                     loading={hourlyLoading}
                     columns={tableColumnsHourly}
                     data={forecastHourly?.map((forecast) => ({ ...forecast, date: formatDate(forecast.date, 'HH A') }))}

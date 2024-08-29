@@ -19,6 +19,8 @@
     "please-wait-loading": "Please wait, loading...",
     "weather-conditions": "Conditions",
     "meters-per-second": "m/s",
+    "weather-forecast-by-days": "Weather Forecast - By Days",
+    "weather-forecast-hourly": "Weather Forecast - Hourly",
     "conditions": {
         "thunderstorm_with_light_rain": "Thunderstorm with light rain",
         "thunderstorm_with_rain": "Thunderstorm with rain",
