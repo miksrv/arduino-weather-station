@@ -4,9 +4,10 @@ import { IconTypes } from './types'
 
 interface IconProps {
     name: IconTypes
+    className?: string
 }
 
-const Icon: React.FC<IconProps> = ({ name }) => {
+const Icon: React.FC<IconProps> = ({ name, className }) => {
     let iconToRender
 
     switch (name) {
@@ -54,7 +55,14 @@ const Icon: React.FC<IconProps> = ({ name }) => {
             break
     }
 
-    return <svg viewBox='0 0 24 24'>{iconToRender}</svg>
+    return (
+        <svg
+            viewBox='0 0 24 24'
+            className={className}
+        >
+            {iconToRender}
+        </svg>
+    )
 }
 
 export default Icon

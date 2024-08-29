@@ -4,7 +4,6 @@ import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
-import { useTheme } from 'next-themes'
 
 import { API, ApiModel } from '@/api'
 import { setLocale } from '@/api/applicationSlice'
@@ -47,7 +46,6 @@ type WidgetType = {
 }
 
 const IndexPage: NextPage<IndexPageProps> = () => {
-    const { theme } = useTheme()
     const { i18n, t } = useTranslation()
 
     const { data: forecastHourly, isLoading: hourlyLoading } = API.useGetForecastQuery('hourly', {
@@ -117,7 +115,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             header: t('temperature-short'),
             accessor: 'temperature',
             className: styles.cellTemperature,
-            background: (temperature) => getTemperatureColor(temperature, theme === 'light'),
+            background: (temperature) => getTemperatureColor(temperature),
             formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>,
             isSortable: true
         },
@@ -125,7 +123,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             header: t('clouds'),
             accessor: 'clouds',
             className: styles.cellClouds,
-            background: (clouds) => getCloudinessColor(clouds, theme === 'light'),
+            background: (clouds) => getCloudinessColor(clouds),
             formatter: (clouds) => <>{clouds}%</>,
             isSortable: true
         }
@@ -143,7 +141,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             header: t('temperature-short'),
             accessor: 'temperature',
             className: styles.cellTemperature,
-            background: (temperature) => getTemperatureColor(temperature, theme === 'light'),
+            background: (temperature) => getTemperatureColor(temperature),
             formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>,
             isSortable: true
         },
@@ -151,7 +149,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             header: t('clouds'),
             accessor: 'clouds',
             className: styles.cellClouds,
-            background: (clouds) => getCloudinessColor(clouds, theme === 'light'),
+            background: (clouds) => getCloudinessColor(clouds),
             formatter: (clouds) => <>{clouds}%</>,
             isSortable: true
         },
@@ -160,6 +158,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             accessor: 'pressure',
             className: styles.cellPressure,
             formatter: (pressure) => round(convertHpaToMmHg(pressure), 1),
+            showComparison: true,
             isSortable: true
         },
         {

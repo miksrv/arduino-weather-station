@@ -93,7 +93,7 @@ export const convertWindDirection = (degrees?: number): 0 | 45 | 90 | 135 | 180 
  * @param isLightTheme
  * @returns A string with the color in HEX format.
  */
-export const getTemperatureColor = (temperature?: number | string, isLightTheme?: boolean): string => {
+export const getTemperatureColor = (temperature?: number | string): string => {
     if (typeof temperature === 'undefined') {
         return ''
     }
@@ -115,10 +115,7 @@ export const getTemperatureColor = (temperature?: number | string, isLightTheme?
     const g = Math.round(0) // Green channel (not used)
     const b = Math.round(255 * (1 - tempPercent)) // Blue channel
 
-    // Determine background color based on theme
-    const color = isLightTheme ? `rgba(${r}, ${g}, ${b}, 0.5)` : `rgb(${r}, ${g}, ${b})`
-
-    return color
+    return `rgba(${r}, ${g}, ${b}, 0.5)`
 }
 
 /**
@@ -128,7 +125,7 @@ export const getTemperatureColor = (temperature?: number | string, isLightTheme?
  * @param isLightTheme
  * @returns String with color in HEX format.
  */
-export const getCloudinessColor = (cloudiness?: number | string, isLightTheme?: boolean): string => {
+export const getCloudinessColor = (cloudiness?: number | string): string => {
     if (typeof cloudiness === 'undefined') {
         return ''
     }
@@ -146,8 +143,5 @@ export const getCloudinessColor = (cloudiness?: number | string, isLightTheme?: 
     const g = Math.round(30 + (225 - 30) * cloudinessPercent) // Green channel
     const b = Math.round(40 + (235 - 40) * cloudinessPercent) // Blue channel
 
-    // Determine background color based on theme
-    const color = isLightTheme ? `rgba(${r}, ${g}, ${b}, 0.5)` : `rgb(${r}, ${g}, ${b})`
-
-    return color
+    return `rgba(${r}, ${g}, ${b}, 0.5)`
 }

@@ -6,12 +6,13 @@ import Icon from '@/ui/icon'
 import Skeleton from '@/ui/skeleton'
 
 export interface Column<T> {
-    header: string
+    header: string | React.ReactNode
     accessor: keyof T
     className?: string
     isSortable?: boolean
     background?: (value: T[keyof T], row: T) => string
-    formatter?: (value: T[keyof T], row: T) => React.ReactNode
+    formatter?: (value: T[keyof T], row: T) => React.ReactNode,
+    showComparison?: boolean
 }
 
 interface SortConfig<T> {
@@ -54,6 +55,25 @@ const Table = <T,>({ loading, columns, data }: TableProps<T>) => {
             direction = 'desc'
         }
         setSortConfig({ key: column.accessor, direction })
+    }
+
+    const renderComparisonIcon = (currentValue: any, previousValue: any) => {
+        if (currentValue > previousValue) {
+            return (
+                <Icon
+                    name={'ArrowUp'}
+                    className={styles.green}
+                />
+            )
+        } else if (currentValue < previousValue) {
+            return (
+                <Icon
+                    name={'ArrowDown'}
+                    className={styles.red}
+                />
+            )
+        }
+        return null
     }
 
     return (
@@ -99,8 +119,8 @@ const Table = <T,>({ loading, columns, data }: TableProps<T>) => {
                             ))}
 
                     {!loading &&
-                        sortedData?.map((row, index) => (
-                            <tr key={`tr${index}`}>
+                        sortedData?.map((row, rowIndex) => (
+                            <tr key={`tr${rowIndex}`}>
                                 {columns?.map((column) => (
                                     <td
                                         key={String(column.accessor)}
@@ -114,6 +134,12 @@ const Table = <T,>({ loading, columns, data }: TableProps<T>) => {
                                         {column.formatter
                                             ? column.formatter(row[column.accessor], row)
                                             : (row[column.accessor] as any)}
+                                        {column.showComparison && rowIndex > 0 &&
+                                            renderComparisonIcon(
+                                                row[column.accessor],
+                                                sortedData[rowIndex - 1][column.accessor]
+                                            )
+                                        }
                                     </td>
                                 ))}
                             </tr>
