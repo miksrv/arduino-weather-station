@@ -4,6 +4,7 @@ import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
+import { useTheme } from 'next-themes'
 
 import { API, ApiModel } from '@/api'
 import { setLocale } from '@/api/applicationSlice'
@@ -46,6 +47,7 @@ type WidgetType = {
 }
 
 const IndexPage: NextPage<IndexPageProps> = () => {
+    const { theme } = useTheme()
     const { i18n, t } = useTranslation()
 
     const { data: forecastHourly, isLoading: hourlyLoading } = API.useGetForecastQuery('hourly', {
@@ -58,7 +60,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     const { data: current, isLoading: currentLoading } = API.useGetCurrentQuery(undefined, {
         pollingInterval: 5 * 60 * 1000
     })
-    const { data: history, isLoading: chartLoading } = API.useGetHistoryQuery(
+    const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
         {
             start_date: formatDate(dayjs().subtract(1, 'day').format(), 'YYYY-MM-DD'),
             end_date: formatDate(new Date(), 'YYYY-MM-DD')
@@ -115,7 +117,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             header: t('temperature-short'),
             accessor: 'temperature',
             className: styles.cellTemperature,
-            background: (temperature) => getTemperatureColor(temperature),
+            background: (temperature) => getTemperatureColor(temperature, theme === 'light'),
             formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>,
             isSortable: true
         },
@@ -123,7 +125,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             header: t('clouds'),
             accessor: 'clouds',
             className: styles.cellClouds,
-            background: (clouds) => getCloudinessColor(clouds),
+            background: (clouds) => getCloudinessColor(clouds, theme === 'light'),
             formatter: (clouds) => <>{clouds}%</>,
             isSortable: true
         }
@@ -141,7 +143,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             header: t('temperature-short'),
             accessor: 'temperature',
             className: styles.cellTemperature,
-            background: (temperature) => getTemperatureColor(temperature),
+            background: (temperature) => getTemperatureColor(temperature, theme === 'light'),
             formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>,
             isSortable: true
         },
@@ -149,7 +151,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             header: t('clouds'),
             accessor: 'clouds',
             className: styles.cellClouds,
-            background: (clouds) => getCloudinessColor(clouds),
+            background: (clouds) => getCloudinessColor(clouds, theme === 'light'),
             formatter: (clouds) => <>{clouds}%</>,
             isSortable: true
         },
@@ -206,7 +208,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         title={widget.title}
                         icon={widget.icon}
                         loading={currentLoading}
-                        chartLoading={chartLoading}
+                        chartLoading={historyLoading}
                         minMax={getMinMaxValues(history, widget.source)}
                         currentValue={current?.[widget.source]}
                         chart={
@@ -238,11 +240,13 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
                 <WidgetChart
                     type={'temperature'}
+                    loading={historyLoading}
                     data={filterRecentData(history, 24)}
                 />
 
                 <WidgetChart
                     type={'clouds'}
+                    loading={historyLoading}
                     data={filterRecentData(history, 24)}
                 />
             </div>

@@ -10,6 +10,7 @@
     "humidity": "Humidity",
     "pressure": "Pressure",
     "wind": "Wind",
+    "wind-speed": "Wind speed",
     "direction": "Direction",
     "cloudiness": "Cloudiness",
     "clouds": "Clouds",

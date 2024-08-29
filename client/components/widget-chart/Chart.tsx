@@ -11,10 +11,11 @@ import { formatDate } from '@/tools/helpers'
 
 type Colors = 'orange' | 'blue'
 
-interface Props {
+interface ChartProps {
     type: 'temperature' | 'light' | 'clouds'
     data?: ApiModel.Weather[]
     color?: Colors
+    height?: string | number
 }
 
 const colors = {
@@ -35,7 +36,7 @@ const colors = {
     'gray': '#7f8c8d'
 }
 
-const Chart: React.FC<Props> = ({ type, data }) => {
+const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
     const { theme } = useTheme()
     const { t } = useTranslation()
 
@@ -272,7 +273,7 @@ const Chart: React.FC<Props> = ({ type, data }) => {
     return (
         <ReactECharts
             option={config}
-            style={{ height: '260px', width: '100%' }}
+            style={{ height: height ?? '260px', width: '100%' }}
         />
     )
 }

@@ -90,10 +90,11 @@ export const convertWindDirection = (degrees?: number): 0 | 45 | 90 | 135 | 180 
  * Converts a temperature value to a color.
  * Temperature in degrees Celsius, where cold temperatures are displayed in blue and hot temperatures are displayed in red.
  * @param temperature Temperature in degrees Celsius.
+ * @param isLightTheme
  * @returns A string with the color in HEX format.
  */
-export const getTemperatureColor = (temperature?: number | string): string => {
-    if (!temperature) {
+export const getTemperatureColor = (temperature?: number | string, isLightTheme?: boolean): string => {
+    if (typeof temperature === 'undefined') {
         return ''
     }
 
@@ -114,18 +115,21 @@ export const getTemperatureColor = (temperature?: number | string): string => {
     const g = Math.round(0) // Green channel (not used)
     const b = Math.round(255 * (1 - tempPercent)) // Blue channel
 
-    // Return color in HEX format
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`
+    // Determine background color based on theme
+    const color = isLightTheme ? `rgba(${r}, ${g}, ${b}, 0.5)` : `rgb(${r}, ${g}, ${b})`
+
+    return color
 }
 
 /**
  * Converts cloudiness value to color.
  * Cloudiness percentage, where 0% is dark sky and 100% is light sky.
  * @param cloudiness Cloudiness percentage from 0 to 100.
+ * @param isLightTheme
  * @returns String with color in HEX format.
  */
-export const getCloudinessColor = (cloudiness?: number | string): string => {
-    if (!cloudiness) {
+export const getCloudinessColor = (cloudiness?: number | string, isLightTheme?: boolean): string => {
+    if (typeof cloudiness === 'undefined') {
         return ''
     }
 
@@ -142,6 +146,8 @@ export const getCloudinessColor = (cloudiness?: number | string): string => {
     const g = Math.round(30 + (225 - 30) * cloudinessPercent) // Green channel
     const b = Math.round(40 + (235 - 40) * cloudinessPercent) // Blue channel
 
-    // Return color in HEX format
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`
+    // Determine background color based on theme
+    const color = isLightTheme ? `rgba(${r}, ${g}, ${b}, 0.5)` : `rgb(${r}, ${g}, ${b})`
+
+    return color
 }
