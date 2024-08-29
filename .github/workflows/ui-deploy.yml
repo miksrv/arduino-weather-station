@@ -102,7 +102,7 @@ jobs:
           rsync -avz -e ssh client/ecosystem.config.js vps:/var/www/meteo.miksoft.pro
 
       # For the first launch of the application on the server:
-      # pm2 start ecosystem.config.js
+      # pm2 start ecosystem.config.js && pm2 save
       - name: Restart PM2
         run: ssh vps "pm2 restart meteo.miksoft.pro"
 
