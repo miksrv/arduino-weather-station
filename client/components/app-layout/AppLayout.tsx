@@ -8,7 +8,6 @@ import { useAppSelector } from '@/api/store'
 import AppBar from '@/components/app-bar'
 import Footer from '@/components/footer'
 import LanguageSwitcher from '@/components/language-switcher'
-import ThemeSwitcher from '@/components/theme-switcher'
 import { concatClassNames as cn } from '@/tools/helpers'
 
 interface AppLayoutProps {
@@ -69,7 +68,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ className, fullSize, children }) 
                 <Menu onClick={handleCloseOverlay} />
                 <div className={styles.content}>
                     <div className={styles.switchers}>
-                        <ThemeSwitcher />
                         <LanguageSwitcher />
                     </div>
                     <Footer />

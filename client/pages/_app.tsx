@@ -43,7 +43,7 @@ const App = ({ Component, pageProps }: AppProps) => {
     // })
 
     return (
-        <ThemeProvider>
+        <ThemeProvider defaultTheme={'dark'}>
             <Head>
                 <meta
                     name={'apple-mobile-web-app-capable'}

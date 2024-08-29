@@ -7,7 +7,7 @@ import styles from './styles.module.sass'
 
 import { setLocale } from '@/api/applicationSlice'
 import { useAppDispatch } from '@/api/store'
-import { ApiTypes } from '@/api/types'
+import { Locale } from '@/api/types'
 import { LOCAL_STORAGE } from '@/tools/constants'
 import useLocalStorage from '@/tools/hooks/useLocalStorage'
 
@@ -21,7 +21,7 @@ const LanguageSwitcher: React.FC = () => {
     const { language: currentLanguage } = i18n
     const { pathname, asPath, query } = router
 
-    const changeLanguage = async (locale: ApiTypes.LocaleType) => {
+    const changeLanguage = async (locale: Locale) => {
         if (locale === currentLanguage) {
             return
         }
@@ -36,7 +36,7 @@ const LanguageSwitcher: React.FC = () => {
     }
 
     useEffect(() => {
-        dispatch(setLocale(currentLanguage as ApiTypes.LocaleType))
+        dispatch(setLocale(currentLanguage as Locale))
     }, [])
 
     return (

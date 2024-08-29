@@ -11,7 +11,7 @@ export interface Column<T> {
     className?: string
     isSortable?: boolean
     background?: (value: T[keyof T], row: T) => string
-    formatter?: (value: T[keyof T], row: T) => React.ReactNode,
+    formatter?: (value: T[keyof T], row: T) => React.ReactNode
     showComparison?: boolean
 }
 
@@ -134,12 +134,12 @@ const Table = <T,>({ loading, columns, data }: TableProps<T>) => {
                                         {column.formatter
                                             ? column.formatter(row[column.accessor], row)
                                             : (row[column.accessor] as any)}
-                                        {column.showComparison && rowIndex > 0 &&
+                                        {column.showComparison &&
+                                            rowIndex > 0 &&
                                             renderComparisonIcon(
                                                 row[column.accessor],
                                                 sortedData[rowIndex - 1][column.accessor]
-                                            )
-                                        }
+                                            )}
                                     </td>
                                 ))}
                             </tr>

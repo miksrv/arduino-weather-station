@@ -19,21 +19,21 @@ interface ChartProps {
 }
 
 const colors = {
-    'green': '#4bb34b',
-    'orange': '#ea5d2e',
-    'red': '#e64646',
-    'blue': ['#4a90e2', '#6aa7ef'],
-    'purple': '#8e44ad',
-    'amber': '#f39c12',
-    'emerald': '#27ae60',
-    'navy': '#2c3e50',
-    'pumpkin': '#d35400',
-    'aqua': '#16a085',
-    'royal': '#2980b9',
-    'garnet': '#e74c3c',
-    'raspberry': '#c0392b',
-    'evening': '#34495e',
-    'gray': '#7f8c8d'
+    green: '#4bb34b',
+    orange: '#ea5d2e',
+    red: '#e64646',
+    blue: ['#4a90e2', '#6aa7ef'],
+    purple: '#8e44ad',
+    amber: '#f39c12',
+    emerald: '#27ae60',
+    navy: '#2c3e50',
+    pumpkin: '#d35400',
+    aqua: '#16a085',
+    royal: '#2980b9',
+    garnet: '#e74c3c',
+    raspberry: '#c0392b',
+    evening: '#34495e',
+    gray: '#7f8c8d'
 }
 
 const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
