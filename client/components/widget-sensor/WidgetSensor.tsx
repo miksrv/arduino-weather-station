@@ -8,7 +8,7 @@ import Icon from '@/ui/icon'
 import { IconTypes } from '@/ui/icon/types'
 import Skeleton from '@/ui/skeleton'
 
-interface WidgetProps {
+interface WidgetSensorProps {
     title?: string
     unit?: string
     icon?: IconTypes
@@ -19,7 +19,16 @@ interface WidgetProps {
     chart?: React.ReactNode
 }
 
-const Widget: React.FC<WidgetProps> = ({ title, icon, loading, chartLoading, currentValue, minMax, unit, chart }) => (
+const WidgetSensor: React.FC<WidgetSensorProps> = ({
+    title,
+    icon,
+    loading,
+    chartLoading,
+    currentValue,
+    minMax,
+    unit,
+    chart
+}) => (
     <div className={styles.widget}>
         <div className={styles.header}>
             <h3>{title}</h3>
@@ -85,4 +94,4 @@ const Widget: React.FC<WidgetProps> = ({ title, icon, loading, chartLoading, cur
     </div>
 )
 
-export default Widget
+export default WidgetSensor

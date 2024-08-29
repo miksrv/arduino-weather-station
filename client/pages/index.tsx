@@ -10,11 +10,12 @@ import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WeatherIcon from '@/components/weather-icon'
-import Widget from '@/components/widget'
-import WeatherChart from '@/components/widget/WeatherChart'
 import WidgetChart from '@/components/widget-chart'
 import WidgetForecastTable from '@/components/widget-forecast-table'
 import styles from '@/components/widget-forecast-table/styles.module.sass'
+import WidgetSensor from '@/components/widget-sensor'
+import WeatherChart from '@/components/widget-sensor/WeatherChart'
+import WidgetSummary from '@/components/widget-summary'
 import WindDirectionIcon from '@/components/wind-direction-icon'
 import { getWeatherI18nKey } from '@/tools/conditions'
 import { formatDate, round } from '@/tools/helpers'
@@ -74,20 +75,20 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             icon: 'Thermometer',
             source: 'temperature'
         },
-        {
-            title: t('humidity'),
-            unit: '%',
-            color: 'blue',
-            icon: 'Water',
-            source: 'humidity'
-        },
-        {
-            title: t('wind-speed'),
-            unit: 'м/с',
-            color: 'purple',
-            icon: 'Wind',
-            source: 'windSpeed'
-        },
+        // {
+        //     title: t('humidity'),
+        //     unit: '%',
+        //     color: 'blue',
+        //     icon: 'Water',
+        //     source: 'humidity'
+        // },
+        // {
+        //     title: t('wind-speed'),
+        //     unit: 'м/с',
+        //     color: 'purple',
+        //     icon: 'Wind',
+        //     source: 'windSpeed'
+        // },
         {
             title: t('cloudiness'),
             unit: '%',
@@ -200,8 +201,13 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             />
 
             <div className={'widgets-list'}>
+                <WidgetSummary
+                    loading={currentLoading}
+                    weather={current}
+                />
+
                 {widgets?.map((widget) => (
-                    <Widget
+                    <WidgetSensor
                         key={`widget-${widget.source}`}
                         unit={widget.unit}
                         title={widget.title}
