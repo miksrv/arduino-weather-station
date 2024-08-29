@@ -94,7 +94,7 @@ const ChipsSelect: React.FC<ChipsSelectProps> = ({
         setIsOpen(false)
     }
 
-    const handleClickRemove = (option: string): void => {
+    const handleClickRemove = (option: string | number): void => {
         onSelect?.([...(value?.filter((item) => item !== option) ?? [])])
     }
 
