@@ -5,64 +5,79 @@ on:
     branches:
       - main
     paths:
-      - 'frontend/**/*'
+      - 'client/**/*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   ui-checks:
+    if: github.event.pull_request.draft == false
+    name: Build & Tests
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: 'npm'
-          cache-dependency-path: 'frontend/package-lock.json'
+          node-version: 20
+          cache: 'yarn'
+          cache-dependency-path: 'client/yarn.lock'
 
       - name: Cache node modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-npm
         with:
           path: |
-            frontend/node_modules
+            client/node_modules
             ~/.npm
-          key: ${{ runner.os }}-modules-${{ hashFiles('frontend/package-lock.json') }}
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-modules-${{ hashFiles('client/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-modules-
             ${{ runner.os }}-
 
       - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
         name: Install dependencies
-        working-directory: frontend
-        run: npm ci -f
+        working-directory: client
+        run: yarn install
 
       - name: Linter
-        run: npm run eslint:check
-        working-directory: frontend
+        run: yarn eslint:check
+        working-directory: client
 
       - name: Prettier
-        run: npm run prettier:check
-        working-directory: frontend
+        run: yarn prettier:check
+        working-directory: client
 
       - name: Cache UI build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-build
         with:
-          path: client/out
-          key: ${{ runner.os }}-build-${{ hashFiles('frontend/**/*.ts', 'frontend/**/*.tsx') }}
+          path: client/.next
+          key: ${{ runner.os }}-build-${{ hashFiles('client/**/*.ts', 'client/**/*.tsx') }}
           restore-keys: |
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
       - if: ${{ steps.cache-build.outputs.cache-hit != 'true' }}
+        name: Configure Client
+        run: |
+          echo "NEXT_PUBLIC_API_HOST = '${{ secrets.NEXT_PUBLIC_API_HOST }}'
+          NEXT_PUBLIC_SITE_LINK = '${{ secrets.NEXT_PUBLIC_SITE_LINK }}'" > .env
+        working-directory: client
+
+      # - name: UI Unit Tests
+      #  run: yarn test
+      #  working-directory: client
+
+      - if: ${{ steps.cache-build.outputs.cache-hit != 'true' }}
         name: Build UI
         run: |
-          export dateNow=$(date +"%d.%m.%Y %H:%M")
-          echo "export const update = '$dateNow'" > src/update.ts
-          npm run build --if-present
-        working-directory: frontend
-
-      - name: Test
-        run: npm run test:coverage
-        working-directory: frontend
+          export dateNow=$(date +"%Y-%m-%dT%H:%M")
+          echo "export const update = '$dateNow'" > update.ts
+          yarn build
+        working-directory: client

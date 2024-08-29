@@ -5,11 +5,11 @@ module.exports = {
             autorestart: true,
             env: {
                 NODE_ENV: 'production',
-                PORT: 3005
+                PORT: 3007
             },
             instances: 1,
-            max_memory_restart: '1G',
-            name: 'geometki.com',
+            max_memory_restart: '256M',
+            name: 'meteo.miksoft.pro',
             script: 'server.js',
             watch: false
         }

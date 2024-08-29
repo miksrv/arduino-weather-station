@@ -5,7 +5,7 @@ import styles from './styles.module.sass'
 
 import useClientOnly from '@/tools/hooks/useClientOnly'
 
-const transitionTime = 200
+const transitionTime = 50
 
 const ThemeToggle: React.FC = () => {
     const isClient = useClientOnly()
@@ -22,7 +22,7 @@ const ThemeToggle: React.FC = () => {
             role='button'
             tabIndex={0}
             onKeyDown={(e) => {
-                if (e.which === 13 || e.which === 32) {
+                if (e.key === 'Enter' || e.key === ' ') {
                     handleToggle()
                 }
             }}
