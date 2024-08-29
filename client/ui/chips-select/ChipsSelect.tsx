@@ -152,7 +152,7 @@ const ChipsSelect: React.FC<ChipsSelectProps> = ({
                                 disabled={disabled}
                                 onClick={toggleDropdown}
                             >
-                                {isOpen ? <Icon name={'Up'} /> : <Icon name={'Down'} />}
+                                {isOpen ? <Icon name={'ArrowUp'} /> : <Icon name={'ArrowDown'} />}
                             </button>
                         )}
                     </span>

@@ -1,1 +1,1 @@
-export type IconTypes = 'Menu' | 'Light' | 'Dark' | 'Water' | 'Thermometer' | 'Wind' | 'Cloud' | 'ArrowUp' | 'ArrowDown'
+export type IconTypes = 'Menu' | 'Light' | 'Dark' | 'Water' | 'Thermometer' | 'Wind' | 'Cloud' | 'ArrowUp' | 'ArrowDown' | 'Close' | 'CheckboxChecked' | 'CheckboxUnchecked' | 'CheckboxIndeterminate' | 'Left' | 'Right' | 'RadioButtonUnchecked' | 'RadioButtonChecked'

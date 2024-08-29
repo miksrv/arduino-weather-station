@@ -194,7 +194,7 @@ const Autocomplete: React.FC<DropdownProps<any>> = ({
                                 type={'button'}
                                 onClick={toggleDropdown}
                             >
-                                {isOpen ? <Icon name={'Up'} /> : <Icon name={'Down'} />}
+                                {isOpen ? <Icon name={'ArrowUp'} /> : <Icon name={'ArrowDown'} />}
                             </button>
                         ) : (
                             <></>

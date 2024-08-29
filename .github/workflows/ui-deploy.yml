@@ -7,9 +7,9 @@ on:
     paths:
       - 'client/**/*'
 
-    pull_request:
-      branches:
-        - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   ui-ssh-deploy:

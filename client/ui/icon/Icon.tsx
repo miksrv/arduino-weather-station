@@ -53,6 +53,42 @@ const Icon: React.FC<IconProps> = ({ name, className }) => {
         case 'ArrowDown':
             iconToRender = <path d='m19 15-1.41-1.41L13 18.17V2h-2v16.17l-4.59-4.59L5 15l7 7z' />
             break
+        case 'Close':
+            iconToRender = (
+                <path d='M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z' />
+            )
+            break
+        case 'CheckboxChecked':
+            iconToRender = (
+                <path d='M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2m-9 14-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z' />
+            )
+            break
+        case 'CheckboxUnchecked':
+            iconToRender = (
+                <path d='M19 5v14H5V5zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2' />
+            )
+            break
+        case 'CheckboxIndeterminate':
+            iconToRender = (
+                <path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-2 10H7v-2h10z' />
+            )
+            break
+        case 'RadioButtonUnchecked':
+            iconToRender = (
+                <path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8' />
+            )
+            break
+        case 'RadioButtonChecked':
+            iconToRender = (
+                <path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z' />
+            )
+            break
+        case 'Left':
+            iconToRender = <path d='M15.41 16.59 10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z' />
+            break
+        case 'Right':
+            iconToRender = <path d='M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z' />
+            break
     }
 
     return (

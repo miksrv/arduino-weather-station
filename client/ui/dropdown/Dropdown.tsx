@@ -129,7 +129,7 @@ const Dropdown: React.FC<DropdownProps<any>> = ({
                                 <Icon name={'Close'} />
                             </button>
                         )}
-                        {isOpen ? <Icon name={'Up'} /> : <Icon name={'Down'} />}
+                        {isOpen ? <Icon name={'ArrowUp'} /> : <Icon name={'ArrowDown'} />}
                     </span>
                 </button>
                 {isOpen && (

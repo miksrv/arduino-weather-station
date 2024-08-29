@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import styles from './styles.module.sass'
 
-import { concatClassNames as cn, encodeQueryData } from '@/functions/helpers'
+import { concatClassNames as cn, encodeQueryData } from '@/tools/helpers'
 import Icon from '@/ui/icon'
 
 const LEFT_PAGE = 'LEFT'
