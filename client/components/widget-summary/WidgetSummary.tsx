@@ -47,7 +47,10 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
                 {loading ? (
                     <Skeleton style={{ width: 75, height: 75 }} />
                 ) : (
-                    <WeatherIcon weatherId={weather?.weatherId as number} />
+                    <WeatherIcon
+                        weatherId={weather?.weatherId as number}
+                        date={weather?.date}
+                    />
                 )}
             </div>
             <div className={styles.chipList}>

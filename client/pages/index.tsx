@@ -99,12 +99,23 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     ]
 
     const tableColumnsDaily: Column<ApiModel.Weather>[] = [
-        { header: t('date'), accessor: 'date', className: styles.cellDate, isSortable: true },
+        {
+            header: t('date'),
+            accessor: 'date',
+            className: styles.cellDate,
+            isSortable: true,
+            formatter: (date) => formatDate(date as string, 'dd, MMM D')
+        },
         {
             header: t('weather'),
             accessor: 'weatherId',
             className: styles.cellIcon,
-            formatter: (weatherId) => <WeatherIcon weatherId={weatherId as number} />
+            formatter: (weatherId, { date }) => (
+                <WeatherIcon
+                    weatherId={weatherId as number}
+                    date={date}
+                />
+            )
         },
         {
             header: t('weather-conditions'),
@@ -116,58 +127,69 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             header: t('temperature-short'),
             accessor: 'temperature',
             className: styles.cellTemperature,
+            isSortable: true,
             background: (temperature) => getTemperatureColor(temperature),
-            formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>,
-            isSortable: true
+            formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>
         },
         {
             header: t('clouds'),
             accessor: 'clouds',
             className: styles.cellClouds,
+            isSortable: true,
             background: (clouds) => getCloudinessColor(clouds),
-            formatter: (clouds) => <>{clouds}%</>,
-            isSortable: true
+            formatter: (clouds) => <>{clouds}%</>
         }
     ]
 
     const tableColumnsHourly: Column<ApiModel.Weather>[] = [
-        { header: t('time'), accessor: 'date', className: styles.cellDate, isSortable: true },
+        {
+            header: t('time'),
+            accessor: 'date',
+            className: styles.cellDate,
+            isSortable: true,
+            formatter: (date) => formatDate(date as string, 'HH A')
+        },
         {
             header: t('weather'),
             accessor: 'weatherId',
             className: styles.cellIcon,
-            formatter: (weatherId) => <WeatherIcon weatherId={weatherId as number} />
+            formatter: (weatherId, { date }) => (
+                <WeatherIcon
+                    weatherId={weatherId as number}
+                    date={date}
+                />
+            )
         },
         {
             header: t('temperature-short'),
             accessor: 'temperature',
             className: styles.cellTemperature,
+            isSortable: true,
             background: (temperature) => getTemperatureColor(temperature),
-            formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>,
-            isSortable: true
+            formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>
         },
         {
             header: t('clouds'),
             accessor: 'clouds',
             className: styles.cellClouds,
+            isSortable: true,
             background: (clouds) => getCloudinessColor(clouds),
-            formatter: (clouds) => <>{clouds}%</>,
-            isSortable: true
+            formatter: (clouds) => <>{clouds}%</>
         },
         {
             header: t('pressure'),
             accessor: 'pressure',
             className: styles.cellPressure,
-            formatter: (pressure) => round(convertHpaToMmHg(pressure), 1),
             showComparison: true,
-            isSortable: true
+            isSortable: true,
+            formatter: (pressure) => round(convertHpaToMmHg(pressure), 1)
         },
         {
             header: t('wind'),
             accessor: 'windSpeed',
             className: styles.cellWind,
-            formatter: (windSpeed) => <>{round(Number(windSpeed), 1)} м/с</>,
-            isSortable: true
+            isSortable: true,
+            formatter: (windSpeed) => <>{round(Number(windSpeed), 1)} м/с</>
         },
         {
             header: '',
@@ -230,17 +252,14 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     title={t('weather-forecast-by-days')}
                     loading={dailyLoading}
                     columns={tableColumnsDaily}
-                    data={forecastDaily?.map((forecast) => ({
-                        ...forecast,
-                        date: formatDate(forecast.date, 'dd, MMM D')
-                    }))}
+                    data={forecastDaily}
                 />
 
                 <WidgetForecastTable
                     title={t('weather-forecast-hourly')}
                     loading={hourlyLoading}
                     columns={tableColumnsHourly}
-                    data={forecastHourly?.map((forecast) => ({ ...forecast, date: formatDate(forecast.date, 'HH A') }))}
+                    data={forecastHourly}
                 />
 
                 <WidgetChart
