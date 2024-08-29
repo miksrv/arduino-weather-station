@@ -1,0 +1,87 @@
+:root[data-theme='dark'] {
+    --font-size: 14px;
+    --font-family: -apple-system, system-ui, 'Helvetica Neue', Roboto,
+        sans-serif;
+    --letter-spacing: 0.00938em;
+
+    --width-max: 1000px;
+    --width-menu: 280px;
+
+    --body-background: #1b1b1b;
+
+    --modal-background: #2c2d2e;
+
+    --menu-background-hover: #282828;
+
+    --border-radius: 6px;
+
+    --text-color-primary: #e1e3e6;
+    --text-color-secondary: #76787a;
+    --icon-color-primary: #e1e3e6;
+    --icon-color-primary-hover: #E2E4E7;
+    --icon-color-secondary: #76787a;
+    --icon-color-secondary-hover: #7B7D7F;
+
+    --container-background-color-error: #522e2e;
+    --container-color-error: #ff5c5c;
+    --container-background-color-success: #2E3E2B;
+    --container-color-success: #4bb34b;
+    --container-background: #282828;
+    --container-border-separator: 0.5px solid #444546;
+    --container-shadow: inset 0 0 0 0.5px #363738;
+
+    --input-background-color: #232324;
+    --input-background-content: #19191a;
+    --input-background-color-error: var(--container-background-color-error);
+    --input-label-color: #969a9f;
+    --input-border-color: #444546;
+    --input-border: 0.5px solid var(--input-border-color);
+    --input-border-focus-color: #1976d2;
+
+    --dropdown-background-color: #232324;
+    --dropdown-background-color-hover: #3a3a3b;
+
+    --link-color: #529ef4;
+    --link-color-hover: #77adec;
+    --link-color-active: #60a6f5;
+
+    --overlay-background: rgba(35, 35, 36, 0.57);
+    --overlay-background-animation: linear-gradient( 90deg, transparent, rgba(255, 255, 255, 0.04), transparent );
+
+    --button-default-background: transparent;
+    --button-default-color: var(--text-color-primary);
+    --button-default-background-hover: rgba(255, 255, 255, 0.04);
+    --button-default-background-active: rgba(255, 255, 255, 0.08);
+    --button-primary-background: var(--text-color-primary);
+    --button-primary-color: var(--body-background);
+    --button-primary-background-hover: #EBEDF0;
+    --button-primary-background-active: #D7D8DB;
+    --button-negative-background: #ff5c5c;
+    --button-negative-color: var(--text-color-primary);
+    --button-negative-background-hover: #FF6363;
+    --button-negative-background-active: #FF6969;
+    --button-secondary-background: rgba(255, 255, 255, 0.10);
+    --button-secondary-color: var(--text-color-primary);
+    --button-secondary-background-hover: rgba(255, 255, 255, 0.12);
+    --button-secondary-color-hover: var(--text-color-primary);
+    --button-secondary-background-active: rgba(255, 255, 255, 0.14);
+    --button-secondary-color-active: var(--text-color-primary);
+
+    --color-green: #4bb34b;
+    --color-orange: #ea5d2e;
+    --color-red: #e64646;
+
+    .leaflet-layer,
+    .leaflet-control-attribution {
+        filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+    }
+
+    .leaflet-container, .leaflet-popup-tip {
+        background-color: var(--input-background-color);
+    }
+
+    .map-tiles {
+        filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+    }
+
+}

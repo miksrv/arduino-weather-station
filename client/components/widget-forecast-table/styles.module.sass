@@ -1,0 +1,70 @@
+@import ../../styles/variables
+
+/* styles.css */
+.widgetForecastTable
+    flex-basis: calc(50% - 5px)
+    width: calc(50% - 5px)
+    background: var(--modal-background)
+    color: var(--text-color-primary)
+    border-radius: var(--border-radius)
+    box-shadow: var(--container-shadow)
+    overflow: hidden
+    overflow-y: auto
+    height: 250px
+
+    .title
+        background-color: var(--modal-background)
+        color: var(--text-color-secondary)
+        text-align: center
+        padding: 6px 12px
+
+    @media only screen and (max-width: $mobileMaxWidth)
+        flex-basis: 100%
+        width: 100%
+
+    table
+        border-radius: var(--border-radius)
+
+    .cellDate
+        white-space: nowrap
+
+        &:first-letter
+            text-transform: uppercase
+
+    .cellIcon, .windDeg
+        padding: 0 !important
+        text-align: center !important
+
+        svg
+            height: 30px
+            width: 100%
+            min-width: 40px
+            display: flex
+            justify-content: center
+
+    .cellConditions
+        white-space: nowrap
+
+    .cellWind
+        white-space: nowrap
+
+    .cellPressure
+        svg
+            vertical-align: middle
+            margin-left: 5px
+            display: inline-block
+            width: 14px
+            height: 14px
+
+    .cellDate
+        width: 140px
+
+    .cellTemperature
+        padding: 0 !important
+
+        & > div
+            height: 100%
+
+    .cellTemperature, .cellClouds
+        width: 60px
+        text-align: center !important

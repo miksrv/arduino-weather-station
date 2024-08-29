@@ -1,0 +1,47 @@
+@import ../../styles/variables
+
+.toggleContainer
+    cursor: pointer
+    width: 70px
+    height: 32px
+    border-radius: 17px
+    overflow: hidden
+
+.dayNightSwitch
+    display: flex
+    flex-direction: row
+    align-items: center
+    height: 32px
+    width: 100%
+    border-radius: 17px
+    transition: background-color 200ms ease-in-out
+
+.circle
+    width: 24px
+    height: 24px
+    border-radius: 50%
+    position: absolute
+    top: 4px
+    border: 2px solid
+    display: flex
+    justify-content: center
+    align-items: center
+    transition: transform 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out
+
+.moonSvg
+    width: 13px
+    height: 13px
+    position: absolute
+    transition: opacity 200ms ease-in-out, transform 200ms ease-in-out
+
+.stars
+    position: relative
+    transition: opacity 200ms ease-in-out, transform 200ms ease-in-out
+
+.star
+    position: absolute
+    width: 3px
+    height: 3px
+    border-radius: 50%
+    background-color: white
+    transition: opacity 200ms ease-in-out, transform 200ms ease-in-out

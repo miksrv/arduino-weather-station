@@ -1,72 +1,124 @@
-name: FTP Deploy
+name: UI Deploy
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'frontend/**/*'
+      - 'client/**/*'
+
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  ftp-ui-deploy:
+  ui-ssh-deploy:
+    name: Production
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: 'npm'
-          cache-dependency-path: 'frontend/package-lock.json'
+          node-version: 20
+          cache: 'yarn'
+          cache-dependency-path: 'client/yarn.lock'
 
       - name: Cache node modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-npm
         with:
           path: |
-            frontend/node_modules
+            client/node_modules
             ~/.npm
-          key: ${{ runner.os }}-modules-${{ hashFiles('frontend/package-lock.json') }}
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-modules-${{ hashFiles('client/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-modules-
             ${{ runner.os }}-
 
       - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
         name: Install dependencies
-        working-directory: frontend
-        run: npm ci -f
-
-      - name: Configure Client
-        run: echo "REACT_APP_API_HOST = '${{ secrets.CLIENT_API_HOST }}'" > .env
-        working-directory: frontend
+        working-directory: client
+        run: yarn install
 
       - name: Cache UI build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-build
         with:
-          path: client/out
-          key: ${{ runner.os }}-build-${{ hashFiles('frontend/**/*.ts', 'frontend/**/*.tsx') }}
+          path: client/.next
+          key: ${{ runner.os }}-build-${{ hashFiles('client/**/*.ts', 'client/**/*.tsx') }}
           restore-keys: |
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
       - if: ${{ steps.cache-build.outputs.cache-hit != 'true' }}
+        name: Configure Client
+        run: |
+          echo "NEXT_PUBLIC_API_HOST = '${{ secrets.NEXT_PUBLIC_API_HOST }}'
+          NEXT_PUBLIC_SITE_LINK = '${{ secrets.NEXT_PUBLIC_SITE_LINK }}'" > .env
+        working-directory: client
+
+      - if: ${{ steps.cache-build.outputs.cache-hit != 'true' }}
         name: Build UI
         run: |
-          export dateNow=$(date +"%d.%m.%Y %H:%M")
-          echo "export const update = '$dateNow'" > src/update.ts
-          npm run build --if-present
-        working-directory: frontend
+          export dateNow=$(date +"%Y-%m-%dT%H:%M")
+          echo "export const update = '$dateNow'" > update.ts
+          yarn build
+        working-directory: client
 
-      - name: Install LFTP client
-        run: sudo apt install lftp
+      - name: Configure SSH
+        env:
+          SSH_HOST: ${{secrets.SSH_HOST}}
+          SSH_PORT: ${{secrets.SSH_PORT}}
+          SSH_USER: ${{secrets.SSH_USER}}
+          SSH_KEY: ${{secrets.SSH_KEY}}
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/deploy
+          chmod 400 ~/.ssh/deploy
+          cat >>~/.ssh/config <<END
+          Host vps
+            HostName $SSH_HOST
+            Port $SSH_PORT
+            User $SSH_USER
+            IdentityFile ~/.ssh/deploy
+            StrictHostKeyChecking no
+          END
 
-      - name: Configure LFTP
-        run: mkdir ~/.lftp && echo "set ssl:verify-certificate false;" >> ~/.lftp/rc
+      # If we just use nginx and the application is exported to plain HTML
+      #- name: Send files
+      #  run: rsync -avz -e ssh ./client/out/ vps:/var/www/meteo.miksoft.pro
 
-      - name: Load Secrets
-        run: echo "machine ${{ secrets.FTP_HOSTNAME }} login ${{ secrets.FTP_USERNAME }} password ${{ secrets.FTP_PASSWORD }}" > ~/.netrc
+      # If we run NextJS on a Node server using PM2
+      - name: Send files
+        run: |
+          ssh vps "cd /var/www/meteo.miksoft.pro && rm -rf .next"
+          rsync -avz -e ssh client/.next/standalone/ vps:/var/www/meteo.miksoft.pro
+          rsync -avz -e ssh client/.next/static vps:/var/www/meteo.miksoft.pro/.next
+          rsync -avz -e ssh client/public vps:/var/www/meteo.miksoft.pro
+          rsync -avz -e ssh client/ecosystem.config.js vps:/var/www/meteo.miksoft.pro
 
-      - name: Deploy UI
-        run: lftp -e "mirror --parallel=100 -R frontend/build/ /" ${{ secrets.FTP_HOSTNAME }}
+      # For the first launch of the application on the server:
+      # pm2 start ecosystem.config.js && pm2 save
+      - name: Restart PM2
+        run: ssh vps "pm2 restart meteo.miksoft.pro"
+
+      # If for deployment we use not SSH, but an FTP connection
+      # - name: Export UI
+      #  working-directory: client
+      #  run: yarn export
+      #
+      # - name: Install LFTP
+      #  run: sudo apt install lftp
+      #
+      # - name: Configure LFTP
+      #  run: mkdir ~/.lftp && echo "set ssl:verify-certificate false;" >> ~/.lftp/rc
+      #
+      # - name: Load Secrets
+      #  run: echo "machine ${{ secrets.FTP_HOSTNAME }} login ${{ secrets.FTP_USERNAME }} password ${{ secrets.FTP_PASSWORD }}" > ~/.netrc
+      #
+      # - name: Upload Folder
+      #  run: lftp -e "mirror --parallel=100 -R client/out/ /" ${{ secrets.FTP_HOSTNAME }}

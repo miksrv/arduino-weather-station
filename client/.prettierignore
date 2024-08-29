@@ -1,0 +1,10 @@
+.next
+.vscode
+.github
+.yarn
+*.css
+eslint.config.mjs
+site.webmanifest
+node_modules
+out
+coverage

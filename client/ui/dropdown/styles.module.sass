@@ -1,0 +1,165 @@
+@import ../../styles/variables
+
+.optionsList
+  list-style: none
+  padding: 0
+  width: 100%
+  z-index: 405
+
+  li
+    button
+      margin: 0
+      height: 100%
+      width: 100%
+      padding: 8px 10px
+      color: var(--text-color-primary)
+      font-size: $fontSizeParagraph
+      cursor: pointer
+      background: transparent
+      border: none
+      text-align: left
+      display: flex
+      align-items: center
+
+      img
+        width: 14px
+        height: 15px
+        margin-right: 4px
+
+    &.disabled
+      pointer-events: none
+      cursor: not-allowed
+      opacity: .5
+
+    &:hover, &.active
+      background-color: var(--input-background-color)
+
+.dropdown
+  display: block
+
+  .label
+    display: block
+    color: var(--input-label-color)
+    overflow: hidden
+    padding-bottom: 4px
+    padding-top: 2px
+    text-overflow: ellipsis
+    white-space: nowrap
+    font-size: $fontSizeHeadline
+
+  .container
+    position: relative
+    background-color: var(--input-background-color)
+    border-radius: var(--border-radius)
+
+    .dropdownButton
+      width: 100%
+      font-size: $fontSizeParagraph
+      line-height: 20px
+      position: relative
+      -webkit-tap-highlight-color: transparent
+      align-items: center
+      border-radius: inherit
+      box-sizing: border-box
+      border: var(--input-border)
+      background-color: transparent
+      color: var(--input-label-color)
+      height: 36px
+      margin: 0
+      padding: 0 12px
+      cursor: pointer
+      display: flex
+      justify-content: space-between
+      transition: border-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms
+
+      &:focus, &:active, &:hover
+        outline: none
+        border-color: var(--input-border-focus-color)
+        //box-shadow: rgba(25, 118, 210, 0.25) 0 0 0 0.05rem
+
+      &.selected
+        color: var(--text-color-primary)
+
+      span
+        overflow: hidden
+        white-space: nowrap
+        display: block
+        text-overflow: ellipsis
+
+        img
+          width: 18px
+          height: 20px
+          margin-right: 5px
+          float: left
+
+        .placeHolder
+          color: var(--input-label-color)
+
+      .arrow
+        display: flex
+        margin-top: 1px
+
+        svg
+          width: 24px
+          height: 24px
+          fill: var(--icon-color-secondary)
+
+      .clear
+        background: transparent
+        border: none
+        margin: 0
+        padding: 0
+        cursor: pointer
+
+        svg
+          margin-top: 2px
+          width: 18px !important
+          height: 18px !important
+
+          &:hover
+            fill: var(--icon-color-secondary-hover)
+
+  &.disabled
+    .label
+      opacity: 0.7
+
+    .dropdownButton
+      opacity: 0.5
+      cursor: default
+
+  &.required
+    .label:after
+      content: '*'
+      margin-left: 3px
+      color: var(--color-red)
+
+  &.error
+    .dropdownButton
+      background-color: var(--input-background-color-error)
+      border-color: #e64646 !important
+
+    &.open
+      .dropdownButton
+        border-bottom-left-radius: 0
+        border-bottom-right-radius: 0
+
+  .optionsList
+    position: absolute
+    background-color: var(--dropdown-background-color)
+    box-shadow: $boxShadow2
+    border: var(--input-border)
+    top: 33px
+    border-bottom-left-radius: var(--border-radius)
+    border-bottom-right-radius: var(--border-radius)
+    max-height: 200px
+    z-index: 405
+    overflow: hidden
+    overflow-y: scroll
+
+    li
+      &:hover, &.active
+        background-color: var(--dropdown-background-color-hover)
+
+      &:last-of-type
+        border-bottom-left-radius: var(--border-radius)
+        border-bottom-right-radius: var(--border-radius)

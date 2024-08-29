@@ -1,0 +1,96 @@
+@import ../../styles/variables
+
+.appBar
+    color: var(--text-color-primary)
+    height: 50px
+    width: 100%
+    margin-top: 10px
+
+    .loading
+        display: flex
+        align-items: center
+
+        svg
+            width: 20px
+            height: 20px
+            margin-right: 10px
+
+    @media only screen and (max-width: $mobileMaxWidth)
+        padding: 0 10px
+
+    .wrapper
+        display: flex
+        max-width: var(--width-max)
+        background-color: var(--container-background)
+        border-radius: var(--border-radius)
+        box-shadow: var(--container-shadow)
+        margin: 0 auto
+        padding: 0 10px
+        align-items: center
+        width: 100%
+        height: 100%
+        justify-content: space-between
+
+        .aside
+            display: flex
+            align-items: center
+
+    .hamburgerButton
+        border: none
+        background: transparent
+        padding: 0
+        line-height: 10px
+        margin-right: 10px
+        cursor: pointer
+        opacity: .7
+        transition: opacity .3s
+
+        &:hover
+            opacity: 1
+
+        svg
+            width: 34px
+            height: 34px
+            fill: var(--text-color-primary)
+
+    .timeAgo
+        font-size: $fontSizeCaption
+        color: var(--text-color-secondary)
+
+    .online, .offline
+        width: 5px
+        height: 32px
+        margin: 0 10px 0 0
+
+    .online
+        background: var(--color-green)
+        -webkit-animation: pulsate 2s infinite
+        -moz-animation: pulsate 2s infinite
+        animation: pulsate 2s infinite
+
+    .offline
+        background: var(--color-red)
+
+@-webkit-keyframes pulsate
+    0%
+        opacity: 1
+    50%
+        opacity: 0
+    100%
+        opacity: 1
+
+@-moz-keyframes pulsate
+    0%
+        opacity: 1
+    50%
+        opacity: 0
+    100%
+        opacity: 1
+
+@keyframes pulsate
+    0%
+        opacity: 1
+    50%
+        opacity: 0
+    100%
+        opacity: 1

@@ -1,0 +1,60 @@
+ name: API Deploy
+
+ on:
+   push:
+     branches:
+       - main
+     paths:
+       - 'server/**/*'
+
+ # https://github.com/codeigniter4/CodeIgniter4/blob/develop/.github/workflows/deploy-apidocs.yml
+ jobs:
+   api-ssh-deploy:
+     name: Production
+     runs-on: ubuntu-latest
+
+     steps:
+       - uses: actions/checkout@v4
+
+       # Docs: https://github.com/shivammathur/setup-php
+       - name: Setup PHP
+         uses: shivammathur/setup-php@v2
+         with:
+           php-version: 8.2
+           extensions: mbstring, intl, curl, dom
+           coverage: none
+
+       - name: Get composer cache directory
+         id: composer-cache
+         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+         working-directory: server
+
+       - name: Cache composer dependencies
+         uses: actions/cache@v4
+         with:
+           path: ${{ steps.composer-cache.outputs.dir }}
+           key: ${{ runner.os }}-composer-${{ hashFiles('server/composer.lock') }}
+           restore-keys: ${{ runner.os }}-composer-
+
+       - name: Install dependencies
+         run: composer install --no-dev --no-progress --prefer-dist --optimize-autoloader
+         working-directory: server
+
+       - name: Install LFTP
+         run: sudo apt install lftp
+
+       - name: Configure LFTP
+         run: mkdir ~/.lftp && echo "set ssl:verify-certificate false;" >> ~/.lftp/rc
+
+       - name: Load Secrets
+         run: echo "machine ${{ secrets.FTP_HOSTNAME }} login ${{ secrets.FTP_USERNAME }} password ${{ secrets.FTP_PASSWORD }}" > ~/.netrc
+
+       - name: Upload Folder
+         run: |
+           lftp -e "put -O / .htaccess" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "rm -rf app" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "mirror --parallel=100 -R app" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "mirror --parallel=100 -R vendor" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "mirror --parallel=100 -R public" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "mirror --parallel=100 -R writable" ${{ secrets.FTP_HOSTNAME }}
+         working-directory: server

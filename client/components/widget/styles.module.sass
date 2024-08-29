@@ -1,0 +1,65 @@
+@import ../../styles/variables
+
+/* styles.css */
+.widget
+    flex-basis: calc(25% - 8px)
+    width: calc(25% - 8px)
+    background: var(--modal-background)
+    color: var(--text-color-primary)
+    border-radius: var(--border-radius)
+    box-shadow: var(--container-shadow)
+    overflow: hidden
+
+    @media only screen and (max-width: $mobileMaxWidth)
+        flex-basis: calc(50% - 5px)
+        width: calc(50% - 5px)
+
+    .header
+        padding: 16px 16px 0
+        display: flex
+        justify-content: space-between
+        align-items: center
+
+        h3
+            color: var(--text-color-secondary)
+            margin: 0
+            font-weight: 200
+
+        svg
+            fill: var(--text-color-secondary)
+            width: 18px
+            height: 18px
+
+    .value
+        padding: 0 16px
+        font-size: 34px
+        font-weight: 100
+        margin-bottom: 5px
+        display: flex
+        align-items: baseline
+
+        span
+            font-size: 20px
+            margin-left: 5px
+            color: var(--text-color-secondary)
+
+    .statsContainer
+        display: flex
+        padding: 0 16px
+        justify-content: space-between
+        margin-bottom: 15px
+
+        .block
+            display: flex
+            flex-direction: column
+            align-items: flex-start
+            color: var(--text-color-secondary)
+            font-weight: 200
+
+            .title
+                color: var(--text-color-primary)
+                font-weight: 400
+
+    .chart
+        margin: -5px
+        //opacity: .6
