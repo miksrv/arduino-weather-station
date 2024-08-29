@@ -95,7 +95,7 @@ jobs:
       # If we run NextJS on a Node server using PM2
       - name: Send files
         run: |
-          ssh vps "cd /var/www/meteo.miksoft.pro && rm -r .next"
+          ssh vps "cd /var/www/meteo.miksoft.pro && rm -rf .next"
           rsync -avz -e ssh client/.next/standalone/ vps:/var/www/meteo.miksoft.pro
           rsync -avz -e ssh client/.next/static vps:/var/www/meteo.miksoft.pro/.next
           rsync -avz -e ssh client/public vps:/var/www/meteo.miksoft.pro
