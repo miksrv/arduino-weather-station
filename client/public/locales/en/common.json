@@ -1,6 +1,7 @@
 {
     "weather-in-orenburg": "Weather in Orenburg",
     "weather-orenburg-now": "Weather in Orenburg now ({{date}})",
+    "site-description": "Current weather in Orenburg: temperature, humidity, pressure, wind speed and other data from weather sensors. Get accurate and updated data for your city.",
     "main-page-description": "Welcome to our weather station! We provide up-to-date weather data, including temperature, humidity, wind speed and direction, pressure, and precipitation levels. Our data is refreshed every 5 minutes, ensuring you always have the latest weather updates. Monitor forecasts, explore historical weather data, and stay informed about all natural phenomena in your area. Our goal is to make weather information accessible and understandable for everyone!",
     "sensors-page-description": "Full list of weather sensors: temperature, pressure, humidity, dew point, visibility, ultraviolet index, solar energy, radiation, cloudiness, precipitation, wind speed and direction. Find out the latest weather data for Orenburg",
     "date": "Date",

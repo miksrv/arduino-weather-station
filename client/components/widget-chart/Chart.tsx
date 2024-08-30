@@ -238,11 +238,11 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                             name: t('wind-speed'),
                             areaStyle: undefined,
                             lineStyle: {
-                                color: colors.teal[0],
+                                color: colors.green[0],
                                 width: 1
                             },
                             itemStyle: {
-                                color: colors.teal[0]
+                                color: colors.green[0]
                             }
                         }
                     ]

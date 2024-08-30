@@ -13,17 +13,10 @@ import WidgetSensor from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import { colors } from '@/tools/colors'
 import { formatDate } from '@/tools/helpers'
-import { getMinMaxValues } from '@/tools/weather'
+import { filterRecentData, getMinMaxValues } from '@/tools/weather'
 import { IconTypes } from '@/ui/icon/types'
 
 interface IndexPageProps {}
-
-const filterRecentData = (data?: ApiModel.Weather[], hours: number = 24): ApiModel.Weather[] | [] => {
-    const now = dayjs.utc()
-    const hoursAgo = now.subtract(hours, 'hours')
-
-    return data?.filter((item) => dayjs.utc(item.date).isAfter(hoursAgo)) || []
-}
 
 type WidgetType = {
     title?: string
@@ -79,7 +72,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('wind-speed'),
             unit: t('meters-per-second'),
-            color: 'teal',
+            color: 'green',
             icon: 'Wind',
             source: 'windSpeed'
         },
@@ -140,19 +133,19 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 description={t('main-page-description')}
                 canonical={'https://meteo.miksoft.pro'}
                 openGraph={{
-                    description: '',
+                    description: t('site-description'),
                     images: [
                         {
-                            height: 1538,
-                            url: '/images/pages/main.jpg',
-                            width: 1768
+                            height: 1640,
+                            url: '/images/sensors.jpg',
+                            width: 2028
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
-                    siteName: '',
-                    title: '',
+                    siteName: t('weather-in-orenburg'),
+                    title: t('weather-in-orenburg'),
                     type: 'website',
-                    url: ''
+                    url: process.env.NEXT_PUBLIC_SITE_LINK
                 }}
             />
 
@@ -171,7 +164,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                             <WeatherChart
                                 color={widget.color as any}
                                 yAxisField={widget.source}
-                                data={filterRecentData(history)}
+                                data={filterRecentData(history, 24)}
                             />
                         }
                     />

@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 import { ApiModel } from '@/api'
 
 export interface MinMaxResult {
@@ -90,7 +92,6 @@ export const convertWindDirection = (degrees?: number): 0 | 45 | 90 | 135 | 180 
  * Converts a temperature value to a color.
  * Temperature in degrees Celsius, where cold temperatures are displayed in blue and hot temperatures are displayed in red.
  * @param temperature Temperature in degrees Celsius.
- * @param isLightTheme
  * @returns A string with the color in HEX format.
  */
 export const getTemperatureColor = (temperature?: number | string): string => {
@@ -122,7 +123,6 @@ export const getTemperatureColor = (temperature?: number | string): string => {
  * Converts cloudiness value to color.
  * Cloudiness percentage, where 0% is dark sky and 100% is light sky.
  * @param cloudiness Cloudiness percentage from 0 to 100.
- * @param isLightTheme
  * @returns String with color in HEX format.
  */
 export const getCloudinessColor = (cloudiness?: number | string): string => {
@@ -144,4 +144,16 @@ export const getCloudinessColor = (cloudiness?: number | string): string => {
     const b = Math.round(40 + (235 - 40) * cloudinessPercent) // Blue channel
 
     return `rgba(${r}, ${g}, ${b}, 0.5)`
+}
+
+/**
+ * Get maximus of *hours* data
+ * @param data
+ * @param hours
+ */
+export const filterRecentData = (data?: ApiModel.Weather[], hours: number = 24): ApiModel.Weather[] | [] => {
+    const now = dayjs.utc()
+    const hoursAgo = now.subtract(hours, 'hours')
+
+    return data?.filter((item) => dayjs.utc(item.date).isAfter(hoursAgo)) || []
 }
