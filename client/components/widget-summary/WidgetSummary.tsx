@@ -26,7 +26,7 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
                     <Icon name={'Point'} />
                     <h1>{t('weather-in-orenburg')}</h1>
                 </div>
-                <div>
+                <div className={styles.conditions}>
                     {loading ? (
                         <Skeleton style={{ width: 140, height: 21 }} />
                     ) : (

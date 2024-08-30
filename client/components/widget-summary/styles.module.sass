@@ -24,6 +24,9 @@
         justify-content: space-between
         align-items: center
 
+        @media only screen and (max-width: 440px)
+            display: block
+
         .title
             display: flex
             align-items: center
@@ -40,11 +43,15 @@
                 height: 22px
                 margin-right: 5px
 
+        .conditions
+            @media only screen and (max-width: 440px)
+                margin-left: 28px
+
     .content
         display: flex
         justify-content: space-between
         align-items: center
-        padding: 0 16px
+        padding: 16px
         position: relative
 
         .temperature
@@ -66,3 +73,4 @@
         padding: 0 16px 8px
         display: flex
         justify-content: space-between
+        overflow: scroll
