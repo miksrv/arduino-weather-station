@@ -55,21 +55,18 @@ $sideBarWidth: 280px
 
     .mainContainer
         display: flex
-        max-width: var(--width-max)
+        width: 100%
         margin: 0 auto
-        padding-top: 5px
+        padding: 5px 10px
 
         .main
             width: 100%
             max-width: var(--width-max)
-            margin-bottom: 20px
+            margin: 0 auto 20px
 
         @media only screen and (max-width: $mobileMaxWidth)
             .menubar
                 display: none
-
-            .main
-                padding: 0 10px
 
     &.fullSize
         .mainContainer

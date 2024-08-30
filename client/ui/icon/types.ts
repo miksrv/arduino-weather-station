@@ -20,3 +20,7 @@ export type IconTypes =
     | 'RadioButtonUnchecked'
     | 'RadioButtonChecked'
     | 'Point'
+    | 'Compass'
+    | 'Visibility'
+    | 'Electric'
+    | 'SolarPower'

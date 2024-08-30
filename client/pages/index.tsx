@@ -17,11 +17,13 @@ import WidgetSensor from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
 import WindDirectionIcon from '@/components/wind-direction-icon'
+import { colors } from '@/tools/colors'
 import { getWeatherI18nKey } from '@/tools/conditions'
 import { formatDate, round } from '@/tools/helpers'
 import {
     convertHpaToMmHg,
     convertWindDirection,
+    filterRecentData,
     getCloudinessColor,
     getMinMaxValues,
     getTemperatureColor
@@ -31,17 +33,10 @@ import { Column } from '@/ui/table'
 
 interface IndexPageProps {}
 
-const filterRecentData = (data?: ApiModel.Weather[], hours: number = 12): ApiModel.Weather[] | [] => {
-    const now = dayjs.utc()
-    const hoursAgo = now.subtract(hours, 'hours')
-
-    return data?.filter((item) => dayjs.utc(item.date).isAfter(hoursAgo)) || []
-}
-
 type WidgetType = {
     title?: string
     unit?: string
-    color?: string
+    color?: keyof typeof colors
     icon?: IconTypes
     source: keyof ApiModel.Weather
 }
@@ -69,30 +64,16 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
     const widgets: WidgetType[] = [
         {
-            title: t('temperature'),
-            unit: '°C',
-            color: 'fire',
-            icon: 'Thermometer',
-            source: 'temperature'
+            title: t('humidity'),
+            unit: '%',
+            color: 'cyan',
+            icon: 'Water',
+            source: 'humidity'
         },
-        // {
-        //     title: t('humidity'),
-        //     unit: '%',
-        //     color: 'blue',
-        //     icon: 'Water',
-        //     source: 'humidity'
-        // },
-        // {
-        //     title: t('wind-speed'),
-        //     unit: 'м/с',
-        //     color: 'purple',
-        //     icon: 'Wind',
-        //     source: 'windSpeed'
-        // },
         {
             title: t('cloudiness'),
             unit: '%',
-            color: 'violet',
+            color: 'navy',
             icon: 'Cloud',
             source: 'clouds'
         }
@@ -206,19 +187,19 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 description={t('main-page-description')}
                 canonical={'https://meteo.miksoft.pro'}
                 openGraph={{
-                    description: '',
+                    description: t('site-description'),
                     images: [
                         {
-                            height: 1538,
-                            url: '/images/pages/main.jpg',
-                            width: 1768
+                            height: 1640,
+                            url: '/images/main.jpg',
+                            width: 2024
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
-                    siteName: '',
-                    title: '',
+                    siteName: t('weather-in-orenburg'),
+                    title: t('weather-in-orenburg'),
                     type: 'website',
-                    url: ''
+                    url: process.env.NEXT_PUBLIC_SITE_LINK
                 }}
             />
 
@@ -231,6 +212,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 {widgets?.map((widget) => (
                     <WidgetSensor
                         key={`widget-${widget.source}`}
+                        link={{ href: '/sensors', title: t('weather-sensors') + ' - ' + widget.title }}
                         unit={widget.unit}
                         title={widget.title}
                         icon={widget.icon}
@@ -242,7 +224,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                             <WeatherChart
                                 color={widget.color as any}
                                 yAxisField={widget.source}
-                                data={filterRecentData(history)}
+                                data={filterRecentData(history, 12)}
                             />
                         }
                     />
