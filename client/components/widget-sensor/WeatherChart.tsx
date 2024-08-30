@@ -1,14 +1,12 @@
 import React from 'react'
-import { graphic } from 'echarts'
+import { EChartsOption, graphic } from 'echarts'
 import ReactECharts from 'echarts-for-react'
 
 import { ApiModel } from '@/api'
 import { colors } from '@/tools/colors'
 
-type Colors = 'orange' | 'blue'
-
 interface Props {
-    color?: Colors
+    color?: keyof typeof colors
     data?: ApiModel.Weather[]
     yAxisField?: keyof ApiModel.Weather
 }
@@ -22,9 +20,9 @@ const WeatherChart: React.FC<Props> = ({ color, data, yAxisField }) => {
     }
 
     const chartData = formatData()
-    const colorsData = color ? colors[color] : colors['orange']
+    const colorsData = color ? colors[color] : colors.red
 
-    const option = {
+    const option: EChartsOption = {
         tooltip: {
             show: false
         },
@@ -72,6 +70,7 @@ const WeatherChart: React.FC<Props> = ({ color, data, yAxisField }) => {
                 type: 'line',
                 smooth: false,
                 showSymbol: false,
+                connectNulls: true,
                 lineStyle: {
                     color: colorsData[0],
                     width: 2

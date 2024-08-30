@@ -11,6 +11,7 @@ import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WidgetSensor from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
+import { colors } from '@/tools/colors'
 import { formatDate } from '@/tools/helpers'
 import { getMinMaxValues } from '@/tools/weather'
 import { IconTypes } from '@/ui/icon/types'
@@ -27,7 +28,7 @@ const filterRecentData = (data?: ApiModel.Weather[], hours: number = 24): ApiMod
 type WidgetType = {
     title?: string
     unit?: string
-    color?: string
+    color?: keyof typeof colors
     icon?: IconTypes
     source: keyof ApiModel.Weather
 }
@@ -50,7 +51,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('temperature'),
             unit: '°C',
-            color: 'fire',
+            color: 'red',
             icon: 'Thermometer',
             source: 'temperature'
         },
@@ -64,69 +65,69 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('dew-point'),
             unit: '°C',
-            color: 'peach',
+            color: 'pink',
             icon: 'Thermometer',
             source: 'dewPoint'
         },
         {
             title: t('humidity'),
             unit: '%',
-            color: 'seal',
+            color: 'cyan',
             icon: 'Water',
             source: 'humidity'
         },
         {
             title: t('wind-speed'),
-            unit: 'м/с',
-            color: 'purple',
+            unit: t('meters-per-second'),
+            color: 'teal',
             icon: 'Wind',
             source: 'windSpeed'
         },
         {
-            title: t('wind-speed'),
-            unit: 'м/с',
-            color: 'violet',
+            title: t('wind-gust'),
+            unit: t('meters-per-second'),
+            color: 'teal',
             icon: 'Wind',
             source: 'windGust'
         },
         {
             title: t('wind-deg'),
             unit: '°',
-            color: 'raspberry',
+            color: 'olive',
             icon: 'Compass',
             source: 'windDeg'
         },
         {
             title: t('cloudiness'),
             unit: '%',
-            color: 'violet',
+            color: 'navy',
             icon: 'Cloud',
             source: 'clouds'
         },
         {
             title: t('precipitation'),
-            unit: 'мм.',
-            color: 'raspberry',
+            unit: t('millimeters'),
+            color: 'blue',
             icon: 'WaterDrop',
             source: 'precipitation'
         },
         {
             title: t('uv-index'),
-            color: 'raspberry',
+            color: 'violet',
             icon: 'Sun',
             source: 'uvIndex'
         },
         {
             title: t('sol-energy'),
-            unit: 'MJ /m2',
-            color: 'raspberry',
+            unit: t('mj-m2'),
+            color: 'yellow',
             icon: 'SolarPower',
             source: 'solEnergy'
         },
         {
             title: t('sol-radiation'),
-            unit: 'W/m2',
-            color: 'raspberry',
+            unit: t('w-m2'),
+            color: 'lime',
             icon: 'Electric',
             source: 'solRadiation'
         }

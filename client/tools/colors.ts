@@ -1,13 +1,18 @@
 export const colors = {
-    blue: ['#3c85d9', '#3a80d3'],
-    seal: ['#3cc1d9', '#3c9dd9'],
-    aqua: ['#16a085', '#118d78'],
-    green: ['#48ac4a', '#45a64a'],
-    peach: ['#f9b54f', '#e5a84e'],
-    orange: ['#f59a02', '#eb9405'],
-    fire: ['#e65944', '#ef4a34'],
-    garnet: ['#ec3e2c', '#d73322'],
-    purple: ['#6e59df', '#6a56d8'],
-    violet: ['#742dbb', '#6f2cb6'],
-    raspberry: ['#e03fab', '#ce3ba2']
+    violet: ['#b43dc6', '#c35adb'], // Violet
+    purple: ['#9b51e0', '#ae71e7'], // Purple
+    magenta: ['#d62d7c', '#e05799'],// Magenta
+    red: ['#ea5545', '#f16b63'],    // Red
+    pink: ['#f46a9b', '#f783b0'],   // Pink
+    orange: ['#ef9b1f', '#f1aa41'], // Orange
+    yellow: ['#ede15c', '#f1e877'], // Yellow
+    lime: ['#bdcf32', '#c6da4d'],   // Lime
+    green: ['#7cc42c', '#97d74a'],  // Green
+    teal: ['#27a69a', '#4db9b1'],   // Teal
+    blue: ['#25afef', '#4fbaf2'],   // Blue
+    cyan: ['#2f9cc3', '#59b3d5'],   // Cyan
+    olive: ['#a4a43d', '#b7b74d'],  // Olive
+    brown: ['#8b572a', '#a26b42'],  // Brown
+    navy: ['#34495e', '#4b6a7f'],   // Navy
+    grey: ['#7f8c8d', '#9ea4a5']    // Grey
 }

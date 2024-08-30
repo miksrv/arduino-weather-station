@@ -10,31 +10,10 @@ import { ApiModel } from '@/api'
 import { colors } from '@/tools/colors'
 import { formatDate } from '@/tools/helpers'
 
-type Colors = 'orange' | 'blue'
-
 interface ChartProps {
     type: 'temperature' | 'light' | 'clouds'
     data?: ApiModel.Weather[]
-    color?: Colors
     height?: string | number
-}
-
-const colors11 = {
-    green: '#4bb34b',
-    orange: '#ea5d2e',
-    red: '#e64646',
-    blue: ['#4a90e2', '#6aa7ef'],
-    purple: '#8e44ad',
-    amber: '#f39c12',
-    emerald: '#27ae60',
-    navy: '#2c3e50',
-    pumpkin: '#d35400',
-    aqua: '#16a085',
-    royal: '#2980b9',
-    garnet: '#e74c3c',
-    raspberry: '#c0392b',
-    evening: '#34495e',
-    gray: '#7f8c8d'
 }
 
 const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
@@ -154,17 +133,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                 type: 'line',
                 showSymbol: false,
                 smooth: false,
-                connectNulls: true,
-                lineStyle: {
-                    color: colors.blue[0],
-                    width: 1
-                },
-                itemStyle: {
-                    color: colors.blue[0]
-                },
-                areaStyle: {
-                    color: colors.blue[1]
-                }
+                connectNulls: true
             }
         ]
     }
@@ -191,11 +160,11 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                             name: t('temperature'),
                             areaStyle: undefined,
                             lineStyle: {
-                                color: colors.fire[0],
+                                color: colors.red[0],
                                 width: 1
                             },
                             itemStyle: {
-                                color: colors.fire[0]
+                                color: colors.red[0]
                             }
                         },
                         {
@@ -204,11 +173,11 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                             name: t('feels-like'),
                             areaStyle: undefined,
                             lineStyle: {
-                                color: colors.peach[0],
+                                color: colors.orange[0],
                                 width: 1
                             },
                             itemStyle: {
-                                color: colors.peach[0]
+                                color: colors.orange[0]
                             }
                         },
                         {
@@ -217,11 +186,11 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                             name: t('dew-point'),
                             areaStyle: undefined,
                             lineStyle: {
-                                color: colors.aqua[0],
+                                color: colors.pink[0],
                                 width: 1
                             },
                             itemStyle: {
-                                color: colors.aqua[0]
+                                color: colors.pink[0]
                             }
                         }
                     ]
@@ -250,7 +219,17 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                         {
                             ...(baseConfig.series as any)[0],
                             data: data?.map(({ date, clouds }) => [date, clouds]),
-                            name: t('cloudiness')
+                            name: t('cloudiness'),
+                            lineStyle: {
+                                color: colors.navy[0],
+                                width: 1
+                            },
+                            itemStyle: {
+                                color: colors.navy[0]
+                            },
+                            areaStyle: {
+                                color: colors.navy[1]
+                            }
                         },
                         {
                             ...(baseConfig.series as any)[0],
@@ -259,11 +238,11 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                             name: t('wind-speed'),
                             areaStyle: undefined,
                             lineStyle: {
-                                color: colors.green[0],
+                                color: colors.teal[0],
                                 width: 1
                             },
                             itemStyle: {
-                                color: colors.green[0]
+                                color: colors.teal[0]
                             }
                         }
                     ]

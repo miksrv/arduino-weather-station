@@ -29,6 +29,8 @@
     "meters-per-second": "м/с",
     "millimeters": "мм",
     "mm-hg": "мм.",
+    "mj-m2": "МДж/м²",
+    "w-m2": "Вт/м²",
     "weather-forecast-by-days": "Прогноз погоды - По дням",
     "weather-forecast-hourly": "Прогноз погоды - По часам",
     "conditions": {

@@ -29,6 +29,8 @@
     "meters-per-second": "m/s",
     "millimeters": "mm",
     "mm-hg": "mm Hg",
+    "mj-m2": "MJ/m²",
+    "w-m2": "W/m²",
     "weather-forecast-by-days": "Weather Forecast - By Days",
     "weather-forecast-hourly": "Weather Forecast - Hourly",
     "conditions": {

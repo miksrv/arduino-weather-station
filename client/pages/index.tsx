@@ -17,6 +17,7 @@ import WidgetSensor from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
 import WindDirectionIcon from '@/components/wind-direction-icon'
+import { colors } from '@/tools/colors'
 import { getWeatherI18nKey } from '@/tools/conditions'
 import { formatDate, round } from '@/tools/helpers'
 import {
@@ -41,7 +42,7 @@ const filterRecentData = (data?: ApiModel.Weather[], hours: number = 12): ApiMod
 type WidgetType = {
     title?: string
     unit?: string
-    color?: string
+    color?: keyof typeof colors
     icon?: IconTypes
     source: keyof ApiModel.Weather
 }
@@ -78,7 +79,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('humidity'),
             unit: '%',
-            color: 'seal',
+            color: 'cyan',
             icon: 'Water',
             source: 'humidity'
         },
@@ -92,7 +93,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('cloudiness'),
             unit: '%',
-            color: 'violet',
+            color: 'navy',
             icon: 'Cloud',
             source: 'clouds'
         }
