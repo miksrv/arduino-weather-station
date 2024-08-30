@@ -17,7 +17,7 @@ import { IconTypes } from '@/ui/icon/types'
 
 interface IndexPageProps {}
 
-const filterRecentData = (data?: ApiModel.Weather[], hours: number = 12): ApiModel.Weather[] | [] => {
+const filterRecentData = (data?: ApiModel.Weather[], hours: number = 24): ApiModel.Weather[] | [] => {
     const now = dayjs.utc()
     const hoursAgo = now.subtract(hours, 'hours')
 
@@ -47,13 +47,27 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     )
 
     const widgets: WidgetType[] = [
-        // {
-        //     title: t('temperature'),
-        //     unit: '°C',
-        //     color: 'fire',
-        //     icon: 'Thermometer',
-        //     source: 'temperature'
-        // },
+        {
+            title: t('temperature'),
+            unit: '°C',
+            color: 'fire',
+            icon: 'Thermometer',
+            source: 'temperature'
+        },
+        {
+            title: t('feels-like'),
+            unit: '°C',
+            color: 'orange',
+            icon: 'Thermometer',
+            source: 'feelsLike'
+        },
+        {
+            title: t('dew-point'),
+            unit: '°C',
+            color: 'peach',
+            icon: 'Thermometer',
+            source: 'dewPoint'
+        },
         {
             title: t('humidity'),
             unit: '%',
@@ -61,26 +75,67 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             icon: 'Water',
             source: 'humidity'
         },
-        // {
-        //     title: t('wind-speed'),
-        //     unit: 'м/с',
-        //     color: 'purple',
-        //     icon: 'Wind',
-        //     source: 'windSpeed'
-        // },
+        {
+            title: t('wind-speed'),
+            unit: 'м/с',
+            color: 'purple',
+            icon: 'Wind',
+            source: 'windSpeed'
+        },
+        {
+            title: t('wind-speed'),
+            unit: 'м/с',
+            color: 'violet',
+            icon: 'Wind',
+            source: 'windGust'
+        },
+        {
+            title: t('wind-deg'),
+            unit: '°',
+            color: 'raspberry',
+            icon: 'Compass',
+            source: 'windDeg'
+        },
         {
             title: t('cloudiness'),
             unit: '%',
             color: 'violet',
             icon: 'Cloud',
             source: 'clouds'
+        },
+        {
+            title: t('precipitation'),
+            unit: 'мм.',
+            color: 'raspberry',
+            icon: 'WaterDrop',
+            source: 'precipitation'
+        },
+        {
+            title: t('uv-index'),
+            color: 'raspberry',
+            icon: 'Sun',
+            source: 'uvIndex'
+        },
+        {
+            title: t('sol-energy'),
+            unit: 'MJ /m2',
+            color: 'raspberry',
+            icon: 'SolarPower',
+            source: 'solEnergy'
+        },
+        {
+            title: t('sol-radiation'),
+            unit: 'W/m2',
+            color: 'raspberry',
+            icon: 'Electric',
+            source: 'solRadiation'
         }
     ]
 
     return (
         <AppLayout>
             <NextSeo
-                title={t('weather-orenburg-now', { date: formatDate(current?.date) })}
+                title={t('weather-orenburg-now', { date: formatDate(current?.date || new Date()) })}
                 description={t('main-page-description')}
                 canonical={'https://meteo.miksoft.pro'}
                 openGraph={{
