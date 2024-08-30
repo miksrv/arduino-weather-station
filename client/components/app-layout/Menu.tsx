@@ -25,6 +25,11 @@ const Menu: React.FC<MenuProps> = ({ onClick }) => {
             icon: 'Cloud',
             link: '/',
             text: t('current-weather')
+        },
+        {
+            icon: 'Pressure',
+            link: '/sensors',
+            text: t('weather-sensors')
         }
     ]
 

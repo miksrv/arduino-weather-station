@@ -136,7 +136,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     return (
         <AppLayout>
             <NextSeo
-                title={t('weather-orenburg-now', { date: formatDate(current?.date || new Date()) })}
+                title={t('weather-sensors')}
                 description={t('main-page-description')}
                 canonical={'https://meteo.miksoft.pro'}
                 openGraph={{

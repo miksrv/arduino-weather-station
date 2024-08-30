@@ -232,6 +232,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 {widgets?.map((widget) => (
                     <WidgetSensor
                         key={`widget-${widget.source}`}
+                        link={{ href: '/sensors', title: t('weather-sensors') + ' - ' + widget.title}}
                         unit={widget.unit}
                         title={widget.title}
                         icon={widget.icon}

@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 
 import styles from './styles.module.sass'
 
@@ -15,6 +16,7 @@ interface WidgetSensorProps {
     loading?: boolean
     chartLoading?: boolean
     currentValue?: string | number
+    link?: React.AnchorHTMLAttributes<HTMLAnchorElement>
     minMax?: MinMaxResult
     chart?: React.ReactNode
 }
@@ -26,12 +28,24 @@ const WidgetSensor: React.FC<WidgetSensorProps> = ({
     chartLoading,
     currentValue,
     minMax,
+    link,
     unit,
     chart
 }) => (
     <div className={styles.widget}>
         <div className={styles.header}>
-            <h3>{title}</h3>
+            <h3>
+                {link ? (
+                    <Link
+                        href={link?.href || ''}
+                        {...link}
+                    >
+                        {title}
+                    </Link>
+                ) : (
+                    title
+                )}
+            </h3>
             {icon && <Icon name={icon} />}
         </div>
         <div className={styles.value}>
