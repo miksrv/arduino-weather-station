@@ -3,6 +3,7 @@ import { graphic } from 'echarts'
 import ReactECharts from 'echarts-for-react'
 
 import { ApiModel } from '@/api'
+import { colors } from '@/tools/colors'
 
 type Colors = 'orange' | 'blue'
 
@@ -10,17 +11,6 @@ interface Props {
     color?: Colors
     data?: ApiModel.Weather[]
     yAxisField?: keyof ApiModel.Weather
-}
-
-const colors = {
-    orange: ['#f59a02', '#eb9405'],
-    blue: ['#3c85d9', '#3a80d3'],
-    green: ['#48ac4a', '#45a64a'],
-    peach: ['#f9b54f', '#e5a84e'],
-    fire: ['#e65944', '#dd5643'],
-    purple: ['#6e59df', '#6a56d8'],
-    violet: ['#742dbb', '#6f2cb6'],
-    raspberry: ['#e03fab', '#ce3ba2']
 }
 
 const WeatherChart: React.FC<Props> = ({ color, data, yAxisField }) => {

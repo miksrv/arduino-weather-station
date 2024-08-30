@@ -68,20 +68,20 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     )
 
     const widgets: WidgetType[] = [
-        {
-            title: t('temperature'),
-            unit: '°C',
-            color: 'fire',
-            icon: 'Thermometer',
-            source: 'temperature'
-        },
         // {
-        //     title: t('humidity'),
-        //     unit: '%',
-        //     color: 'blue',
-        //     icon: 'Water',
-        //     source: 'humidity'
+        //     title: t('temperature'),
+        //     unit: '°C',
+        //     color: 'fire',
+        //     icon: 'Thermometer',
+        //     source: 'temperature'
         // },
+        {
+            title: t('humidity'),
+            unit: '%',
+            color: 'seal',
+            icon: 'Water',
+            source: 'humidity'
+        },
         // {
         //     title: t('wind-speed'),
         //     unit: 'м/с',

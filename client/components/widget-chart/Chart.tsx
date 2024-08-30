@@ -7,6 +7,7 @@ import { useTheme } from 'next-themes'
 import styles from './styles.module.sass'
 
 import { ApiModel } from '@/api'
+import { colors } from '@/tools/colors'
 import { formatDate } from '@/tools/helpers'
 
 type Colors = 'orange' | 'blue'
@@ -18,7 +19,7 @@ interface ChartProps {
     height?: string | number
 }
 
-const colors = {
+const colors11 = {
     green: '#4bb34b',
     orange: '#ea5d2e',
     red: '#e64646',
@@ -190,11 +191,11 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                             name: t('temperature'),
                             areaStyle: undefined,
                             lineStyle: {
-                                color: colors.red,
+                                color: colors.fire[0],
                                 width: 1
                             },
                             itemStyle: {
-                                color: colors.red
+                                color: colors.fire[0]
                             }
                         },
                         {
@@ -203,11 +204,11 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                             name: t('feels-like'),
                             areaStyle: undefined,
                             lineStyle: {
-                                color: colors.amber,
+                                color: colors.peach[0],
                                 width: 1
                             },
                             itemStyle: {
-                                color: colors.amber
+                                color: colors.peach[0]
                             }
                         },
                         {
@@ -216,11 +217,11 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                             name: t('dew-point'),
                             areaStyle: undefined,
                             lineStyle: {
-                                color: colors.aqua,
+                                color: colors.aqua[0],
                                 width: 1
                             },
                             itemStyle: {
-                                color: colors.aqua
+                                color: colors.aqua[0]
                             }
                         }
                     ]
@@ -258,11 +259,11 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                             name: t('wind-speed'),
                             areaStyle: undefined,
                             lineStyle: {
-                                color: colors.green,
+                                color: colors.green[0],
                                 width: 1
                             },
                             itemStyle: {
-                                color: colors.green
+                                color: colors.green[0]
                             }
                         }
                     ]

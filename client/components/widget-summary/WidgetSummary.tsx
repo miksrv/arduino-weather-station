@@ -79,7 +79,7 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
                         />
 
                         <Chip
-                            text={`${weather?.pressure} ${t('mm-рg')}`}
+                            text={`${weather?.pressure} ${t('mm-hg')}`}
                             icon={'Pressure'}
                         />
                     </>
