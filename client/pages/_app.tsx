@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { AppProps } from 'next/app'
 import { useRouter } from 'next/dist/client/router'
@@ -35,6 +36,7 @@ const App = ({ Component, pageProps }: AppProps) => {
     }, [])
 
     dayjs.extend(utc)
+    dayjs.extend(timezone)
     dayjs.extend(relativeTime)
     dayjs.locale(i18n.language ?? i18Config.i18n.defaultLocale)
 

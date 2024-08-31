@@ -1,7 +1,8 @@
 import React from 'react'
-import dayjs from 'dayjs'
 
 import styles from './styles.module.sass'
+
+import { getDate } from '@/tools/helpers'
 
 interface WeatherIconProps {
     weatherId: number
@@ -73,7 +74,7 @@ const WeatherIcon: React.FC<WeatherIconProps> = ({ weatherId, date }) => {
     let iconToRender
 
     const isDayTime = (date: string): boolean => {
-        const hours = dayjs.utc(date).local().hour()
+        const hours = getDate(date).hour()
 
         return hours >= 6 && hours < 18 // Day from 6:00 to 18:00, the rest is night
     }

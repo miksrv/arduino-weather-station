@@ -58,7 +58,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('dew-point'),
             unit: '°C',
-            color: 'pink',
+            color: 'lightblue',
             icon: 'Thermometer',
             source: 'dewPoint'
         },

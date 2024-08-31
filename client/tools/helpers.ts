@@ -1,18 +1,6 @@
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 
-export const truncateText = (text?: string, maxLength: number = 300) => {
-    if (!text || text.length <= maxLength) {
-        return text
-    }
-
-    const lastSpaceIndex = text.lastIndexOf(' ', maxLength)
-
-    if (lastSpaceIndex === -1) {
-        return text.slice(0, maxLength)
-    }
-
-    return text.slice(0, lastSpaceIndex)
-}
+const TIME_ZONE = 'Asia/Yekaterinburg'
 
 export const encodeQueryData = (data: any): string => {
     if (typeof data === 'undefined' || !data) {
@@ -30,64 +18,24 @@ export const encodeQueryData = (data: any): string => {
     return ret.length ? '?' + ret.join('&') : ''
 }
 
-export const makeActiveLink = (link: string) => {
-    if (link === '') {
-        return ''
-    }
+export const getDate = (date: string | Date): Dayjs => dayjs.utc(date).tz(TIME_ZONE)
 
-    if (link.includes('http://') || link.includes('https://')) {
-        return link
-    }
-    return `https://${link}`
-}
+export const formatDateFromUTC = (utc?: number, format: string = 'D MMMM YYYY, HH:mm'): string =>
+    utc
+        ? dayjs
+              .unix(utc / 1000)
+              .utc(true)
+              .tz(TIME_ZONE)
+              .format(format)
+        : ''
 
-export const equalsArrays = (array1?: string[], array2?: string[]): boolean =>
-    (!array1?.length && !array2?.length) ||
-    (!!array1?.length &&
-        !!array2?.length &&
-        array1.length === array2.length &&
-        array1.every((item) => array2.includes(item)))
-
-export const removeProtocolFromUrl = (url: string): string => url.replace(/^https?:\/\//, '')
-
-export const numberFormatter = (num: number, digits?: number) => {
-    const lookup = [
-        { symbol: '', value: 1 },
-        { symbol: 'k', value: 1e3 },
-        { symbol: 'M', value: 1e6 },
-        { symbol: 'G', value: 1e9 },
-        { symbol: 'T', value: 1e12 },
-        { symbol: 'P', value: 1e15 },
-        { symbol: 'E', value: 1e18 }
-    ]
-
-    if (num < 1) {
-        return num
-    }
-
-    const rx = /\.0+$|(\.[0-9]*[1-9])0+$/
-    const item = lookup
-        .slice()
-        .reverse()
-        .find((item) => num >= item.value)
-
-    return item ? (num / item.value).toFixed(digits || 1).replace(rx, '$1') + item.symbol : '0'
-}
-
-export const formatDate = (date?: string | Date, format: string = 'D MMMM YYYY, HH:mm'): string =>
-    date ? dayjs.utc(date).local().format(format) : ''
-
-export const dateToUnixTime = (date?: string | Date): number => dayjs(date).unix()
-
-export const formatDateISO = (date?: string | Date): string => dayjs(date).toISOString()
+export const formatDate = (date?: string | number | Date, format: string = 'D MMMM YYYY, HH:mm'): string =>
+    date ? getDate(typeof date === 'number' ? new Date(date) : date).format(format) : ''
 
 export const timeAgo = (date?: string | Date, withoutSuffix?: boolean): string =>
-    date ? dayjs.utc(date).fromNow(withoutSuffix) : ''
+    date ? getDate(date).fromNow(withoutSuffix) : ''
 
-export const minutesAgo = (date?: string | Date): number => (date ? dayjs().diff(dayjs.utc(date), 'minute') : 99999999)
-
-export const formatDateUTC = (date?: string | Date): string =>
-    date ? dayjs(date).format('YYYY-MM-DDTHH:mm:ss[Z]') : ''
+export const minutesAgo = (date?: string | Date): number => (date ? dayjs().diff(getDate(date), 'minute') : 99999999)
 
 export const round = (value?: number, digits: number = 4): number | undefined =>
     value ? Number(value.toFixed(digits)) : undefined
