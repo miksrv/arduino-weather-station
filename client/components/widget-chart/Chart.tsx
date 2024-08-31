@@ -8,7 +8,7 @@ import styles from './styles.module.sass'
 
 import { ApiModel } from '@/api'
 import { colors } from '@/tools/colors'
-import { formatDate } from '@/tools/helpers'
+import { formatDate,formatDateFromUTC } from '@/tools/helpers'
 
 interface ChartProps {
     type: 'temperature' | 'light' | 'clouds'
@@ -49,7 +49,13 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
         tooltip: {
             trigger: 'axis',
             axisPointer: {
-                type: 'cross'
+                type: 'cross',
+                label: {
+                    // #TODO
+                    // formatter({ value }) {
+                    //     return dateFromUTC(value as number)
+                    // }
+                }
             },
             backgroundColor: backgroundColor,
             borderColor: borderColor,
@@ -83,7 +89,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                 show: true,
                 color: textSecondaryColor, // Color of X-axis labels
                 formatter: function (value: number) {
-                    return formatDate(value.toString(), 'HH:mm')
+                    return formatDateFromUTC(value, 'HH:mm')
                 }
             },
             axisTick: {
