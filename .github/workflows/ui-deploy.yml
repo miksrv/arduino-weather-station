@@ -7,10 +7,6 @@ on:
     paths:
       - 'client/**/*'
 
-  pull_request:
-    branches:
-      - main
-
 jobs:
   ui-ssh-deploy:
     name: Production
