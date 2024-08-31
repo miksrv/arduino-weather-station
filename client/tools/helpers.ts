@@ -1,4 +1,6 @@
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
+
+const TIME_ZONE = 'Asia/Yekaterinburg'
 
 export const encodeQueryData = (data: any): string => {
     if (typeof data === 'undefined' || !data) {
@@ -16,13 +18,15 @@ export const encodeQueryData = (data: any): string => {
     return ret.length ? '?' + ret.join('&') : ''
 }
 
+export const getDate = (date: string | Date): Dayjs => dayjs.utc(date).tz(TIME_ZONE)
+
 export const formatDate = (date?: string | Date, format: string = 'D MMMM YYYY, HH:mm'): string =>
-    date ? dayjs.utc(date).local().format(format) : ''
+    date ? getDate(date).format(format) : ''
 
 export const timeAgo = (date?: string | Date, withoutSuffix?: boolean): string =>
-    date ? dayjs.utc(date).fromNow(withoutSuffix) : ''
+    date ? getDate(date).fromNow(withoutSuffix) : ''
 
-export const minutesAgo = (date?: string | Date): number => (date ? dayjs().diff(dayjs.utc(date), 'minute') : 99999999)
+export const minutesAgo = (date?: string | Date): number => (date ? dayjs().diff(getDate(date), 'minute') : 99999999)
 
 export const round = (value?: number, digits: number = 4): number | undefined =>
     value ? Number(value.toFixed(digits)) : undefined
