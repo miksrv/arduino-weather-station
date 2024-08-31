@@ -186,11 +186,11 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                             name: t('dew-point'),
                             areaStyle: undefined,
                             lineStyle: {
-                                color: colors.pink[0],
+                                color: colors.lightblue[0],
                                 width: 1
                             },
                             itemStyle: {
-                                color: colors.pink[0]
+                                color: colors.lightblue[0]
                             }
                         }
                     ]

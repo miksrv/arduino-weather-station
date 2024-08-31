@@ -29,7 +29,8 @@ export const colors = {
     lime: ['#cddc39', '#d4e157'], // Lime
     green: ['#4caf50', '#66bb6a'], // Green
     teal: ['#009688', '#26a69a'], // Teal
-    blue: ['#2196f3', '#42a5f5'], // Blue
+    blue: ['#2c7eec', '#468de8'], // Blue
+    lightblue: ['#2196f3', '#42a5f5'], // Light Blue
     cyan: ['#00bcd4', '#4dd0e1'], // Cyan
     olive: ['#8c9e35', '#a3b236'], // Olive
     brown: ['#795548', '#8d6e63'], // Brown
