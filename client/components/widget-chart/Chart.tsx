@@ -8,7 +8,7 @@ import styles from './styles.module.sass'
 
 import { ApiModel } from '@/api'
 import { colors } from '@/tools/colors'
-import { formatDate,formatDateFromUTC } from '@/tools/helpers'
+import { formatDate, formatDateFromUTC } from '@/tools/helpers'
 
 interface ChartProps {
     type: 'temperature' | 'light' | 'clouds'
