@@ -47,6 +47,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     const { data: forecastHourly, isLoading: hourlyLoading } = API.useGetForecastQuery('hourly', {
         pollingInterval: 10 * 60 * 1000
     })
+
     const { data: forecastDaily, isLoading: dailyLoading } = API.useGetForecastQuery('daily', {
         pollingInterval: 10 * 60 * 1000
     })
@@ -54,10 +55,11 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     const { data: current, isLoading: currentLoading } = API.useGetCurrentQuery(undefined, {
         pollingInterval: 5 * 60 * 1000
     })
+
     const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
         {
-            start_date: formatDate(dayjs().subtract(1, 'day').format(), 'YYYY-MM-DD'),
-            end_date: formatDate(new Date(), 'YYYY-MM-DD')
+            start_date: formatDate(dayjs().utc(false).subtract(1, 'day').format(), 'YYYY-MM-DD'),
+            end_date: formatDate(dayjs().utc(false).toDate(), 'YYYY-MM-DD')
         },
         { pollingInterval: 60 * 1000 }
     )
