@@ -73,11 +73,11 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             source: 'humidity'
         },
         {
-            title: t('cloudiness'),
-            unit: '%',
-            color: 'navy',
-            icon: 'Cloud',
-            source: 'clouds'
+            title: t('temperature'),
+            unit: '°C',
+            color: 'red',
+            icon: 'Thermometer',
+            source: 'temperature'
         }
     ]
 
