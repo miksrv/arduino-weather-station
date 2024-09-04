@@ -1,13 +1,15 @@
 import React from 'react'
 import { useTranslation } from 'next-i18next'
+import { useTheme } from 'next-themes'
 
 import styles from './styles.module.sass'
 
 import { API } from '@/api'
-import ThemeToggle from '@/components/theme-toggle'
 import { formatDate, minutesAgo, timeAgo } from '@/tools/helpers'
+import useClientOnly from '@/tools/hooks/useClientOnly'
 import Icon from '@/ui/icon'
 import Spinner from '@/ui/spinner'
+import ThemeSwitcher from '@/ui/theme-switcher'
 
 interface HeaderProps {
     fullSize?: boolean
@@ -17,6 +19,8 @@ interface HeaderProps {
 const OFFLINE_TIME = 30
 
 const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
+    const isClient = useClientOnly()
+    const { theme, setTheme } = useTheme()
     const { t } = useTranslation()
     const { data: current, isLoading } = API.useGetCurrentQuery(undefined, { pollingInterval: 60 * 1000 })
 
@@ -48,7 +52,12 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     )}
                 </div>
 
-                <ThemeToggle />
+                {isClient && (
+                    <ThemeSwitcher
+                        theme={theme}
+                        onChangeTheme={setTheme}
+                    />
+                )}
             </div>
         </header>
     )
