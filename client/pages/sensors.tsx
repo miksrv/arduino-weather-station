@@ -14,6 +14,7 @@ import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import { colors } from '@/tools/colors'
 import { formatDate } from '@/tools/helpers'
 import { filterRecentData, getMinMaxValues } from '@/tools/weather'
+import Calendar from '@/ui/datepicker'
 import { IconTypes } from '@/ui/icon/types'
 
 interface IndexPageProps {}
@@ -171,6 +172,8 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     />
                 ))}
             </div>
+
+            <Calendar />
         </AppLayout>
     )
 }

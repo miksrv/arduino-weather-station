@@ -1,0 +1,36 @@
+@import ../../styles/variables
+
+.calendar
+    border: 1px solid #ddd
+    border-radius: 4px
+    width: 280px
+    font-family: Arial, sans-serif
+
+    .header
+        display: flex
+        justify-content: space-between
+        padding: 10px
+        background-color: #f5f5f5
+        border-bottom: 1px solid #ddd
+
+    .body
+        display: grid
+        grid-template-columns: repeat(7, 1fr)
+        gap: 1px
+
+    .day
+        text-align: center
+        padding: 10px
+        cursor: pointer
+        transition: background-color 0.2s
+
+        &:hover
+            background-color: #f0f0f0
+
+        &.prevMonth
+            color: #aaa
+
+        &.selected
+            background-color: #007bff
+            color: white
+            border-radius: 50%
