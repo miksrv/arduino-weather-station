@@ -50,12 +50,16 @@
         &:hover
             background-color: var(--input-background-color)
 
-        &.prevMonth
+        &.prevMonth, &.notAllowed
             color: var(--text-color-secondary)
             cursor: default
+            pointer-events: none
 
             &:hover
                 background-color: transparent
+
+        &.notAllowed
+            cursor: not-allowed
 
         &.selected
             background-color: var(--dropdown-background-color-hover)

@@ -7,10 +7,12 @@ import Icon from '@/ui/icon'
 
 interface CalendarProps {
     hideDaysOfWeek?: boolean
+    minDate?: Date;
+    maxDate?: Date;
     onPeriodSelect?: (startDate?: Date, endDate?: Date) => void
 }
 
-const Calendar: React.FC<CalendarProps> = ({ hideDaysOfWeek, onPeriodSelect }) => {
+const Calendar: React.FC<CalendarProps> = ({ hideDaysOfWeek, minDate, maxDate, onPeriodSelect }) => {
     const [currentMonth, setCurrentMonth] = useState(new Date())
     const [startDate, setStartDate] = useState<Date>()
     const [endDate, setEndDate] = useState<Date>()
@@ -33,6 +35,13 @@ const Calendar: React.FC<CalendarProps> = ({ hideDaysOfWeek, onPeriodSelect }) =
 
     const handleDateClick = (day: number) => {
         const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
+
+        if (minDate && newDate < minDate) {
+            return
+        }
+        if (maxDate && newDate > maxDate) {
+            return
+        }
 
         if (!startDate) {
             // If the start date is not selected, set it
@@ -91,6 +100,9 @@ const Calendar: React.FC<CalendarProps> = ({ hideDaysOfWeek, onPeriodSelect }) =
             }
             if (startDate && endDate && date.toDateString() === endDate.toDateString()) {
                 dayClass = cn(dayClass, styles.selected, styles.endDate)
+            }
+            if ((minDate && date < minDate) || (maxDate && date > maxDate)) {
+                dayClass = cn(dayClass, styles.notAllowed)
             }
 
             days.push(

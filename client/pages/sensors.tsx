@@ -173,7 +173,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 ))}
             </div>
 
-            <Calendar />
+            <Calendar maxDate={dayjs()?.add(1, 'day').toDate()}/>
         </AppLayout>
     )
 }
