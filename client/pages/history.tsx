@@ -24,7 +24,11 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
     const [startDate, setStartDate] = useState<string>()
     const [endDate, setEndDate] = useState<string>()
 
-    const { data: history, isLoading: historyLoading, isFetching: historyFetching } = API.useGetHistoryQuery(
+    const {
+        data: history,
+        isLoading: historyLoading,
+        isFetching: historyFetching
+    } = API.useGetHistoryQuery(
         {
             start_date: startDate ?? '',
             end_date: endDate ?? ''
@@ -61,7 +65,11 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
             />
 
             <Popout
-                action={<div>{startDate} - {endDate}</div>}
+                action={
+                    <div>
+                        {startDate} - {endDate}
+                    </div>
+                }
                 position={'left'}
             >
                 <Calendar
