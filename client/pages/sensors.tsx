@@ -14,7 +14,6 @@ import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import { colors } from '@/tools/colors'
 import { formatDate } from '@/tools/helpers'
 import { filterRecentData, getMinMaxValues } from '@/tools/weather'
-import Calendar from '@/ui/datepicker'
 import { IconTypes } from '@/ui/icon/types'
 
 interface IndexPageProps {}
@@ -36,7 +35,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
     const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
         {
-            start_date: formatDate(dayjs().utc(false).subtract(1, 'day').format(), 'YYYY-MM-DD'),
+            start_date: formatDate(dayjs().utc(false).subtract(1, 'day').toDate(), 'YYYY-MM-DD'),
             end_date: formatDate(dayjs().utc(false).toDate(), 'YYYY-MM-DD')
         },
         { pollingInterval: 60 * 1000 }
@@ -132,7 +131,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         <AppLayout>
             <NextSeo
                 title={t('weather-sensors')}
-                description={t('main-page-description')}
+                description={t('sensors-page-description')}
                 canonical={'https://meteo.miksoft.pro'}
                 openGraph={{
                     description: t('site-description'),
@@ -172,11 +171,6 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     />
                 ))}
             </div>
-
-            <Calendar
-                minDate={dayjs('01-01-2021').toDate()}
-                maxDate={dayjs()?.add(1, 'day').toDate()}
-            />
         </AppLayout>
     )
 }

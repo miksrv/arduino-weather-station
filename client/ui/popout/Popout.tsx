@@ -9,9 +9,10 @@ interface PaginationProps {
     position?: 'left' | 'right'
     action?: React.ReactNode | string
     children?: React.ReactNode
+    closeOnChildrenClick?: boolean
 }
 
-const Popout: React.FC<PaginationProps> = ({ className, position, action, children }) => {
+const Popout: React.FC<PaginationProps> = ({ className, position, action, children, closeOnChildrenClick }) => {
     const popoutRef = useRef<HTMLDivElement>(null)
     const popoutChildrenRef = useRef<HTMLDivElement>(null)
     const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -56,7 +57,7 @@ const Popout: React.FC<PaginationProps> = ({ className, position, action, childr
                 <div
                     ref={popoutRef}
                     className={styles.content}
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => (closeOnChildrenClick ? setIsOpen(false) : undefined)}
                     style={position === 'left' ? { left: 0 } : { right: 0 }}
                 >
                     {children}

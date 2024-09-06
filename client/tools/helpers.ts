@@ -1,6 +1,6 @@
 import dayjs, { Dayjs } from 'dayjs'
 
-const TIME_ZONE = 'Asia/Yekaterinburg'
+export const TIME_ZONE = 'Asia/Yekaterinburg'
 
 export const encodeQueryData = (data: any): string => {
     if (typeof data === 'undefined' || !data) {
