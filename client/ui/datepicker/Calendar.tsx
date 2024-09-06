@@ -15,24 +15,21 @@ export interface CalendarProps {
     endDate?: string
     minDate?: string
     maxDate?: string
+    locale?: 'en' | 'ru' | string
     onPeriodSelect?: (startDate?: string, endDate?: string) => void
 }
 
-const daysOfWeek = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
+export const enDaysOfWeek = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
+export const ruDaysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 
-const months = [
-    'Январь',
-    'Февраль',
-    'Март',
-    'Апрель',
-    'Май',
-    'Июнь',
-    'Июль',
-    'Август',
-    'Сентябрь',
-    'Октябрь',
-    'Ноябрь',
-    'Декабрь'
+export const enMonths = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+]
+
+export const ruMonths = [
+    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
 ]
 
 const Calendar: React.FC<CalendarProps> = ({
@@ -41,6 +38,7 @@ const Calendar: React.FC<CalendarProps> = ({
     endDate,
     minDate,
     maxDate,
+    locale,
     onPeriodSelect
 }) => {
     const [currentMonth, setCurrentMonth] = useState(dayjs().utc())
@@ -164,7 +162,7 @@ const Calendar: React.FC<CalendarProps> = ({
 
     const renderDaysOfWeek = () => (
         <div className={styles.daysOfWeekContainer}>
-            {daysOfWeek.map((day) => (
+            {(locale === 'ru' ? ruDaysOfWeek : enDaysOfWeek).map((day) => (
                 <div
                     key={`dayOfWeek-${day}`}
                     className={styles.dayOfWeek}
@@ -215,7 +213,7 @@ const Calendar: React.FC<CalendarProps> = ({
                             onChange={handleMonthChange}
                             className={styles.monthSelect}
                         >
-                            {months.map((month, index) => (
+                            {(locale === 'ru' ? ruMonths : enMonths).map((month, index) => (
                                 <option
                                     key={index}
                                     value={index}

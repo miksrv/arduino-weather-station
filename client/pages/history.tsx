@@ -26,8 +26,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
 
     const {
         data: history,
-        isLoading: historyLoading,
-        isFetching: historyFetching
+        isLoading: historyLoading
     } = API.useGetHistoryQuery(
         {
             start_date: startDate ?? '',
@@ -73,6 +72,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
                 position={'left'}
             >
                 <Calendar
+                    locale={i18n.language}
                     startDate={startDate}
                     endDate={endDate}
                     onPeriodSelect={(startDate, endDate) => {
