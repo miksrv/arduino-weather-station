@@ -55,16 +55,16 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
     return (
         <AppLayout>
             <NextSeo
-                title={t('weather-sensors')}
-                description={t('sensors-page-description')}
+                title={t('historical-weather-data')}
+                description={t('history-page-description')}
                 canonical={'https://meteo.miksoft.pro'}
                 openGraph={{
                     description: t('site-description'),
                     images: [
                         {
-                            height: 1640,
-                            url: '/images/sensors.jpg',
-                            width: 2028
+                            height: 1291,
+                            url: '/images/history.jpg',
+                            width: 2042
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',

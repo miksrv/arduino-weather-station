@@ -7,11 +7,13 @@ import Chart from '@/components/widget-chart/Chart'
 import { concatClassNames as cn } from '@/tools/helpers'
 import Skeleton from '@/ui/skeleton'
 
+export type ChartTypes = 'temperature' | 'clouds'
+
 interface WidgetProps {
     loading?: boolean
     fullWidth?: boolean
     data?: ApiModel.Weather[]
-    type: 'temperature' | 'light' | 'clouds'
+    type: ChartTypes
 }
 
 const CHART_HEIGHT = '260px'

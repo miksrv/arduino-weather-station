@@ -7,11 +7,12 @@ import { useTheme } from 'next-themes'
 import styles from './styles.module.sass'
 
 import { ApiModel } from '@/api'
+import { ChartTypes } from '@/components/widget-chart/WidgetChart'
 import { getSensorColor } from '@/tools/colors'
 import { formatDate, formatDateFromUTC } from '@/tools/helpers'
 
 interface ChartProps {
-    type: 'temperature' | 'light' | 'clouds'
+    type: ChartTypes
     data?: ApiModel.Weather[]
     height?: string | number
 }
@@ -144,10 +145,11 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
         ]
     }
 
-    const getChartLineConfig = (source: keyof ApiModel.Sensors, name?: string, area?: boolean) => ({
+    const getChartLineConfig = (source: keyof ApiModel.Sensors, name?: string, axis?: number, area?: boolean) => ({
         ...(baseConfig.series as any)[0],
         data: data?.map(({ date, [source]: sensorData }) => [date, sensorData]),
         name: name ?? '',
+        yAxisIndex: axis ?? 0,
         lineStyle: {
             color: getSensorColor(source)[0],
             width: 1
@@ -204,8 +206,8 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                         }
                     ],
                     series: [
-                        getChartLineConfig('clouds', t('cloudiness'), true),
-                        getChartLineConfig('windSpeed', t('wind-speed'))
+                        getChartLineConfig('clouds', t('cloudiness'), 0, true),
+                        getChartLineConfig('windSpeed', t('wind-speed'), 1)
                     ]
                 }
         }
