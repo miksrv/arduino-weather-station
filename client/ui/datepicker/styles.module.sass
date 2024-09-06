@@ -1,6 +1,11 @@
+@import ../../styles/variables
+
 .datePickerContainer
     display: flex
     justify-content: space-between
+
+    @media only screen and (max-width: $mobileMaxWidth)
+        flex-direction: column
 
     .presetList
         display: flex
@@ -9,6 +14,10 @@
         gap: 5px
         width: 170px
         border-right: 2px solid var(--input-border-color)
+
+        @media only screen and (max-width: $mobileMaxWidth)
+            width: 100%
+            border-right: none
 
         button
             justify-content: flex-start
@@ -38,6 +47,10 @@
         border-bottom: 1px solid var(--input-border-color)
         border-top-left-radius: var(--border-radius)
         border-top-right-radius: var(--border-radius)
+
+        @media only screen and (max-width: $mobileMaxWidth)
+            border-top-left-radius: 0
+            border-top-right-radius: 0
 
     .body
         display: grid

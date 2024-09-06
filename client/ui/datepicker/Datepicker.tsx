@@ -5,10 +5,9 @@ import styles from './styles.module.sass'
 
 import Button from '@/ui/button'
 import Calendar, { CalendarProps } from '@/ui/datepicker/Calendar'
+import { CalendarPresetType, enPresets, PresetOption, ruPresets } from '@/ui/datepicker/utils'
 
 interface DatePickerProps extends CalendarProps {}
-
-import { PresetOption, CalendarPresetType, ruPresets, enPresets } from '@/ui/datepicker/utils'
 
 const nowDate = dayjs.utc()
 

@@ -13,7 +13,7 @@ import WeatherIcon from '@/components/weather-icon'
 import WidgetChart from '@/components/widget-chart'
 import WidgetForecastTable from '@/components/widget-forecast-table'
 import styles from '@/components/widget-forecast-table/styles.module.sass'
-import WidgetSensor from '@/components/widget-sensor'
+import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
 import WindDirectionIcon from '@/components/wind-direction-icon'
@@ -28,16 +28,12 @@ import {
     getMinMaxValues,
     getTemperatureColor
 } from '@/tools/weather'
-import { IconTypes } from '@/ui/icon/types'
 import { Column } from '@/ui/table'
 
 interface IndexPageProps {}
 
-type WidgetType = {
-    title?: string
-    unit?: string
+type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon'> & {
     color?: keyof typeof colors
-    icon?: IconTypes
     source: keyof ApiModel.Weather
 }
 
@@ -165,7 +161,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             className: styles.cellPressure,
             showComparison: true,
             isSortable: true,
-            formatter: (pressure) => round(convertHpaToMmHg(pressure), 1)
+            formatter: (pressure) => convertHpaToMmHg(pressure)
         },
         {
             header: t('wind'),

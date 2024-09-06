@@ -101,7 +101,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
 
                 {historyFetching && !historyLoading && (
                     <div className={'loading'}>
-                        <Spinner /> {t('please-wait-loading')}
+                        <Spinner /> <span>{t('please-wait-loading')}</span>
                     </div>
                 )}
             </div>

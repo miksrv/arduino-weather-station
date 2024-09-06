@@ -9,20 +9,16 @@ import { API, ApiModel } from '@/api'
 import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
-import WidgetSensor from '@/components/widget-sensor'
+import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import { colors } from '@/tools/colors'
 import { formatDate } from '@/tools/helpers'
-import { filterRecentData, getMinMaxValues } from '@/tools/weather'
-import { IconTypes } from '@/ui/icon/types'
+import { convertHpaToMmHg, filterRecentData, getMinMaxValues } from '@/tools/weather'
 
 interface IndexPageProps {}
 
-type WidgetType = {
-    title?: string
-    unit?: string
+type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon' | 'formatter'> & {
     color?: keyof typeof colors
-    icon?: IconTypes
     source: keyof ApiModel.Weather
 }
 
@@ -71,19 +67,27 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             source: 'humidity'
         },
         {
+            title: t('pressure'),
+            unit: t('mm-hg'),
+            color: 'purple',
+            icon: 'Pressure',
+            source: 'pressure',
+            formatter: convertHpaToMmHg
+        },
+        {
             title: t('wind-speed'),
             unit: t('meters-per-second'),
             color: 'green',
             icon: 'Wind',
             source: 'windSpeed'
         },
-        {
-            title: t('wind-gust'),
-            unit: t('meters-per-second'),
-            color: 'teal',
-            icon: 'Wind',
-            source: 'windGust'
-        },
+        // {
+        //     title: t('wind-gust'),
+        //     unit: t('meters-per-second'),
+        //     color: 'teal',
+        //     icon: 'Wind',
+        //     source: 'windGust'
+        // },
         {
             title: t('wind-deg'),
             unit: '°',
@@ -161,6 +165,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         chartLoading={historyLoading}
                         minMax={getMinMaxValues(history, widget.source)}
                         currentValue={current?.[widget.source]}
+                        formatter={widget?.formatter}
                         chart={
                             <WeatherChart
                                 color={widget.color as any}

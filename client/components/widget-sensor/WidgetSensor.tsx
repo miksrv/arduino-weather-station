@@ -9,7 +9,7 @@ import Icon from '@/ui/icon'
 import { IconTypes } from '@/ui/icon/types'
 import Skeleton from '@/ui/skeleton'
 
-interface WidgetSensorProps {
+export interface WidgetSensorProps {
     title?: string
     unit?: string
     icon?: IconTypes
@@ -18,6 +18,7 @@ interface WidgetSensorProps {
     currentValue?: string | number
     link?: React.AnchorHTMLAttributes<HTMLAnchorElement>
     minMax?: MinMaxResult
+    formatter?: (value: string | number | undefined) => string | number
     chart?: React.ReactNode
 }
 
@@ -30,6 +31,7 @@ const WidgetSensor: React.FC<WidgetSensorProps> = ({
     minMax,
     link,
     unit,
+    formatter,
     chart
 }) => (
     <div className={styles.widget}>
@@ -51,6 +53,8 @@ const WidgetSensor: React.FC<WidgetSensorProps> = ({
         <div className={styles.value}>
             {loading ? (
                 <Skeleton style={{ width: 100, height: 35, marginTop: 10, marginBottom: 5 }} />
+            ) : formatter ? (
+                formatter(currentValue ?? '??')
             ) : (
                 (currentValue ?? '??')
             )}
@@ -65,7 +69,7 @@ const WidgetSensor: React.FC<WidgetSensorProps> = ({
                             <Skeleton style={{ width: 40, height: 15, marginTop: 2 }} />
                         ) : (
                             <>
-                                {minMax?.min?.value}
+                                {formatter ? formatter(minMax?.min?.value ?? '??') : (minMax?.min?.value ?? '??')}
                                 {unit && <span>{unit}</span>}
                             </>
                         )}
@@ -85,7 +89,7 @@ const WidgetSensor: React.FC<WidgetSensorProps> = ({
                             <Skeleton style={{ width: 40, height: 15, marginTop: 2 }} />
                         ) : (
                             <>
-                                {minMax?.max?.value}
+                                {formatter ? formatter(minMax?.max?.value ?? '??') : (minMax?.max?.value ?? '??')}
                                 {unit && <span>{unit}</span>}
                             </>
                         )}

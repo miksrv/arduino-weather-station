@@ -22,8 +22,8 @@ export const colors = {
     violet: ['#8c1fc9', '#a23de3'], // Violet
     purple: ['#7d2ae8', '#9146ff'], // Purple
     magenta: ['#c2185b', '#db3c7f'], // Magenta
-    red: ['#e53935', '#f25755'], // Red
     pink: ['#e91e63', '#ff5b85'], // Pink
+    red: ['#e53935', '#f25755'], // Red
     orange: ['#ff5722', '#ff7043'], // Orange
     yellow: ['#ffeb3b', '#fff176'], // Yellow
     lime: ['#cddc39', '#d4e157'], // Lime
