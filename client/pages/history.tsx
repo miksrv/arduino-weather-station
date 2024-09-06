@@ -17,7 +17,7 @@ import Popout from '@/ui/popout'
 import { PopoutHandle } from '@/ui/popout/Popout'
 import Spinner from '@/ui/spinner'
 
-interface HistoryPageProps {}
+type HistoryPageProps = object
 
 const HistoryPage: NextPage<HistoryPageProps> = () => {
     const { i18n, t } = useTranslation()

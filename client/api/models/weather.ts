@@ -1,5 +1,4 @@
-export type Weather = {
-    date?: string
+export type Sensors = {
     temperature?: number
     feelsLike?: number
     pressure?: number
@@ -14,5 +13,9 @@ export type Weather = {
     windSpeed?: number
     windGust?: number
     windDeg?: number
+}
+
+export type Weather = Sensors & {
+    date?: string
     weatherId?: number
 }

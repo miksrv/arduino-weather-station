@@ -17,7 +17,6 @@ import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
 import WindDirectionIcon from '@/components/wind-direction-icon'
-import { colors } from '@/tools/colors'
 import { getWeatherI18nKey } from '@/tools/conditions'
 import { formatDate, round } from '@/tools/helpers'
 import {
@@ -30,11 +29,10 @@ import {
 } from '@/tools/weather'
 import { Column } from '@/ui/table'
 
-interface IndexPageProps {}
+type IndexPageProps = object
 
 type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon'> & {
-    color?: keyof typeof colors
-    source: keyof ApiModel.Weather
+    source: keyof ApiModel.Sensors
 }
 
 const IndexPage: NextPage<IndexPageProps> = () => {
@@ -64,14 +62,12 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('humidity'),
             unit: '%',
-            color: 'cyan',
             icon: 'Water',
             source: 'humidity'
         },
         {
             title: t('temperature'),
             unit: '°C',
-            color: 'red',
             icon: 'Thermometer',
             source: 'temperature'
         }
@@ -220,8 +216,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         currentValue={current?.[widget.source]}
                         chart={
                             <WeatherChart
-                                color={widget.color as any}
-                                yAxisField={widget.source}
+                                source={widget.source}
                                 data={filterRecentData(history, 12)}
                             />
                         }

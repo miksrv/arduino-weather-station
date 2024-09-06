@@ -11,15 +11,13 @@ import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
-import { colors } from '@/tools/colors'
 import { formatDate } from '@/tools/helpers'
 import { convertHpaToMmHg, filterRecentData, getMinMaxValues } from '@/tools/weather'
 
-interface IndexPageProps {}
+type IndexPageProps = object
 
 type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon' | 'formatter'> & {
-    color?: keyof typeof colors
-    source: keyof ApiModel.Weather
+    source: keyof ApiModel.Sensors
 }
 
 const IndexPage: NextPage<IndexPageProps> = () => {
@@ -41,35 +39,30 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('temperature'),
             unit: '°C',
-            color: 'red',
             icon: 'Thermometer',
             source: 'temperature'
         },
         {
             title: t('feels-like'),
             unit: '°C',
-            color: 'orange',
             icon: 'Thermometer',
             source: 'feelsLike'
         },
         {
             title: t('dew-point'),
             unit: '°C',
-            color: 'lightblue',
             icon: 'Thermometer',
             source: 'dewPoint'
         },
         {
             title: t('humidity'),
             unit: '%',
-            color: 'cyan',
             icon: 'Water',
             source: 'humidity'
         },
         {
             title: t('pressure'),
             unit: t('mm-hg'),
-            color: 'purple',
             icon: 'Pressure',
             source: 'pressure',
             formatter: convertHpaToMmHg
@@ -77,55 +70,47 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('wind-speed'),
             unit: t('meters-per-second'),
-            color: 'green',
             icon: 'Wind',
             source: 'windSpeed'
         },
         // {
         //     title: t('wind-gust'),
         //     unit: t('meters-per-second'),
-        //     color: 'teal',
         //     icon: 'Wind',
         //     source: 'windGust'
         // },
         {
             title: t('wind-deg'),
             unit: '°',
-            color: 'olive',
             icon: 'Compass',
             source: 'windDeg'
         },
         {
             title: t('cloudiness'),
             unit: '%',
-            color: 'navy',
             icon: 'Cloud',
             source: 'clouds'
         },
         {
             title: t('precipitation'),
             unit: t('millimeters'),
-            color: 'blue',
             icon: 'WaterDrop',
             source: 'precipitation'
         },
         {
             title: t('uv-index'),
-            color: 'violet',
             icon: 'Sun',
             source: 'uvIndex'
         },
         {
             title: t('sol-energy'),
             unit: t('mj-m2'),
-            color: 'yellow',
             icon: 'SolarPower',
             source: 'solEnergy'
         },
         {
             title: t('sol-radiation'),
             unit: t('w-m2'),
-            color: 'lime',
             icon: 'Electric',
             source: 'solRadiation'
         }
@@ -168,8 +153,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         formatter={widget?.formatter}
                         chart={
                             <WeatherChart
-                                color={widget.color as any}
-                                yAxisField={widget.source}
+                                source={widget.source}
                                 data={filterRecentData(history, 24)}
                             />
                         }

@@ -7,7 +7,7 @@ import Button from '@/ui/button'
 import Calendar, { CalendarProps } from '@/ui/datepicker/Calendar'
 import { CalendarPresetType, enPresets, PresetOption, ruPresets } from '@/ui/datepicker/utils'
 
-interface DatePickerProps extends CalendarProps {}
+type DatePickerProps = CalendarProps
 
 const nowDate = dayjs.utc()
 

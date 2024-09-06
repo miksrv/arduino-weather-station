@@ -3,24 +3,23 @@ import { EChartsOption, graphic } from 'echarts'
 import ReactECharts from 'echarts-for-react'
 
 import { ApiModel } from '@/api'
-import { colors } from '@/tools/colors'
+import { getSensorColor } from '@/tools/colors'
 
 interface Props {
-    color?: keyof typeof colors
     data?: ApiModel.Weather[]
-    yAxisField?: keyof ApiModel.Weather
+    source?: keyof ApiModel.Sensors
 }
 
-const WeatherChart: React.FC<Props> = ({ color, data, yAxisField }) => {
+const WeatherChart: React.FC<Props> = ({ data, source }) => {
     const formatData = () => {
         return data?.map((item) => ({
             date: new Date(item?.date || '').toLocaleString(),
-            value: yAxisField ? item?.[yAxisField] : ''
+            value: source ? item?.[source] : ''
         }))
     }
 
     const chartData = formatData()
-    const colorsData = color ? colors[color] : colors.red
+    const colorsData = getSensorColor(source)
 
     const option: EChartsOption = {
         tooltip: {
