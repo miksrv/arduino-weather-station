@@ -3,8 +3,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import styles from './styles.module.sass'
 
 import { concatClassNames as cn } from '@/tools/helpers'
+import Button, { ButtonProps } from '@/ui/button'
 
-interface PaginationProps {
+interface PaginationProps extends ButtonProps {
     className?: string
     position?: 'left' | 'right'
     action?: React.ReactNode | string
@@ -12,7 +13,14 @@ interface PaginationProps {
     closeOnChildrenClick?: boolean
 }
 
-const Popout: React.FC<PaginationProps> = ({ className, position, action, children, closeOnChildrenClick }) => {
+const Popout: React.FC<PaginationProps> = ({
+    className,
+    position,
+    action,
+    children,
+    closeOnChildrenClick,
+    ...props
+}) => {
     const popoutRef = useRef<HTMLDivElement>(null)
     const popoutChildrenRef = useRef<HTMLDivElement>(null)
     const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -46,12 +54,12 @@ const Popout: React.FC<PaginationProps> = ({ className, position, action, childr
             ref={popoutRef}
             className={cn(className, styles.popout)}
         >
-            <button
-                className={styles.trigger}
+            <Button
                 onClick={toggleDropdown}
+                {...props}
             >
                 {action}
-            </button>
+            </Button>
 
             {isOpen && (
                 <div

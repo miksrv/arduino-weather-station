@@ -5,6 +5,7 @@ import utc from 'dayjs/plugin/utc'
 import styles from './styles.module.sass'
 
 import { concatClassNames as cn } from '@/tools/helpers'
+import {enDaysOfWeek, enMonths,ruDaysOfWeek, ruMonths} from '@/ui/datepicker/utils'
 import Icon from '@/ui/icon'
 
 dayjs.extend(utc)
@@ -18,19 +19,6 @@ export interface CalendarProps {
     locale?: 'en' | 'ru' | string
     onPeriodSelect?: (startDate?: string, endDate?: string) => void
 }
-
-export const enDaysOfWeek = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
-export const ruDaysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
-
-export const enMonths = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-]
-
-export const ruMonths = [
-    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-]
 
 const Calendar: React.FC<CalendarProps> = ({
     hideDaysOfWeek,

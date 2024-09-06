@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -11,7 +11,8 @@ import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WidgetChart from '@/components/widget-chart'
 import { formatDate, TIME_ZONE } from '@/tools/helpers'
-import Calendar from '@/ui/datepicker'
+import Datepicker from '@/ui/datepicker'
+import { findPresetByDate } from '@/ui/datepicker/Datepicker'
 import Popout from '@/ui/popout'
 
 interface HistoryPageProps {}
@@ -19,21 +20,24 @@ interface HistoryPageProps {}
 const HistoryPage: NextPage<HistoryPageProps> = () => {
     const { i18n, t } = useTranslation()
 
-    const dateUTC = dayjs().utc(false).tz(TIME_ZONE)
+    const dateUTC = dayjs().utc(true).tz(TIME_ZONE)
 
     const [startDate, setStartDate] = useState<string>()
     const [endDate, setEndDate] = useState<string>()
 
-    const {
-        data: history,
-        isLoading: historyLoading
-    } = API.useGetHistoryQuery(
+    const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
         {
             start_date: startDate ?? '',
             end_date: endDate ?? ''
         },
         { pollingInterval: 60 * 1000, skip: !startDate?.length || !endDate?.length }
     )
+
+    const currentDatePreset = useMemo((): string => {
+        const preset = findPresetByDate(startDate, endDate, i18n.language)
+
+        return preset ? preset : startDate && endDate ? `${startDate} - ${endDate}` : ''
+    }, [startDate, endDate, i18n.language])
 
     useEffect(() => {
         setStartDate(formatDate(dateUTC.subtract(1, 'day').toDate(), 'YYYY-MM-DD'))
@@ -64,23 +68,20 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
             />
 
             <Popout
-                action={
-                    <div>
-                        {startDate} - {endDate}
-                    </div>
-                }
+                action={currentDatePreset}
+                mode={'secondary'}
                 position={'left'}
             >
-                <Calendar
+                <Datepicker
                     locale={i18n.language}
                     startDate={startDate}
                     endDate={endDate}
+                    minDate={'01-01-2021'}
+                    maxDate={formatDate(dateUTC.toDate(), 'YYYY-MM-DD')}
                     onPeriodSelect={(startDate, endDate) => {
                         setStartDate(startDate)
                         setEndDate(endDate)
                     }}
-                    minDate={'01-01-2021'}
-                    maxDate={formatDate(dateUTC.toDate(), 'YYYY-MM-DD')}
                 />
             </Popout>
 
