@@ -47,7 +47,9 @@ class History extends ResourceController {
             return $this->failValidationErrors('Invalid date format');
         }
 
-        if ($startTimestamp > $currentTimestamp || $endTimestamp > $currentTimestamp) {
+        // Temporary commented: need to fix timeZones on the client side
+        //  || $endTimestamp > $currentTimestamp
+        if ($startTimestamp > $currentTimestamp) {
             return $this->failValidationErrors('Date cannot be in the future');
         }
 
