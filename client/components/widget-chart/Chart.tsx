@@ -7,11 +7,12 @@ import { useTheme } from 'next-themes'
 import styles from './styles.module.sass'
 
 import { ApiModel } from '@/api'
-import { colors } from '@/tools/colors'
+import { ChartTypes } from '@/components/widget-chart/WidgetChart'
+import { getSensorColor } from '@/tools/colors'
 import { formatDate, formatDateFromUTC } from '@/tools/helpers'
 
 interface ChartProps {
-    type: 'temperature' | 'light' | 'clouds'
+    type: ChartTypes
     data?: ApiModel.Weather[]
     height?: string | number
 }
@@ -144,6 +145,25 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
         ]
     }
 
+    const getChartLineConfig = (source: keyof ApiModel.Sensors, name?: string, axis?: number, area?: boolean) => ({
+        ...(baseConfig.series as any)[0],
+        data: data?.map(({ date, [source]: sensorData }) => [date, sensorData]),
+        name: name ?? '',
+        yAxisIndex: axis ?? 0,
+        lineStyle: {
+            color: getSensorColor(source)[0],
+            width: 1
+        },
+        itemStyle: {
+            color: getSensorColor(source)[0]
+        },
+        areaStyle: area
+            ? {
+                  color: getSensorColor(source)[1]
+              }
+            : undefined
+    })
+
     const config: EChartsOption = useMemo(() => {
         switch (type) {
             default:
@@ -160,45 +180,9 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                         }
                     ],
                     series: [
-                        {
-                            ...(baseConfig.series as any)[0],
-                            data: data?.map(({ date, temperature }) => [date, temperature]),
-                            name: t('temperature'),
-                            areaStyle: undefined,
-                            lineStyle: {
-                                color: colors.red[0],
-                                width: 1
-                            },
-                            itemStyle: {
-                                color: colors.red[0]
-                            }
-                        },
-                        {
-                            ...(baseConfig.series as any)[0],
-                            data: data?.map(({ date, feelsLike }) => [date, feelsLike]),
-                            name: t('feels-like'),
-                            areaStyle: undefined,
-                            lineStyle: {
-                                color: colors.orange[0],
-                                width: 1
-                            },
-                            itemStyle: {
-                                color: colors.orange[0]
-                            }
-                        },
-                        {
-                            ...(baseConfig.series as any)[0],
-                            data: data?.map(({ date, dewPoint }) => [date, dewPoint]),
-                            name: t('dew-point'),
-                            areaStyle: undefined,
-                            lineStyle: {
-                                color: colors.lightblue[0],
-                                width: 1
-                            },
-                            itemStyle: {
-                                color: colors.lightblue[0]
-                            }
-                        }
+                        getChartLineConfig('temperature', t('temperature')),
+                        getChartLineConfig('feelsLike', t('feels-like')),
+                        getChartLineConfig('dewPoint', t('dew-point'))
                     ]
                 }
 
@@ -222,35 +206,8 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
                         }
                     ],
                     series: [
-                        {
-                            ...(baseConfig.series as any)[0],
-                            data: data?.map(({ date, clouds }) => [date, clouds]),
-                            name: t('cloudiness'),
-                            lineStyle: {
-                                color: colors.navy[0],
-                                width: 1
-                            },
-                            itemStyle: {
-                                color: colors.navy[0]
-                            },
-                            areaStyle: {
-                                color: colors.navy[1]
-                            }
-                        },
-                        {
-                            ...(baseConfig.series as any)[0],
-                            yAxisIndex: 1,
-                            data: data?.map(({ date, windSpeed }) => [date, windSpeed]),
-                            name: t('wind-speed'),
-                            areaStyle: undefined,
-                            lineStyle: {
-                                color: colors.green[0],
-                                width: 1
-                            },
-                            itemStyle: {
-                                color: colors.green[0]
-                            }
-                        }
+                        getChartLineConfig('clouds', t('cloudiness'), 0, true),
+                        getChartLineConfig('windSpeed', t('wind-speed'), 1)
                     ]
                 }
         }

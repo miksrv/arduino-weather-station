@@ -18,22 +18,66 @@
 //     grey: ['#7f8c8d', '#9ea4a5']    // Grey
 // }
 
+import { ApiModel } from '@/api'
+
 export const colors = {
+    brown: ['#795548', '#8d6e63'], // Brown
+    navy: ['#283593', '#3f51b5'], // Navy
     violet: ['#8c1fc9', '#a23de3'], // Violet
     purple: ['#7d2ae8', '#9146ff'], // Purple
     magenta: ['#c2185b', '#db3c7f'], // Magenta
-    red: ['#e53935', '#f25755'], // Red
     pink: ['#e91e63', '#ff5b85'], // Pink
+    red: ['#e53935', '#f25755'], // Red
     orange: ['#ff5722', '#ff7043'], // Orange
     yellow: ['#ffeb3b', '#fff176'], // Yellow
     lime: ['#cddc39', '#d4e157'], // Lime
+    olive: ['#8c9e35', '#a3b236'], // Olive
     green: ['#4caf50', '#66bb6a'], // Green
     teal: ['#009688', '#26a69a'], // Teal
     blue: ['#2c7eec', '#468de8'], // Blue
     lightblue: ['#2196f3', '#42a5f5'], // Light Blue
     cyan: ['#00bcd4', '#4dd0e1'], // Cyan
-    olive: ['#8c9e35', '#a3b236'], // Olive
-    brown: ['#795548', '#8d6e63'], // Brown
-    navy: ['#283593', '#3f51b5'], // Navy
+    air: ['#8dbdef', '#9bc4f5'], // Air
     grey: ['#607d8b', '#78909c'] // Grey
+}
+
+export const getSensorColorType = (sensor?: keyof ApiModel.Sensors): keyof typeof colors => {
+    switch (sensor) {
+        case 'temperature':
+            return 'red'
+        case 'feelsLike':
+            return 'orange'
+        case 'pressure':
+            return 'purple'
+        case 'humidity':
+            return 'cyan'
+        case 'dewPoint':
+            return 'lightblue'
+        case 'visibility':
+            return 'air'
+        case 'uvIndex':
+            return 'violet'
+        case 'solEnergy':
+            return 'yellow'
+        case 'solRadiation':
+            return 'lime'
+        case 'clouds':
+            return 'navy'
+        case 'precipitation':
+            return 'blue'
+        case 'windSpeed':
+            return 'green'
+        case 'windGust':
+            return 'teal'
+        case 'windDeg':
+            return 'olive'
+        default:
+            return 'grey'
+    }
+}
+
+export const getSensorColor = (sensor?: keyof ApiModel.Sensors): string[] => {
+    const sensorColor = getSensorColorType(sensor)
+
+    return colors[sensorColor]
 }

@@ -4,7 +4,7 @@ import { NextSeo } from 'next-seo'
 
 import Button from '@/ui/button'
 
-interface NotFoundProps {}
+type NotFoundProps = object
 
 const NotFound: NextPage<NotFoundProps> = () => (
     <div className={'page404'}>

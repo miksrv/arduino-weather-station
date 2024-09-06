@@ -13,11 +13,10 @@ import WeatherIcon from '@/components/weather-icon'
 import WidgetChart from '@/components/widget-chart'
 import WidgetForecastTable from '@/components/widget-forecast-table'
 import styles from '@/components/widget-forecast-table/styles.module.sass'
-import WidgetSensor from '@/components/widget-sensor'
+import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
 import WindDirectionIcon from '@/components/wind-direction-icon'
-import { colors } from '@/tools/colors'
 import { getWeatherI18nKey } from '@/tools/conditions'
 import { formatDate, round } from '@/tools/helpers'
 import {
@@ -28,17 +27,12 @@ import {
     getMinMaxValues,
     getTemperatureColor
 } from '@/tools/weather'
-import { IconTypes } from '@/ui/icon/types'
 import { Column } from '@/ui/table'
 
-interface IndexPageProps {}
+type IndexPageProps = object
 
-type WidgetType = {
-    title?: string
-    unit?: string
-    color?: keyof typeof colors
-    icon?: IconTypes
-    source: keyof ApiModel.Weather
+type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon'> & {
+    source: keyof ApiModel.Sensors
 }
 
 const IndexPage: NextPage<IndexPageProps> = () => {
@@ -58,8 +52,8 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
     const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
         {
-            start_date: formatDate(dayjs().utc(false).subtract(1, 'day').format(), 'YYYY-MM-DD'),
-            end_date: formatDate(dayjs().utc(false).toDate(), 'YYYY-MM-DD')
+            start_date: formatDate(dayjs().utc(true).subtract(1, 'day').toDate(), 'YYYY-MM-DD'),
+            end_date: formatDate(dayjs().utc(true).toDate(), 'YYYY-MM-DD')
         },
         { pollingInterval: 60 * 1000 }
     )
@@ -68,14 +62,12 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('humidity'),
             unit: '%',
-            color: 'cyan',
             icon: 'Water',
             source: 'humidity'
         },
         {
             title: t('temperature'),
             unit: '°C',
-            color: 'red',
             icon: 'Thermometer',
             source: 'temperature'
         }
@@ -165,7 +157,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             className: styles.cellPressure,
             showComparison: true,
             isSortable: true,
-            formatter: (pressure) => round(convertHpaToMmHg(pressure), 1)
+            formatter: (pressure) => convertHpaToMmHg(pressure)
         },
         {
             header: t('wind'),
@@ -185,7 +177,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     return (
         <AppLayout>
             <NextSeo
-                title={t('weather-orenburg-now', { date: formatDate(current?.date) })}
+                title={t('weather-orenburg-now', { date: formatDate(current?.date ?? new Date()) })}
                 description={t('main-page-description')}
                 canonical={'https://meteo.miksoft.pro'}
                 openGraph={{
@@ -224,8 +216,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         currentValue={current?.[widget.source]}
                         chart={
                             <WeatherChart
-                                color={widget.color as any}
-                                yAxisField={widget.source}
+                                source={widget.source}
                                 data={filterRecentData(history, 12)}
                             />
                         }

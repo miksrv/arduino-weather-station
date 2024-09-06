@@ -7,6 +7,7 @@ import { ApiModel } from '@/api'
 import WeatherIcon from '@/components/weather-icon'
 import { getWeatherI18nKey } from '@/tools/conditions'
 import { round } from '@/tools/helpers'
+import { convertHpaToMmHg } from '@/tools/weather'
 import Chip from '@/ui/chips-select/Chip'
 import Icon from '@/ui/icon'
 import Skeleton from '@/ui/skeleton'
@@ -79,7 +80,7 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
                         />
 
                         <Chip
-                            text={`${weather?.pressure} ${t('mm-hg')}`}
+                            text={`${convertHpaToMmHg(weather?.pressure)} ${t('mm-hg')}`}
                             icon={'Pressure'}
                         />
                     </>

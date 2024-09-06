@@ -30,6 +30,11 @@ const Menu: React.FC<MenuProps> = ({ onClick }) => {
             icon: 'Pressure',
             link: '/sensors',
             text: t('weather-sensors')
+        },
+        {
+            icon: 'Chart',
+            link: '/history',
+            text: t('historical-data')
         }
     ]
 

@@ -9,21 +9,15 @@ import { API, ApiModel } from '@/api'
 import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
-import WidgetSensor from '@/components/widget-sensor'
+import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
-import { colors } from '@/tools/colors'
 import { formatDate } from '@/tools/helpers'
-import { filterRecentData, getMinMaxValues } from '@/tools/weather'
-import { IconTypes } from '@/ui/icon/types'
+import { convertHpaToMmHg, filterRecentData, getMinMaxValues } from '@/tools/weather'
 
-interface IndexPageProps {}
+type IndexPageProps = object
 
-type WidgetType = {
-    title?: string
-    unit?: string
-    color?: keyof typeof colors
-    icon?: IconTypes
-    source: keyof ApiModel.Weather
+type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon' | 'formatter'> & {
+    source: keyof ApiModel.Sensors
 }
 
 const IndexPage: NextPage<IndexPageProps> = () => {
@@ -35,8 +29,8 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
     const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
         {
-            start_date: formatDate(dayjs().utc(false).subtract(1, 'day').format(), 'YYYY-MM-DD'),
-            end_date: formatDate(dayjs().utc(false).toDate(), 'YYYY-MM-DD')
+            start_date: formatDate(dayjs().utc(true).subtract(1, 'day').toDate(), 'YYYY-MM-DD'),
+            end_date: formatDate(dayjs().utc(true).toDate(), 'YYYY-MM-DD')
         },
         { pollingInterval: 60 * 1000 }
     )
@@ -45,83 +39,78 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('temperature'),
             unit: '°C',
-            color: 'red',
             icon: 'Thermometer',
             source: 'temperature'
         },
         {
             title: t('feels-like'),
             unit: '°C',
-            color: 'orange',
             icon: 'Thermometer',
             source: 'feelsLike'
         },
         {
             title: t('dew-point'),
             unit: '°C',
-            color: 'lightblue',
             icon: 'Thermometer',
             source: 'dewPoint'
         },
         {
             title: t('humidity'),
             unit: '%',
-            color: 'cyan',
             icon: 'Water',
             source: 'humidity'
         },
         {
+            title: t('pressure'),
+            unit: t('mm-hg'),
+            icon: 'Pressure',
+            source: 'pressure',
+            formatter: convertHpaToMmHg
+        },
+        {
             title: t('wind-speed'),
             unit: t('meters-per-second'),
-            color: 'green',
             icon: 'Wind',
             source: 'windSpeed'
         },
-        {
-            title: t('wind-gust'),
-            unit: t('meters-per-second'),
-            color: 'teal',
-            icon: 'Wind',
-            source: 'windGust'
-        },
+        // {
+        //     title: t('wind-gust'),
+        //     unit: t('meters-per-second'),
+        //     icon: 'Wind',
+        //     source: 'windGust'
+        // },
         {
             title: t('wind-deg'),
             unit: '°',
-            color: 'olive',
             icon: 'Compass',
             source: 'windDeg'
         },
         {
             title: t('cloudiness'),
             unit: '%',
-            color: 'navy',
             icon: 'Cloud',
             source: 'clouds'
         },
         {
             title: t('precipitation'),
             unit: t('millimeters'),
-            color: 'blue',
             icon: 'WaterDrop',
             source: 'precipitation'
         },
         {
             title: t('uv-index'),
-            color: 'violet',
             icon: 'Sun',
             source: 'uvIndex'
         },
         {
             title: t('sol-energy'),
             unit: t('mj-m2'),
-            color: 'yellow',
             icon: 'SolarPower',
             source: 'solEnergy'
         },
         {
             title: t('sol-radiation'),
             unit: t('w-m2'),
-            color: 'lime',
             icon: 'Electric',
             source: 'solRadiation'
         }
@@ -131,7 +120,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         <AppLayout>
             <NextSeo
                 title={t('weather-sensors')}
-                description={t('main-page-description')}
+                description={t('sensors-page-description')}
                 canonical={'https://meteo.miksoft.pro'}
                 openGraph={{
                     description: t('site-description'),
@@ -161,10 +150,10 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         chartLoading={historyLoading}
                         minMax={getMinMaxValues(history, widget.source)}
                         currentValue={current?.[widget.source]}
+                        formatter={widget?.formatter}
                         chart={
                             <WeatherChart
-                                color={widget.color as any}
-                                yAxisField={widget.source}
+                                source={widget.source}
                                 data={filterRecentData(history, 24)}
                             />
                         }

@@ -25,3 +25,20 @@ body
     margin-top: 5px
     gap: 10px
 
+.toolbar
+    margin: 5px 0 10px
+    display: flex
+    gap: 10px
+
+    .loading
+        display: flex
+        align-items: center
+
+        svg
+            width: 20px
+            height: 20px
+            margin-right: 10px
+
+        @media only screen and (max-width: $mobileMaxWidth)
+            span
+                display: none

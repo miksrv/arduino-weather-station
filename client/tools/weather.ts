@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 
 import { ApiModel } from '@/api'
+import { round } from '@/tools/helpers'
 
 export interface MinMaxResult {
     min?: {
@@ -66,7 +67,7 @@ export const convertHpaToMmHg = (hPa?: number | string): number => {
     }
 
     const mmHg = Number(hPa) * (760 / 1013.25)
-    return parseFloat(mmHg.toFixed(2))
+    return round(parseFloat(mmHg.toFixed(2)), 1) ?? mmHg
 }
 
 /**
