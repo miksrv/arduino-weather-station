@@ -24,3 +24,4 @@ export type IconTypes =
     | 'Visibility'
     | 'Electric'
     | 'SolarPower'
+    | 'Chart'

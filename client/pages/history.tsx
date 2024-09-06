@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import dayjs from 'dayjs'
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -14,6 +14,8 @@ import { formatDate, TIME_ZONE } from '@/tools/helpers'
 import Datepicker from '@/ui/datepicker'
 import { findPresetByDate } from '@/ui/datepicker/Datepicker'
 import Popout from '@/ui/popout'
+import { PopoutHandle } from '@/ui/popout/Popout'
+import Spinner from '@/ui/spinner'
 
 interface HistoryPageProps {}
 
@@ -22,10 +24,16 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
 
     const dateUTC = dayjs().utc(true).tz(TIME_ZONE)
 
+    const popoutRef = useRef<PopoutHandle>(null)
+
     const [startDate, setStartDate] = useState<string>()
     const [endDate, setEndDate] = useState<string>()
 
-    const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
+    const {
+        data: history,
+        isLoading: historyLoading,
+        isFetching: historyFetching
+    } = API.useGetHistoryQuery(
         {
             start_date: startDate ?? '',
             end_date: endDate ?? ''
@@ -67,23 +75,36 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
                 }}
             />
 
-            <Popout
-                action={currentDatePreset}
-                mode={'secondary'}
-                position={'left'}
-            >
-                <Datepicker
-                    locale={i18n.language}
-                    startDate={startDate}
-                    endDate={endDate}
-                    minDate={'01-01-2021'}
-                    maxDate={formatDate(dateUTC.toDate(), 'YYYY-MM-DD')}
-                    onPeriodSelect={(startDate, endDate) => {
-                        setStartDate(startDate)
-                        setEndDate(endDate)
-                    }}
-                />
-            </Popout>
+            <div className={'toolbar'}>
+                <Popout
+                    ref={popoutRef}
+                    action={currentDatePreset}
+                    mode={'secondary'}
+                    position={'left'}
+                >
+                    <Datepicker
+                        locale={i18n.language}
+                        startDate={startDate}
+                        endDate={endDate}
+                        minDate={'01-01-2021'}
+                        maxDate={formatDate(dateUTC.toDate(), 'YYYY-MM-DD')}
+                        onPeriodSelect={(startDate, endDate) => {
+                            setStartDate(startDate)
+                            setEndDate(endDate)
+
+                            if (popoutRef.current) {
+                                popoutRef.current.close()
+                            }
+                        }}
+                    />
+                </Popout>
+
+                {historyFetching && !historyLoading && (
+                    <div className={'loading'}>
+                        <Spinner /> {t('please-wait-loading')}
+                    </div>
+                )}
+            </div>
 
             <div className={'widgets-list'}>
                 <WidgetChart

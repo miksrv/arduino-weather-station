@@ -5,7 +5,7 @@ import utc from 'dayjs/plugin/utc'
 import styles from './styles.module.sass'
 
 import { concatClassNames as cn } from '@/tools/helpers'
-import {enDaysOfWeek, enMonths,ruDaysOfWeek, ruMonths} from '@/ui/datepicker/utils'
+import { enDaysOfWeek, enMonths, ruDaysOfWeek, ruMonths } from '@/ui/datepicker/utils'
 import Icon from '@/ui/icon'
 
 dayjs.extend(utc)
@@ -148,19 +148,6 @@ const Calendar: React.FC<CalendarProps> = ({
         return days
     }
 
-    const renderDaysOfWeek = () => (
-        <div className={styles.daysOfWeekContainer}>
-            {(locale === 'ru' ? ruDaysOfWeek : enDaysOfWeek).map((day) => (
-                <div
-                    key={`dayOfWeek-${day}`}
-                    className={styles.dayOfWeek}
-                >
-                    {day}
-                </div>
-            ))}
-        </div>
-    )
-
     useEffect(() => {
         const years: number[] = []
         const currentYear = dayjs().utc().year()
@@ -235,7 +222,18 @@ const Calendar: React.FC<CalendarProps> = ({
                     <Icon name={'Right'} />
                 </button>
             </header>
-            {!hideDaysOfWeek && renderDaysOfWeek()}
+            {!hideDaysOfWeek && (
+                <div className={styles.daysOfWeekContainer}>
+                    {(locale === 'ru' ? ruDaysOfWeek : enDaysOfWeek).map((day) => (
+                        <div
+                            key={`dayOfWeek-${day}`}
+                            className={styles.dayOfWeek}
+                        >
+                            {day}
+                        </div>
+                    ))}
+                </div>
+            )}
             <div className={styles.body}>{renderDays()}</div>
         </div>
     )
