@@ -11,6 +11,7 @@ import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WidgetChart from '@/components/widget-chart'
 import { formatDate, TIME_ZONE } from '@/tools/helpers'
+import { getDateTimeFormat } from '@/tools/weather'
 import Datepicker from '@/ui/datepicker'
 import { findPresetByDate } from '@/ui/datepicker/Datepicker'
 import Popout from '@/ui/popout'
@@ -46,6 +47,8 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
 
         return preset ? preset : startDate && endDate ? `${startDate} - ${endDate}` : ''
     }, [startDate, endDate, i18n.language])
+
+    const dateFormat = useMemo(() => getDateTimeFormat(startDate, endDate), [startDate, endDate])
 
     useEffect(() => {
         setStartDate(formatDate(dateUTC.subtract(1, 'day').toDate(), 'YYYY-MM-DD'))
@@ -108,17 +111,19 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
 
             <div className={'widgets-list'}>
                 <WidgetChart
-                    type={'temperature'}
-                    loading={historyLoading}
                     fullWidth={true}
+                    type={'temperature'}
                     data={history}
+                    loading={historyLoading}
+                    dateFormat={dateFormat}
                 />
 
                 <WidgetChart
-                    type={'clouds'}
-                    loading={historyLoading}
                     fullWidth={true}
+                    type={'clouds'}
                     data={history}
+                    loading={historyLoading}
+                    dateFormat={dateFormat}
                 />
             </div>
         </AppLayout>

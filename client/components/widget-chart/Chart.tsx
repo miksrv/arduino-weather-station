@@ -9,15 +9,16 @@ import styles from './styles.module.sass'
 import { ApiModel } from '@/api'
 import { ChartTypes } from '@/components/widget-chart/WidgetChart'
 import { getSensorColor } from '@/tools/colors'
-import { formatDate, formatDateFromUTC } from '@/tools/helpers'
+import { formatDate, formatDateFromUTC, round } from '@/tools/helpers'
 
 interface ChartProps {
     type: ChartTypes
     data?: ApiModel.Weather[]
     height?: string | number
+    dateFormat?: string
 }
 
-const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
+const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
     const { theme } = useTheme()
     const { t } = useTranslation()
 
@@ -52,10 +53,13 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
             axisPointer: {
                 type: 'cross',
                 label: {
-                    // #TODO
-                    // formatter({ value }) {
-                    //     return dateFromUTC(value as number)
-                    // }
+                    formatter: function (params) {
+                        if (params?.axisDimension === 'x') {
+                            return formatDateFromUTC(params?.value as number, 'D MMM YYYY, HH:mm')
+                        }
+
+                        return round(Number(params?.value), 2)?.toString() ?? ''
+                    }
                 }
             },
             backgroundColor: backgroundColor,
@@ -88,9 +92,10 @@ const Chart: React.FC<ChartProps> = ({ type, data, height }) => {
             type: 'time',
             axisLabel: {
                 show: true,
+                hideOverlap: true,
                 color: textSecondaryColor, // Color of X-axis labels
                 formatter: function (value: number) {
-                    return formatDateFromUTC(value, 'HH:mm')
+                    return formatDateFromUTC(value, dateFormat ?? 'HH:mm')
                 }
             },
             axisTick: {

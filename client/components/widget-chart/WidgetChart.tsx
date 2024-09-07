@@ -14,11 +14,12 @@ interface WidgetProps {
     fullWidth?: boolean
     data?: ApiModel.Weather[]
     type: ChartTypes
+    dateFormat?: string
 }
 
 const CHART_HEIGHT = '260px'
 
-const WidgetChart: React.FC<WidgetProps> = ({ loading, fullWidth, data, type }) => (
+const WidgetChart: React.FC<WidgetProps> = ({ loading, fullWidth, data, type, dateFormat }) => (
     <div className={cn(styles.widget, fullWidth && styles.fullWidth)}>
         <div className={styles.value}>
             {loading ? (
@@ -28,6 +29,7 @@ const WidgetChart: React.FC<WidgetProps> = ({ loading, fullWidth, data, type }) 
                     data={data}
                     type={type}
                     height={CHART_HEIGHT}
+                    dateFormat={dateFormat}
                 />
             )}
         </div>
