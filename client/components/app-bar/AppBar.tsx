@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes'
 import styles from './styles.module.sass'
 
 import { API } from '@/api'
-import { formatDate, minutesAgo, timeAgo } from '@/tools/helpers'
+import { formatDate, minutesAgo, timeAgo } from '@/tools/date'
 import useClientOnly from '@/tools/hooks/useClientOnly'
 import Icon from '@/ui/icon'
 import Spinner from '@/ui/spinner'

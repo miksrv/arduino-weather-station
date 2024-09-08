@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import dayjs from 'dayjs'
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -10,7 +9,7 @@ import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WidgetChart from '@/components/widget-chart'
-import { formatDate, TIME_ZONE } from '@/tools/helpers'
+import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
 import { getDateTimeFormat } from '@/tools/weather'
 import Datepicker from '@/ui/datepicker'
 import { findPresetByDate } from '@/ui/datepicker/Datepicker'
@@ -24,8 +23,6 @@ const MIN_DATE = '2021-01-01'
 
 const HistoryPage: NextPage<HistoryPageProps> = () => {
     const { i18n, t } = useTranslation()
-
-    const dateUTC = dayjs().utc(false).tz(TIME_ZONE)
 
     const popoutRef = useRef<PopoutHandle>(null)
 
@@ -53,8 +50,8 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
     const dateFormat = useMemo(() => getDateTimeFormat(startDate, endDate), [startDate, endDate])
 
     useEffect(() => {
-        setStartDate(formatDate(dateUTC.subtract(1, 'day').toDate(), 'YYYY-MM-DD'))
-        setEndDate(formatDate(dateUTC.toDate(), 'YYYY-MM-DD'))
+        setStartDate(formatDate(yesterdayDate, 'YYYY-MM-DD'))
+        setEndDate(formatDate(currentDate.toDate(), 'YYYY-MM-DD'))
     }, [])
 
     return (
@@ -92,7 +89,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
                         startDate={startDate}
                         endDate={endDate}
                         minDate={MIN_DATE}
-                        maxDate={formatDate(dateUTC.toDate(), 'YYYY-MM-DD')}
+                        maxDate={formatDate(currentDate.toDate(), 'YYYY-MM-DD')}
                         onPeriodSelect={(startDate, endDate) => {
                             setStartDate(startDate)
                             setEndDate(endDate)

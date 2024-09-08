@@ -1,7 +1,3 @@
-import dayjs, { Dayjs } from 'dayjs'
-
-export const TIME_ZONE = 'Asia/Yekaterinburg'
-
 export const encodeQueryData = (data: any): string => {
     if (typeof data === 'undefined' || !data) {
         return ''
@@ -17,25 +13,6 @@ export const encodeQueryData = (data: any): string => {
 
     return ret.length ? '?' + ret.join('&') : ''
 }
-
-export const getDate = (date: string | Date): Dayjs => dayjs.utc(date).tz(TIME_ZONE)
-
-export const formatDateFromUTC = (utc?: number, format: string = 'D MMMM YYYY, HH:mm'): string =>
-    utc
-        ? dayjs
-              .unix(utc / 1000)
-              .utc(true)
-              .tz(TIME_ZONE)
-              .format(format)
-        : ''
-
-export const formatDate = (date?: string | number | Date, format: string = 'D MMMM YYYY, HH:mm'): string =>
-    date ? getDate(typeof date === 'number' ? new Date(date) : date).format(format) : ''
-
-export const timeAgo = (date?: string | Date, withoutSuffix?: boolean): string =>
-    date ? getDate(date).fromNow(withoutSuffix) : ''
-
-export const minutesAgo = (date?: string | Date): number => (date ? dayjs().diff(getDate(date), 'minute') : 99999999)
 
 export const round = (value?: number, digits: number = 4): number | undefined =>
     value ? Number(value.toFixed(digits)) : undefined

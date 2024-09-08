@@ -3,7 +3,7 @@ import React from 'react'
 import styles from './styles.module.sass'
 
 import packageInfo from '@/package.json'
-import { formatDate } from '@/tools/helpers'
+import { formatDate } from '@/tools/date'
 import { update } from '@/update'
 
 const Footer: React.FC = () => (

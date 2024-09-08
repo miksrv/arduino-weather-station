@@ -1,5 +1,4 @@
 import React from 'react'
-import dayjs from 'dayjs'
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -18,7 +17,8 @@ import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
 import WindDirectionIcon from '@/components/wind-direction-icon'
 import { getWeatherI18nKey } from '@/tools/conditions'
-import { formatDate, round } from '@/tools/helpers'
+import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
+import { round } from '@/tools/helpers'
 import {
     convertHpaToMmHg,
     convertWindDirection,
@@ -52,8 +52,8 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
     const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
         {
-            start_date: formatDate(dayjs().utc(false).subtract(1, 'day').toDate(), 'YYYY-MM-DD'),
-            end_date: formatDate(dayjs().utc(false).toDate(), 'YYYY-MM-DD')
+            start_date: formatDate(yesterdayDate, 'YYYY-MM-DD'),
+            end_date: formatDate(currentDate.toDate(), 'YYYY-MM-DD')
         },
         { pollingInterval: 60 * 1000 }
     )

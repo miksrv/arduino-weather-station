@@ -2,7 +2,7 @@ import React from 'react'
 
 import styles from './styles.module.sass'
 
-import { getDate } from '@/tools/helpers'
+import { getDate } from '@/tools/date'
 
 interface WeatherIconProps {
     weatherId: number
