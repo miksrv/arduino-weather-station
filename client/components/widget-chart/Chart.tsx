@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react'
-import dayjs from 'dayjs'
 import { EChartsOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
 import { useTranslation } from 'next-i18next'
@@ -10,7 +9,7 @@ import styles from './styles.module.sass'
 import { ApiModel } from '@/api'
 import { ChartTypes } from '@/components/widget-chart/WidgetChart'
 import { getSensorColor } from '@/tools/colors'
-import { formatDate, formatDateFromUTC } from '@/tools/date'
+import { formatDateFromUTC } from '@/tools/date'
 import { round } from '@/tools/helpers'
 
 interface ChartProps {
