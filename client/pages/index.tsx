@@ -16,6 +16,7 @@ import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
 import WindDirectionIcon from '@/components/wind-direction-icon'
+import { POLING_INTERVAL_CURRENT, POLING_INTERVAL_FORECAST } from '@/pages/_app'
 import { getWeatherI18nKey } from '@/tools/conditions'
 import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
 import { round } from '@/tools/helpers'
@@ -39,15 +40,15 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n, t } = useTranslation()
 
     const { data: forecastHourly, isLoading: hourlyLoading } = API.useGetForecastQuery('hourly', {
-        pollingInterval: 10 * 60 * 1000
+        pollingInterval: POLING_INTERVAL_FORECAST
     })
 
     const { data: forecastDaily, isLoading: dailyLoading } = API.useGetForecastQuery('daily', {
-        pollingInterval: 10 * 60 * 1000
+        pollingInterval: POLING_INTERVAL_FORECAST
     })
 
     const { data: current, isLoading: currentLoading } = API.useGetCurrentQuery(undefined, {
-        pollingInterval: 5 * 60 * 1000
+        pollingInterval: POLING_INTERVAL_CURRENT
     })
 
     const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
@@ -55,7 +56,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             start_date: formatDate(yesterdayDate, 'YYYY-MM-DD'),
             end_date: formatDate(currentDate.toDate(), 'YYYY-MM-DD')
         },
-        { pollingInterval: 60 * 1000 }
+        { pollingInterval: POLING_INTERVAL_CURRENT }
     )
 
     const widgets: WidgetType[] = [

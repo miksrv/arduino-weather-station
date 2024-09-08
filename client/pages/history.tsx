@@ -9,6 +9,7 @@ import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WidgetChart from '@/components/widget-chart'
+import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
 import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
 import { getDateTimeFormat } from '@/tools/weather'
 import Datepicker from '@/ui/datepicker'
@@ -38,7 +39,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
             start_date: startDate ?? '',
             end_date: endDate ?? ''
         },
-        { pollingInterval: 60 * 1000, skip: !startDate?.length || !endDate?.length }
+        { pollingInterval: POLING_INTERVAL_CURRENT, skip: !startDate?.length || !endDate?.length }
     )
 
     const currentDatePreset = useMemo((): string => {

@@ -10,6 +10,7 @@ import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
+import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
 import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
 import { convertHpaToMmHg, filterRecentData, getMinMaxValues } from '@/tools/weather'
 
@@ -23,7 +24,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n, t } = useTranslation()
 
     const { data: current, isLoading: currentLoading } = API.useGetCurrentQuery(undefined, {
-        pollingInterval: 5 * 60 * 1000
+        pollingInterval: POLING_INTERVAL_CURRENT
     })
 
     const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
@@ -31,7 +32,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             start_date: formatDate(yesterdayDate, 'YYYY-MM-DD'),
             end_date: formatDate(currentDate.toDate(), 'YYYY-MM-DD')
         },
-        { pollingInterval: 60 * 1000 }
+        { pollingInterval: POLING_INTERVAL_CURRENT }
     )
 
     const widgets: WidgetType[] = [

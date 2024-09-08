@@ -22,6 +22,9 @@ import { wrapper } from '@/api/store'
 import { LOCAL_STORAGE } from '@/tools/constants'
 import * as LocalStorage from '@/tools/localstorage'
 
+export const POLING_INTERVAL_CURRENT = 10 * 60 * 1000
+export const POLING_INTERVAL_FORECAST = 10 * 60 * 1000
+
 const locale = LocalStorage.getItem(LOCAL_STORAGE.LOCALE as any)
 
 const App = ({ Component, pageProps }: AppProps) => {
