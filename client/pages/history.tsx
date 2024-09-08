@@ -25,7 +25,7 @@ const MIN_DATE = '2021-01-01'
 const HistoryPage: NextPage<HistoryPageProps> = () => {
     const { i18n, t } = useTranslation()
 
-    const dateUTC = dayjs().utc(true).tz(TIME_ZONE)
+    const dateUTC = dayjs().utc(false).tz(TIME_ZONE)
 
     const popoutRef = useRef<PopoutHandle>(null)
 

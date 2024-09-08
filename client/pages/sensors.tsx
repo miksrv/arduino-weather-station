@@ -29,8 +29,8 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
     const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
         {
-            start_date: formatDate(dayjs().utc(true).subtract(1, 'day').toDate(), 'YYYY-MM-DD'),
-            end_date: formatDate(dayjs().utc(true).toDate(), 'YYYY-MM-DD')
+            start_date: formatDate(dayjs().utc(false).subtract(1, 'day').toDate(), 'YYYY-MM-DD'),
+            end_date: formatDate(dayjs().utc(false).toDate(), 'YYYY-MM-DD')
         },
         { pollingInterval: 60 * 1000 }
     )
