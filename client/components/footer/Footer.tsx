@@ -12,7 +12,7 @@ const Footer: React.FC = () => (
             {'Copyright ©'} {packageInfo.name} {formatDate(new Date(), 'YYYY')}
         </div>
         <div>
-            {'Version'} <span>{packageInfo.version}</span> <span>({formatDate(update, 'MM.D.YYYY, HH:mm')})</span>
+            {'Version'} <span>{packageInfo.version}</span> <span>({formatDate(update, 'DD.MM.YYYY, HH:mm')})</span>
         </div>
     </footer>
 )
