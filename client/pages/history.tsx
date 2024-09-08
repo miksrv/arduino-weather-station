@@ -10,8 +10,7 @@ import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WidgetChart from '@/components/widget-chart'
 import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
-import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
-import { getDateTimeFormat } from '@/tools/weather'
+import { currentDate, formatDate, getDateTimeFormat, yesterdayDate } from '@/tools/date'
 import Datepicker from '@/ui/datepicker'
 import { findPresetByDate } from '@/ui/datepicker/Datepicker'
 import Popout from '@/ui/popout'
@@ -48,7 +47,10 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
         return preset ? preset : startDate && endDate ? `${startDate} - ${endDate}` : ''
     }, [startDate, endDate, i18n.language])
 
-    const dateFormat = useMemo(() => getDateTimeFormat(startDate, endDate), [startDate, endDate])
+    const dateFormat = useMemo(
+        () => getDateTimeFormat(startDate, endDate, i18n.language === 'en'),
+        [startDate, endDate, i18n.language]
+    )
 
     useEffect(() => {
         setStartDate(formatDate(yesterdayDate, 'YYYY-MM-DD'))

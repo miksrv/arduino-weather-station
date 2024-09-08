@@ -123,7 +123,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             accessor: 'date',
             className: styles.cellDate,
             isSortable: true,
-            formatter: (date) => formatDate(date as string, 'HH A')
+            formatter: (date) => formatDate(date as string, t('date-only-hour'))
         },
         {
             header: t('weather'),

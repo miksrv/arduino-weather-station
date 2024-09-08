@@ -39,6 +39,9 @@
     "w-m2": "W/m²",
     "weather-forecast-by-days": "Weather Forecast - By Days",
     "weather-forecast-hourly": "Weather Forecast - Hourly",
+    "date-full-format": "D MMMM YYYY, h:mm a",
+    "date-chart-tooltip": "dddd, DD MMM YYYY, h:mm a",
+    "date-chart-label": "D MMM YYYY, h:mm a",
     "conditions": {
         "thunderstorm_with_light_rain": "Thunderstorm with light rain",
         "thunderstorm_with_rain": "Thunderstorm with rain",

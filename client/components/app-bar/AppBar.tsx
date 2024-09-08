@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes'
 import styles from './styles.module.sass'
 
 import { API } from '@/api'
+import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
 import { formatDate, minutesAgo, timeAgo } from '@/tools/date'
 import useClientOnly from '@/tools/hooks/useClientOnly'
 import Icon from '@/ui/icon'
@@ -22,7 +23,7 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
     const isClient = useClientOnly()
     const { theme, setTheme } = useTheme()
     const { t } = useTranslation()
-    const { data: current, isLoading } = API.useGetCurrentQuery(undefined, { pollingInterval: 60 * 1000 })
+    const { data: current, isLoading } = API.useGetCurrentQuery(undefined, { pollingInterval: POLING_INTERVAL_CURRENT })
 
     return (
         <header className={styles.appBar}>
@@ -46,7 +47,7 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
                         </div>
                     ) : (
                         <div>
-                            <div>{formatDate(current?.date)}</div>
+                            <div>{formatDate(current?.date, t('date-full-format'))}</div>
                             <div className={styles.timeAgo}>{timeAgo(current?.date)}</div>
                         </div>
                     )}

@@ -39,6 +39,10 @@
     "w-m2": "Вт/м²",
     "weather-forecast-by-days": "Прогноз погоды - По дням",
     "weather-forecast-hourly": "Прогноз погоды - По часам",
+    "date-full-format": "D MMMM YYYY, HH:mm",
+    "date-only-hour": "HH a",
+    "date-chart-tooltip": "dddd, DD MMM YYYY, HH:mm",
+    "date-chart-label": "D MMM YYYY, HH:mm",
     "conditions": {
         "thunderstorm_with_light_rain": "Гроза с небольшим дождем",
         "thunderstorm_with_rain": "Гроза с дождем",

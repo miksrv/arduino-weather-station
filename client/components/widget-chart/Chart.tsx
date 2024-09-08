@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import dayjs from 'dayjs'
 import { EChartsOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
 import { useTranslation } from 'next-i18next'
@@ -56,7 +57,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                 label: {
                     formatter: function (params) {
                         if (params?.axisDimension === 'x') {
-                            return formatDateFromUTC(params?.value as number, 'D MMM YYYY, HH:mm')
+                            return formatDateFromUTC(params?.value as number, t('date-chart-label'))
                         }
 
                         return round(Number(params?.value), 2)?.toString() ?? ''
@@ -71,7 +72,8 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
 
                 //Format the header - let's assume it's a date (xAxis)
                 if (params.length > 0) {
-                    const header = `<div class="${styles.chartTooltipTitle}">${formatDate(params[0].axisValueLabel, 'dddd, DD MMM YYYY, HH:mm')}</div>`
+                    // const header = `<div class="${styles.chartTooltipTitle}">${formatDate(params[0].axisValueLabel, t('date-chart-tooltip'))}</div>`
+                    const header = `<div class="${styles.chartTooltipTitle}">${params[0].axisValueLabel}</div>`
                     tooltipContent.push(header)
                 }
 
@@ -96,7 +98,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                 hideOverlap: true,
                 color: textSecondaryColor, // Color of X-axis labels
                 formatter: function (value: number) {
-                    return formatDateFromUTC(value, dateFormat ?? 'HH:mm')
+                    return formatDateFromUTC(value, dateFormat ?? t('date-only-hour'))
                 }
             },
             axisTick: {
