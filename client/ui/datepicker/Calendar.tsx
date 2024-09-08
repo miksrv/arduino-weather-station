@@ -150,10 +150,9 @@ const Calendar: React.FC<CalendarProps> = ({
 
     useEffect(() => {
         const years: number[] = []
-        const currentYear = dayjs().utc().year()
 
         const minYear = minDate ? dayjs.utc(minDate).year() : 1900
-        const maxYear = maxDate ? dayjs.utc(maxDate).year() : currentYear
+        const maxYear = maxDate ? dayjs.utc(maxDate).year() : dayjs().year()
 
         for (let year = minYear; year <= maxYear; year++) {
             years.push(year)

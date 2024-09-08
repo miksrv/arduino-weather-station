@@ -20,6 +20,8 @@ import Spinner from '@/ui/spinner'
 
 type HistoryPageProps = object
 
+const MIN_DATE = '2021-01-01'
+
 const HistoryPage: NextPage<HistoryPageProps> = () => {
     const { i18n, t } = useTranslation()
 
@@ -89,7 +91,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
                         locale={i18n.language}
                         startDate={startDate}
                         endDate={endDate}
-                        minDate={'01-01-2021'}
+                        minDate={MIN_DATE}
                         maxDate={formatDate(dateUTC.toDate(), 'YYYY-MM-DD')}
                         onPeriodSelect={(startDate, endDate) => {
                             setStartDate(startDate)
