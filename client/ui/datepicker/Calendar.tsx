@@ -186,7 +186,6 @@ const Calendar: React.FC<CalendarProps> = ({
                         <select
                             value={selectedMonth}
                             onChange={handleMonthChange}
-                            className={styles.monthSelect}
                         >
                             {(locale === 'ru' ? ruMonths : enMonths).map((month, index) => (
                                 <option
@@ -202,7 +201,6 @@ const Calendar: React.FC<CalendarProps> = ({
                         <select
                             value={selectedYear}
                             onChange={handleYearChange}
-                            className={styles.yearSelect}
                         >
                             {yearsOptions.map((year) => (
                                 <option
