@@ -158,21 +158,3 @@ export const filterRecentData = (data?: ApiModel.Weather[], hours: number = 24):
 
     return data?.filter((item) => dayjs.utc(item.date).isAfter(hoursAgo)) || []
 }
-
-export const getDateTimeFormat = (startDate?: string, endDate?: string): string => {
-    const start = dayjs(startDate)
-    const end = dayjs(endDate)
-
-    const diffInDays = end.diff(start, 'day')
-
-    if (diffInDays <= 1) {
-        // Если разница 1 день и меньше, форматирование по часам и минутам
-        return 'HH:mm'
-    } else if (diffInDays > 1 && diffInDays <= 7) {
-        // Если разница больше 1 дня, но меньше или равна 7 дням, форматирование по дате и часу
-        return 'D MMM HH:00'
-    }
-
-    // Если разница больше 7 дней, форматирование по дням
-    return 'D MMMM'
-}

@@ -150,10 +150,9 @@ const Calendar: React.FC<CalendarProps> = ({
 
     useEffect(() => {
         const years: number[] = []
-        const currentYear = dayjs().utc().year()
 
         const minYear = minDate ? dayjs.utc(minDate).year() : 1900
-        const maxYear = maxDate ? dayjs.utc(maxDate).year() : currentYear
+        const maxYear = maxDate ? dayjs.utc(maxDate).year() : dayjs().year()
 
         for (let year = minYear; year <= maxYear; year++) {
             years.push(year)
@@ -186,7 +185,6 @@ const Calendar: React.FC<CalendarProps> = ({
                         <select
                             value={selectedMonth}
                             onChange={handleMonthChange}
-                            className={styles.monthSelect}
                         >
                             {(locale === 'ru' ? ruMonths : enMonths).map((month, index) => (
                                 <option
@@ -202,7 +200,6 @@ const Calendar: React.FC<CalendarProps> = ({
                         <select
                             value={selectedYear}
                             onChange={handleYearChange}
-                            className={styles.yearSelect}
                         >
                             {yearsOptions.map((year) => (
                                 <option

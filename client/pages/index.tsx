@@ -1,5 +1,4 @@
 import React from 'react'
-import dayjs from 'dayjs'
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -17,8 +16,10 @@ import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
 import WindDirectionIcon from '@/components/wind-direction-icon'
+import { POLING_INTERVAL_CURRENT, POLING_INTERVAL_FORECAST } from '@/pages/_app'
 import { getWeatherI18nKey } from '@/tools/conditions'
-import { formatDate, round } from '@/tools/helpers'
+import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
+import { round } from '@/tools/helpers'
 import {
     convertHpaToMmHg,
     convertWindDirection,
@@ -39,23 +40,23 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n, t } = useTranslation()
 
     const { data: forecastHourly, isLoading: hourlyLoading } = API.useGetForecastQuery('hourly', {
-        pollingInterval: 10 * 60 * 1000
+        pollingInterval: POLING_INTERVAL_FORECAST
     })
 
     const { data: forecastDaily, isLoading: dailyLoading } = API.useGetForecastQuery('daily', {
-        pollingInterval: 10 * 60 * 1000
+        pollingInterval: POLING_INTERVAL_FORECAST
     })
 
     const { data: current, isLoading: currentLoading } = API.useGetCurrentQuery(undefined, {
-        pollingInterval: 5 * 60 * 1000
+        pollingInterval: POLING_INTERVAL_CURRENT
     })
 
     const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
         {
-            start_date: formatDate(dayjs().utc(true).subtract(1, 'day').toDate(), 'YYYY-MM-DD'),
-            end_date: formatDate(dayjs().utc(true).toDate(), 'YYYY-MM-DD')
+            start_date: formatDate(yesterdayDate, 'YYYY-MM-DD'),
+            end_date: formatDate(currentDate.toDate(), 'YYYY-MM-DD')
         },
-        { pollingInterval: 60 * 1000 }
+        { pollingInterval: POLING_INTERVAL_CURRENT }
     )
 
     const widgets: WidgetType[] = [
@@ -122,7 +123,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             accessor: 'date',
             className: styles.cellDate,
             isSortable: true,
-            formatter: (date) => formatDate(date as string, 'HH A')
+            formatter: (date) => formatDate(date as string, t('date-only-hour'))
         },
         {
             header: t('weather'),

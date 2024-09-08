@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import dayjs from 'dayjs'
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -10,8 +9,8 @@ import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WidgetChart from '@/components/widget-chart'
-import { formatDate, TIME_ZONE } from '@/tools/helpers'
-import { getDateTimeFormat } from '@/tools/weather'
+import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
+import { currentDate, formatDate, getDateTimeFormat, yesterdayDate } from '@/tools/date'
 import Datepicker from '@/ui/datepicker'
 import { findPresetByDate } from '@/ui/datepicker/Datepicker'
 import Popout from '@/ui/popout'
@@ -20,10 +19,10 @@ import Spinner from '@/ui/spinner'
 
 type HistoryPageProps = object
 
+const MIN_DATE = '2021-01-01'
+
 const HistoryPage: NextPage<HistoryPageProps> = () => {
     const { i18n, t } = useTranslation()
-
-    const dateUTC = dayjs().utc(true).tz(TIME_ZONE)
 
     const popoutRef = useRef<PopoutHandle>(null)
 
@@ -39,7 +38,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
             start_date: startDate ?? '',
             end_date: endDate ?? ''
         },
-        { pollingInterval: 60 * 1000, skip: !startDate?.length || !endDate?.length }
+        { pollingInterval: POLING_INTERVAL_CURRENT, skip: !startDate?.length || !endDate?.length }
     )
 
     const currentDatePreset = useMemo((): string => {
@@ -48,11 +47,14 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
         return preset ? preset : startDate && endDate ? `${startDate} - ${endDate}` : ''
     }, [startDate, endDate, i18n.language])
 
-    const dateFormat = useMemo(() => getDateTimeFormat(startDate, endDate), [startDate, endDate])
+    const dateFormat = useMemo(
+        () => getDateTimeFormat(startDate, endDate, i18n.language === 'en'),
+        [startDate, endDate, i18n.language]
+    )
 
     useEffect(() => {
-        setStartDate(formatDate(dateUTC.subtract(1, 'day').toDate(), 'YYYY-MM-DD'))
-        setEndDate(formatDate(dateUTC.toDate(), 'YYYY-MM-DD'))
+        setStartDate(formatDate(yesterdayDate, 'YYYY-MM-DD'))
+        setEndDate(formatDate(currentDate.toDate(), 'YYYY-MM-DD'))
     }, [])
 
     return (
@@ -89,8 +91,8 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
                         locale={i18n.language}
                         startDate={startDate}
                         endDate={endDate}
-                        minDate={'01-01-2021'}
-                        maxDate={formatDate(dateUTC.toDate(), 'YYYY-MM-DD')}
+                        minDate={MIN_DATE}
+                        maxDate={formatDate(currentDate.toDate(), 'YYYY-MM-DD')}
                         onPeriodSelect={(startDate, endDate) => {
                             setStartDate(startDate)
                             setEndDate(endDate)

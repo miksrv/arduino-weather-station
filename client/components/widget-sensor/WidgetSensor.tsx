@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import styles from './styles.module.sass'
 
-import { formatDate } from '@/tools/helpers'
+import { formatDate } from '@/tools/date'
 import { MinMaxResult } from '@/tools/weather'
 import Icon from '@/ui/icon'
 import { IconTypes } from '@/ui/icon/types'
