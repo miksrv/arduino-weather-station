@@ -63,8 +63,8 @@ export const getMinMaxValues = (data?: ApiModel.Weather[], parameter?: keyof Api
  */
 export const findMinValue = (weatherData?: ApiModel.Weather[], key?: keyof ApiModel.Sensors): number | undefined =>
     weatherData
-        ?.map(data => data[key ?? 'temperature']) // Get values by key
-        ?.filter(value => value !== undefined) // Filter only existing values
+        ?.map((data) => data[key ?? 'temperature']) // Get values by key
+        ?.filter((value) => value !== undefined) // Filter only existing values
         ?.reduce((min, value) => (value !== undefined && value < min ? value : min), Infinity)
 
 /**
@@ -74,8 +74,8 @@ export const findMinValue = (weatherData?: ApiModel.Weather[], key?: keyof ApiMo
  */
 export const findMaxValue = (weatherData?: ApiModel.Weather[], key?: keyof ApiModel.Sensors): number | undefined =>
     weatherData
-        ?.map(data => data[key ?? 'temperature']) // Get values by key
-        ?.filter(value => value !== undefined) // Filter only existing values
+        ?.map((data) => data[key ?? 'temperature']) // Get values by key
+        ?.filter((value) => value !== undefined) // Filter only existing values
         ?.reduce((max, value) => (value !== undefined && value > max ? value : max), -Infinity)
 
 /**

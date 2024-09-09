@@ -4,6 +4,7 @@ import ReactECharts from 'echarts-for-react'
 
 import { ApiModel } from '@/api'
 import { getSensorColor } from '@/tools/colors'
+import { findMaxValue, findMinValue } from '@/tools/weather'
 
 interface Props {
     data?: ApiModel.Weather[]
@@ -50,6 +51,8 @@ const WeatherChart: React.FC<Props> = ({ data, source }) => {
         },
         yAxis: {
             type: 'value',
+            min: findMinValue(data, source),
+            max: findMaxValue(data, source),
             axisLine: {
                 show: false
             },
