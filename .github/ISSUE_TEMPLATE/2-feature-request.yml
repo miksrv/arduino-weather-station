@@ -1,0 +1,48 @@
+name: Feature Request
+description: Suggest a new feature or enhancement.
+title: "[Feature]: "
+labels: ["enhancement", "discussion"]
+projects: []
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your suggestion! Please describe your idea in as much detail as possible.
+
+  - type: input
+    id: feature-title
+    attributes:
+      label: Feature Title
+      description: Provide a brief title for the new feature or enhancement.
+      placeholder: Enter the title
+    validations:
+      required: true
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature Description
+      description: Describe how the new feature or enhancement should work.
+      placeholder: Describe your idea here
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Describe how this feature can be used and what problems it solves.
+      placeholder: Describe the use case
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to abide by our [Code of Conduct](https://example.com).
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

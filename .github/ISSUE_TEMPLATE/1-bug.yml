@@ -1,0 +1,75 @@
+name: Bug Report
+description: Report a bug or issue.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+projects: []
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report an issue! Please fill out the form below to help us understand the problem better.
+
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more information?
+      placeholder: Enter your email
+    validations:
+      required: false
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected to happen.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+
+#  - type: dropdown
+#    id: version
+#    attributes:
+#      label: Version
+#      description: What version of our software are you using?
+#      options:
+#        - 1.0.0
+#        - 1.0.1
+#        - 1.0.2
+#      default: 1.0.0
+#    validations:
+#      required: true
+
+#  - type: checkboxes
+#    id: browsers
+#    attributes:
+#      label: Which browsers are you experiencing the problem on?
+#      multiple: true
+#      options:
+#        - Firefox
+#        - Chrome
+#        - Safari
+#        - Microsoft Edge
+#      validations:
+#        required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Log Output
+      description: Please paste any relevant log output here. It will be automatically formatted as code.
+#      render: shell
+      placeholder: Paste logs here
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to abide by our [Code of Conduct](https://example.com).
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
