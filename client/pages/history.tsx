@@ -127,6 +127,14 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
                     loading={historyLoading}
                     dateFormat={dateFormat}
                 />
+
+                <WidgetChart
+                    fullWidth={true}
+                    type={'pressure'}
+                    data={history}
+                    loading={historyLoading}
+                    dateFormat={dateFormat}
+                />
             </div>
         </AppLayout>
     )

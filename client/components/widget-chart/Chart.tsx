@@ -11,6 +11,7 @@ import { ChartTypes } from '@/components/widget-chart/WidgetChart'
 import { getSensorColor } from '@/tools/colors'
 import { formatDateFromUTC } from '@/tools/date'
 import { round } from '@/tools/helpers'
+import { findMaxValue, findMinValue } from '@/tools/weather'
 
 interface ChartProps {
     type: ChartTypes
@@ -152,7 +153,12 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
         ]
     }
 
-    const getChartLineConfig = (source: keyof ApiModel.Sensors, name?: string, axis?: number, area?: boolean) => ({
+    const getChartLineConfig = (
+        source: keyof ApiModel.Sensors,
+        name?: string,
+        axis?: number,
+        area?: boolean
+    ) => ({
         ...(baseConfig.series as any)[0],
         data: data?.map(({ date, [source]: sensorData }) => [date, sensorData]),
         name: name ?? '',
@@ -215,6 +221,36 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                     series: [
                         getChartLineConfig('clouds', t('cloudiness'), 0, true),
                         getChartLineConfig('windSpeed', t('wind-speed'), 1)
+                    ]
+                }
+
+            case 'pressure':
+                return {
+                    ...baseConfig,
+                    yAxis: [
+                        {
+                            ...baseConfig.yAxis,
+                            min: findMinValue(data, 'pressure'),
+                            max: findMaxValue(data, 'pressure'),
+                            axisLabel: {
+                                ...(baseConfig.yAxis as any).axisLabel,
+                                formatter: '{value}'
+                            }
+                        },
+                        {
+                            ...baseConfig.yAxis,
+                            axisLabel: {
+                                ...(baseConfig.yAxis as any).axisLabel,
+                                formatter: `{value} ${t('millimeters')}`
+                            }
+                        }
+                    ],
+                    series: [
+                        getChartLineConfig('pressure', t('pressure'), 0, false),
+                        {
+                            ...getChartLineConfig('precipitation', t('precipitation'), 1, false),
+                            type: 'bar'
+                        }
                     ]
                 }
         }

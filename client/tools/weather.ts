@@ -57,6 +57,28 @@ export const getMinMaxValues = (data?: ApiModel.Weather[], parameter?: keyof Api
 }
 
 /**
+ * Function to find the minimum value
+ * @param weatherData
+ * @param key
+ */
+export const findMinValue = (weatherData?: ApiModel.Weather[], key?: keyof ApiModel.Sensors): number | undefined =>
+    weatherData
+        ?.map(data => data[key ?? 'temperature']) // Get values by key
+        ?.filter(value => value !== undefined) // Filter only existing values
+        ?.reduce((min, value) => (value !== undefined && value < min ? value : min), Infinity)
+
+/**
+ * Function to find the maximum value
+ * @param weatherData
+ * @param key
+ */
+export const findMaxValue = (weatherData?: ApiModel.Weather[], key?: keyof ApiModel.Sensors): number | undefined =>
+    weatherData
+        ?.map(data => data[key ?? 'temperature']) // Get values by key
+        ?.filter(value => value !== undefined) // Filter only existing values
+        ?.reduce((max, value) => (value !== undefined && value > max ? value : max), -Infinity)
+
+/**
  * Converts pressure from hectopascals (hPa) to millimeters of mercury (mmHg).
  * @param hPa Pressure in hectopascals (hPa).
  * @returns Pressure in millimeters of mercury (mmHg).
