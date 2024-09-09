@@ -7,7 +7,7 @@ Arduino Weather Station is an automated weather monitoring project built on Ardu
   <img src="https://miksoft.pro/_next/static/media/project-meteostation.3b4b51cb.jpg" alt="Arduino Weather Station" width="150" height="150">
 
 <h3>Arduino Weather Station</h3>
-<a href="https://github.com/miksrv/arduino-weather-station/README.md"><strong>Explore the docs »</strong></a>
+<a href="https://github.com/miksrv/arduino-weather-station/blob/main/README.md"><strong>Explore the docs »</strong></a>
 <br /><br />
 <a href="https://meteo.miksoft.pro" target="_blank">Demo</a>
 ·
