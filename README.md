@@ -53,11 +53,7 @@ Arduino Weather Station is an automated weather monitoring project built on Ardu
 
 The Arduino Weather Station is an advanced, automated weather monitoring system designed to collect, process, and display real-time environmental data. The weather station is built using an Arduino microcontroller to handle sensor input and transmit data to a backend server. This data is then made available through an API built on PHP, MySQL, and CodeIgniter, with a frontend developed using Next.js and Redux RTK.
 
-<div align="center">
-
-    ![Arduino Weather Station](./docs/arduino-weather-station-1.jpg)
-
-</div>
+![Arduino Weather Station](./docs/arduino-weather-station-1.jpg)
 
 ### Key Features:
 - **Real-time Data Collection:** The weather station continuously monitors various atmospheric parameters using multiple sensors.
@@ -66,11 +62,7 @@ The Arduino Weather Station is an advanced, automated weather monitoring system 
 - **Data Visualization:** Users can view live graphs of parameters such as temperature, humidity, pressure, and more, along with detailed statistics for selected time frames.
 - **API Integration:** The backend provides an API for developers to access weather data for integration into external applications.
 
-<div align="center">
-
-    ![Arduino Weather Station](./docs/arduino-weather-station-2.jpg)
-
-</div>
+![Arduino Weather Station](./docs/arduino-weather-station-2.jpg)
 
 ### Measured Parameters:
 - Temperature
@@ -84,12 +76,6 @@ The Arduino Weather Station is an advanced, automated weather monitoring system 
 - Atmospheric pressure
 - Precipitation levels
 - Cloud cover
-
-<div align="center">
-
-    ![Weather Station User Interface - Sensors Page](./client/public/images/sensors.jpg)
-
-</div>
 
 The system is highly customizable, and additional sensors can be integrated to expand its functionality. This project demonstrates how microcontrollers, web development, and real-time data processing can be combined to create a fully functional, real-world application.
 
@@ -297,15 +283,11 @@ The **Current** section provides real-time data on the current weather condition
 
 ![Current Weather Interface](./client/public/images/main.jpg)
 
----
-
 #### 2. **Sensors Dashboard**
 
 The **Sensors** section displays a list of all connected weather sensors, including temperature, pressure, wind speed, and solar radiation. This section gives users an in-depth view of each sensor's status and real-time readings.
 
 ![Sensors Dashboard](./client/public/images/sensors.jpg)
-
----
 
 #### 3. **Weather History and Trends**
 
@@ -313,18 +295,11 @@ The **History** section allows users to explore weather data over a specified ti
 
 ![History Interface](./client/public/images/history.jpg)
 
----
-
 #### Live Demo
 
 Explore the fully functioning weather station web application at:  
 🌐 [Live Demo](https://meteo.miksoft.pro/en)
 
-This live demo showcases all the features of the weather station, allowing users to monitor real-time weather data, explore historical trends, and interact with the data from any browser.
-
----
-
-This section showcases your project’s core functionality with images and a live demo link for easy access.
 <p align="right">
   (<a href="#top">Back to top</a>)
 </p>
