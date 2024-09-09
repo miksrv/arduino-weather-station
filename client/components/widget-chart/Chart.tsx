@@ -11,6 +11,7 @@ import { ChartTypes } from '@/components/widget-chart/WidgetChart'
 import { getSensorColor } from '@/tools/colors'
 import { formatDateFromUTC } from '@/tools/date'
 import { round } from '@/tools/helpers'
+import { findMaxValue, findMinValue } from '@/tools/weather'
 
 interface ChartProps {
     type: ChartTypes
@@ -25,6 +26,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
 
     const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff' // --modal-background
     const borderColor = theme === 'dark' ? '#444546' : '#cbcccd' // --input-border-color
+    const textPrimaryColor = theme === 'dark' ? '#e1e3e6' : '#000000E5' // --text-color-primary
     const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99' // --text-color-secondary
 
     const baseConfig: EChartsOption = {
@@ -45,7 +47,9 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
             itemWidth: 20, // Ширина значка линии в легенде
             itemHeight: 2, // Высота значка линии в легенде (делает линию тоньше)
             textStyle: {
-                color: textSecondaryColor // Цвет текста легенды
+                // fontFamily: '-apple-system, system-ui, \'Helvetica Neue\', Roboto, sans-serif',
+                color: textPrimaryColor, // Цвет текста легенды
+                fontSize: '12px'
             },
             icon: 'rect' // Используем короткую линию в качестве значка
         },
@@ -96,6 +100,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                 show: true,
                 hideOverlap: true,
                 color: textSecondaryColor, // Color of X-axis labels
+                fontSize: '11px',
                 formatter: function (value: number) {
                     return formatDateFromUTC(value, dateFormat ?? t('date-only-hour'))
                 }
@@ -132,7 +137,8 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
             axisLabel: {
                 show: true,
                 formatter: '{value}%',
-                color: textSecondaryColor // Color of Y axis labels
+                color: textSecondaryColor, // Color of Y axis labels
+                fontSize: '11px'
             },
             splitLine: {
                 show: true,
@@ -215,6 +221,36 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                     series: [
                         getChartLineConfig('clouds', t('cloudiness'), 0, true),
                         getChartLineConfig('windSpeed', t('wind-speed'), 1)
+                    ]
+                }
+
+            case 'pressure':
+                return {
+                    ...baseConfig,
+                    yAxis: [
+                        {
+                            ...baseConfig.yAxis,
+                            min: findMinValue(data, 'pressure'),
+                            max: findMaxValue(data, 'pressure'),
+                            axisLabel: {
+                                ...(baseConfig.yAxis as any).axisLabel,
+                                formatter: '{value}'
+                            }
+                        },
+                        {
+                            ...baseConfig.yAxis,
+                            axisLabel: {
+                                ...(baseConfig.yAxis as any).axisLabel,
+                                formatter: `{value} ${t('millimeters')}`
+                            }
+                        }
+                    ],
+                    series: [
+                        getChartLineConfig('pressure', t('pressure'), 0, false),
+                        {
+                            ...getChartLineConfig('precipitation', t('precipitation'), 1, false),
+                            type: 'bar'
+                        }
                     ]
                 }
         }

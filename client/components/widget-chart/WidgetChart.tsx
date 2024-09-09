@@ -7,7 +7,7 @@ import Chart from '@/components/widget-chart/Chart'
 import { concatClassNames as cn } from '@/tools/helpers'
 import Skeleton from '@/ui/skeleton'
 
-export type ChartTypes = 'temperature' | 'clouds'
+export type ChartTypes = 'temperature' | 'clouds' | 'pressure'
 
 interface WidgetProps {
     loading?: boolean
