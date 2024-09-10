@@ -197,9 +197,10 @@ cd arduino-weather-station
 
 ### 4. Arduino Setup
 
-1. Open the Arduino sketch from the `firmware` folder in the Arduino IDE.
-2. Connect your Arduino microcontroller and upload the sketch.
-3. Make sure the Arduino is correctly wired with the sensors.
+1. Open [Arduino Firmfare Readme](./firmware/README.md)
+2. Open the Arduino sketch from the `firmware` -> `main` folder in the Arduino IDE.
+3. Connect your Arduino microcontroller and upload the sketch.
+4. Make sure the Arduino is correctly wired with the sensors.
 
 ### 5. Accessing the Application
 
@@ -210,12 +211,6 @@ http://localhost:3000
 ```
 
 You can now monitor real-time and historical weather data from the Arduino Weather Station!
-
-<div align="center">
-
-    ![Weather Station User Interface - Main Page](./client/public/images/main.jpg)
-
-</div>
 
 <p align="right">
   (<a href="#top">Back to top</a>)
