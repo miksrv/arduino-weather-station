@@ -1,58 +1,70 @@
 // ******************************************** //
 //  Name    : WEATHER STATION
-//  Author  : Mik™ <miksoft.tm@gmail.com>
-//  Version : 1.3.0 (10 Nov 2021)
+//  Author  : Misha Topchilo <miksoft.tm@gmail.com>
+//  Version : 1.3.1 (10 Sep 2024)
 // ******************************************** //
+
+// This is the wiring scheme between the sensors and the Arduino
 // Sensors      Arduino
 //  [R] Red   -> VCC +5V
 //  [W] White -> GND
 //  [G] Green -> Data / I2C: SCL
 //  [B] Blue  -> Data / I2C: SDA
-// 
-// 1. BMP085 [G, B] -> I2C
-// 2. BH1750 [G, B] -> I2C
-// 3. Vane   [G, B] -> I2C
-// 4. Anemometr [G] -> PIN3
-// 5. DHT22     [G] -> PIN4
-// 6. GUML8511  [G] -> A0
-//              [B] -> A1
+//
+// Sensor connections:
+// 1. BMP085 (Barometric pressure sensor) [G, B] -> I2C (SCL, SDA)
+// 2. BH1750 (Light sensor) [G, B] -> I2C (SCL, SDA)
+// 3. Wind vane (for wind direction) [G, B] -> I2C (SCL, SDA)
+// 4. Anemometer (for wind speed) [G] -> Digital PIN 3 (interrupt)
+// 5. DHT22 (Temperature and humidity sensor) [G] -> Digital PIN 4
+// 6. GUML8511 (UV sensor) [G] -> Analog PIN A0 (UV OUT), [B] -> Analog PIN A1 (UV Reference)
 
-#include "Wire.h"
-#include "BMP085.h"
-#include "TroykaDHT.h"
-#include "BH1750.h"
-#include "PCF8574.h"
+// Include necessary libraries
+#include "Wire.h"         // For I2C communication
+#include "BMP085.h"       // For barometric pressure sensor BMP085
+#include "TroykaDHT.h"    // For temperature and humidity sensor DHT22
+#include "BH1750.h"       // For light sensor BH1750
+#include "PCF8574.h"      // For I2C expansion (used for wind vane)
+// Ethernet libraries for networking
 #include "SPI.h"
 #include "Ethernet.h"
 
-// If the variable is not commented out, debug mode is activated, messages are sent to the serial port
+// Uncomment to enable debug messages sent to the serial monitor
 // #define DEBUG
 
-const long SEND_DATA_INTERVAL = 60; // Interval to send data (sec)
-const char API_SERVER[] = "meteo.miksoft.pro";
-const char API_METHOD[] = "/api/set/sensors";
-const char API_SECRET[] = ""; // Change this API key
+const long SEND_DATA_INTERVAL = 60; // Interval (in seconds) to send data to the server
+const char API_SERVER[] = "api.meteo.miksoft.pro"; // API server address
+const char API_METHOD[] = "/current";  // API endpoint to send sensor data
+const char API_SECRET[] = "";  // API key for authorization (must be provided)
 
-const int PIN_ANEMOMETR = 3; // PIN Anemometr (Leonardo ETH PIN #3 for interputs
-const int PIN_DHT22 = 4;     // PIN DHT22
-const int PIN_UV_OUT = A0;   // Output from the UV sensor
-const int PIN_UV_REF = A1;   // 3.3V power on the Arduino board
+// Pin assignments for different sensors
+const int PIN_ANEMOMETR = 3; // Digital PIN for the anemometer (wind speed sensor)
+const int PIN_DHT22 = 4;     // Digital PIN for the DHT22 sensor (temperature and humidity)
+const int PIN_UV_OUT = A0;   // Analog PIN for UV sensor output
+const int PIN_UV_REF = A1;   // Analog PIN for UV reference voltage
 
+// MAC address for the Ethernet shield
 byte MAC[] = { 0x38, 0x59, 0xF9, 0x6D, 0xD7, 0xFF };
+// Static IP address for the weather station
 IPAddress IP(10,10,1,70);
+
+// Initialize Ethernet client
 EthernetClient LAN;
 
-DHT dht(PIN_DHT22, DHT22);
-PCF8574 expander(0x20);
-BMP085 dps = BMP085();
-BH1750 lightmeter;
+// Sensor objects
+DHT dht(PIN_DHT22, DHT22);   // Initialize the DHT22 sensor
+PCF8574 expander(0x20);      // Initialize the I2C expander for wind vane
+BMP085 dps = BMP085();       // Initialize the BMP085 pressure sensor
+BH1750 lightmeter;           // Initialize the BH1750 light sensor
 
-int rps_impulses = -1;
-unsigned long previousMillis;
-char webclient_data[120], temp[6], humd[6], mmHg[6], // mlxA[6], mlxO[6],
-     lux[5], uvindex[5], wind_dir[5], wind_speed[5];
+// Variables for storing sensor data and transmission
+int rps_impulses = -1;       // Impulse count for anemometer (used to calculate wind speed)
+unsigned long previousMillis; // Variable for tracking time between data transmissions
+char webclient_data[120], temp[6], humd[6], mmHg[6], // Data buffers for various sensor readings
+     lux[5], uvindex[5], wind_dir[5], wind_speed[5]; // Buffers for light, UV index, wind direction, and wind speed
 
 void setup() {
+  // Start the serial port for debug messages if DEBUG is enabled
   #ifdef DEBUG
     delay(1000);
     Serial.begin(9600);
@@ -60,14 +72,16 @@ void setup() {
     Serial.println("Arduino weather init...");
   #endif
 
+  // Configure UV sensor pins as inputs
   pinMode(PIN_UV_OUT, INPUT);
   pinMode(PIN_UV_REF, INPUT);
   delay(200);
-  
+
   #ifdef DEBUG
     Serial.println(" - OK: Digital PINs");
   #endif
 
+  // Initialize the BH1750 light sensor
   lightmeter.begin();
   delay(1000);
   
@@ -75,6 +89,7 @@ void setup() {
     Serial.println(" - OK: BH1750");
   #endif
 
+  // Initialize I2C communication
   Wire.begin();
   delay(1000);
 
@@ -82,66 +97,35 @@ void setup() {
     Serial.println(" - OK: Wire");
   #endif
 
+  // Initialize the BMP085 pressure sensor
   dps.init();
   delay(1000);
+  
   #ifdef DEBUG
     Serial.println(" - OK: BMP085");
   #endif
 
+  // Initialize the DHT22 temperature and humidity sensor
   dht.begin();
   delay(1000);
+
   #ifdef DEBUG
     Serial.println(" - OK: DHT22");
   #endif
 
+  // Initialize the I2C expander for the wind vane
   expander.begin();
   delay(100);
   for (int i=0; i<8; i++) {
-    expander.pinMode(i, INPUT_PULLUP);
+    expander.pinMode(i, INPUT_PULLUP);  // Set each pin as input with pull-up resistor
     delay(100);
   }
+  
   #ifdef DEBUG
     Serial.println(" - OK: PCF8574");
   #endif
 
-  // start the Ethernet connection:
-//  #ifdef DEBUG
-//    Serial.println("Initialize Ethernet with DHCP:");
-//  #endif
-  
-//  if (Ethernet.begin(MAC) == 0) {
-//    #ifdef DEBUG
-//      Serial.println("Failed to configure Ethernet using DHCP");
-//    #endif
-//
-//    // Check for Ethernet hardware present
-//    if (Ethernet.hardwareStatus() == EthernetNoHardware) {
-//      #ifdef DEBUG
-//        Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
-//      #endif
-//
-//      while (true) {
-//        delay(1); // do nothing, no point running without Ethernet hardware
-//      }
-//    }
-//    if (Ethernet.linkStatus() == LinkOFF) {
-//      #ifdef DEBUG
-//        Serial.println("Ethernet cable is not connected.");
-//      #endif
-//    }
-//    // try to congifure using IP address instead of DHCP:
-//    Ethernet.begin(MAC, IP);
-//    #ifdef DEBUG
-//      Serial.print("My IP address: ");
-//      Serial.println(Ethernet.localIP());
-//    #endif
-//  } else {
-//    #ifdef DEBUG
-//      Serial.print("DHCP assigned IP: ");
-//      Serial.println(Ethernet.localIP());
-//    #endif
-//  }
-
+  // Initialize the Ethernet connection using a static IP address
   Ethernet.begin(MAC, IP);
 
   #ifdef DEBUG
@@ -153,29 +137,32 @@ void setup() {
   delay(1000);
 
   #ifdef DEBUG
-    Serial.begin(9600);
-    Serial.println("Initializatiom complete");
+    Serial.println("Initialization complete");
   #endif
 }
 
-
+// Main loop function
 void loop() {
-  unsigned long currentMillis = millis();
+  unsigned long currentMillis = millis();  // Get the current time
 
+  // Check if it's time to send data
   if (currentMillis - previousMillis >= SEND_DATA_INTERVAL * 1000) {
-    previousMillis = currentMillis; 
+    previousMillis = currentMillis;  // Update the last send time
 
     #ifdef DEBUG
       Serial.println(" ");
       Serial.println("Start reading sensors:");
     #endif
 
+    // Read data from each sensor
     get_sensor_anemometer();
     get_sensor_wind_direction();
     get_sensor_uvindex();
     get_sensor_pressure();
     get_sensor_dht22();
     get_sensor_luxmeter();
+
+    // Send the data to the web server
     webclient_send_data();
 
     #ifdef DEBUG
@@ -184,24 +171,26 @@ void loop() {
   }
 }
 
+// Function to read wind speed from the anemometer
 void get_sensor_anemometer() {
-  rps_impulses = -1;
+  rps_impulses = -1;  // Reset the impulse count
 
-  attachInterrupt(digitalPinToInterrupt(PIN_ANEMOMETR), rps, RISING);
-  delay(5000);
-  detachInterrupt(digitalPinToInterrupt(PIN_ANEMOMETR));
+  attachInterrupt(digitalPinToInterrupt(PIN_ANEMOMETR), rps, RISING);  // Attach interrupt to count pulses
+  delay(5000);  // Wait 5 seconds to accumulate data
+  detachInterrupt(digitalPinToInterrupt(PIN_ANEMOMETR));  // Detach interrupt after measurement
 
-  dtostrf(rps_impulses, 0, 0, wind_speed);
+  dtostrf(rps_impulses, 0, 0, wind_speed);  // Convert the impulse count to a string for transmission
 
   #ifdef DEBUG
     Serial.print(" - Wind speed: ");
     Serial.print(wind_speed);
-    Serial.println(" RPS");
+    Serial.println(" RPS");  // Display the wind speed in Revolutions Per Second
   #endif
 
   delay(500);
 }
 
+// Interrupt service routine for counting wind speed pulses
 void rps() {
-  rps_impulses++;
+  rps_impulses++;  // Increment the pulse count each time the anemometer triggers an interrupt
 }
