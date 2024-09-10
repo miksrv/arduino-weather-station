@@ -197,9 +197,23 @@ cd arduino-weather-station
 
 ### 4. Arduino Setup
 
-1. Open the Arduino sketch from the `firmware` folder in the Arduino IDE.
-2. Connect your Arduino microcontroller and upload the sketch.
-3. Make sure the Arduino is correctly wired with the sensors.
+
+1. Open [Arduino Readme](./arduino/README.md)
+2. Open the Arduino sketch from the `arduino` -> `main` folder in the Arduino IDE.
+3. Connect your Arduino microcontroller and upload the sketch.
+4. Make sure the Arduino is correctly wired with the sensors.
+
+#### Arduino Components:
+
+- **BMP085**: Barometric pressure sensor
+- **BH1750**: Light sensor
+- **DHT22**: Temperature and humidity sensor
+- **PCF8574**: I2C expander for wind direction
+- **GUML8511**: UV sensor
+- **Anemometer**: Measures wind speed
+- **Wind Vane**: Measures wind direction
+
+All models for 3D printing can be found in the `models` directory.
 
 ### 5. Accessing the Application
 
@@ -210,12 +224,6 @@ http://localhost:3000
 ```
 
 You can now monitor real-time and historical weather data from the Arduino Weather Station!
-
-<div align="center">
-
-    ![Weather Station User Interface - Main Page](./client/public/images/main.jpg)
-
-</div>
 
 <p align="right">
   (<a href="#top">Back to top</a>)
