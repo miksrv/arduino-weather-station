@@ -51,7 +51,7 @@ Sensors are connected to the Arduino as follows:
 
 ## Files
 
-### `main.ino`
+### `main.ino`[README.md](..%2FREADME.md)
 
 The main file that initializes the sensors, manages the main loop, and sends data to the web server. It includes:
 
