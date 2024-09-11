@@ -7,7 +7,7 @@
 - [Wiring Diagram](#wiring-diagram)
 - [Files](#files)
   - [`main.ino`](#mainino)
-  - [`get_sensor_dht22.ino`](#get_sensor_dht220ino)
+  - [`get_sensor_dht22.ino`](#get_sensor_dht22ino)
   - [`get_sensor_wind_direction.ino`](#get_sensor_wind_directionino)
   - [`get_sensor_luxmeter.ino`](#get_sensor_luxmeterino)
   - [`get_sensor_pressure.ino`](#get_sensor_pressureino)
@@ -16,11 +16,11 @@
 - [Setup](#setup)
 - [Usage](#usage)
   - [Debugging](#debugging)
-- [Auxiliary Files](#auxiliary-files)
   - [`i2c_scanner.ino`](#i2c_scannerino)
   - [`test_gyml8511.ino`](#test_gyml8511ino)
   - [`test_interput.ino`](#test_interputino)
   - [`test_pcf8574.ino`](#test_pcf8574ino)
+- [Notes](#notes)
 
 ## Overview
 
@@ -51,7 +51,7 @@ Sensors are connected to the Arduino as follows:
 
 ## Files
 
-### `main.ino`[README.md](..%2FREADME.md)
+### `main.ino`
 
 The main file that initializes the sensors, manages the main loop, and sends data to the web server. It includes:
 
@@ -118,13 +118,13 @@ Handles sending collected sensor data to the web server. It includes:
 
 The weather station will periodically collect data from all sensors and send it to the specified web server. The data is sent every 60 seconds, as defined by `SEND_DATA_INTERVAL` in `main.ino`.
 
-### Debugging
+## Debugging
 
 - **Serial Monitor**: Enable the debug messages by uncommenting the `#define DEBUG` line in `main.ino`. This will print sensor readings and status messages to the Serial Monitor.
 
 In additional directories you can find auxiliary files for debugging and testing electronic components:
 
-#### 1. `i2c_scanner.ino`
+### 1. `i2c_scanner.ino`
 
 **Purpose:**  
 This sketch scans the I2C bus for connected devices and prints their addresses to the Serial Monitor. It helps in identifying the addresses of I2C devices connected to the Arduino.
@@ -140,7 +140,7 @@ This sketch scans the I2C bus for connected devices and prints their addresses t
 - `Wire.beginTransmission(address)` and `Wire.endTransmission()`: Test each address for an I2C device.
 - Addresses from `0x01` to `0x7F` are scanned.
 
-#### 2. `test_gyml8511.ino`
+### 2. `test_gyml8511.ino`
 
 **Purpose:**  
 This sketch reads data from an MP8511 UV sensor and calculates UV intensity. It prints the sensor's output voltage and UV intensity to the Serial Monitor.
@@ -156,7 +156,7 @@ This sketch reads data from an MP8511 UV sensor and calculates UV intensity. It 
 - `mapfloat(x, in_min, in_max, out_min, out_max)`: Maps a float value from one range to another.
 - UV intensity is calculated based on the sensor's output voltage.
 
-#### 3. `test_interput.ino`
+### 3. `test_interput.ino`
 
 **Purpose:**  
 This sketch measures RPM (Revolutions Per Minute) using a Hall effect sensor and an interrupt. It prints the time elapsed and RPM to the Serial Monitor.
@@ -172,7 +172,7 @@ This sketch measures RPM (Revolutions Per Minute) using a Hall effect sensor and
 - `addValue()`: Increment the pulse count.
 - RPM is calculated based on the time elapsed and number of pulses.
 
-#### 4. `test_pcf8574.ino`
+### 4. `test_pcf8574.ino`
 
 **Purpose:**  
 This sketch reads inputs from a PCF8574 I/O expander and displays the wind direction based on the digital input values.
@@ -188,7 +188,7 @@ This sketch reads inputs from a PCF8574 I/O expander and displays the wind direc
 - `expander.digitalRead(i)`: Reads the state of each pin.
 - The wind direction is derived from the digital input values.
 
-####Notes
+## Notes
 
 - Ensure the correct board and port are selected in the Arduino IDE before uploading the sketches.
 - Adjust pin numbers and I2C addresses in the sketches as needed for your specific hardware configuration.

@@ -187,7 +187,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         {
                             height: 1640,
                             url: '/images/main.jpg',
-                            width: 2024
+                            width: 2032
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
