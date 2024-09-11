@@ -67,8 +67,6 @@ The Arduino Weather Station is an advanced, automated weather monitoring system 
 - **Data Visualization:** Users can view live graphs of parameters such as temperature, humidity, pressure, and more, along with detailed statistics for selected time frames.
 - **API Integration:** The backend provides an API for developers to access weather data for integration into external applications.
 
-![Arduino Weather Station](./docs/models.jpg)
-
 ### Measured Parameters:
 - Temperature
 - Feels like temperature
@@ -214,6 +212,8 @@ cd arduino-weather-station
 - **Wind Vane**: Measures wind direction
 
 All models for 3D printing can be found in the `models` directory.
+
+![Arduino Weather Station](./docs/models.jpg)
 
 ### 5. Accessing the Application
 

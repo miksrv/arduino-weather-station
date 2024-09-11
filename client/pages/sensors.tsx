@@ -126,9 +126,9 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     description: t('site-description'),
                     images: [
                         {
-                            height: 1640,
+                            height: 1484,
                             url: '/images/sensors.jpg',
-                            width: 2028
+                            width: 2032
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',

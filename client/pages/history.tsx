@@ -67,9 +67,9 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
                     description: t('site-description'),
                     images: [
                         {
-                            height: 1291,
+                            height: 1292,
                             url: '/images/history.jpg',
-                            width: 2042
+                            width: 2028
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
