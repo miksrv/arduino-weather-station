@@ -4,8 +4,10 @@ export * as Forecast from './forecast'
 
 export type Locale = 'en' | 'ru'
 
-export interface ResError {
-    status?: number
-    code?: number
-    messages?: any
+export type Maybe<T> = T | void
+
+export type APIErrorType = {
+    messages: {
+        error?: string
+    }
 }

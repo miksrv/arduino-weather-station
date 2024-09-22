@@ -4,13 +4,17 @@ import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
 
-import { API } from '@/api'
+import { API, ApiType } from '@/api'
+import { urlAPI } from '@/api/api'
 import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
+import {Maybe} from '@/api/types'
 import AppLayout from '@/components/app-layout'
 import WidgetChart from '@/components/widget-chart'
 import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
 import { currentDate, formatDate, getDateTimeFormat, yesterdayDate } from '@/tools/date'
+import { encodeQueryData } from '@/tools/helpers'
+import Button from '@/ui/button'
 import Datepicker from '@/ui/datepicker'
 import { findPresetByDate } from '@/ui/datepicker/Datepicker'
 import Popout from '@/ui/popout'
@@ -29,15 +33,20 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
     const [startDate, setStartDate] = useState<string>()
     const [endDate, setEndDate] = useState<string>()
 
+    const historyDateParam: Maybe<ApiType.History.Request> = useMemo(
+        () => ({
+            start_date: startDate ?? '',
+            end_date: endDate ?? ''
+        }),
+        [startDate, endDate]
+    )
+
     const {
         data: history,
         isLoading: historyLoading,
         isFetching: historyFetching
     } = API.useGetHistoryQuery(
-        {
-            start_date: startDate ?? '',
-            end_date: endDate ?? ''
-        },
+        historyDateParam,
         { pollingInterval: POLING_INTERVAL_CURRENT, skip: !startDate?.length || !endDate?.length }
     )
 
@@ -103,6 +112,15 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
                         }}
                     />
                 </Popout>
+
+                <Button
+                    mode={'secondary'}
+                    icon={'Download'}
+                    disabled={historyLoading || historyFetching}
+                    link={`${urlAPI}history/export${encodeQueryData(historyDateParam)}`}
+                >
+                    {'Download CSV'}
+                </Button>
 
                 {historyFetching && !historyLoading && (
                     <div className={'loading'}>

@@ -2,19 +2,14 @@ import { HYDRATE } from 'next-redux-wrapper'
 
 import { ApiType } from '@/api'
 import { RootState } from '@/api/store'
+import { APIErrorType, Maybe } from '@/api/types'
 import { encodeQueryData } from '@/tools/helpers'
 import type { Action, PayloadAction } from '@reduxjs/toolkit'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-type Maybe<T> = T | void
-
-type APIErrorType = {
-    messages: {
-        error?: string
-    }
-}
-
 const isHydrateAction = (action: Action): action is PayloadAction<RootState> => action.type === HYDRATE
+
+export const urlAPI = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:8080/'
 
 // export const isApiValidationErrors = <T>(response: unknown): response is ApiTypes.ApiResponseError<T> =>
 //     typeof response === 'object' &&
@@ -24,7 +19,7 @@ const isHydrateAction = (action: Action): action is PayloadAction<RootState> => 
 
 export const API = createApi({
     baseQuery: fetchBaseQuery({
-        baseUrl: process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:8080/',
+        baseUrl: urlAPI,
         prepareHeaders: (headers, { getState }) => {
             const locale = (getState() as RootState).application.locale
 
