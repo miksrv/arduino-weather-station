@@ -61,7 +61,7 @@ const Button: React.FC<ButtonProps> = ({
 
     return link ? (
         <Link
-            className={styles.buttonLink}
+            className={cn(styles.buttonLink, props.disabled && styles.disabled)}
             href={link}
             title={''}
             rel={noIndex ? 'noindex nofollow' : ''}
