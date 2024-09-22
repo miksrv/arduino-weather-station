@@ -16,4 +16,5 @@ $routes->get('forecast/hourly', 'Forecast::getForecastHourly');
 $routes->options('forecast/(:alphanum)', 'Forecast');
 
 $routes->get('history', 'History::getHistoryWeather');
+$routes->get('history/export', 'History::getHistoryWeatherCSV');
 $routes->options('history', 'History');
