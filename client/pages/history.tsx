@@ -8,7 +8,7 @@ import { API, ApiType } from '@/api'
 import { urlAPI } from '@/api/api'
 import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
-import {Maybe} from '@/api/types'
+import { Maybe } from '@/api/types'
 import AppLayout from '@/components/app-layout'
 import WidgetChart from '@/components/widget-chart'
 import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
@@ -45,10 +45,10 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
         data: history,
         isLoading: historyLoading,
         isFetching: historyFetching
-    } = API.useGetHistoryQuery(
-        historyDateParam,
-        { pollingInterval: POLING_INTERVAL_CURRENT, skip: !startDate?.length || !endDate?.length }
-    )
+    } = API.useGetHistoryQuery(historyDateParam, {
+        pollingInterval: POLING_INTERVAL_CURRENT,
+        skip: !startDate?.length || !endDate?.length
+    })
 
     const currentDatePreset = useMemo((): string => {
         const preset = findPresetByDate(startDate, endDate, i18n.language)
