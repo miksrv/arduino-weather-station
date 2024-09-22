@@ -25,3 +25,4 @@ export type IconTypes =
     | 'Electric'
     | 'SolarPower'
     | 'Chart'
+    | 'Download'
