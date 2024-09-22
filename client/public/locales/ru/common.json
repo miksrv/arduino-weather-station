@@ -27,6 +27,7 @@
     "cloudiness": "Облачность",
     "clouds": "Облака",
     "weather": "Погода",
+    "download-csv": "Скачать CSV",
     "current-weather": "Текущая погода",
     "weather-sensors": "Погодные датчики",
     "historical-data": "Исторические данные",
