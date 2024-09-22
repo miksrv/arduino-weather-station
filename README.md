@@ -93,9 +93,10 @@ The Arduino Weather Station project leverages a wide range of technologies acros
 - [![C++][c++-badge]][c++-url] Programming language used for the Arduino firmware.
 - [![PHP][php-badge]][php-url] Server-side scripting language for the backend API.
 - [![MySQL][mysql-badge]][mysql-url] Database system for storing weather data.
+- [![JavaScript][js-badge]][js-url] Core languages used in frontend development.
+- [![TypeScript][ts-badge]][ts-url] TypeScript extends JavaScript by adding types to the language.
 - [![NextJS][nextjs-badge]][nextjs-url] React-based frontend framework for building the user interface.
 - [![Redux][redux-badge]][redux-url] State management for the frontend, providing predictable and centralized state.
-- [![JS][js-badge]][js-url] Core languages used in frontend development.
 - [![NodeJS][nodejs-badge]][nodejs-url] JavaScript runtime used for frontend development and package management.
 - [![Sass][sass-badge]][sass-url] Styling the user interface.
 - [![GitHub Actions][githubactions-badge]][githubactions-url] Continuous integration and deployment pipeline for automating tests and deployment processes.
@@ -388,6 +389,8 @@ Misha - [miksoft.pro](https://miksoft.pro)
 <!-- Other ready-made icons can be seen for example here: https://github.com/inttter/md-badges -->
 [js-badge]: https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000
 [js-url]: https://www.javascript.com/
+[ts-badge]: https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff
+[ts-url]: https://www.typescriptlang.org/
 [nextjs-badge]: https://img.shields.io/badge/Next.js-black?logo=next.js&logoColor=white
 [nextjs-url]: https://nextjs.org/
 [nodejs-badge]: https://img.shields.io/badge/Node.js-6DA55F?logo=node.js&logoColor=white
