@@ -27,6 +27,7 @@
     "cloudiness": "Cloudiness",
     "clouds": "Clouds",
     "weather": "Weather",
+    "download-csv": "Download CSV",
     "current-weather": "Current weather",
     "weather-sensors": "Weather sensors",
     "historical-data": "Historical data",
