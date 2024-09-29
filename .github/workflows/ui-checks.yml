@@ -43,7 +43,7 @@ jobs:
       - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
         name: Install dependencies
         working-directory: client
-        run: yarn install
+        run: yarn workspaces focus
 
       - name: Linter
         run: yarn eslint:check
