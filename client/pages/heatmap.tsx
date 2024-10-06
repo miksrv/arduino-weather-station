@@ -3,46 +3,44 @@ import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
-import { Button, Popout, PopoutHandleProps, Spinner } from 'simple-react-ui-kit'
+import { Dropdown, Popout, PopoutHandleProps, Spinner } from 'simple-react-ui-kit'
 
 import { API, ApiType } from '@/api'
-import { urlAPI } from '@/api/api'
 import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
 import { Maybe } from '@/api/types'
 import AppLayout from '@/components/app-layout'
-import WidgetChart from '@/components/widget-chart'
-import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
-import { currentDate, formatDate, getDateTimeFormat, yesterdayDate } from '@/tools/date'
-import { encodeQueryData } from '@/tools/helpers'
-import Datepicker, { findPresetByDate } from '@/ui/datepicker'
+import WidgetHeatmap from '@/components/widget-heatmap'
+import { currentDate, formatDate, halfYearDate } from '@/tools/date'
+import Datepicker, { findPresetByDate, PresetOption } from '@/ui/datepicker'
 
-type HistoryPageProps = object
+type HeatmapPageProps = object
 
 const MIN_DATE = '2021-01-01'
 
-const HistoryPage: NextPage<HistoryPageProps> = () => {
+const HeatmapPage: NextPage<HeatmapPageProps> = () => {
     const { i18n, t } = useTranslation()
 
     const popoutRef = useRef<PopoutHandleProps>(null)
 
     const [startDate, setStartDate] = useState<string>()
     const [endDate, setEndDate] = useState<string>()
+    const [sensor, setSensor] = useState<ApiType.Heatmap.SensorType>('temperature')
 
-    const historyDateParam: Maybe<ApiType.History.Request> = useMemo(
+    const historyDateParam: Maybe<ApiType.Heatmap.Request> = useMemo(
         () => ({
             start_date: startDate ?? '',
-            end_date: endDate ?? ''
+            end_date: endDate ?? '',
+            type: sensor
         }),
-        [startDate, endDate]
+        [startDate, endDate, sensor]
     )
 
     const {
         data: history,
         isLoading: historyLoading,
         isFetching: historyFetching
-    } = API.useGetHistoryQuery(historyDateParam, {
-        pollingInterval: POLING_INTERVAL_CURRENT,
+    } = API.useGetHeatmapQuery(historyDateParam, {
         skip: !startDate?.length || !endDate?.length
     })
 
@@ -52,29 +50,24 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
         return preset ? preset : startDate && endDate ? `${startDate} - ${endDate}` : ''
     }, [startDate, endDate, i18n.language])
 
-    const dateFormat = useMemo(
-        () => getDateTimeFormat(startDate, endDate, i18n.language === 'en'),
-        [startDate, endDate, i18n.language]
-    )
-
     useEffect(() => {
-        setStartDate(formatDate(yesterdayDate, 'YYYY-MM-DD'))
+        setStartDate(formatDate(halfYearDate, 'YYYY-MM-DD'))
         setEndDate(formatDate(currentDate.toDate(), 'YYYY-MM-DD'))
     }, [])
 
     return (
         <AppLayout>
             <NextSeo
-                title={t('historical-weather-data')}
-                description={t('history-page-description')}
+                title={t('heatmap')}
+                description={t('heatmap-page-description')}
                 canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/history`}
                 openGraph={{
                     description: t('site-description'),
                     images: [
                         {
-                            height: 1292,
-                            url: '/images/history.jpg',
-                            width: 2028
+                            height: 1130,
+                            url: '/images/heatmap.jpg',
+                            width: 2026
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
@@ -98,6 +91,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
                         endDate={endDate}
                         minDate={MIN_DATE}
                         maxDate={formatDate(currentDate.toDate(), 'YYYY-MM-DD')}
+                        hidePresets={[PresetOption.TODAY, PresetOption.DAY]}
                         onPeriodSelect={(startDate, endDate) => {
                             setStartDate(startDate)
                             setEndDate(endDate)
@@ -109,14 +103,19 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
                     />
                 </Popout>
 
-                <Button
-                    mode={'secondary'}
-                    icon={'Download'}
-                    disabled={historyLoading || historyFetching}
-                    link={`${urlAPI}history/export${encodeQueryData(historyDateParam)}`}
-                >
-                    {t('download-csv')}
-                </Button>
+                <Dropdown<ApiType.Heatmap.SensorType>
+                    required={true}
+                    disabled={historyFetching || historyLoading}
+                    value={sensor}
+                    options={[
+                        { key: 'temperature', value: t('temperature'), icon: 'Thermometer' },
+                        { key: 'pressure', value: t('pressure'), icon: 'Pressure' },
+                        { key: 'humidity', value: t('humidity'), icon: 'Water' },
+                        { key: 'precipitation', value: t('precipitation'), icon: 'WaterDrop' },
+                        { key: 'clouds', value: t('clouds'), icon: 'Cloud' }
+                    ]}
+                    onSelect={(value) => setSensor(value?.key ?? 'temperature')}
+                />
 
                 {historyFetching && !historyLoading && (
                     <div className={'loading'}>
@@ -126,28 +125,12 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
             </div>
 
             <div className={'widgets-list'}>
-                <WidgetChart
-                    fullWidth={true}
-                    type={'temperature'}
+                <WidgetHeatmap
                     data={history}
-                    loading={historyLoading}
-                    dateFormat={dateFormat}
-                />
-
-                <WidgetChart
-                    fullWidth={true}
-                    type={'clouds'}
-                    data={history}
-                    loading={historyLoading}
-                    dateFormat={dateFormat}
-                />
-
-                <WidgetChart
-                    fullWidth={true}
-                    type={'pressure'}
-                    data={history}
-                    loading={historyLoading}
-                    dateFormat={dateFormat}
+                    type={sensor}
+                    loading={historyLoading || historyFetching}
+                    title={`${t('heatmap')}: ${t(sensor)}`}
+                    subTitle={t('heat-map-data-shown-period', { period: currentDatePreset.toLowerCase() })}
                 />
             </div>
         </AppLayout>
@@ -156,7 +139,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
 
 export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
-        async (context): Promise<GetServerSidePropsResult<HistoryPageProps>> => {
+        async (context): Promise<GetServerSidePropsResult<HeatmapPageProps>> => {
             const locale = context.locale ?? 'en'
             const translations = await serverSideTranslations(locale)
 
@@ -170,4 +153,4 @@ export const getServerSideProps = wrapper.getServerSideProps(
         }
 )
 
-export default HistoryPage
+export default HeatmapPage

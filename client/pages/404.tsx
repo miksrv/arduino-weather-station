@@ -1,8 +1,7 @@
 import React from 'react'
 import { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
-
-import Button from '@/ui/button'
+import { Button } from 'simple-react-ui-kit'
 
 type NotFoundProps = object
 

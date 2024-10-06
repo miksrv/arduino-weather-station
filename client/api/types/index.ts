@@ -1,5 +1,6 @@
 export * as Current from './current'
 export * as History from './history'
+export * as Heatmap from './heatmap'
 export * as Forecast from './forecast'
 
 export type Locale = 'en' | 'ru'

@@ -2,21 +2,13 @@
 
 /* styles.css */
 .widget
-    flex-basis: calc(50% - 5px)
-    width: calc(50% - 5px)
+    flex-basis: 100%
+    width: 100%
     background: var(--modal-background)
     color: var(--text-color-primary)
     border-radius: var(--border-radius)
     box-shadow: var(--container-shadow)
     overflow: hidden
-
-    @media only screen and (max-width: $mobileMaxWidth)
-        flex-basis: 100%
-        width: 100%
-
-    &.fullWidth
-        width: 100% !important
-        flex-basis: 100%
 
 .chartTooltipTitle
     font-family: (--font-family), sans-serif

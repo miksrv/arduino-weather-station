@@ -9,6 +9,7 @@ export const TIME_ZONE = 'Asia/Yekaterinburg'
 
 export const currentDate = dayjs().utc(false).tz(TIME_ZONE)
 export const yesterdayDate = currentDate.subtract(1, 'day').toDate()
+export const halfYearDate = currentDate.subtract(6, 'month').toDate()
 
 export const getDate = (date: string | Date): Dayjs => dayjs.utc(date).tz(TIME_ZONE)
 

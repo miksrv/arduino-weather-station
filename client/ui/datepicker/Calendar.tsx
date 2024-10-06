@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import dayjs, { Dayjs } from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { cn, Icon } from 'simple-react-ui-kit'
 
 import styles from './styles.module.sass'
 
-import { concatClassNames as cn } from '@/tools/helpers'
 import { enDaysOfWeek, enMonths, ruDaysOfWeek, ruMonths } from '@/ui/datepicker/utils'
-import Icon from '@/ui/icon'
 
 dayjs.extend(utc)
 
@@ -178,7 +177,7 @@ const Calendar: React.FC<CalendarProps> = ({
                     className={styles.navigateButton}
                     onClick={handlePrevMonth}
                 >
-                    <Icon name={'Left'} />
+                    <Icon name={'KeyboardLeft'} />
                 </button>
                 <span>
                     <div className={styles.selectContainer}>
@@ -216,7 +215,7 @@ const Calendar: React.FC<CalendarProps> = ({
                     className={styles.navigateButton}
                     onClick={handleNextMonth}
                 >
-                    <Icon name={'Right'} />
+                    <Icon name={'KeyboardRight'} />
                 </button>
             </header>
             {!hideDaysOfWeek && (

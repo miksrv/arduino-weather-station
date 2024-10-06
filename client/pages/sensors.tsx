@@ -111,7 +111,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             title: t('sol-radiation'),
             unit: t('w-m2'),
-            icon: 'Electric',
+            icon: 'Lightning',
             source: 'solRadiation'
         }
     ]
@@ -121,14 +121,14 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             <NextSeo
                 title={t('weather-sensors')}
                 description={t('sensors-page-description')}
-                canonical={'https://meteo.miksoft.pro'}
+                canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/sensors`}
                 openGraph={{
                     description: t('site-description'),
                     images: [
                         {
-                            height: 1484,
+                            height: 1480,
                             url: '/images/sensors.jpg',
-                            width: 2032
+                            width: 2026
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',

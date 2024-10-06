@@ -1,13 +1,14 @@
 import React, { useCallback } from 'react'
 import dayjs from 'dayjs'
+import { Button } from 'simple-react-ui-kit'
 
+import Calendar, { CalendarProps } from './Calendar'
 import styles from './styles.module.sass'
+import { CalendarPresetType, enPresets, PresetOption, ruPresets } from './utils'
 
-import Button from '@/ui/button'
-import Calendar, { CalendarProps } from '@/ui/datepicker/Calendar'
-import { CalendarPresetType, enPresets, PresetOption, ruPresets } from '@/ui/datepicker/utils'
-
-type DatePickerProps = CalendarProps
+type DatePickerProps = CalendarProps & {
+    hidePresets?: PresetOption[]
+}
 
 const nowDate = dayjs.utc()
 
@@ -76,15 +77,17 @@ const DatePicker: React.FC<DatePickerProps> = (props) => {
     return (
         <div className={styles.datePickerContainer}>
             <div className={styles.presetList}>
-                {timePresets?.map(({ key }) => (
-                    <Button
-                        key={key}
-                        mode={findCurrentPreset(key)?.key ? 'secondary' : 'outline'}
-                        onClick={() => handlePresetSelect(key)}
-                    >
-                        {props?.locale === 'ru' ? ruPresets[key] : enPresets[key]}
-                    </Button>
-                ))}
+                {timePresets
+                    ?.filter(({ key }) => (props.hidePresets ? !props.hidePresets.includes(key) : true))
+                    ?.map(({ key }) => (
+                        <Button
+                            key={key}
+                            mode={findCurrentPreset(key)?.key ? 'secondary' : 'outline'}
+                            onClick={() => handlePresetSelect(key)}
+                        >
+                            {props?.locale === 'ru' ? ruPresets[key] : enPresets[key]}
+                        </Button>
+                    ))}
             </div>
             <Calendar {...props} />
         </div>

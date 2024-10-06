@@ -8,11 +8,11 @@
     color: var(--text-color-primary)
     border-radius: var(--border-radius)
     box-shadow: var(--container-shadow)
-    overflow: hidden
-    overflow-y: auto
     height: 250px
 
     .title
+        border-top-right-radius: var(--border-radius)
+        border-top-left-radius: var(--border-radius)
         background-color: var(--modal-background)
         color: var(--text-color-secondary)
         text-align: center
@@ -22,8 +22,12 @@
         flex-basis: 100%
         width: 100%
 
-    table
-        border-radius: var(--border-radius)
+    .table
+        border-bottom-right-radius: var(--border-radius)
+        border-bottom-left-radius: var(--border-radius)
+
+        & *
+            font-size: var(--font-size-small) !important
 
     .cellDate
         white-space: nowrap
@@ -32,15 +36,14 @@
             text-transform: uppercase
 
     .cellIcon, .windDeg
-        padding: 0 !important
+        display: flex
+        justify-content: center
+        align-items: center
         text-align: center !important
 
         svg
             height: 30px
-            width: 100%
-            min-width: 40px
             display: flex
-            justify-content: center
 
     .cellConditions
         white-space: nowrap
@@ -60,11 +63,10 @@
         width: 140px
 
     .cellTemperature
-        padding: 0 !important
-
         & > div
             height: 100%
 
     .cellTemperature, .cellClouds
         width: 60px
         text-align: center !important
+        white-space: nowrap

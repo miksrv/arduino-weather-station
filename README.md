@@ -159,7 +159,7 @@ cd arduino-weather-station
 5. Start the backend server (built-in PHP server or any web server of your choice):
 
    ```bash
-   php spark migrate
+   php spark serve
    ```
 
 ### 3. Frontend Setup (Next.js + Redux)
@@ -309,6 +309,12 @@ The **History** section allows users to explore weather data over a specified ti
 
 ![History Interface](./client/public/images/history.jpg)
 
+#### 4. **Heatmap**
+
+The **Heatmap** section provides a detailed visualization of weather metrics, including temperature, pressure, humidity, precipitation, and cloud coverage, displayed as a heatmap. Users can select any time period to view trends and patterns across multiple environmental factors at once. This powerful tool allows for quick comparison and in-depth analysis of weather conditions over time.
+
+![History Interface](./client/public/images/heatmap.jpg)
+
 #### Live Demo
 
 Explore the fully functioning weather station web application at:  
@@ -361,6 +367,7 @@ Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 This section is dedicated to recognizing the resources and individuals that have been invaluable to this project. I’d like to highlight a few key tools and contributions that made a significant impact on its development. Feel free to explore them as they may be useful for your own projects!
 
 1. [CodeIgniter](https://codeigniter.com/user_guide/helpers/date_helper.html)
+2. [Simple React UI](https://github.com/miksrv/simple-react-ui-kit)
 
 <p align="right">
   (<a href="#top">Back to top</a>)
