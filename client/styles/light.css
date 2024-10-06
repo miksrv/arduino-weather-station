@@ -1,5 +1,6 @@
 :root {
     --font-size: 14px;
+    --font-size-small: 12px;
     --font-family: -apple-system, system-ui, 'Helvetica Neue', Roboto,
         sans-serif;
     --letter-spacing: 0.00938em;
@@ -11,67 +12,69 @@
 
     --modal-background: #ffffff;
 
-    --menu-background-hover: rgba(255, 255, 255, 0.7);
-
     --border-radius: 6px;
 
     --text-color-primary: rgba(0, 0, 0, 0.9);
     --text-color-secondary: #818c99;
     --icon-color-primary: #99a2ad;
-    --icon-color-primary-hover: #939CA9;
     --icon-color-secondary: #818c99;
     --icon-color-secondary-hover: #939CA9;
-
-    --container-background-color-error: #FFE9E9;
-    --container-color-error: #e64646;
-    --container-background-color-success: #E8F9E8;
-    --container-color-success: #4bb34b;
     --container-background: #fff;
-    --container-border-separator: 0.5px solid #d7d8d9;
-    --container-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.12);
-
-    --input-background-color: #f2f3f5;
-    --input-background-content: #ffffff;
-    --input-background-color-error: var(--container-background-color-error);
-    --input-label-color: #6d7885;
-    --input-border-color: #cbcccd;
-    --input-border: 0.5px solid var(--input-border-color);
-    --input-border-focus-color: #1976d2;
-
-    --dropdown-background-color: #ffffff;
-    --dropdown-background-color-hover: #f2f3f5;
 
     --link-color: #2688eb;
     --link-color-hover: #2483e4;
     --link-color-active: #237edd;
 
-    --overlay-background: rgba(242, 243, 252, 0.7);
-    --overlay-background-animation: linear-gradient( 90deg, transparent, rgba(0, 0, 0, 0.04), transparent );
+    /* Colors */
+    --color-green: #4bb34b;
+    --color-green-hover: #48AC4A;
+    --color-green-active: #45A64A;
 
+    --color-orange: #F8A01C;
+    --color-orange-hover: #EE9A1D;
+    --color-orange-active: #E4941F;
+
+    --color-red: #e64646;
+    --color-red-hover: #DD4446;
+    --color-red-active: #D44245;
+
+    /* Containers */
+    --container-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.12);
+    --container-error-background-color: #FFE9E9;
+    --container-error-color: var(--color-red);
+    --container-success-background-color: #E8F9E8;
+    --container-success-color: var(--color-green);
+
+    /* Input, Dropdown */
+    --input-background-color: #f2f3f5;
+
+    --dropdown-background-color: #ffffff;
+    --dropdown-background-color-hover: #f2f3f5;
+    --input-label-color: #6d7885;
+    --input-border-color: #cbcccd;
+    --input-border: 0.5px solid var(--input-border-color);
+
+    /* Buttons */
+    --button-font-weight: 500;
     --button-default-background: transparent;
     --button-default-color: #3770b1;
     --button-default-background-hover: #f7f8fa;
     --button-default-background-active: #f1f2f5;
+
     --button-primary-background: #2688eb;
     --button-primary-color: #ffffff;
     --button-primary-background-hover: #2483e4;
     --button-primary-background-active: #237edd;
-    --button-negative-background: #e64646;
-    --button-negative-color: #ffffff;
-    --button-negative-background-hover: #DD4446;
-    --button-negative-background-active: #D44245;
+
     --button-secondary-background: rgba(235,242,250,.99);
-    --button-secondary-color: #3770b1;
     --button-secondary-background-hover: rgba(223,234,246,.99);
+    --button-secondary-color: #3770b1;
     --button-secondary-color-hover: #356cac;
     --button-secondary-background-active: rgba(213,226,241,.99);
     --button-secondary-color-active: #3368a8;
 
-    --color-green: #4bb34b;
-    --color-orange: #ea5d2e;
-    --color-red: #e64646;
-
-    .leaflet-container {
-        background-color: var(--input-background-color);
-    }
+    /* Table */
+    --table-header-background: #f2f3f5;
+    --table-header-background-hover: rgba(255, 255, 255, 0.1);
+    --table-border-color: var(--input-border-color);
 }
