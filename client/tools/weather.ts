@@ -117,6 +117,30 @@ export const convertWindDirection = (degrees?: number): 0 | 45 | 90 | 135 | 180 
  * @param temperature Temperature in degrees Celsius.
  * @returns A string with the color in HEX format.
  */
+// export const getTemperatureColor = (temperature?: number | string): string => {
+//     if (typeof temperature === 'undefined') {
+//         return ''
+//     }
+//
+//     const temp = Number(temperature)
+//
+//     // Temperature limits
+//     const minTemp = -35 // Minimum temperature for blue
+//     const maxTemp = 35 // Maximum temperature for red
+//
+//     // Limit temperature between minTemp and maxTemp
+//     const clampedTemp = Math.max(minTemp, Math.min(maxTemp, temp))
+//
+//     // Calculate temperature percentage between 0 and 1
+//     const tempPercent = (clampedTemp - minTemp) / (maxTemp - minTemp)
+//
+//     // Linear color interpolation (from blue to red)
+//     const r = Math.round(255 * tempPercent) // Red channel
+//     const g = Math.round(0) // Green channel (not used)
+//     const b = Math.round(255 * (1 - tempPercent)) // Blue channel
+//
+//     return `rgba(${r}, ${g}, ${b}, 0.5)`
+// }
 export const getTemperatureColor = (temperature?: number | string): string => {
     if (typeof temperature === 'undefined') {
         return ''
@@ -124,22 +148,51 @@ export const getTemperatureColor = (temperature?: number | string): string => {
 
     const temp = Number(temperature)
 
-    // Temperature limits
-    const minTemp = -35 // Minimum temperature for blue
-    const maxTemp = 35 // Maximum temperature for red
+    // Colors and their corresponding temperature ranges (in degrees Celsius)
+    const temperatureColors: { min: number; max: number; color: string }[] = [
+        { min: 48.9, max: Infinity, color: '#3d0216' }, // > 120°F
+        { min: 46.1, max: 48.9, color: '#580b25' }, // 115-120°F
+        { min: 43.3, max: 46.1, color: '#6e1532' }, // 110-115°F
+        { min: 40.6, max: 43.3, color: '#87203e' }, // 105-110°F
+        { min: 37.8, max: 40.6, color: '#9f294d' }, // 100-105°F
+        { min: 35, max: 37.8, color: '#af4d4c' }, // 95-100°F
+        { min: 32.2, max: 35, color: '#be6f4c' }, // 90-95°F
+        { min: 29.4, max: 32.2, color: '#c38b53' }, // 85-90°F
+        { min: 26.7, max: 29.4, color: '#c19d62' }, // 80-85°F
+        { min: 23.9, max: 26.7, color: '#c3ab75' }, // 75-80°F
+        { min: 21.1, max: 23.9, color: '#aca87d' }, // 70-75°F
+        { min: 18.3, max: 21.1, color: '#879b84' }, // 65-70°F
+        { min: 15.6, max: 18.3, color: '#658c89' }, // 60-65°F
+        { min: 12.8, max: 15.6, color: '#438090' }, // 55-60°F
+        { min: 10, max: 12.8, color: '#277593' }, // 50-55°F
+        { min: 7.2, max: 10, color: '#276789' }, // 45-50°F
+        { min: 4.4, max: 7.2, color: '#275b80' }, // 40-45°F
+        { min: 1.7, max: 4.4, color: '#264f77' }, // 35-40°F
+        { min: -1.1, max: 1.7, color: '#25436f' }, // 30-35°F
+        { min: -3.9, max: -1.1, color: '#2f4774' }, // 25-30°F
+        { min: -6.7, max: -3.9, color: '#39517e' }, // 20-25°F
+        { min: -9.4, max: -6.7, color: '#415c87' }, // 15-20°F
+        { min: -12.2, max: -9.4, color: '#4d6690' }, // 10-15°F
+        { min: -15, max: -12.2, color: '#57719d' }, // 5-10°F
+        { min: -17.8, max: -15, color: '#617ba7' }, // 0-5°F
+        { min: -20.6, max: -17.8, color: '#7691b9' }, // -5-0°F
+        { min: -23.3, max: -20.6, color: '#809bc4' }, // -10--5°F
+        { min: -26.1, max: -23.3, color: '#8aa5ce' }, // -15--10°F
+        { min: -28.9, max: -26.1, color: '#93b1d6' }, // -20--15°F
+        { min: -31.7, max: -28.9, color: '#9db8de' }, // -25--20°F
+        { min: -34.4, max: -31.7, color: '#a8bfe3' }, // -30--25°F
+        { min: -37.2, max: -34.4, color: '#b0c6e6' }, // -35--30°F
+        { min: -40, max: -37.2, color: '#b8cdea' }, // -40--35°F
+        { min: -42.8, max: -40, color: '#c0d4ed' }, // -45--40°F
+        { min: -45.6, max: -42.8, color: '#cbdaf3' }, // -50--45°F
+        { min: -48.3, max: -45.6, color: '#d3e2f7' }, // -55--50°F
+        { min: -51.1, max: -48.3, color: '#dbe9fb' }, // -60--55°F
+        { min: -Infinity, max: -51.1, color: '#e4f1ff' } // < -60°F
+    ]
 
-    // Limit temperature between minTemp and maxTemp
-    const clampedTemp = Math.max(minTemp, Math.min(maxTemp, temp))
+    const matchedColor = temperatureColors.find(({ min, max }) => temp >= min && temp < max)
 
-    // Calculate temperature percentage between 0 and 1
-    const tempPercent = (clampedTemp - minTemp) / (maxTemp - minTemp)
-
-    // Linear color interpolation (from blue to red)
-    const r = Math.round(255 * tempPercent) // Red channel
-    const g = Math.round(0) // Green channel (not used)
-    const b = Math.round(255 * (1 - tempPercent)) // Blue channel
-
-    return `rgba(${r}, ${g}, ${b}, 0.5)`
+    return matchedColor ? matchedColor.color : ''
 }
 
 /**
