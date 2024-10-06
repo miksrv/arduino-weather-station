@@ -1,14 +1,30 @@
-@import ../../styles/variables
-
 .badge
-    color: #FFF
-    background: transparent
-    display: flex
+    font-size: var(--font-size-small)
+    border-radius: var(--border-radius)
+    background: var(--input-background-color)
+    border: 0.5px solid rgba(0, 0, 0, 0.08)
+    display: inline-flex
+    margin: 2px
+    box-sizing: border-box
     align-items: center
-    font-size: $fontSizeCaption
-    margin-right: 8px
+    height: 28px
+    padding: 0 12px
+    white-space: nowrap
 
     svg
-        fill: #FFF
+        width: 16px
         height: 16px
-        margin-right: 5px
+        fill: var(--icon-color-secondary)
+        vertical-align: middle
+        margin-right: 10px
+
+    .content
+        overflow: hidden
+
+    .close
+        border: none
+        background: none
+        cursor: pointer
+
+        &:hover
+            opacity: .7

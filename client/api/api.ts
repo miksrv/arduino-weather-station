@@ -41,6 +41,11 @@ export const API = createApi({
             query: (params) => `history${encodeQueryData(params)}`,
             transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
         }),
+        getHeatmap: builder.query<ApiType.Heatmap.Response, Maybe<ApiType.Heatmap.Request>>({
+            providesTags: ['Heatmap'],
+            query: (params) => `heatmap${encodeQueryData(params)}`,
+            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+        }),
         getForecast: builder.query<ApiType.Forecast.Response, 'hourly' | 'daily'>({
             providesTags: ['Forecast'],
             query: (period) => `forecast/${period}`,
@@ -53,5 +58,5 @@ export const API = createApi({
         }
     },
     reducerPath: 'api',
-    tagTypes: ['Current', 'History', 'Forecast']
+    tagTypes: ['Current', 'History', 'Heatmap', 'Forecast']
 })
