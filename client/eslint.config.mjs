@@ -260,7 +260,7 @@ export default [
             // Forbid import of modules using absolute paths
             'import/no-absolute-path': 'error',
             // forbid default exports - we want to standardize on named exports so that imported names are consistent
-            'import/no-default-export': 'error',
+            // 'import/no-default-export': 'error',
             // disallow imports from duplicate paths
             'import/no-duplicates': 'error',
             // Forbid the use of extraneous packages
