@@ -18,3 +18,6 @@ $routes->options('forecast/(:alphanum)', 'Forecast');
 $routes->get('history', 'History::getHistoryWeather');
 $routes->get('history/export', 'History::getHistoryWeatherCSV');
 $routes->options('history', 'History');
+
+$routes->get('heatmap', 'Heatmap::getHeatmapData');
+$routes->options('heatmap', 'Heatmap');

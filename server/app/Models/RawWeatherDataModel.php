@@ -181,10 +181,10 @@ class RawWeatherDataModel extends Model
         return $data?->date;
     }
 
-    public function getWeatherHistoryGrouped($startDate, $endDate, $groupInterval): array
+    public function getWeatherHistoryGrouped($startDate, $endDate, $groupInterval, $type = null): array
     {
         return $this
-            ->select('DATE_FORMAT(date, "%Y-%m-%d %H:%i:00") as date,' . RawWeatherDataModel::getSelectAverageSQL())
+            ->select('DATE_FORMAT(date, "%Y-%m-%d %H:%i:00") as date,' . RawWeatherDataModel::getSelectAverageSQL($type))
             ->where('date >=', $startDate)
             ->where('date <=', $endDate)
             ->groupBy("FLOOR(UNIX_TIMESTAMP(date)/" . (strtotime('+' . $groupInterval) - strtotime('now')) . ")")
@@ -194,25 +194,36 @@ class RawWeatherDataModel extends Model
     }
 
     /**
+     * @param string|null $type
      * @return string
      */
-    static public function getSelectAverageSQL(): string
+    static public function getSelectAverageSQL(?string $type = null): string
     {
-        return 'ROUND(AVG(temperature), 2) as temperature,' .
-            'ROUND(AVG(feels_like), 2) as feels_like,' .
-            'ROUND(AVG(pressure), 2) as pressure,' .
-            'ROUND(AVG(humidity), 2) as humidity,' .
-            'ROUND(AVG(dew_point), 2) as dew_point,' .
-            'ROUND(AVG(uv_index), 2) as uv_index,' .
-            'ROUND(AVG(sol_energy), 2) as sol_energy,' .
-            'ROUND(AVG(sol_radiation), 2) as sol_radiation,' .
-            'ROUND(AVG(precipitation), 2) as precipitation,' .
-            'ROUND(AVG(clouds), 2) as clouds,' .
-            'ROUND(AVG(visibility), 2) as visibility,' .
-            'ROUND(AVG(wind_speed), 2) as wind_speed,' .
-            'ROUND(AVG(wind_deg), 2) as wind_deg,' .
-            'ROUND(AVG(wind_gust), 2) as wind_gust,' .
-            'MAX(weather_id) as weather_id,';
+        $fields = [
+            'temperature'   => 'ROUND(AVG(temperature), 2) as temperature',
+            'feels_like'    => 'ROUND(AVG(feels_like), 2) as feels_like',
+            'pressure'      => 'ROUND(AVG(pressure), 2) as pressure',
+            'humidity'      => 'ROUND(AVG(humidity), 2) as humidity',
+            'dew_point'     => 'ROUND(AVG(dew_point), 2) as dew_point',
+            'uv_index'      => 'ROUND(AVG(uv_index), 2) as uv_index',
+            'sol_energy'    => 'ROUND(AVG(sol_energy), 2) as sol_energy',
+            'sol_radiation' => 'ROUND(AVG(sol_radiation), 2) as sol_radiation',
+            'precipitation' => 'ROUND(AVG(precipitation), 2) as precipitation',
+            'clouds'        => 'ROUND(AVG(clouds), 2) as clouds',
+            'visibility'    => 'ROUND(AVG(visibility), 2) as visibility',
+            'wind_speed'    => 'ROUND(AVG(wind_speed), 2) as wind_speed',
+            'wind_deg'      => 'ROUND(AVG(wind_deg), 2) as wind_deg',
+            'wind_gust'     => 'ROUND(AVG(wind_gust), 2) as wind_gust',
+            'weather_id'    => 'MAX(weather_id) as weather_id',
+        ];
+
+        // Если задан тип, возвращаем только его
+        if ($type && isset($fields[$type])) {
+            return $fields[$type] . ',';
+        }
+
+        // Если тип не задан, возвращаем все поля
+        return implode(',', $fields) . ',';
     }
 
     /**
