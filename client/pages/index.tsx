@@ -3,6 +3,7 @@ import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
+import { ColumnProps } from 'simple-react-ui-kit'
 
 import { API, ApiModel } from '@/api'
 import { setLocale } from '@/api/applicationSlice'
@@ -28,7 +29,7 @@ import {
     getMinMaxValues,
     getTemperatureColor
 } from '@/tools/weather'
-import { Column } from '@/ui/table'
+import ComparisonIcon from '@/ui/comparison-icon'
 
 type IndexPageProps = object
 
@@ -74,7 +75,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         }
     ]
 
-    const tableColumnsDaily: Column<ApiModel.Weather>[] = [
+    const tableColumnsDaily: ColumnProps<ApiModel.Weather>[] = [
         {
             header: t('date'),
             accessor: 'date',
@@ -86,10 +87,10 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             header: t('weather'),
             accessor: 'weatherId',
             className: styles.cellIcon,
-            formatter: (weatherId, { date }) => (
+            formatter: (weatherId, data, i) => (
                 <WeatherIcon
                     weatherId={weatherId as number}
-                    date={date}
+                    date={data[i]?.date}
                 />
             )
         },
@@ -117,7 +118,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         }
     ]
 
-    const tableColumnsHourly: Column<ApiModel.Weather>[] = [
+    const tableColumnsHourly: ColumnProps<ApiModel.Weather>[] = [
         {
             header: t('time'),
             accessor: 'date',
@@ -128,11 +129,12 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             header: t('weather'),
             accessor: 'weatherId',
+            // maxWidth: '60px',
             className: styles.cellIcon,
-            formatter: (weatherId, { date }) => (
+            formatter: (weatherId, data, i) => (
                 <WeatherIcon
                     weatherId={weatherId as number}
-                    date={date}
+                    date={data[i].date}
                 />
             )
         },
@@ -156,9 +158,16 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             header: t('pressure'),
             accessor: 'pressure',
             className: styles.cellPressure,
-            showComparison: true,
             isSortable: true,
-            formatter: (pressure) => convertHpaToMmHg(pressure)
+            formatter: (pressure, data, i) => (
+                <>
+                    {convertHpaToMmHg(pressure)}
+                    <ComparisonIcon
+                        currentValue={pressure}
+                        previousValue={data[i - 1]?.pressure}
+                    />
+                </>
+            )
         },
         {
             header: t('wind'),
@@ -180,14 +189,14 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             <NextSeo
                 title={t('weather-orenburg-now', { date: formatDate(current?.date ?? new Date()) })}
                 description={t('main-page-description')}
-                canonical={'https://meteo.miksoft.pro'}
+                canonical={process.env.NEXT_PUBLIC_SITE_LINK}
                 openGraph={{
                     description: t('site-description'),
                     images: [
                         {
                             height: 1640,
                             url: '/images/main.jpg',
-                            width: 2032
+                            width: 2028
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
@@ -229,6 +238,8 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     loading={dailyLoading}
                     columns={tableColumnsDaily}
                     data={forecastDaily}
+                    defaultSort={{ key: 'date', direction: 'asc' }}
+                    stickyHeader={true}
                 />
 
                 <WidgetForecastTable
@@ -236,6 +247,8 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     loading={hourlyLoading}
                     columns={tableColumnsHourly}
                     data={forecastHourly}
+                    defaultSort={{ key: 'date', direction: 'asc' }}
+                    stickyHeader={true}
                 />
 
                 <WidgetChart

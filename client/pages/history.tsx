@@ -3,6 +3,7 @@ import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
+import { Button, Popout, PopoutHandleProps, Spinner } from 'simple-react-ui-kit'
 
 import { API, ApiType } from '@/api'
 import { urlAPI } from '@/api/api'
@@ -14,12 +15,7 @@ import WidgetChart from '@/components/widget-chart'
 import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
 import { currentDate, formatDate, getDateTimeFormat, yesterdayDate } from '@/tools/date'
 import { encodeQueryData } from '@/tools/helpers'
-import Button from '@/ui/button'
-import Datepicker from '@/ui/datepicker'
-import { findPresetByDate } from '@/ui/datepicker/Datepicker'
-import Popout from '@/ui/popout'
-import { PopoutHandle } from '@/ui/popout/Popout'
-import Spinner from '@/ui/spinner'
+import Datepicker, { findPresetByDate } from '@/ui/datepicker'
 
 type HistoryPageProps = object
 
@@ -28,7 +24,7 @@ const MIN_DATE = '2021-01-01'
 const HistoryPage: NextPage<HistoryPageProps> = () => {
     const { i18n, t } = useTranslation()
 
-    const popoutRef = useRef<PopoutHandle>(null)
+    const popoutRef = useRef<PopoutHandleProps>(null)
 
     const [startDate, setStartDate] = useState<string>()
     const [endDate, setEndDate] = useState<string>()
@@ -71,7 +67,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
             <NextSeo
                 title={t('historical-weather-data')}
                 description={t('history-page-description')}
-                canonical={'https://meteo.miksoft.pro'}
+                canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/history`}
                 openGraph={{
                     description: t('site-description'),
                     images: [
