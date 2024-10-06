@@ -1,11 +1,9 @@
 import React from 'react'
 import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
+import { Icon, IconTypes } from 'simple-react-ui-kit'
 
 import styles from './styles.module.sass'
-
-import Icon from '@/ui/icon'
-import { IconTypes } from '@/ui/icon/types'
 
 export type MenuItemType = {
     icon?: IconTypes
@@ -35,6 +33,11 @@ const Menu: React.FC<MenuProps> = ({ onClick }) => {
             icon: 'Chart',
             link: '/history',
             text: t('historical-data')
+        },
+        {
+            icon: 'BarChart',
+            link: '/heatmap',
+            text: t('heatmap')
         }
     ]
 

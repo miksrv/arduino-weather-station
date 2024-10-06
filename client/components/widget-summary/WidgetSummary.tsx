@@ -1,5 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'next-i18next'
+import { Icon, Skeleton } from 'simple-react-ui-kit'
 
 import styles from './styles.module.sass'
 
@@ -8,9 +9,7 @@ import WeatherIcon from '@/components/weather-icon'
 import { getWeatherI18nKey } from '@/tools/conditions'
 import { round } from '@/tools/helpers'
 import { convertHpaToMmHg } from '@/tools/weather'
-import Chip from '@/ui/chips-select/Chip'
-import Icon from '@/ui/icon'
-import Skeleton from '@/ui/skeleton'
+import Badge from '@/ui/badge'
 
 interface WidgetSummaryProps {
     loading?: boolean
@@ -64,24 +63,24 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
                     </>
                 ) : (
                     <>
-                        <Chip
-                            text={`${weather?.windSpeed} ${t('meters-per-second')}`}
+                        <Badge
                             icon={'Wind'}
+                            label={`${weather?.windSpeed} ${t('meters-per-second')}`}
                         />
 
-                        <Chip
-                            text={`${weather?.precipitation} ${t('millimeters')}`}
+                        <Badge
                             icon={'WaterDrop'}
+                            label={`${weather?.precipitation} ${t('millimeters')}`}
                         />
 
-                        <Chip
-                            text={`${weather?.humidity} %`}
+                        <Badge
                             icon={'Water'}
+                            label={`${weather?.humidity} %`}
                         />
 
-                        <Chip
-                            text={`${convertHpaToMmHg(weather?.pressure)} ${t('mm-hg')}`}
+                        <Badge
                             icon={'Pressure'}
+                            label={`${convertHpaToMmHg(weather?.pressure)} ${t('mm-hg')}`}
                         />
                     </>
                 )}

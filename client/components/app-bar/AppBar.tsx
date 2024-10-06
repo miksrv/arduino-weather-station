@@ -1,6 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'next-i18next'
 import { useTheme } from 'next-themes'
+import { Icon, Spinner } from 'simple-react-ui-kit'
 
 import styles from './styles.module.sass'
 
@@ -8,8 +9,6 @@ import { API } from '@/api'
 import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
 import { formatDate, minutesAgo, timeAgo } from '@/tools/date'
 import useClientOnly from '@/tools/hooks/useClientOnly'
-import Icon from '@/ui/icon'
-import Spinner from '@/ui/spinner'
 import ThemeSwitcher from '@/ui/theme-switcher'
 
 interface HeaderProps {
