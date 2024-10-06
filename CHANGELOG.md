@@ -1,17 +1,20 @@
-# # Changelog
+# Changelog
 
-## 1.1.0
+## 3.3.0
 
 ### Minor Changes
 
--   Added new UI Components: Popout, Dropdown, Skeleton, Table
--   Added new icons: BarChart, Chart, Download, ArrowUp, ArrowDown
--   Added story for UI Components: Dropdown, Popout, Skeleton, Table
--   Improved Button UI Component styles
--   Improved icons story for storybook
--   Improved global styles variables
--   Dependent libraries updated
--   Renamed "GPS" icons to "Position"
--   Renamed "Address" icons to "AddressSign"
--   Renamed icons "Dark" -> "Moon", "Light" -> "Sun"
--   Removed icons Down, Up, LeftLarge
+-   Implemented new API Endpoint - Heatmap
+-   Connect UI to new API endpoint
+-   Implemented new UI Widget Heatmap Component
+-   Added new UI page - Heatmap
+-   Improved UI locales
+-   Optimized and improved UI styles
+-   Improved UI tools and utilities functions
+-   Improved WidgetChart UI Component
+-   Optimized UI pages
+-   Improved README, fixed ESLint config
+-   Improved Widgets, AppBar and Layouts components
+-   Removed unused UI components and install Simple React UI Kit library
+-   Added new UI ComparisonIcon Component
+-   Added CI/CD release action
