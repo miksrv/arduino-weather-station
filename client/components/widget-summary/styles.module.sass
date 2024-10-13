@@ -1,41 +1,40 @@
 @import ../../styles/variables
 
-/* styles.css */
 .widget
     min-height: 180px
     flex-basis: calc(50% - 5px)
     width: calc(50% - 5px)
-    background: var(--modal-background)
+    background: var(--container-background-color)
     color: var(--text-color-primary)
     border-radius: var(--border-radius)
     box-shadow: var(--container-shadow)
     overflow: hidden
     display: flex
     flex-direction: column
-    justify-content: space-around
+    justify-content: space-between
+    padding: 16px
 
     @media only screen and (max-width: $mobileMaxWidth)
         flex-basis: 100%
         width: 100%
 
-    .header
-        padding: 16px 16px 0
-        display: flex
-        justify-content: space-between
-        align-items: center
-
-        @media only screen and (max-width: 440px)
-            display: block
-
-        .title
+    .content
+        .header
             display: flex
             align-items: center
+            margin-bottom: 10px
 
             h1
                 color: var(--text-color-primary)
                 margin: 0
                 font-size: 18px
                 font-weight: 200
+
+                span
+                    display: inline-block
+                    margin-left: 5px
+                    color: var(--text-color-secondary)
+                    font-size: var(--font-size)
 
             svg
                 fill: var(--text-color-primary)
@@ -44,33 +43,23 @@
                 margin-right: 5px
 
         .conditions
-            @media only screen and (max-width: 440px)
-                margin-left: 28px
+            .value
+                display: flex
+                justify-content: flex-start
+                align-items: center
 
-    .content
-        display: flex
-        justify-content: space-between
-        align-items: center
-        padding: 16px
-        position: relative
+                .temperature
+                    margin-left: 10px
+                    font-size: 60px
+                    font-weight: 100
 
-        .temperature
-            font-size: 50px
-
-            .sign
-                font-size: 32px
-                font-weight: 100
-                color: var(--text-color-secondary)
-
-        svg
-            position: absolute
-            right: 0
-            fill: var(--text-color-primary)
-            width: 100px
-            height: 100px
+                    .sign
+                        font-size: 32px
+                        font-weight: 100
+                        color: var(--text-color-secondary)
 
     .chipList
-        padding: 0 16px 8px
         display: flex
-        justify-content: space-between
+        flex-direction: row
+        justify-content: flex-start
         overflow: scroll

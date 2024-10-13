@@ -1,8 +1,6 @@
 @import ../../styles/variables
 @import ../../styles/animations
 
-$sideBarWidth: 280px
-
 @keyframes animation-sideBar-slideIn
     0%
         left: -$sideBarWidth
@@ -78,7 +76,7 @@ $sideBarWidth: 280px
         height: 100%
         width: 100%
         z-index: 500
-        background: $overlayBackground
+        background: var(--overlay-background)
         transition: opacity 167ms ease-out
 
         &.hidden
@@ -93,7 +91,7 @@ $sideBarWidth: 280px
 
     .sidebar
         position: fixed
-        background-color: var(--modal-background)
+        background-color: var(--container-background-color)
         width: $sideBarWidth
         height: 100vh
         z-index: 600
