@@ -1,10 +1,9 @@
 @import ../../styles/variables
 
-/* styles.css */
 .widgetForecastTable
     flex-basis: calc(50% - 5px)
     width: calc(50% - 5px)
-    background: var(--modal-background)
+    background: var(--container-background-color)
     color: var(--text-color-primary)
     border-radius: var(--border-radius)
     box-shadow: var(--container-shadow)
@@ -13,7 +12,7 @@
     .title
         border-top-right-radius: var(--border-radius)
         border-top-left-radius: var(--border-radius)
-        background-color: var(--modal-background)
+        background-color: var(--container-background-color)
         color: var(--text-color-secondary)
         text-align: center
         padding: 6px 12px
@@ -26,32 +25,31 @@
         border-bottom-right-radius: var(--border-radius)
         border-bottom-left-radius: var(--border-radius)
 
-        & *
-            font-size: var(--font-size-small) !important
-
     .cellDate
         white-space: nowrap
 
         &:first-letter
             text-transform: uppercase
 
-    .cellIcon, .windDeg
+    .cellCondition, .cellWind, .cellWeather
         display: flex
         justify-content: center
         align-items: center
-        text-align: center !important
-
-        svg
-            height: 30px
-            display: flex
-
-    .cellConditions
         white-space: nowrap
 
-    .cellWind
-        white-space: nowrap
+    .cellCondition, .cellWind
+        justify-content: flex-start
+
+        img, svg
+            margin-right: 10px
 
     .cellPressure
+        white-space: nowrap
+
+        span
+            display: inline-block
+            width: 32px
+
         svg
             vertical-align: middle
             margin-left: 5px

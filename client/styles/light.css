@@ -1,80 +1,91 @@
 :root {
-    --font-size: 14px;
-    --font-size-small: 12px;
-    --font-family: -apple-system, system-ui, 'Helvetica Neue', Roboto,
-        sans-serif;
     --letter-spacing: 0.00938em;
-
     --width-max: 1000px;
     --width-menu: 280px;
-
-    --body-background: #ebedf0;
-
-    --modal-background: #ffffff;
-
-    --border-radius: 6px;
-
-    --text-color-primary: rgba(0, 0, 0, 0.9);
-    --text-color-secondary: #818c99;
-    --icon-color-primary: #99a2ad;
-    --icon-color-secondary: #818c99;
-    --icon-color-secondary-hover: #939CA9;
-    --container-background: #fff;
 
     --link-color: #2688eb;
     --link-color-hover: #2483e4;
     --link-color-active: #237edd;
 
-    /* Colors */
+    --overlay-background: rgba(0,0,0,.4);
+
+    /* Primary Colors */
+    --color-contrast: #FFF;
+
     --color-green: #4bb34b;
     --color-green-hover: #48AC4A;
     --color-green-active: #45A64A;
+    --color-green-background: #e5ffe5;
 
     --color-orange: #F8A01C;
     --color-orange-hover: #EE9A1D;
     --color-orange-active: #E4941F;
+    --color-orange-background: #fff2db;
 
     --color-red: #e64646;
     --color-red-hover: #DD4446;
     --color-red-active: #D44245;
+    --color-red-background: #ffdddd;
 
-    /* Containers */
+    --color-main: #2688eb;
+    --color-main-hover: #2483e4;
+    --color-main-active: #237edd;
+    --color-main-background: #d6eaff;
+
+    /* Text and Typography */
+    --font-size: 14px;
+    --font-size-small: 12px;
+    --font-family: -apple-system, system-ui, 'Helvetica Neue', Roboto, sans-serif;
+    --text-color-primary: rgba(0, 0, 0, 0.9);
+    --text-color-secondary: #818c99;
+    --text-color-secondary-hover: #939CA9;
+
+    /* Layout and Containers */
+    --body-background: #ebedf0;
+    --border-radius: 6px;
     --container-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.12);
+    --container-background-color: #fff;
     --container-error-background-color: #FFE9E9;
     --container-error-color: var(--color-red);
     --container-success-background-color: #E8F9E8;
     --container-success-color: var(--color-green);
 
-    /* Input, Dropdown */
-    --input-background-color: #f2f3f5;
-
+    /* Input Fields and Dropdowns */
     --dropdown-background-color: #ffffff;
     --dropdown-background-color-hover: #f2f3f5;
+    --input-background-color: #f2f3f5;
     --input-label-color: #6d7885;
     --input-border-color: #cbcccd;
     --input-border: 0.5px solid var(--input-border-color);
 
     /* Buttons */
     --button-font-weight: 500;
+    --button-default-color: var(--color-main);
     --button-default-background: transparent;
-    --button-default-color: #3770b1;
     --button-default-background-hover: #f7f8fa;
     --button-default-background-active: #f1f2f5;
 
-    --button-primary-background: #2688eb;
     --button-primary-color: #ffffff;
-    --button-primary-background-hover: #2483e4;
-    --button-primary-background-active: #237edd;
+    --button-primary-background: var(--color-main);
+    --button-primary-background-hover: var(--color-main-hover);
+    --button-primary-background-active: var(--color-main-active);
 
     --button-secondary-background: rgba(235,242,250,.99);
     --button-secondary-background-hover: rgba(223,234,246,.99);
-    --button-secondary-color: #3770b1;
-    --button-secondary-color-hover: #356cac;
     --button-secondary-background-active: rgba(213,226,241,.99);
-    --button-secondary-color-active: #3368a8;
+    --button-secondary-color: var(--color-main);
+    --button-secondary-color-hover: var(--color-main-hover);
+    --button-secondary-color-active: var(--color-main-active);
+
+    /* Popout */
+    --popout-shadow: 0 0 2px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.08);
 
     /* Table */
+    --table-font-size: var(--font-size-small);
     --table-header-background: #f2f3f5;
     --table-header-background-hover: rgba(255, 255, 255, 0.1);
     --table-border-color: var(--input-border-color);
+
+    /* Skeleton */
+    --skeleton-background-animation: linear-gradient( 90deg, transparent, rgba(0, 0, 0, 0.04), transparent);
 }

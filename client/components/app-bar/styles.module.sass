@@ -1,5 +1,3 @@
-@import ../../styles/variables
-
 .appBar
     color: var(--text-color-primary)
     height: 50px
@@ -19,7 +17,7 @@
     .wrapper
         display: flex
         max-width: var(--width-max)
-        background-color: var(--container-background)
+        background-color: var(--container-background-color)
         border-radius: var(--border-radius)
         box-shadow: var(--container-shadow)
         margin: 0 auto
@@ -52,7 +50,7 @@
             fill: var(--text-color-primary)
 
     .timeAgo
-        font-size: $fontSizeCaption
+        font-size: var(--font-size-small)
         color: var(--text-color-secondary)
 
     .online, .offline

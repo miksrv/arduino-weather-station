@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'next-i18next'
-import { Icon, Skeleton } from 'simple-react-ui-kit'
+import { Badge, Icon, Skeleton } from 'simple-react-ui-kit'
 
 import styles from './styles.module.sass'
 
@@ -9,7 +9,6 @@ import WeatherIcon from '@/components/weather-icon'
 import { getWeatherI18nKey } from '@/tools/conditions'
 import { round } from '@/tools/helpers'
 import { convertHpaToMmHg } from '@/tools/weather'
-import Badge from '@/ui/badge'
 
 interface WidgetSummaryProps {
     loading?: boolean
@@ -21,45 +20,53 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
 
     return (
         <div className={styles.widget}>
-            <div className={styles.header}>
-                <div className={styles.title}>
+            <div className={styles.content}>
+                <div className={styles.header}>
                     <Icon name={'Point'} />
-                    <h1>{t('weather-in-orenburg')}</h1>
+                    <h1>
+                        {t('weather-in-orenburg')}
+                        <span>{'(GMT+5)'}</span>
+                    </h1>
                 </div>
+
                 <div className={styles.conditions}>
                     {loading ? (
                         <Skeleton style={{ width: 140, height: 21 }} />
                     ) : (
-                        t(getWeatherI18nKey(weather?.weatherId || ''))
+                        <div>{t(getWeatherI18nKey(weather?.weatherId || ''))}</div>
                     )}
+
+                    <div className={styles.value}>
+                        {loading ? (
+                            <Skeleton style={{ width: 75, height: 75, marginTop: 10, marginRight: 15 }} />
+                        ) : (
+                            <WeatherIcon
+                                weatherId={weather?.weatherId as number}
+                                date={weather?.date}
+                                height={80}
+                                width={80}
+                            />
+                        )}
+
+                        {loading ? (
+                            <Skeleton style={{ width: 130, height: 75, marginTop: 10 }} />
+                        ) : (
+                            <div className={styles.temperature}>
+                                {round(weather?.temperature || 0, 1)}
+                                <span className={styles.sign}>°C</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
-            <div className={styles.content}>
-                {loading ? (
-                    <Skeleton style={{ width: 130, height: 75 }} />
-                ) : (
-                    <div className={styles.temperature}>
-                        {round(weather?.temperature || 0, 1)}
-                        <span className={styles.sign}>°C</span>
-                    </div>
-                )}
 
-                {loading ? (
-                    <Skeleton style={{ width: 75, height: 75 }} />
-                ) : (
-                    <WeatherIcon
-                        weatherId={weather?.weatherId as number}
-                        date={weather?.date}
-                    />
-                )}
-            </div>
             <div className={styles.chipList}>
                 {loading ? (
                     <>
-                        <Skeleton style={{ width: 100, height: 28 }} />
-                        <Skeleton style={{ width: 100, height: 28 }} />
-                        <Skeleton style={{ width: 100, height: 28 }} />
-                        <Skeleton style={{ width: 100, height: 28 }} />
+                        <Skeleton style={{ width: 90, height: 28, marginRight: 10 }} />
+                        <Skeleton style={{ width: 90, height: 28, marginRight: 10 }} />
+                        <Skeleton style={{ width: 90, height: 28, marginRight: 10 }} />
+                        <Skeleton style={{ width: 90, height: 28 }} />
                     </>
                 ) : (
                     <>

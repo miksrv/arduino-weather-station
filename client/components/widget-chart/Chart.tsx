@@ -24,7 +24,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
     const { theme } = useTheme()
     const { t } = useTranslation()
 
-    const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff' // --modal-background
+    const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff' // --container-background-color
     const borderColor = theme === 'dark' ? '#444546' : '#cbcccd' // --input-border-color
     const textPrimaryColor = theme === 'dark' ? '#e1e3e6' : '#000000E5' // --text-color-primary
     const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99' // --text-color-secondary
