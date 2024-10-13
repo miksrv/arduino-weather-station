@@ -23,7 +23,6 @@ import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
 import { round } from '@/tools/helpers'
 import {
     convertHpaToMmHg,
-    convertWindDirection,
     filterRecentData,
     getCloudinessColor,
     getMinMaxValues,
@@ -86,19 +85,13 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             header: t('weather'),
             accessor: 'weatherId',
-            className: styles.cellIcon,
-            formatter: (weatherId, data, i) => (
-                <WeatherIcon
-                    weatherId={weatherId as number}
-                    date={data[i]?.date}
-                />
+            className: styles.cellCondition,
+            formatter: (weatherId) => (
+                <>
+                    <WeatherIcon weatherId={weatherId as number} />
+                    {t(getWeatherI18nKey(weatherId || ''))}
+                </>
             )
-        },
-        {
-            header: t('weather-conditions'),
-            accessor: 'weatherId',
-            className: styles.cellConditions,
-            formatter: (weatherId) => t(getWeatherI18nKey(weatherId || ''))
         },
         {
             header: t('temperature-short'),
@@ -129,8 +122,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         {
             header: t('weather'),
             accessor: 'weatherId',
-            // maxWidth: '60px',
-            className: styles.cellIcon,
+            className: styles.cellWeather,
             formatter: (weatherId, data, i) => (
                 <WeatherIcon
                     weatherId={weatherId as number}
@@ -161,7 +153,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             isSortable: true,
             formatter: (pressure, data, i) => (
                 <>
-                    {convertHpaToMmHg(pressure)}
+                    <span>{convertHpaToMmHg(pressure)}</span>
                     <ComparisonIcon
                         currentValue={pressure}
                         previousValue={data[i - 1]?.pressure}
@@ -174,13 +166,12 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             accessor: 'windSpeed',
             className: styles.cellWind,
             isSortable: true,
-            formatter: (windSpeed) => <>{round(Number(windSpeed), 1)} м/с</>
-        },
-        {
-            header: '',
-            accessor: 'windDeg',
-            className: styles.windDeg,
-            formatter: (windDeg) => <WindDirectionIcon direction={convertWindDirection(Number(windDeg))} />
+            formatter: (windSpeed, data, i) => (
+                <>
+                    <WindDirectionIcon direction={Number(data[i]?.windDeg)} />
+                    {round(Number(windSpeed), 1)} {t('meters-per-second')}
+                </>
+            )
         }
     ]
 
@@ -194,9 +185,9 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     description: t('site-description'),
                     images: [
                         {
-                            height: 1640,
+                            height: 1642,
                             url: '/images/main.jpg',
-                            width: 2028
+                            width: 2032
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',

@@ -93,25 +93,6 @@ export const convertHpaToMmHg = (hPa?: number | string): number => {
 }
 
 /**
- * Converts wind direction (0 to 360 degrees) to an 8-point direction.
- * @param degrees Wind direction in degrees (0 to 360).
- * @returns One of 8 directions (0, 45, 90, 135, 180, 225, 270, 315 degrees).
- */
-export const convertWindDirection = (degrees?: number): 0 | 45 | 90 | 135 | 180 | 225 | 270 | 315 | undefined => {
-    if (!degrees) {
-        return
-    }
-
-    const normalizedDegrees = degrees % 360
-
-    const directions: (0 | 45 | 90 | 135 | 180 | 225 | 270 | 315)[] = [0, 45, 90, 135, 180, 225, 270, 315]
-
-    const index = Math.round(normalizedDegrees / 45) % 8
-
-    return directions[index]
-}
-
-/**
  * Converts a temperature value to a color.
  * Temperature in degrees Celsius, where cold temperatures are displayed in blue and hot temperatures are displayed in red.
  * @param temperature Temperature in degrees Celsius.
