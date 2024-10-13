@@ -23,7 +23,10 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
             <div className={styles.content}>
                 <div className={styles.header}>
                     <Icon name={'Point'} />
-                    <h1>{t('weather-in-orenburg')}<span>{'(GMT+5)'}</span></h1>
+                    <h1>
+                        {t('weather-in-orenburg')}
+                        <span>{'(GMT+5)'}</span>
+                    </h1>
                 </div>
 
                 <div className={styles.conditions}>
@@ -60,7 +63,7 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
             <div className={styles.chipList}>
                 {loading ? (
                     <>
-                    <Skeleton style={{ width: 90, height: 28, marginRight: 10 }} />
+                        <Skeleton style={{ width: 90, height: 28, marginRight: 10 }} />
                         <Skeleton style={{ width: 90, height: 28, marginRight: 10 }} />
                         <Skeleton style={{ width: 90, height: 28, marginRight: 10 }} />
                         <Skeleton style={{ width: 90, height: 28 }} />
