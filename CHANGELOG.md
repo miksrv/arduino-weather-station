@@ -1,5 +1,23 @@
 # Changelog
 
+## 3.3.1
+
+### Path Changes
+
+-   Added animated weather icons
+-   Created SECURITY.md
+-   Updated UI libraries
+-   Removed unused UI Container component
+-   Removed unused UI Badge Component
+-   Updated locales
+-   Improved UI styles and themes
+-   Improved UI components styles
+-   Removed UI convertWindDirection function
+-   Changed main screen image
+-   Upgrade index page
+-   Updated UI WeatherIcon, Chart, WidgetSummary and WindDirection
+-   Updated README.md
+
 ## 3.3.0
 
 ### Minor Changes

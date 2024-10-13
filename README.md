@@ -7,8 +7,7 @@ Arduino Weather Station is an automated weather monitoring project built on Ardu
   <img src="https://miksoft.pro/_next/static/media/project-meteostation.3b4b51cb.jpg" alt="Arduino Weather Station" width="150" height="150">
 
 <h3>Arduino Weather Station</h3>
-<a href="https://github.com/miksrv/arduino-weather-station/blob/main/README.md"><strong>Explore the docs »</strong></a>
-<br /><br />
+
 <a href="https://meteo.miksoft.pro" target="_blank">Demo</a>
 ·
 <a href="https://github.com/miksrv/arduino-weather-station/issues/new?assignees=miksrv&labels=bug&projects=&template=1-bug.yml&title=%5BBug%5D%3A+">Report Bug</a>
@@ -196,7 +195,6 @@ cd arduino-weather-station
 
 ### 4. Arduino Setup
 
-
 1. Open [Arduino Readme](./arduino/README.md)
 2. Open the Arduino sketch from the `arduino` -> `main` folder in the Arduino IDE.
 3. Connect your Arduino microcontroller and upload the sketch.
@@ -368,6 +366,8 @@ This section is dedicated to recognizing the resources and individuals that have
 
 1. [CodeIgniter](https://codeigniter.com/user_guide/helpers/date_helper.html)
 2. [Simple React UI](https://github.com/miksrv/simple-react-ui-kit)
+3. [Weather Icons](https://erikflowers.github.io/weather-icons/)
+4. [Meteocons](https://bas.dev/work/meteocons)
 
 <p align="right">
   (<a href="#top">Back to top</a>)
