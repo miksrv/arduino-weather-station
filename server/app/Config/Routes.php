@@ -9,7 +9,9 @@ $routes->cli('system/current', 'System::getCurrentWeather'); // php index.php sy
 $routes->cli('system/forecast', 'System::getForecastWeather'); // php index.php system forecast
 
 $routes->get('current', 'Current::getCurrentWeather');
+$routes->get('current/text', 'Current::getCurrentTextWeather');
 $routes->options('current', 'Current');
+$routes->options('current/text', 'Current');
 
 $routes->get('forecast/daily', 'Forecast::getForecastDaily');
 $routes->get('forecast/hourly', 'Forecast::getForecastHourly');

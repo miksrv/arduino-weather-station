@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.3.2
+
+### Path Changes
+
+-   Updated UI libraries
+-   Updated API dependencies
+-   Added new API Endpoint: 'GET /current/text'
+-   Added new API Method: getCurrentTextWeather
+
 ## 3.3.1
 
 ### Path Changes
