@@ -16,7 +16,7 @@ interface MenuProps {
 }
 
 const Menu: React.FC<MenuProps> = ({ onClick }) => {
-    const { t } = useTranslation('common')
+    const { t } = useTranslation()
 
     const menuItems: MenuItemType[] = [
         {
