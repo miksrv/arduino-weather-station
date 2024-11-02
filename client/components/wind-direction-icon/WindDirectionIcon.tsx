@@ -10,7 +10,7 @@ const WindDirectionIcon: React.FC<WindDirectionIconProps> = ({ direction }) => (
     <svg
         viewBox='0 0 30 30'
         className={styles.weatherIcon}
-        style={{ transform: `rotate(${direction}deg)` }}
+        style={{ transform: `rotate(${direction || 0}deg)` }}
     >
         <path
             d='M3.74,14.5c0-2.04,0.51-3.93,1.52-5.66s2.38-3.1,4.11-4.11s3.61-1.51,5.64-1.51c1.52,0,2.98,0.3,4.37,0.89

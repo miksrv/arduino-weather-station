@@ -1,47 +1,25 @@
-import type { Config } from '@jest/types'
+import type { Config } from 'jest'
 
-const config: Config.InitialOptions = {
-    collectCoverage: true,
-    collectCoverageFrom: [
-        '**/*.{js,jsx,ts,tsx}',
-        '!**/*.d.ts',
-        '!**/node_modules/**',
-        '!<rootDir>/out/**',
-        '!<rootDir>/.next/**',
-        '!<rootDir>/*.config.js',
-        '!<rootDir>/coverage/**'
-    ],
-    coverageProvider: 'v8',
-    globals: {
-        'ts-jest': {
-            tsconfig: 'tsconfig.node.json'
-        }
-    },
-    moduleNameMapper: {
-        '^.+\\.(png|jpg|jpeg|gif|webp|avif|ico|bmp|svg)$': 'identity-obj-proxy',
-
-        // Handle CSS imports (with CSS modules)
-        // https://jestjs.io/docs/webpack#mocking-css-modules
-        '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
-
-        // Handle module aliases
-        '^@/(.*)$': '<rootDir>/$1',
-        '^@/api/(.*)$': '<rootDir>/api/$1',
-        '^@/components/(.*)$': '<rootDir>/components/$1',
-        '^@/functions/(.*)$': '<rootDir>/functions/$1',
-        '^@/public/(.*)$': '<rootDir>/public/$1',
-        '^@/styles/(.*)$': '<rootDir>/styles/$1'
-    },
-    setupFilesAfterEnv: ['<rootDir>/setupTests.config.tsx'],
-    silent: true, // hide all warnings
+const config: Config = {
+    preset: 'ts-jest',
     testEnvironment: 'jsdom',
-    testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/'],
-    transform: {
-        // Use babel-jest to transpile tests with the next/babel preset
-        // https://jestjs.io/docs/configuration#transform-objectstring-pathtotransformer--pathtotransformer-object
-        '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }]
+    moduleNameMapper: {
+        '\\.(css|sass|scss)$': 'identity-obj-proxy',
+        '\\.(jpg|jpeg|png)$': 'identity-obj-proxy',
+        '^@/(.*)$': '<rootDir>/$1'
     },
-    transformIgnorePatterns: ['/node_modules/', '^.+\\.module\\.(css|sass|scss)$']
+    transform: {
+        '^.+\\.tsx?$': [
+            'ts-jest',
+            {
+                babel: true,
+                tsconfig: 'tsconfig.jest.json'
+            }
+        ]
+    },
+    collectCoverageFrom: ['components/**/*.{ts,tsx}', '!components/**/*.d.ts', '!components/**/*.test.tsx', '!*.d.ts'],
+    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+    transformIgnorePatterns: ['node_modules/(?!(module-to-transform)/)', '/.next/']
 }
 
 export default config
