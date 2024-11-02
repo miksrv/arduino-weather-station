@@ -25,21 +25,10 @@ const nextConfig = {
         // size, or format. Defaults to false.
         unoptimized: false
     },
+
     output: 'standalone',
 
-    transpilePackages: ['@uiw/react-md-editor', 'leaflet', 'leaflet.heat'],
-
-    webpack(config) {
-        config.resolve.fallback = {
-            // if you miss it, all the other options in fallback, specified
-            // by next.js will be dropped.
-            ...config.resolve.fallback,
-
-            fs: false // the solution
-        }
-
-        return config
-    }
+    transpilePackages: ['echarts']
 }
 
 module.exports = nextConfig
