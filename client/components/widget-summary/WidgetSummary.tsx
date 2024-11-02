@@ -38,7 +38,9 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
 
                     <div className={styles.value}>
                         {loading ? (
-                            <Skeleton style={{ width: 75, height: 75, marginTop: 10, marginRight: 15 }} />
+                            <Skeleton
+                                style={{ width: 75, height: 65, marginTop: 10, marginBottom: 10, marginRight: 15 }}
+                            />
                         ) : (
                             <WeatherIcon
                                 weatherId={weather?.weatherId as number}
@@ -49,7 +51,7 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
                         )}
 
                         {loading ? (
-                            <Skeleton style={{ width: 130, height: 75, marginTop: 10 }} />
+                            <Skeleton style={{ width: 130, height: 65, marginTop: 10, marginBottom: 10 }} />
                         ) : (
                             <div className={styles.temperature}>
                                 {round(weather?.temperature || 0, 1)}
