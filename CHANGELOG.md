@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.3.3
+
+### Path Changes
+
+-   Updated UI libraries
+-   Fixed height of base component
+-   Added memoization data for UI WeatherChart
+-   Changed UI Tests names
+-   Added UI function for interpolation charts data (invertData)
+-   Improved SonarCloud configuration file
+-   Fixed issues in the UI WidgetSummary and WindDirectionIcon components
+-   Improved and fixed client config files
+-   Added UI Unit tests for Footer and WindDirectionIcon components
+-   Migrate to new version of Next.js (15)
+-   Updated GitHub CI/CD Actions
+-   Fixed code-style
+
 ## 3.3.2
 
 ### Path Changes
