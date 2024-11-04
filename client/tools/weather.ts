@@ -68,6 +68,30 @@ export const findMinValue = (weatherData?: ApiModel.Weather[], key?: keyof ApiMo
         ?.reduce((min, value) => (value !== undefined && value < min ? value : min), Infinity)
 
 /**
+ * Inverts the values of the specified sensor data key within the weather data array to ensure all values are positive.
+ * If there are negative values, it calculates the minimum value and adds its absolute value to each data point for that key.
+ *
+ * @param {ApiModel.Weather[]} weatherData - The array of weather data points, each containing various sensor readings.
+ * @param {keyof ApiModel.Sensors} key - The key representing the specific sensor data to invert.
+ * @returns {ApiModel.Weather[]} - The transformed array with all specified sensor values adjusted to be non-negative, preserving original structure.
+ */
+export const invertData = (weatherData: ApiModel.Weather[] = [], key?: keyof ApiModel.Sensors): ApiModel.Weather[] => {
+    if (!key) {
+        return weatherData
+    }
+
+    const values = weatherData.map((data) => data[key]).filter((value): value is number => value !== undefined)
+
+    const minValue = Math.min(...values)
+    const offset = minValue < 0 ? Math.abs(minValue) : 0
+
+    return weatherData.map((data) => ({
+        ...data,
+        [key]: data[key] ? data[key] + offset : undefined
+    }))
+}
+
+/**
  * Function to find the maximum value
  * @param weatherData
  * @param key

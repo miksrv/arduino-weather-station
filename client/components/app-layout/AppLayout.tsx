@@ -19,6 +19,7 @@ interface AppLayoutProps {
 const AppLayout: React.FC<AppLayoutProps> = ({ className, fullSize, children }) => {
     const application = useAppSelector((store) => store.application)
 
+    const [overlayHeight, setOverlayHeight] = useState<number | string>('100%')
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
 
     const handleCloseOverlay = () => {
@@ -41,6 +42,22 @@ const AppLayout: React.FC<AppLayoutProps> = ({ className, fullSize, children }) 
         }
     }, [application.showOverlay, sidebarOpen])
 
+    useEffect(() => {
+        const calculatePageHeight = () => {
+            if (document.documentElement.scrollHeight) {
+                setOverlayHeight(document.documentElement.clientHeight)
+            }
+        }
+
+        calculatePageHeight()
+
+        window.addEventListener('resize', calculatePageHeight)
+
+        return () => {
+            window.removeEventListener('resize', calculatePageHeight)
+        }
+    }, [])
+
     return (
         <div className={cn(className, styles.appLayout, fullSize && styles.fullSize)}>
             <NextNProgress
@@ -55,6 +72,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ className, fullSize, children }) 
                     styles.overlay,
                     application.showOverlay || sidebarOpen ? styles.displayed : styles.hidden
                 )}
+                style={{ height: overlayHeight }}
                 onKeyDown={handleCloseOverlay}
                 onClick={handleCloseOverlay}
             />
@@ -64,7 +82,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ className, fullSize, children }) 
                 onMenuClick={handleOpenSideBar}
             />
 
-            <aside className={cn(styles.sidebar, sidebarOpen ? styles.opened : styles.closed)}>
+            <aside
+                className={cn(styles.sidebar, sidebarOpen ? styles.opened : styles.closed)}
+                style={{ height: overlayHeight }}
+            >
                 <Menu onClick={handleCloseOverlay} />
                 <div className={styles.content}>
                     <div className={styles.switchers}>

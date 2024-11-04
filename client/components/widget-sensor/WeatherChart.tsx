@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { EChartsOption, graphic } from 'echarts'
 import ReactECharts from 'echarts-for-react'
 
 import { ApiModel } from '@/api'
 import { getSensorColor } from '@/tools/colors'
-import { findMaxValue, findMinValue } from '@/tools/weather'
+import { findMaxValue, findMinValue, invertData } from '@/tools/weather'
 
 interface Props {
     data?: ApiModel.Weather[]
@@ -12,15 +12,21 @@ interface Props {
 }
 
 const WeatherChart: React.FC<Props> = ({ data, source }) => {
-    const formatData = () => {
-        return data?.map((item) => ({
-            date: new Date(item?.date || '').toLocaleString(),
-            value: source ? item?.[source] : ''
-        }))
-    }
-
-    const chartData = formatData()
     const colorsData = getSensorColor(source)
+
+    const weatherData = useMemo(
+        () => (source && ['temperature', 'feelsLike', 'dewPoint'].includes(source) ? invertData(data, source) : data),
+        [data, source]
+    )
+
+    const weatherFormatedData = useMemo(
+        () =>
+            weatherData?.map((item) => ({
+                date: new Date(item?.date || '').toLocaleString(),
+                value: source ? item?.[source] : null
+            })),
+        [weatherData]
+    )
 
     const option: EChartsOption = {
         tooltip: {
@@ -35,7 +41,7 @@ const WeatherChart: React.FC<Props> = ({ data, source }) => {
         },
         xAxis: {
             type: 'category',
-            data: chartData?.map((item) => item.date),
+            data: weatherFormatedData?.map((item) => item.date),
             axisLine: {
                 show: false
             },
@@ -51,8 +57,8 @@ const WeatherChart: React.FC<Props> = ({ data, source }) => {
         },
         yAxis: {
             type: 'value',
-            min: findMinValue(data, source),
-            max: findMaxValue(data, source),
+            min: findMinValue(weatherData, source),
+            max: findMaxValue(weatherData, source),
             axisLine: {
                 show: false
             },
@@ -68,7 +74,7 @@ const WeatherChart: React.FC<Props> = ({ data, source }) => {
         },
         series: [
             {
-                data: chartData?.map((item) => item.value),
+                data: weatherFormatedData?.map((item) => item.value),
                 type: 'line',
                 smooth: false,
                 showSymbol: false,

@@ -18,7 +18,7 @@ jest.mock('@/tools/date', () => ({
 
 jest.mock('@/update', () => new Date(2023, 0, 1, 12, 0, 0)) // 1 января 2023 года, 12:00
 
-describe('Footer Component', () => {
+describe('Footer', () => {
     it('displays the correct copyright information', () => {
         ;(formatDate as jest.Mock).mockImplementation((date, format) =>
             format === 'YYYY' ? '2023' : '01.01.2023, 12:00'
