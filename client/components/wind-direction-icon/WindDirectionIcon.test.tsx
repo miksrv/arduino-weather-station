@@ -7,7 +7,7 @@ import WindDirectionIcon from './WindDirectionIcon'
 
 import { render } from '@testing-library/react'
 
-describe('WindDirectionIcon Component', () => {
+describe('WindDirectionIcon', () => {
     it('renders SVG element with correct viewBox attribute', () => {
         const { container } = render(<WindDirectionIcon />)
         const svgElement = container.querySelector('svg')
