@@ -1,9 +1,9 @@
-@import ../../styles/variables
-@import ../../styles/animations
+@use '../../styles/variables'
+@use '../../styles/animations'
 
 @keyframes animation-sideBar-slideIn
     0%
-        left: -$sideBarWidth
+        left: - variables.$sideBarWidth
 
     100%
         left: 0
@@ -13,7 +13,7 @@
         left: 0
 
     100%
-        left: -$sideBarWidth
+        left: - variables.$sideBarWidth
 
 .noAnimation
     animation: none !important
@@ -62,7 +62,7 @@
             max-width: var(--width-max)
             margin: 0 auto 20px
 
-        @media only screen and (max-width: $mobileMaxWidth)
+        @media only screen and (max-width: variables.$mobileMaxWidth)
             .menubar
                 display: none
 
@@ -93,10 +93,10 @@
     .sidebar
         position: fixed
         background-color: var(--container-background-color)
-        width: $sideBarWidth
+        width: variables.$sideBarWidth
         z-index: 600
         top: 0
-        left: -$sideBarWidth
+        left: - variables.$sideBarWidth
         transition: left 167ms ease-out
 
         &.opened
@@ -104,7 +104,7 @@
             //animation: animation-sideBar-slideIn .32s ease
 
         &.closed
-            left: -$sideBarWidth
+            left: - variables.$sideBarWidth
             //animation: animation-sideBar-slideOut .32s ease
 
         .content

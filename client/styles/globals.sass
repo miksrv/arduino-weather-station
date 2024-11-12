@@ -1,5 +1,5 @@
-@import variables
-@import animations
+@use 'variables'
+@use 'animations'
 
 *, ::before, ::after
     box-sizing: border-box
@@ -44,6 +44,6 @@ body
             height: 20px
             margin-right: 10px
 
-        @media only screen and (max-width: $mobileMaxWidth)
+        @media only screen and (max-width: variables.$mobileMaxWidth)
             span
                 display: none

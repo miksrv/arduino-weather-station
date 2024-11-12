@@ -1,4 +1,4 @@
-@import ../../styles/variables
+@use '../../styles/variables'
 
 .widgetForecastTable
     flex-basis: calc(50% - 5px)
@@ -17,7 +17,7 @@
         text-align: center
         padding: 6px 12px
 
-    @media only screen and (max-width: $mobileMaxWidth)
+    @media only screen and (max-width: variables.$mobileMaxWidth)
         flex-basis: 100%
         width: 100%
 

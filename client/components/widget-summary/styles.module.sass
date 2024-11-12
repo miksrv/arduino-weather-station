@@ -1,4 +1,4 @@
-@import ../../styles/variables
+@use '../../styles/variables'
 
 .widget
     min-height: 180px
@@ -14,7 +14,7 @@
     justify-content: space-between
     padding: 16px
 
-    @media only screen and (max-width: $mobileMaxWidth)
+    @media only screen and (max-width: variables.$mobileMaxWidth)
         flex-basis: 100%
         width: 100%
 
