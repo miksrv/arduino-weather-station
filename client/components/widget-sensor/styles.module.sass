@@ -1,4 +1,4 @@
-@import ../../styles/variables
+@use '../../styles/variables'
 
 /* styles.css */
 .widget
@@ -10,7 +10,7 @@
     box-shadow: var(--container-shadow)
     overflow: hidden
 
-    @media only screen and (max-width: $mobileMaxWidth)
+    @media only screen and (max-width: variables.$mobileMaxWidth)
         flex-basis: calc(50% - 5px)
         width: calc(50% - 5px)
 
