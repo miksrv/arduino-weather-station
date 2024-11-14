@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.3.4
+
+### Path Changes
+
+-   Updated UI libraries
+-   Improved CSS themes
+-   Changed sensors min and max values to last 12 hours
+-   Optimized UI filterRecentData function
+
 ## 3.3.3
 
 ### Path Changes
