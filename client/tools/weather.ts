@@ -3,11 +3,20 @@ import dayjs from 'dayjs'
 import { ApiModel } from '@/api'
 import { round } from '@/tools/helpers'
 
+/**
+ * Represents the result of finding the minimum and maximum values.
+ */
 export interface MinMaxResult {
+    /**
+     * The minimum value and its corresponding date.
+     */
     min?: {
         value: number
         date: string
     }
+    /**
+     * The maximum value and its corresponding date.
+     */
     max?: {
         value: number
         date: string
@@ -122,30 +131,6 @@ export const convertHpaToMmHg = (hPa?: number | string): number => {
  * @param temperature Temperature in degrees Celsius.
  * @returns A string with the color in HEX format.
  */
-// export const getTemperatureColor = (temperature?: number | string): string => {
-//     if (typeof temperature === 'undefined') {
-//         return ''
-//     }
-//
-//     const temp = Number(temperature)
-//
-//     // Temperature limits
-//     const minTemp = -35 // Minimum temperature for blue
-//     const maxTemp = 35 // Maximum temperature for red
-//
-//     // Limit temperature between minTemp and maxTemp
-//     const clampedTemp = Math.max(minTemp, Math.min(maxTemp, temp))
-//
-//     // Calculate temperature percentage between 0 and 1
-//     const tempPercent = (clampedTemp - minTemp) / (maxTemp - minTemp)
-//
-//     // Linear color interpolation (from blue to red)
-//     const r = Math.round(255 * tempPercent) // Red channel
-//     const g = Math.round(0) // Green channel (not used)
-//     const b = Math.round(255 * (1 - tempPercent)) // Blue channel
-//
-//     return `rgba(${r}, ${g}, ${b}, 0.5)`
-// }
 export const getTemperatureColor = (temperature?: number | string): string => {
     if (typeof temperature === 'undefined') {
         return ''

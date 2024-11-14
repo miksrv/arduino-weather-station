@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -58,6 +58,9 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         },
         { pollingInterval: POLING_INTERVAL_CURRENT }
     )
+
+    const history12HoursData = useMemo(() => filterRecentData(history, 12), [history])
+    const history24HoursData = useMemo(() => filterRecentData(history, 24), [history])
 
     const widgets: WidgetType[] = [
         {
@@ -213,12 +216,12 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         icon={widget.icon}
                         loading={currentLoading}
                         chartLoading={historyLoading}
-                        minMax={getMinMaxValues(history, widget.source)}
+                        minMax={getMinMaxValues(history12HoursData, widget.source)}
                         currentValue={current?.[widget.source]}
                         chart={
                             <WeatherChart
                                 source={widget.source}
-                                data={filterRecentData(history, 12)}
+                                data={history12HoursData}
                             />
                         }
                     />
@@ -245,13 +248,13 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 <WidgetChart
                     type={'temperature'}
                     loading={historyLoading}
-                    data={filterRecentData(history, 24)}
+                    data={history24HoursData}
                 />
 
                 <WidgetChart
                     type={'clouds'}
                     loading={historyLoading}
-                    data={filterRecentData(history, 24)}
+                    data={history24HoursData}
                 />
             </div>
         </AppLayout>
