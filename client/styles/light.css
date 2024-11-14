@@ -53,6 +53,7 @@
     /* Input Fields and Dropdowns */
     --dropdown-background-color: #ffffff;
     --dropdown-background-color-hover: #f2f3f5;
+    --dropdown-badge-background-color: #000;
     --input-background-color: #f2f3f5;
     --input-label-color: #6d7885;
     --input-border-color: #cbcccd;
