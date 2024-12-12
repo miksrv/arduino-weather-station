@@ -20,6 +20,7 @@ interface ChartProps {
     dateFormat?: string
 }
 
+// TODO: formatter: function (params: any) - replace any with correct type
 const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
     const { theme } = useTheme()
     const { t } = useTranslation()
@@ -30,7 +31,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
     const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99' // --text-color-secondary
 
     const baseConfig: EChartsOption = {
-        backgroundColor: backgroundColor,
+        backgroundColor,
         grid: {
             left: 10,
             right: 10,
@@ -67,9 +68,9 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                     }
                 }
             },
-            backgroundColor: backgroundColor,
-            borderColor: borderColor,
-            formatter: function (params: any) {
+            backgroundColor,
+            borderColor,
+            formatter: (params: any) => {
                 // An array of strings that will be concatenated and returned as the contents of the tooltip
                 const tooltipContent: string[] = []
 
@@ -101,9 +102,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                 hideOverlap: true,
                 color: textSecondaryColor, // Color of X-axis labels
                 fontSize: '11px',
-                formatter: function (value: number) {
-                    return formatDateFromUTC(value, dateFormat ?? t('date-only-hour'))
-                }
+                formatter: (value: number) => formatDateFromUTC(value, dateFormat ?? t('date-only-hour'))
             },
             axisTick: {
                 show: true

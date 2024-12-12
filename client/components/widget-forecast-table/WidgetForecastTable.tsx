@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Table, TableProps } from 'simple-react-ui-kit'
+import Link from 'next/link'
+import { cn, Table, TableProps } from 'simple-react-ui-kit'
 
 import styles from './styles.module.sass'
 
@@ -7,16 +8,18 @@ import { ApiModel } from '@/api'
 
 interface WidgetProps extends TableProps<ApiModel.Weather> {
     title?: string
+    link?: React.AnchorHTMLAttributes<HTMLAnchorElement>
+    fullWidth?: boolean
 }
 
-const WidgetForecastTable: React.FC<WidgetProps> = ({ title, ...props }) => {
+const WidgetForecastTable: React.FC<WidgetProps> = ({ title, link, fullWidth, ...props }) => {
     const containerRef = useRef<HTMLDivElement | null>(null)
     const titleRef = useRef<HTMLDivElement | null>(null)
     const [tableHeight, setTableHeight] = useState<number | null>(null)
 
     useEffect(() => {
         const calculateTableHeight = () => {
-            if (containerRef.current && titleRef.current) {
+            if (containerRef.current && titleRef.current && props.stickyHeader) {
                 const containerHeight = containerRef.current.offsetHeight
                 const titleHeight = titleRef.current.offsetHeight
                 const calculatedHeight = containerHeight - titleHeight
@@ -36,21 +39,34 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ title, ...props }) => {
     return (
         <div
             ref={containerRef}
-            className={styles.widgetForecastTable}
+            className={cn(
+                styles.widgetForecastTable,
+                props.stickyHeader && styles.stickyHeader,
+                fullWidth && styles.fullWidth
+            )}
         >
             {title && (
-                <div
+                <h3
                     ref={titleRef}
                     className={styles.title}
                 >
-                    {title}
-                </div>
+                    {link ? (
+                        <Link
+                            href={link?.href || ''}
+                            {...link}
+                        >
+                            {title}
+                        </Link>
+                    ) : (
+                        title
+                    )}
+                </h3>
             )}
 
             <Table<ApiModel.Weather>
                 {...props}
                 className={styles.table}
-                height={tableHeight}
+                height={props.stickyHeader ? tableHeight : undefined}
             />
         </div>
     )
