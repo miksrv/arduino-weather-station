@@ -3,32 +3,19 @@ import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
-import { ColumnProps } from 'simple-react-ui-kit'
 
 import { API, ApiModel } from '@/api'
 import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
-import WeatherIcon from '@/components/weather-icon'
 import WidgetChart from '@/components/widget-chart'
 import WidgetForecastTable from '@/components/widget-forecast-table'
-import styles from '@/components/widget-forecast-table/styles.module.sass'
 import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
-import WindDirectionIcon from '@/components/wind-direction-icon'
 import { POLING_INTERVAL_CURRENT, POLING_INTERVAL_FORECAST } from '@/pages/_app'
-import { getWeatherI18nKey } from '@/tools/conditions'
 import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
-import { round } from '@/tools/helpers'
-import {
-    convertHpaToMmHg,
-    filterRecentData,
-    getCloudinessColor,
-    getMinMaxValues,
-    getTemperatureColor
-} from '@/tools/weather'
-import ComparisonIcon from '@/ui/comparison-icon'
+import { filterRecentData, getMinMaxValues } from '@/tools/weather'
 
 type IndexPageProps = object
 
@@ -75,107 +62,6 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             unit: '°C',
             icon: 'Thermometer',
             source: 'temperature'
-        }
-    ]
-
-    const tableColumnsDaily: ColumnProps<ApiModel.Weather>[] = [
-        {
-            header: t('date'),
-            accessor: 'date',
-            className: styles.cellDate,
-            isSortable: true,
-            formatter: (date) => formatDate(date as string, 'dd, MMM D')
-        },
-        {
-            header: t('weather'),
-            accessor: 'weatherId',
-            className: styles.cellCondition,
-            formatter: (weatherId) => (
-                <>
-                    <WeatherIcon weatherId={weatherId as number} />
-                    {t(getWeatherI18nKey(weatherId || ''))}
-                </>
-            )
-        },
-        {
-            header: t('temperature-short'),
-            accessor: 'temperature',
-            className: styles.cellTemperature,
-            isSortable: true,
-            background: (temperature) => getTemperatureColor(temperature),
-            formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>
-        },
-        {
-            header: t('clouds'),
-            accessor: 'clouds',
-            className: styles.cellClouds,
-            isSortable: true,
-            background: (clouds) => getCloudinessColor(clouds),
-            formatter: (clouds) => <>{clouds}%</>
-        }
-    ]
-
-    const tableColumnsHourly: ColumnProps<ApiModel.Weather>[] = [
-        {
-            header: t('time'),
-            accessor: 'date',
-            className: styles.cellDate,
-            isSortable: true,
-            formatter: (date) => formatDate(date as string, t('date-only-hour'))
-        },
-        {
-            header: t('weather'),
-            accessor: 'weatherId',
-            className: styles.cellWeather,
-            formatter: (weatherId, data, i) => (
-                <WeatherIcon
-                    weatherId={weatherId as number}
-                    date={data[i].date}
-                />
-            )
-        },
-        {
-            header: t('temperature-short'),
-            accessor: 'temperature',
-            className: styles.cellTemperature,
-            isSortable: true,
-            background: (temperature) => getTemperatureColor(temperature),
-            formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>
-        },
-        {
-            header: t('clouds'),
-            accessor: 'clouds',
-            className: styles.cellClouds,
-            isSortable: true,
-            background: (clouds) => getCloudinessColor(clouds),
-            formatter: (clouds) => <>{clouds}%</>
-        },
-        {
-            header: t('pressure'),
-            accessor: 'pressure',
-            className: styles.cellPressure,
-            isSortable: true,
-            formatter: (pressure, data, i) => (
-                <>
-                    <span>{convertHpaToMmHg(pressure)}</span>
-                    <ComparisonIcon
-                        currentValue={pressure}
-                        previousValue={data[i - 1]?.pressure}
-                    />
-                </>
-            )
-        },
-        {
-            header: t('wind'),
-            accessor: 'windSpeed',
-            className: styles.cellWind,
-            isSortable: true,
-            formatter: (windSpeed, data, i) => (
-                <>
-                    <WindDirectionIcon direction={Number(data[i]?.windDeg)} />
-                    {round(Number(windSpeed), 1)} {t('meters-per-second')}
-                </>
-            )
         }
     ]
 
@@ -231,8 +117,8 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 <WidgetForecastTable
                     title={t('weather-forecast-by-days')}
                     link={{ href: '/forecast', title: t('forecast') }}
+                    columnsPreset={['date', 'weather', 'temperature', 'clouds']}
                     loading={dailyLoading}
-                    columns={tableColumnsDaily}
                     data={forecastDaily}
                     defaultSort={{ key: 'date', direction: 'asc' }}
                     stickyHeader={true}
@@ -241,8 +127,8 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 <WidgetForecastTable
                     title={t('weather-forecast-hourly')}
                     link={{ href: '/forecast', title: t('forecast') }}
+                    columnsPreset={['time', 'weatherIcon', 'temperature', 'clouds', 'pressure', 'wind']}
                     loading={hourlyLoading}
-                    columns={tableColumnsHourly}
                     data={forecastHourly}
                     defaultSort={{ key: 'date', direction: 'asc' }}
                     stickyHeader={true}

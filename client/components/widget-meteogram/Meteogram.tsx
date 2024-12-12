@@ -106,8 +106,8 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
         }
     }
 
-    const config: EChartsOption = useMemo(() => {
-        return {
+    const config: EChartsOption = useMemo(
+        () => ({
             backgroundColor,
             grid: {
                 left: 10,
@@ -302,8 +302,9 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
                     ])
                 }
             ]
-        }
-    }, [data, backgroundColor, textPrimaryColor, t, weatherIconsCount])
+        }),
+        [data, backgroundColor, textPrimaryColor, t, weatherIconsCount]
+    )
 
     return (
         <div

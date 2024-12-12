@@ -8,6 +8,7 @@
 -   Created new Forecast page
 -   Refactoring WeatherIcon, added getWeatherIconUrl function
 -   Refactoring WidgetChart and WidgetForecastTable
+-   Columns for WidgetForecastTable are moved to the component, a set of columns is created
 -   Created getSampledData UI function
 -   Updated README, CHANGELOG and fixed styles
 -   Updated UI libraries
