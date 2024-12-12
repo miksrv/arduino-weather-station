@@ -35,6 +35,11 @@ const Menu: React.FC<MenuProps> = ({ onClick }) => {
             text: t('historical-data')
         },
         {
+            icon: 'Time',
+            link: '/forecast',
+            text: t('forecast')
+        },
+        {
             icon: 'BarChart',
             link: '/heatmap',
             text: t('heatmap')

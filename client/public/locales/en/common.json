@@ -1,5 +1,6 @@
 {
     "weather-in-orenburg": "Weather in Orenburg",
+    "forecast-weather-in-orenburg": "Weather forecast in Orenburg",
     "weather-orenburg-now": "Weather in Orenburg now ({{date}})",
     "historical-weather-data": "Historical weather data",
     "site-description": "Current weather in Orenburg: temperature, humidity, pressure, wind speed and other data from weather sensors. Get accurate and updated data for your city.",
@@ -7,6 +8,7 @@
     "sensors-page-description": "Full list of weather sensors: temperature, pressure, humidity, dew point, visibility, ultraviolet index, solar energy, radiation, cloudiness, precipitation, wind speed and direction. Find out the latest weather data for Orenburg",
     "history-page-description": "Open the weather archive for any day in Orenburg. Find out detailed information about temperature, precipitation, wind and climate changes in past years. Quick access to Orenburg weather data with an accuracy of up to 10 minutes",
     "heatmap-page-description": "Interactive heat map with visualization of temperature, pressure, humidity, precipitation and cloudiness. Analyze weather data for any selected period",
+    "forecast-page-description": "Find out the accurate weather forecast for 5 days ahead with detailed information about the current day. Temperature, precipitation, wind and other parameters for your city. Plan your day with confidence!",
     "date": "Date",
     "time": "Time",
     "temperature": "Temperature",
@@ -33,6 +35,7 @@
     "weather-sensors": "Weather sensors",
     "historical-data": "Historical data",
     "heatmap": "Heatmap",
+    "forecast": "Weather forecast",
     "heat-map-data-shown-period": "Heat map data is shown for the period {{period}}",
     "please-wait-loading": "Please wait, loading...",
     "meters-per-second": "m/s",

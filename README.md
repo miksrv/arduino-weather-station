@@ -307,7 +307,13 @@ The **History** section allows users to explore weather data over a specified ti
 
 ![History Interface](./client/public/images/history.jpg)
 
-#### 4. **Heatmap**
+#### 4. **Forecast**
+
+The **Forecast** section offers a comprehensive weather outlook for the next five days, accompanied by a detailed breakdown for the current day. Users can access forecasts for temperature, precipitation, wind speed, humidity, and more, presented in an intuitive interface. This section is designed to help users plan their activities with precision by providing accurate, easy-to-read weather data for both short-term and extended periods.
+
+![History Interface](./client/public/images/forecast.jpg)
+
+#### 5. **Heatmap**
 
 The **Heatmap** section provides a detailed visualization of weather metrics, including temperature, pressure, humidity, precipitation, and cloud coverage, displayed as a heatmap. Users can select any time period to view trends and patterns across multiple environmental factors at once. This powerful tool allows for quick comparison and in-depth analysis of weather conditions over time.
 

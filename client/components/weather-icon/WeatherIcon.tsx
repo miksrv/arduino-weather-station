@@ -71,7 +71,7 @@ interface WeatherIconProps {
     height?: number
 }
 
-const WeatherIcon: React.FC<WeatherIconProps> = ({ weatherId, date, width, height }) => {
+export const getWeatherIconUrl = (weatherId: number, date?: string): string => {
     const isDayTime = (date: string): boolean => {
         const hours = getDate(date).hour()
 
@@ -84,10 +84,14 @@ const WeatherIcon: React.FC<WeatherIconProps> = ({ weatherId, date, width, heigh
     const name = weatherIconsMapping[weatherId]
     const time = !date || withoutDayIcon.includes(name) ? '' : isDayTime(date) ? '-day' : '-night'
 
+    return `/icons/${name}${time}.svg`
+}
+
+const WeatherIcon: React.FC<WeatherIconProps> = ({ weatherId, date, width, height }) => {
     return (
         <Image
-            src={`/icons/${name}${time}.svg`}
-            alt={`${name}${time}`}
+            src={getWeatherIconUrl(weatherId, date)}
+            alt={''}
             width={width ?? 24}
             height={height ?? 24}
         />

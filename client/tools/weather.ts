@@ -188,6 +188,7 @@ export const getTemperatureColor = (temperature?: number | string): string => {
 /**
  * Converts cloudiness value to color.
  * Cloudiness percentage, where 0% is dark sky and 100% is light sky.
+ * TODO: With a white color scheme, the text color on the dark background is too contrasting
  * @param cloudiness Cloudiness percentage from 0 to 100.
  * @returns String with color in HEX format.
  */
@@ -222,4 +223,31 @@ export const filterRecentData = (data?: ApiModel.Weather[], hours: number = 24):
     const hoursAgo = now.subtract(hours, 'hours')
 
     return data?.filter((item) => dayjs.utc(item.date).isAfter(hoursAgo)) || []
+}
+
+/**
+ * Returns a sampled subset of the input data array.
+ *
+ * @param {ApiModel.Weather[]} data - The input array of weather data.
+ * @param {number} count - The number of samples to return.
+ * @returns {ApiModel.Weather[]} The sampled subset of the input data array.
+ */
+export const getSampledData = (data: ApiModel.Weather[], count: number): ApiModel.Weather[] => {
+    if (!data || data.length === 0 || count <= 0) {
+        return []
+    }
+
+    if (data.length <= count) {
+        return data
+    }
+
+    const step = (data.length - 1) / (count - 1)
+    const sampledData = []
+
+    for (let i = 0; i < count; i++) {
+        const index = Math.round(i * step)
+        sampledData.push(data[index])
+    }
+
+    return sampledData
 }
