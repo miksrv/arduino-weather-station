@@ -7,19 +7,32 @@
     color: var(--text-color-primary)
     border-radius: var(--border-radius)
     box-shadow: var(--container-shadow)
-    height: 250px
 
-    .title
+    .title, a
         border-top-right-radius: var(--border-radius)
         border-top-left-radius: var(--border-radius)
         background-color: var(--container-background-color)
         color: var(--text-color-secondary)
         text-align: center
         padding: 6px 12px
+        margin: 0
+        font-weight: 200
+        text-decoration: none
+        transition: color 0.3s
+
+        a:hover
+            color: var(--text-color-primary)
 
     @media only screen and (max-width: variables.$mobileMaxWidth)
         flex-basis: 100%
         width: 100%
+
+    &.fullWidth
+        width: 100% !important
+        flex-basis: 100%
+
+    &.stickyHeader
+        height: 250px
 
     .table
         border-bottom-right-radius: var(--border-radius)
