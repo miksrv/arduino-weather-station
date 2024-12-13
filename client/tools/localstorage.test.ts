@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEY } from './constants'
-import { getItem, removeItem,setItem } from './localstorage'
+import { getItem, removeItem, setItem } from './localstorage'
 
 const mockLocalStorage = (() => {
     let store: { [key: string]: string } = {}

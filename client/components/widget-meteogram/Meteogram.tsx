@@ -1,7 +1,7 @@
 import React, { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 import { CustomSeriesRenderItemAPI, CustomSeriesRenderItemParams, EChartsOption } from 'echarts'
 import { CustomSeriesRenderItemReturn } from 'echarts/types/dist/echarts'
-import { LabelOption, TooltipFormatterCallback } from 'echarts/types/src/util/types'
+import { LabelOption } from 'echarts/types/src/util/types'
 import ReactECharts from 'echarts-for-react'
 import { useTranslation } from 'next-i18next'
 import { useTheme } from 'next-themes'

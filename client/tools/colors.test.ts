@@ -1,4 +1,4 @@
-import { colors, getSensorColor,getSensorColorType } from './colors'
+import { colors, getSensorColor, getSensorColorType } from './colors'
 
 describe('colors', () => {
     describe('getSensorColorType', () => {

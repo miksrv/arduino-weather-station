@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 
-import { currentDate, formatDate, getDate, getDateTimeFormat,halfYearDate, minutesAgo, yesterdayDate } from './date'
+import { currentDate, formatDate, getDate, getDateTimeFormat, halfYearDate, minutesAgo, yesterdayDate } from './date'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)

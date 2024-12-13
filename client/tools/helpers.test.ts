@@ -23,7 +23,9 @@ describe('helpers', () => {
         })
 
         it('encodes special characters', () => {
-            expect(encodeQueryData({ 'key with spaces': 'value with spaces' })).toBe('?key%20with%20spaces=value%20with%20spaces')
+            expect(encodeQueryData({ 'key with spaces': 'value with spaces' })).toBe(
+                '?key%20with%20spaces=value%20with%20spaces'
+            )
         })
 
         it('ignores keys with undefined or null values', () => {
