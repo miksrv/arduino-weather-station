@@ -23,7 +23,6 @@ type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon'> & {
     source: keyof ApiModel.Sensors
 }
 
-// TODO: There are repeating columns in the tables here and on forecast, we need to think about how to make a common configuration
 const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n, t } = useTranslation()
 

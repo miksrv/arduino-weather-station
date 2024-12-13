@@ -139,7 +139,6 @@ export default [
             //     'error',
             //     { allowIIFEs: true },
             // ],
-            // TODO
             '@typescript-eslint/no-explicit-any': 'off',
             'no-constant-condition': 'off',
             '@typescript-eslint/no-unnecessary-condition': 'off',

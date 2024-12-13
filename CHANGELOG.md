@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.4.1
+
+### Path Changes
+
+-   Fixed Jest config
+-   Fixed types for UI setItem function
+-   Added some UI Unit tests
+-   Added descriptions (TSDoc) for UI helpers functions
+
 ## 3.4.0
 
 ### Minor Changes

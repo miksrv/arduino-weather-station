@@ -4,8 +4,7 @@ const config: Config = {
     preset: 'ts-jest',
     testEnvironment: 'jsdom',
     moduleNameMapper: {
-        '\\.(css|sass|scss)$': 'identity-obj-proxy',
-        '\\.(jpg|jpeg|png)$': 'identity-obj-proxy',
+        '\\.(css|sass|scss|jpg|jpeg|png)$': 'identity-obj-proxy',
         '^@/(.*)$': '<rootDir>/$1'
     },
     transform: {
