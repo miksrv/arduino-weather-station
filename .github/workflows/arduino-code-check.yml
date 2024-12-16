@@ -38,7 +38,6 @@ jobs:
           arduino-cli lib install Firmata
           arduino-cli lib install TroykaDHT
           arduino-cli lib install BH1750
-          arduino-cli lib install PCF8574
           arduino-cli lib install Ethernet
 
       - name: Install Custom Libraries
