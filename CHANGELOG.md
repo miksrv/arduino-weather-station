@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.4.2
+
+### Path Changes
+
+-   Added Arduino code check
+-   Fixed Arduino code for testing GYML8511 UV sensor
+-   README documentation has been improved
+-   Added Arduino BMP085 and PCF8574 libraries to the repository
+
 ## 3.4.1
 
 ### Path Changes

@@ -30,6 +30,7 @@ Arduino Weather Station is an automated weather monitoring project built on Ardu
 
 [![UI Checks](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-checks.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-checks.yml)
 [![FTP Deploy](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-deploy.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-deploy.yml)
+[![Arduino Code Check](https://github.com/miksrv/arduino-weather-station/actions/workflows/arduino-code-check.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/arduino-code-check.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=miksrv_arduino-weather-station&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=miksrv_arduino-weather-station)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=miksrv_arduino-weather-station&metric=coverage)](https://sonarcloud.io/summary/new_code?id=miksrv_arduino-weather-station)
 
@@ -195,10 +196,12 @@ cd arduino-weather-station
 
 ### 4. Arduino Setup
 
-1. Open [Arduino Readme](./arduino/README.md)
-2. Open the Arduino sketch from the `arduino` -> `main` folder in the Arduino IDE.
-3. Connect your Arduino microcontroller and upload the sketch.
-4. Make sure the Arduino is correctly wired with the sensors.
+1. Open [Arduino Readme](./arduino/README.md).
+2. Open the Arduino sketch from the `arduino/main` folder in the Arduino IDE.
+3. Before compiling, make sure to install the required libraries:
+    - Extract the **BMP085_Library.zip** and **PCF8574_Library.zip** archives from the `/arduino` directory into the `libraries` folder of your Arduino IDE.
+4. Connect your Arduino microcontroller and upload the sketch.
+5. Ensure the Arduino is correctly wired with the sensors for proper functionality.
 
 #### Arduino Components:
 

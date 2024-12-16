@@ -1,6 +1,3 @@
-Here's the code with comments added in English:
-
-```cpp
 // Hardware pin definitions
 int UVOUT = A0;    // Analog pin connected to the UV sensor output
 int REF_3V3 = A1;  // Analog pin connected to the 3.3V reference voltage on the Arduino board
@@ -20,10 +17,10 @@ void loop()
   // Read average analog values from the UV sensor and reference voltage
   int uvLevel = averageAnalogRead(UVOUT);
   int refLevel = averageAnalogRead(REF_3V3);
-  
+
   // Calculate the output voltage using the 3.3V reference pin for accuracy
   float outputVoltage = 3.3 / refLevel * uvLevel;
-  
+
   // Convert the output voltage to UV intensity in mW/cm^2
   float uvIntensity = mapfloat(outputVoltage, 0.99, 2.9, 0.0, 15.0);
 
@@ -35,10 +32,10 @@ void loop()
   Serial.print(outputVoltage);
 
   Serial.print(" UV Intensity (mW/cm^2): ");
-  Serial.print(uvIntensity);  
-  
+  Serial.print(uvIntensity);
+
   Serial.println();  // Print a newline character for formatting
-  
+
   delay(100);  // Wait 100 milliseconds before the next loop iteration
 }
 
@@ -62,4 +59,3 @@ float mapfloat(float x, float in_min, float in_max, float out_min, float out_max
 {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
-```

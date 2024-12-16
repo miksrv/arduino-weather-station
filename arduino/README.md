@@ -26,6 +26,16 @@
 
 This project is a weather station built with an Arduino that collects and sends various environmental data, including temperature, humidity, wind speed, wind direction, barometric pressure, UV index, and light levels. The data is sent to a web server for remote monitoring.
 
+Before running and compiling the code, ensure that the required libraries are installed in your Arduino IDE:
+
+1. **Install BMP085_Library.zip and PCF8574_Library.zip**  
+   Place the library archives in the `libraries` folder of your Arduino IDE and extract them. Alternatively, you can use the Arduino Library Manager to include these libraries if they are available.
+
+2. **Optionally, use the latest version of the Adafruit BMP085 library**  
+   If you prefer to use the updated Adafruit BMP085 library for the pressure sensor, install it via the Arduino Library Manager. Note that using the updated library may require slight modifications to the sketch `get_sensor_pressure.ino` to align with the updated library's API.
+
+This ensures that all dependencies are correctly set up for the successful compilation and functionality of your weather station.
+
 ## Components
 
 - **BMP085**: Barometric pressure sensor

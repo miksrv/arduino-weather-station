@@ -1,0 +1,56 @@
+name: Arduino Code Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths:
+      - 'arduino/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  arduino-lint:
+    if: github.event.pull_request.draft == false
+    name: Check Arduino Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+        with:
+          version: 0.33.0
+
+      - name: Configure Arduino CLI
+        run: |
+          arduino-cli config init
+          arduino-cli config set library.enable_unsafe_install true
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr
+          arduino-cli lib install Firmata
+          arduino-cli lib install TroykaDHT
+          arduino-cli lib install BH1750
+          arduino-cli lib install Ethernet
+
+      - name: Install Custom Libraries
+        run: |
+          for archive in arduino/*.zip; do
+            echo "Installing library from $archive"
+            arduino-cli lib install --zip-path $archive || exit 1
+          done
+        shell: bash
+
+      - name: Verify Sketches
+        working-directory: arduino
+        run: |
+          for sketch in */*.ino; do
+            echo "Checking $sketch"
+            arduino-cli compile --fqbn arduino:avr:uno $sketch || exit 1
+          done
+        shell: bash

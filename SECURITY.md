@@ -5,12 +5,13 @@
 This section lists the versions of the project that are currently supported with security updates.
 
 | Version | Supported          |
-| ------- | ------------------ |
-| 2.1.x   | :white_check_mark: |
+|---------| ------------------ |
+| 3.4.x   | :white_check_mark: |
+| 3.3.x   | :white_check_mark: |
+| 2.1.x   | :x:                |
 | 2.0.x   | :x:                |
-| 1.0.x   | :x:                |
 
-We only support the latest stable versions (2.1.x). If you are using an older version, please upgrade to receive the latest security patches.
+We only support the latest stable versions (3.3.x and 3.4.x). If you are using an older version, please upgrade to receive the latest security patches.
 
 ## Reporting a Vulnerability
 
