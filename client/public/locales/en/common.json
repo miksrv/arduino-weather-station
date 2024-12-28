@@ -9,6 +9,8 @@
     "history-page-description": "Open the weather archive for any day in Orenburg. Find out detailed information about temperature, precipitation, wind and climate changes in past years. Quick access to Orenburg weather data with an accuracy of up to 10 minutes",
     "heatmap-page-description": "Interactive heat map with visualization of temperature, pressure, humidity, precipitation and cloudiness. Analyze weather data for any selected period",
     "forecast-page-description": "Find out the accurate weather forecast for 5 days ahead with detailed information about the current day. Temperature, precipitation, wind and other parameters for your city. Plan your day with confidence!",
+    "page-not-found": "Page not found",
+    "page-not-found-description": "You may have mistyped the page address or it has been removed. Return to one of the existing sections",
     "date": "Date",
     "time": "Time",
     "temperature": "Temperature",
