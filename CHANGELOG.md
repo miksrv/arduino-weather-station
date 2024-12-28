@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.3
+
+### Path Changes
+
+-   Implemented Not Found Page
+
 ## 3.4.2
 
 ### Path Changes

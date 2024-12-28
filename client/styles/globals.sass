@@ -47,3 +47,36 @@ body
         @media only screen and (max-width: variables.$mobileMaxWidth)
             span
                 display: none
+
+.not-found
+    margin: 30px auto 0
+    text-align: center
+
+    h1
+        font-size: 3em
+
+    .not-found-menu
+        margin-top: 40px
+
+        menu
+            display: flex
+            justify-content: center
+            gap: 8px
+            flex-wrap: wrap
+
+        li
+            background: var(--container-background-color)
+            border-radius: var(--border-radius)
+            flex-basis: calc(33.333% - 8px)
+            width: calc(33.333% - 8px)
+
+        a
+            display: flex
+            flex-direction: column
+            padding: 20px
+
+            svg
+                display: block
+                width: 46px
+                height: 46px
+                margin-bottom: 10px
