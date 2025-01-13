@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.4.4
+
+### Path Changes
+
+-   Updated UI Libraries
+-   Redesigned footer, added links
+
 ## 3.4.3
 
 ### Path Changes

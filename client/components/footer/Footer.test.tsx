@@ -16,19 +16,9 @@ jest.mock('@/tools/date', () => ({
     formatDate: jest.fn()
 }))
 
-jest.mock('@/update', () => new Date(2023, 0, 1, 12, 0, 0)) // 1 января 2023 года, 12:00
+jest.mock('@/update', () => new Date(2023, 0, 1, 12, 0, 0))
 
 describe('Footer', () => {
-    it('displays the correct copyright information', () => {
-        ;(formatDate as jest.Mock).mockImplementation((date, format) =>
-            format === 'YYYY' ? '2023' : '01.01.2023, 12:00'
-        )
-
-        render(<Footer />)
-
-        expect(screen.getByText('Copyright © TestApp 2023')).toBeInTheDocument()
-    })
-
     it('displays the correct version information', () => {
         ;(formatDate as jest.Mock).mockImplementation((date, format) =>
             format === 'DD.MM.YYYY, HH:mm' ? '01.01.2023, 12:00' : '2023'
@@ -36,7 +26,8 @@ describe('Footer', () => {
 
         render(<Footer />)
 
-        expect(screen.getByText('Version')).toBeInTheDocument()
+        expect(screen.getByText('v')).toBeInTheDocument()
+        expect(screen.getByText('GitHub')).toBeInTheDocument()
         expect(screen.getByText('1.0.0')).toBeInTheDocument()
         expect(screen.getByText('(01.01.2023, 12:00)')).toBeInTheDocument()
     })
