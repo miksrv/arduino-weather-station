@@ -5,6 +5,20 @@ namespace App\Models;
 use App\Entities\WeatherDataEntity;
 use CodeIgniter\Model;
 
+/**
+ * Class DailyAveragesModel
+ *
+ * This class represents the model for daily weather averages, providing methods to interact with the database.
+ *
+ * @package App\Models
+ *
+ * Public Methods:
+ * - getWeatherHistoryGrouped($startDate, $endDate, $groupInterval): Retrieves and returns weather history data grouped by a specified interval.
+ *
+ * Usage:
+ * $dailyAveragesModel = new DailyAveragesModel();
+ * $data = $dailyAveragesModel->getWeatherHistoryGrouped('2023-01-01', '2023-01-31', '1 day');
+ */
 class DailyAveragesModel extends Model
 {
     protected $table         = 'daily_averages';

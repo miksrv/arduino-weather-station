@@ -13,6 +13,9 @@ class WeatherAPILibrary
 {
     const API_URL = 'https://api.weatherapi.com/v1';
 
+    /**
+     * @var \CodeIgniter\HTTP\CURLRequest The HTTP client used for making requests.
+     */
     protected CURLRequest $httpClient;
 
     /**

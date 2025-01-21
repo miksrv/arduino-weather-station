@@ -8,6 +8,22 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Exception;
 
+/**
+ * Class Forecast
+ *
+ * This class handles the retrieval of forecast weather data, both daily and hourly.
+ *
+ * @package App\Controllers
+ *
+ * Public Methods:
+ * - getForecastDaily(): Retrieves and returns daily forecast weather data.
+ * - getForecastHourly(): Retrieves and returns hourly forecast weather data.
+ *
+ * Usage:
+ * $forecast = new Forecast();
+ * $forecast->getForecastDaily();
+ * $forecast->getForecastHourly();
+ */
 class Forecast extends ResourceController {
     protected ForecastWeatherDataModel $weatherForecastModel;
 
