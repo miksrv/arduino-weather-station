@@ -16,6 +16,9 @@ class OpenWeatherAPILibrary
     const API_VERSION = 2.5;
     const API_URL     = 'https://api.openweathermap.org/data/' . self::API_VERSION . '/';
 
+    /**
+     * @var \CodeIgniter\HTTP\CURLRequest The HTTP client used for making requests.
+     */
     protected CURLRequest $httpClient;
 
     public function __construct()

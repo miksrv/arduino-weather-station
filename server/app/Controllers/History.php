@@ -10,6 +10,22 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Exception;
 
+/**
+ * Class History
+ *
+ * This class handles the retrieval of historical weather data and provides it in different formats.
+ *
+ * @package App\Controllers
+ *
+ * Public Methods:
+ * - getHistoryWeather(): Retrieves and returns historical weather data.
+ * - getHistoryWeatherCSV(): Retrieves historical weather data and returns it as a CSV file.
+ *
+ * Usage:
+ * $history = new History();
+ * $history->getHistoryWeather();
+ * $history->getHistoryWeatherCSV();
+ */
 class History extends ResourceController {
     protected RawWeatherDataModel $weatherDataModel;
     protected HourlyAveragesModel $hourlyAveragesModel;
@@ -47,8 +63,8 @@ class History extends ResourceController {
     {
         // CSV file headers
         $csvHeader = [
-            'UTC Date', 'Temperature', 'Feels Like', 'Pressure', 'Humidity', 'Dew Point', 
-            'Visibility', 'UV Index', 'Solar Energy', 'Solar Radiation', 'Clouds', 
+            'UTC Date', 'Temperature', 'Feels Like', 'Pressure', 'Humidity', 'Dew Point',
+            'Visibility', 'UV Index', 'Solar Energy', 'Solar Radiation', 'Clouds',
             'Precipitation', 'Wind Speed', 'Wind Gust', 'Wind Degree'
         ];
 
@@ -100,17 +116,17 @@ class History extends ResourceController {
 
     /**
      * Retrieves historical weather data based on the provided date range.
-     * 
+     *
      * This method accepts 'start_date' and 'end_date' as query parameters and returns weather data
      * from the corresponding time period. The data is grouped by different intervals depending on
      * the duration of the date range.
-     * 
+     *
      * - If the date range is 24 hours or less, data is grouped by 10 minutes.
      * - If the range is between 24 hours and 7 days, data is grouped by the hour.
      * - If the range is more than 7 days, data is grouped by day.
-     * 
+     *
      * @return array|null Returns an array of weather data objects or null in case of errors.
-     * 
+     *
      * @throws \CodeIgniter\HTTP\Exceptions\HTTPException If any required parameters are missing or invalid.
      * @throws \CodeIgniter\HTTP\Exceptions\HTTPException If the date is in the future or before 2020-01-01.
      */

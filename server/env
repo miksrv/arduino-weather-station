@@ -20,7 +20,19 @@ CI_ENVIRONMENT = production
 # APP
 #--------------------------------------------------------------------
 
-app.baseURL = ''
+app.baseURL = 'http://localhost:8080/'
+
+app.weatherapi.key  = ''
+app.openweather.key = ''
+app.visualcrossing.key = ''
+
+app.lat = 51.70
+app.lon = 55.26
+
+app.narodmon.mac = ''
+app.narodmon.lat = 51.70
+app.narodmon.lon = 55.26
+app.narodmon.alt = 120
 
 # app.forceGlobalSecureRequests = false
 # app.CSPEnabled = false

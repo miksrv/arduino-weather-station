@@ -5,6 +5,22 @@ namespace App\Models;
 use App\Entities\WeatherForecastEntity;
 use CodeIgniter\Model;
 
+/**
+ * Class ForecastWeatherDataModel
+ *
+ * This class represents the model for forecast weather data, providing methods to interact with the database and retrieve weather forecasts.
+ *
+ * @package App\Models
+ *
+ * Public Methods:
+ * - getHourlyAverages(): Retrieves and returns hourly average forecast weather data.
+ * - getDailyAverages(): Retrieves and returns daily average forecast weather data.
+ *
+ * Usage:
+ * $forecastWeatherDataModel = new ForecastWeatherDataModel();
+ * $hourlyAverages = $forecastWeatherDataModel->getHourlyAverages();
+ * $dailyAverages = $forecastWeatherDataModel->getDailyAverages();
+ */
 class ForecastWeatherDataModel extends Model
 {
     protected $table         = 'forecast_weather_data';

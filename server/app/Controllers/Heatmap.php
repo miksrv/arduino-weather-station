@@ -8,6 +8,20 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Exception;
 
+/**
+ * Class Heatmap
+ *
+ * This class handles the retrieval of heatmap data for various weather types.
+ *
+ * @package App\Controllers
+ *
+ * Public Methods:
+ * - getHeatmapData(): Retrieves heatmap data for a specific weather type within a given date range.
+ *
+ * Usage:
+ * $heatmap = new Heatmap();
+ * $heatmap->getHeatmapData();
+ */
 class Heatmap extends ResourceController {
     protected RawWeatherDataModel $weatherDataModel;
 

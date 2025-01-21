@@ -41,10 +41,10 @@ class Current extends ResourceController {
         $hourlyForecast = $weatherForecastModel->getHourlyAverages();
         $weatherData    = $this->_getWeatherData();
 
-        // Преобразуем текущую дату в объект DateTime
+        // Convert the current date to a DateTime object
         $currentDateTime = new \DateTime($weatherData['date']);
 
-        // Находим первый объект прогноза, у которого дата больше текущей
+        // Find the first forecast object whose date is greater than the current one
         $nextForecast = null;
         foreach ($hourlyForecast as $forecast) {
             $forecastDate = new \DateTime($forecast['date']);
@@ -99,21 +99,7 @@ class Current extends ResourceController {
     private function _getWeatherData(): array
     {
         try {
-            // Get the current date and time
-            $currentDateTime = new \DateTime();
-            // Set the interval for data sampling (last 30 minutes)
-            $intervalMinutes = 30;
-            $startDateTime = clone $currentDateTime;
-            $startDateTime->modify("-$intervalMinutes minutes");
-
-            // Get data for the last 20 minutes
-            $recentAverages = $this->weatherDataModel->getRecentAverages($startDateTime, $currentDateTime);
-
-            // Get the latest data for fields that are updated less frequently
-            $latestData = $this->weatherDataModel->getLatestWeatherData(['precipitation', 'sol_energy', 'sol_radiation']); // 'sol_energy', 'sol_radiation', 'uv_index',
-            $latestDate = $this->weatherDataModel->getLastUpdateTime();
-
-            return array_merge(['date' => $latestDate], $recentAverages, $latestData);
+            return $this->weatherDataModel->getCurrentActualWeatherData();
         } catch (\Exception $e) {
             log_message('error', 'Failed to get current weather data, errors: ' . $e);
             return $this->failServerError('An error occurred while retrieving current weather data.');

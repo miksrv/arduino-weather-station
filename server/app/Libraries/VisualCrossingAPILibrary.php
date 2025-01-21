@@ -15,6 +15,9 @@ class VisualCrossingAPILibrary
 {
     const API_URL = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/';
 
+    /**
+     * @var \CodeIgniter\HTTP\CURLRequest The HTTP client used for making requests.
+     */
     protected CURLRequest $httpClient;
 
     /**

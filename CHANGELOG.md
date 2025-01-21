@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.4.5
+
+### Path Changes
+
+-   Updated UI Libraries
+-   Upgraded API Libraries
+-   Removed unused API dependencies
+-   Fixed API Locale
+-   Implemented new API Library for narodmon.ru
+-   Improved API RawWeatherDataModel (new function `getCurrentActualWeatherData`)
+-   Added new API Endpoint: `CLI system/narodmon`
+-   Written documentation (PHPDoc) for the API Classes
+-   Added new parameters (for NarodMonLibrary) to the .env file
+
 ## 3.4.4
 
 ### Path Changes

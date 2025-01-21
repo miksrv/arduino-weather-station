@@ -6,6 +6,7 @@ use App\Entities\WeatherDataEntity;
 use App\Libraries\OpenWeatherAPILibrary;
 use App\Libraries\VisualCrossingAPILibrary;
 use App\Libraries\WeatherAPILibrary;
+use App\Libraries\NarodMonLibrary;
 use App\Models\DailyAveragesModel;
 use App\Models\ForecastWeatherDataModel;
 use App\Models\HourlyAveragesModel;
@@ -15,6 +16,25 @@ use CodeIgniter\RESTful\ResourceController;
 use Exception;
 use ReflectionException;
 
+/**
+ * Class System
+ *
+ * This class handles various system operations related to weather data, including fetching current weather,
+ * sending data to narodmon.ru, and calculating averages.
+ *
+ * @package App\Controllers
+ *
+ * Public Methods:
+ * - sendNarodmonData(): Sends current weather data to the narodmon.ru monitoring service.
+ * - getCurrentWeather(): Fetches and saves current weather data from various APIs.
+ * - getForecastWeather(): Fetches and saves forecast weather data from various APIs.
+ *
+ * Usage:
+ * $system = new System();
+ * $system->sendNarodmonData();
+ * $system->getCurrentWeather();
+ * $system->getForecastWeather();
+ */
 class System extends ResourceController {
     protected OpenWeatherAPILibrary $openWeatherApi;
     protected WeatherAPILibrary $weatherApi;
@@ -35,6 +55,21 @@ class System extends ResourceController {
         $this->dailyAveragesModel  = new DailyAveragesModel();
 
         $this->forecastWeatherDataModel = new ForecastWeatherDataModel();
+    }
+
+    public function sendNarodmonData(): ResponseInterface
+    {
+        try {
+            $NarodMonLibrary = new NarodMonLibrary();
+            $weatherData     = $this->weatherDataModel->getCurrentActualWeatherData();
+
+            $NarodMonLibrary->send($weatherData);
+
+            return $this->respondCreated();
+        } catch (Exception $e) {
+            log_message('error', 'Error sending data to the project narodmon.ru: {e}', ['e' => $e->getMessage()]);
+            return $this->failServerError('Error sending data to the project narodmon.ru.');
+        }
     }
 
     /**

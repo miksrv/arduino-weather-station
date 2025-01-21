@@ -5,6 +5,20 @@ namespace App\Models;
 use App\Entities\WeatherDataEntity;
 use CodeIgniter\Model;
 
+/**
+ * Class HourlyAveragesModel
+ *
+ * This class represents the model for hourly weather averages, providing methods to interact with the database.
+ *
+ * @package App\Models
+ *
+ * Public Methods:
+ * - getWeatherHistoryGrouped($startDate, $endDate, $groupInterval): Retrieves and returns weather history data grouped by a specified interval.
+ *
+ * Usage:
+ * $hourlyAveragesModel = new HourlyAveragesModel();
+ * $data = $hourlyAveragesModel->getWeatherHistoryGrouped('2023-01-01', '2023-01-31', '1 hour');
+ */
 class HourlyAveragesModel extends Model
 {
     protected $table         = 'hourly_averages';
