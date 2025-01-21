@@ -115,7 +115,7 @@ class Current extends ResourceController {
 
             return array_merge(['date' => $latestDate], $recentAverages, $latestData);
         } catch (\Exception $e) {
-            log_message('error', 'Failed to get cuttent weather data, errors: ' . $e);
+            log_message('error', 'Failed to get current weather data, errors: ' . $e);
             return $this->failServerError('An error occurred while retrieving current weather data.');
         }
     }
