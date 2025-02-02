@@ -2,6 +2,7 @@
 
 namespace App\Libraries;
 
+use CodeIgniter\HTTP\CURLRequest;
 use Config\Services;
 
 /**
