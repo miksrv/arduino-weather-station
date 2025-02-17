@@ -1,7 +1,7 @@
 // ******************************************** //
 //  Name    : WEATHER STATION
 //  Author  : Misha Topchilo <miksoft.tm@gmail.com>
-//  Version : 1.3.1 (10 Sep 2024)
+//  Version : 1.3.2 (11 Feb 2025)
 // ******************************************** //
 
 // This is the wiring scheme between the sensors and the Arduino
@@ -34,8 +34,8 @@
 
 const long SEND_DATA_INTERVAL = 60; // Interval (in seconds) to send data to the server
 const char API_SERVER[] = "api.meteo.miksoft.pro"; // API server address
-const char API_METHOD[] = "/current";  // API endpoint to send sensor data
-const char API_SECRET[] = "";  // API key for authorization (must be provided)
+const char API_METHOD[] = "/sensors";  // API endpoint to send sensor data
+const char API_SECRET[] = "";  // API token for authorization (must be provided)
 
 // Pin assignments for different sensors
 const int PIN_ANEMOMETR = 3; // Digital PIN for the anemometer (wind speed sensor)
@@ -84,7 +84,7 @@ void setup() {
   // Initialize the BH1750 light sensor
   lightmeter.begin();
   delay(1000);
-  
+
   #ifdef DEBUG
     Serial.println(" - OK: BH1750");
   #endif
@@ -100,7 +100,7 @@ void setup() {
   // Initialize the BMP085 pressure sensor
   dps.init();
   delay(1000);
-  
+
   #ifdef DEBUG
     Serial.println(" - OK: BMP085");
   #endif
@@ -120,7 +120,7 @@ void setup() {
     expander.pinMode(i, INPUT_PULLUP);  // Set each pin as input with pull-up resistor
     delay(100);
   }
-  
+
   #ifdef DEBUG
     Serial.println(" - OK: PCF8574");
   #endif
