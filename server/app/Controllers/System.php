@@ -125,7 +125,7 @@ class System extends ResourceController {
     public function getForecastWeather(): ResponseInterface
     {
         try {
-            foreach ([/*$this->visualCrossingApi,*/ $this->weatherApi, $this->openWeatherApi] as $weatherClient) {
+            foreach ([$this->visualCrossingApi, $this->weatherApi, $this->openWeatherApi] as $weatherClient) {
                 $dataArray = $weatherClient->getForecastWeatherData();
 
                 if ($dataArray === false) {
