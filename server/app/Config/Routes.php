@@ -5,22 +5,45 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->cli('system/current', 'System::getCurrentWeather'); // php index.php system current
-$routes->cli('system/forecast', 'System::getForecastWeather'); // php index.php system forecast
-$routes->cli('system/narodmon', 'System::sendNarodmonData'); // php index.php system narodmon
 
-$routes->get('current', 'Current::getCurrentWeather');
-$routes->get('current/text', 'Current::getCurrentTextWeather');
-$routes->options('current', 'Current');
-$routes->options('current/text', 'Current');
+/** System Controller **/
+$routes->group('system', static function ($routes) {
+    $routes->cli('current', 'System::getCurrentWeather'); // php index.php system current
+    $routes->cli('forecast', 'System::getForecastWeather'); // php index.php system forecast
+    $routes->cli('narodmon', 'System::sendNarodmonData'); // php index.php system narodmon
+});
 
-$routes->get('forecast/daily', 'Forecast::getForecastDaily');
-$routes->get('forecast/hourly', 'Forecast::getForecastHourly');
-$routes->options('forecast/(:alphanum)', 'Forecast');
+/** Current Controller **/
+$routes->group('current', static function ($routes) {
+    $routes->get('/', 'Current::getCurrentWeather');
+    $routes->get('text', 'Current::getCurrentTextWeather');
+    $routes->options('/', static function () {});
+    $routes->options('text', static function () {});
+});
 
-$routes->get('history', 'History::getHistoryWeather');
-$routes->get('history/export', 'History::getHistoryWeatherCSV');
-$routes->options('history', 'History');
+/** Forecast Controller **/
+$routes->group('forecast', static function ($routes) {
+    $routes->get('daily', 'Forecast::getForecastDaily');
+    $routes->get('hourly', 'Forecast::getForecastHourly');
+    $routes->options('daily', static function () {});
+    $routes->options('hourly', static function () {});
+});
 
-$routes->get('heatmap', 'Heatmap::getHeatmapData');
-$routes->options('heatmap', 'Heatmap');
+/** History Controller **/
+$routes->group('history', static function ($routes) {
+    $routes->get('/', 'History::getHistoryWeather');
+    $routes->get('export', 'History::getHistoryWeatherCSV');
+    $routes->options('/', static function () {});
+});
+
+/** Heatmap Controller **/
+$routes->group('heatmap', static function ($routes) {
+    $routes->get('/', 'Heatmap::getHeatmapData');
+    $routes->options('/', static function () {});
+});
+
+/** Sensors Controller **/
+$routes->group('sensors', static function ($routes) {
+    $routes->post('/', 'Sensors::setWeather');
+    $routes->options('/', static function () {});
+});

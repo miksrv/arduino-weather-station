@@ -74,6 +74,36 @@ use Exception;
  * 803 => 'Broken clouds: 51-84%',
  * 804 => 'Overcast clouds: 85-100%',
  */
+
+ /**
+  * Class WeatherData
+  *
+  * This class represents formatted weather data retrieved from the database. It is used solely for displaying weather data, not for setting or modifying it.
+  *
+  * @package App\Entities
+  *
+  * Properties:
+  * - float|null $temperature: The temperature value.
+  * - float|null $feelsLike: The feels-like temperature value.
+  * - int|null $pressure: The atmospheric pressure value.
+  * - int|null $humidity: The humidity percentage.
+  * - float|null $dewPoint: The dew point temperature.
+  * - int|null $visibility: The visibility distance.
+  * - float|null $uvIndex: The UV index value.
+  * - float|null $solEnergy: The solar energy value.
+  * - float|null $solRadiation: The solar radiation value.
+  * - int|null $clouds: The cloudiness percentage.
+  * - float|null $precipitation: The precipitation amount.
+  * - float|null $windSpeed: The wind speed value.
+  * - float|null $windGust: The wind gust speed value.
+  * - int|null $windDeg: The wind direction in degrees.
+  * - int|null $weatherId: The weather condition ID.
+  * - string|null $date: The date of the weather data.
+  *
+  * Usage:
+  * $weatherData = new WeatherData($dataArray);
+  * echo $weatherData->temperature;
+  */
 class WeatherData
 {
     public ?float $temperature;
