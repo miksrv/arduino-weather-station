@@ -9,6 +9,26 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Exception;
 
+/**
+ * Class Current
+ *
+ * This class handles the retrieval of current weather data.
+ *
+ * @package App\Controllers
+ *
+ * Public Methods:
+ * - getCurrentWeather(): Retrieves and returns the current weather data.
+ * - getCurrentTextWeather(): Retrieves and returns the current weather data formatted as text.
+ *
+ * Private Methods:
+ * - _formatWeatherDataToText(array $data, string $forecast = null): Formats weather data into text.
+ * - _getWeatherData(): Gets the current weather data and returns it as an array of values.
+ *
+ * Usage:
+ * $current = new Current();
+ * $currentWeather = $current->getCurrentWeather();
+ * $currentTextWeather = $current->getCurrentTextWeather();
+ */
 class Current extends ResourceController {
     protected RawWeatherDataModel $weatherDataModel;
 
