@@ -22,6 +22,8 @@ CI_ENVIRONMENT = production
 
 app.baseURL = 'http://localhost:8080/'
 
+app.arduino.token = ''
+
 app.weatherapi.key  = ''
 app.openweather.key = ''
 app.visualcrossing.key = ''

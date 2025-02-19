@@ -150,6 +150,9 @@ cd arduino-weather-station
    cp .env.example .env
    ```
 
+    Don't forget to set the parameter `app.arduino.token` = '' in the .env file. This token will be used for proper authentication of the Arduino weather station when transmitting data to the server. The same token will need to be set in the Arduino sketch, which will be described in step 4.
+
+
 4. Migrate the database:
 
    ```bash
@@ -198,6 +201,11 @@ cd arduino-weather-station
 
 1. Open [Arduino Readme](./arduino/README.md).
 2. Open the Arduino sketch from the `arduino/main` folder in the Arduino IDE.
+3. Configure the following parameters in the `main.ino` file for Arduino:
+   - `API_SERVER` - the server address for sending data from the weather station.
+   - `API_METHOD` - the correct method (if you haven't changed anything in the server settings in this repository, you don't need to change it).
+   - `API_SECRET` - your secret for server authentication, the same secret key set in step 2 during server setup.
+   - Make sure the Arduino sensors are connected to the correct pins, or simply reassign them: `PIN_ANEMOMETR`, `PIN_DHT22`, `PIN_UV_OUT`, `PIN_UV_REF`
 3. Before compiling, make sure to install the required libraries:
     - Extract the **BMP085_Library.zip** and **PCF8574_Library.zip** archives from the `/arduino` directory into the `libraries` folder of your Arduino IDE.
 4. Connect your Arduino microcontroller and upload the sketch.

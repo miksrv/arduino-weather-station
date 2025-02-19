@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.4.6
+
+### Path Changes
+
+-   Fixed API NarodMonLibrary
+-   Updated UI Libraries
+-   Improved CI/CD API Deploy GitHub Action
+-   Fixed API Kint Config
+-   Changed Arduino firmware send data method
+-   Implemented API Sensors Controller
+-   Upgraded and added new one API Route
+-   Add visualCrossingApi for API get Weather tasks
+-   Added PHPDoc for WeatherData Entity
+-   Updated Readme, added new params for Server .env
+
 ## 3.4.5
 
 ### Path Changes
