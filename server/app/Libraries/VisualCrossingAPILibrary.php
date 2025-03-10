@@ -106,6 +106,16 @@ class VisualCrossingAPILibrary
     }
 
     /**
+     * We receive the weather forecast
+     * @return array|false
+     * @throws Exception
+     */
+    public function getForecastWeatherData(): false|array
+    {
+        return false;
+    }
+
+    /**
      * Mapping weather data to the desired format
      * @example https://www.visualcrossing.com/resources/documentation/weather-data/weather-data-documentation/
      * @param array $data
