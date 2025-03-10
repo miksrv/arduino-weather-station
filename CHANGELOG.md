@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.4.7
+
+### Path Changes
+
+-   Implemented getForecastWeatherData method for VisualCrossingAPILibrary
+-   Fixed CI/CD API Deploy
+-   Updated UI Libraries
+
 ## 3.4.6
 
 ### Path Changes
