@@ -95,7 +95,7 @@ const Calendar: React.FC<CalendarProps> = ({
     }
 
     const renderDays = () => {
-        const days: JSX.Element[] = []
+        const days: React.ReactNode[] = []
 
         // Display days of the previous month
         for (let i = 0; i < startDay; i++) {
