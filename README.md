@@ -4,7 +4,7 @@
 Arduino Weather Station is an automated weather monitoring project built on Arduino for collecting environmental data, featuring an API (PHP + MySQL + CodeIgniter) and a web interface (Next.js + Redux RTK) for real-time and historical weather data analysis. Please give the project a star :)
 
 <div align="center">
-  <img src="https://miksoft.pro/_next/static/media/project-meteostation.3b4b51cb.jpg" alt="Arduino Weather Station" width="150" height="150">
+  <img src="https://miksoft.pro/_next/static/media/meteostation.de6617a7.jpg" alt="Arduino Weather Station" width="150" height="150">
 
 <h3>Arduino Weather Station</h3>
 
