@@ -9,7 +9,7 @@ import { useRouter } from 'next/dist/client/router'
 import Head from 'next/head'
 // import { useReportWebVitals } from 'next/web-vitals'
 import { appWithTranslation, useTranslation } from 'next-i18next'
-import { ThemeProvider, useTheme } from 'next-themes'
+import { ThemeProvider } from 'next-themes'
 
 import '@/styles/globals.sass'
 import 'dayjs/locale/ru'
@@ -58,6 +58,20 @@ const App = ({ Component, pageProps }: AppProps) => {
                     name={'viewport'}
                     content={'width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no'}
                 />
+                <meta
+                    name={'theme-color'}
+                    content={'#ebedf0'}
+                    media={'(prefers-color-scheme: light)'}
+                />
+                <meta
+                    name={'theme-color'}
+                    content={'#1b1b1b'}
+                    media={'(prefers-color-scheme: dark)'}
+                />
+                <meta
+                    name={'apple-mobile-web-app-status-bar-style'}
+                    content={'black-translucent'}
+                />
                 <link
                     rel={'apple-touch-icon'}
                     sizes={'180x180'}
@@ -86,8 +100,6 @@ const App = ({ Component, pageProps }: AppProps) => {
                 />
             </Head>
 
-            <ThemeMeta />
-
             <Provider store={store}>
                 <Component {...pageProps} />
             </Provider>
@@ -100,24 +112,6 @@ const App = ({ Component, pageProps }: AppProps) => {
                 />
             )}
         </ThemeProvider>
-    )
-}
-
-const ThemeMeta: React.FC = () => {
-    const { theme } = useTheme()
-
-    return (
-        <Head>
-            <meta
-                name={'apple-mobile-web-app-status-bar-style'}
-                content={theme === 'dark' ? 'black-translucent' : 'default'}
-            />
-            <meta
-                name={'theme-color'}
-                content={theme === 'dark' ? '#1b1b1b' : '#ebedf0'}
-                media={`(prefers-color-scheme: ${theme === 'dark' ? 'dark' : 'light'})`}
-            />
-        </Head>
     )
 }
 
