@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.4.8
+
+### Path Changes
+-   Fixed Calendar UI Component type
+-   Updated UI Libraries
+-   Updated README.md
+-   Updated yarn version from `4.5.0` to `4.8.1`
+-   Improved UI themes and website manifest
+
 ## 3.4.7
 
 ### Path Changes
