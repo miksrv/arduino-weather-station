@@ -203,7 +203,7 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ columnsPreset, title, link
                         ? tableConfig.filter((column) => columnsPreset?.includes(column.column))
                         : props.columns
                 }
-                height={props.stickyHeader ? tableHeight : undefined}
+                height={props.stickyHeader && tableHeight ? tableHeight : undefined}
             />
         </div>
     )
