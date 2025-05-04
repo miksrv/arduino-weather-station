@@ -1,4 +1,17 @@
-# Changelog
+# CHANGELOG
+
+## 3.4.9
+
+### Path Changes
+-   Upgraded yarn version from `4.8.1` to `4.9.1`
+-   Updated ESLint and Prettier config
+-   Removed unused UI functions and types
+-   Implemented UI useLocalStorage hook
+-   Updated UI `light` and `dark` themes
+-   Updated UI libraries and SimpleUIKit version
+-   Refactoring UI code-style, fixed code by Prettier and ESLint
+-   Refactoring UI API, added new ENV variable -> `NEXT_PUBLIC_STORAGE_KEY`
+-   Updated README.md
 
 ## 3.4.8
 
