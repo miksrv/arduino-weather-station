@@ -1,7 +1,9 @@
 import React from 'react'
+import { cn, Icon, IconTypes } from 'simple-react-ui-kit'
+
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
-import { Icon, IconTypes } from 'simple-react-ui-kit'
 
 import styles from './styles.module.sass'
 
@@ -17,6 +19,7 @@ interface MenuProps {
 
 const Menu: React.FC<MenuProps> = ({ onClick }) => {
     const { t } = useTranslation()
+    const router = useRouter()
 
     const menuItems: MenuItemType[] = [
         {
@@ -55,6 +58,7 @@ const Menu: React.FC<MenuProps> = ({ onClick }) => {
                         <Link
                             href={item.link!}
                             title={item.text}
+                            className={cn(router.pathname === item.link && styles.active)}
                             onClick={() => onClick?.()}
                         >
                             {item.icon && <Icon name={item.icon} />}

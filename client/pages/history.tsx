@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { Button, Popout, PopoutHandleProps, Spinner } from 'simple-react-ui-kit'
+
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
-import { Button, Popout, PopoutHandleProps, Spinner } from 'simple-react-ui-kit'
 
-import { API, ApiType } from '@/api'
+import { API, ApiType, setLocale } from '@/api'
 import { urlAPI } from '@/api/api'
-import { setLocale } from '@/api/applicationSlice'
 import { wrapper } from '@/api/store'
 import { Maybe } from '@/api/types'
 import AppLayout from '@/components/app-layout'
@@ -15,6 +15,7 @@ import WidgetChart from '@/components/widget-chart'
 import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
 import { currentDate, formatDate, getDateTimeFormat, yesterdayDate } from '@/tools/date'
 import { encodeQueryData } from '@/tools/helpers'
+import { LocaleType } from '@/tools/types'
 import Datepicker, { findPresetByDate } from '@/ui/datepicker'
 
 type HistoryPageProps = object
@@ -47,7 +48,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
     })
 
     const currentDatePreset = useMemo((): string => {
-        const preset = findPresetByDate(startDate, endDate, i18n.language)
+        const preset = findPresetByDate(startDate, endDate, i18n.language as LocaleType)
 
         return preset ? preset : startDate && endDate ? `${startDate} - ${endDate}` : ''
     }, [startDate, endDate, i18n.language])
@@ -93,7 +94,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
                     position={'left'}
                 >
                     <Datepicker
-                        locale={i18n.language}
+                        locale={i18n.language as LocaleType}
                         startDate={startDate}
                         endDate={endDate}
                         minDate={MIN_DATE}
@@ -157,16 +158,12 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
 export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context): Promise<GetServerSidePropsResult<HistoryPageProps>> => {
-            const locale = context.locale ?? 'en'
+            const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
             const translations = await serverSideTranslations(locale)
 
             store.dispatch(setLocale(locale))
 
-            return {
-                props: {
-                    ...translations
-                }
-            }
+            return { props: { ...translations } }
         }
 )
 

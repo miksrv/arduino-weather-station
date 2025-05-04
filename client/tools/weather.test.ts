@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { filterRecentData, getCloudinessColor, getSampledData } from './weather'
-
 import { ApiModel } from '@/api'
+
+import { filterRecentData, getCloudinessColor, getSampledData } from './weather'
 
 dayjs.extend(utc)
 
@@ -73,25 +73,25 @@ describe('weather', () => {
         ]
 
         it('returns empty array when no data is provided', () => {
-            expect(filterRecentData()).toEqual([])
+            expect(filterRecentData()).toStrictEqual([])
         })
 
         it('filters data within the last 24 hours by default', () => {
             const result = filterRecentData(mockData)
-            expect(result.length).toBe(2)
+            expect(result).toHaveLength(2)
             expect(result[0].date).toBe(mockData[0].date)
             expect(result[1].date).toBe(mockData[2].date)
         })
 
         it('filters data within the last 2 hours', () => {
             const result = filterRecentData(mockData, 2)
-            expect(result.length).toBe(1)
+            expect(result).toHaveLength(1)
             expect(result[0].date).toBe(mockData[0].date)
         })
 
         it('returns all data if hours is greater than the oldest data', () => {
             const result = filterRecentData(mockData, 26)
-            expect(result.length).toBe(3)
+            expect(result).toHaveLength(3)
         })
     })
 
@@ -140,22 +140,22 @@ describe('weather', () => {
         ]
 
         it('returns empty array when no data is provided', () => {
-            expect(getSampledData([], 3)).toEqual([])
+            expect(getSampledData([], 3)).toStrictEqual([])
         })
 
         it('returns empty array when count is less than or equal to zero', () => {
-            expect(getSampledData(mockData, 0)).toEqual([])
-            expect(getSampledData(mockData, -1)).toEqual([])
+            expect(getSampledData(mockData, 0)).toStrictEqual([])
+            expect(getSampledData(mockData, -1)).toStrictEqual([])
         })
 
         it('returns all data if count is greater than or equal to data length', () => {
-            expect(getSampledData(mockData, 4)).toEqual(mockData)
-            expect(getSampledData(mockData, 5)).toEqual(mockData)
+            expect(getSampledData(mockData, 4)).toStrictEqual(mockData)
+            expect(getSampledData(mockData, 5)).toStrictEqual(mockData)
         })
 
         it('returns correct sampled data for count less than data length', () => {
             const result = getSampledData(mockData, 2)
-            expect(result.length).toBe(2)
+            expect(result).toHaveLength(2)
             expect(result[0].date).toBe(mockData[0].date)
             expect(result[1].date).toBe(mockData[3].date)
         })

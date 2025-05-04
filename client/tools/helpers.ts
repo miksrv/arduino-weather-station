@@ -4,16 +4,18 @@
  * @param data - The data object to be encoded.
  * @returns The encoded query string.
  */
-export const encodeQueryData = (data?: any): string => {
-    if (typeof data === 'undefined' || !data) {
+export const encodeQueryData = <T extends Record<keyof T, string | number | boolean>>(
+    data?: T | null | void
+): string => {
+    if (!data) {
         return ''
     }
 
     const ret = []
 
-    for (const d in data) {
-        if (d && data[d]) {
-            ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]))
+    for (const key in data) {
+        if (data[key] !== undefined && data[key] != null) {
+            ret.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
         }
     }
 

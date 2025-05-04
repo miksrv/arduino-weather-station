@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
-import { useTranslation } from 'next-i18next'
 import { cn, ColumnProps, Table, TableProps } from 'simple-react-ui-kit'
 
-import styles from './styles.module.sass'
+import Link from 'next/link'
+import { useTranslation } from 'next-i18next'
 
 import { ApiModel } from '@/api'
 import WeatherIcon from '@/components/weather-icon'
@@ -13,6 +12,8 @@ import { formatDate } from '@/tools/date'
 import { round } from '@/tools/helpers'
 import { convertHpaToMmHg, getCloudinessColor, getTemperatureColor } from '@/tools/weather'
 import ComparisonIcon from '@/ui/comparison-icon'
+
+import styles from './styles.module.sass'
 
 export const TABLE_COLUMNS = {
     date: 'date',
@@ -31,7 +32,7 @@ type ExtendedColumnProps<T> = ColumnProps<T> & {
 }
 
 interface WidgetProps extends TableProps<ApiModel.Weather> {
-    columnsPreset?: (keyof typeof TABLE_COLUMNS)[]
+    columnsPreset?: Array<keyof typeof TABLE_COLUMNS>
     title?: string
     link?: React.AnchorHTMLAttributes<HTMLAnchorElement>
     fullWidth?: boolean
@@ -44,7 +45,7 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ columnsPreset, title, link
     const titleRef = useRef<HTMLDivElement | null>(null)
     const [tableHeight, setTableHeight] = useState<number | null>(null)
 
-    const tableConfig: ExtendedColumnProps<ApiModel.Weather>[] = [
+    const tableConfig: Array<ExtendedColumnProps<ApiModel.Weather>> = [
         {
             column: 'date',
             header: t('date'),
@@ -197,6 +198,7 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ columnsPreset, title, link
 
             <Table<ApiModel.Weather>
                 {...props}
+                size={'small'}
                 className={styles.table}
                 columns={
                     columnsPreset?.length

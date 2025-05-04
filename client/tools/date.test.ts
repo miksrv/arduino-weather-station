@@ -13,11 +13,11 @@ describe('date utilities', () => {
     })
 
     it('should return the date for yesterday', () => {
-        expect(yesterdayDate).toEqual(currentDate.subtract(1, 'day').toDate())
+        expect(yesterdayDate).toStrictEqual(currentDate.subtract(1, 'day').toDate())
     })
 
     it('should return the date for half a year ago', () => {
-        expect(halfYearDate).toEqual(currentDate.subtract(6, 'month').toDate())
+        expect(halfYearDate).toStrictEqual(currentDate.subtract(6, 'month').toDate())
     })
 
     it('should parse a date string or Date object to Dayjs object in the specified timezone', () => {

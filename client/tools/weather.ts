@@ -139,7 +139,7 @@ export const getTemperatureColor = (temperature?: number | string): string => {
     const temp = Number(temperature)
 
     // Colors and their corresponding temperature ranges (in degrees Celsius)
-    const temperatureColors: { min: number; max: number; color: string }[] = [
+    const temperatureColors: Array<{ min: number; max: number; color: string }> = [
         { min: 48.9, max: Infinity, color: '#3d0216' }, // > 120°F
         { min: 46.1, max: 48.9, color: '#580b25' }, // 115-120°F
         { min: 43.3, max: 46.1, color: '#6e1532' }, // 110-115°F

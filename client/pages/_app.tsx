@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+
 import { AppProps } from 'next/app'
 import { useRouter } from 'next/dist/client/router'
 import Head from 'next/head'
@@ -11,30 +12,36 @@ import Head from 'next/head'
 import { appWithTranslation, useTranslation } from 'next-i18next'
 import { ThemeProvider } from 'next-themes'
 
-import '@/styles/globals.sass'
-import 'dayjs/locale/ru'
-import '@/styles/dark.css'
-import '@/styles/light.css'
+import { wrapper } from '@/api/store'
+import useLocalStorage from '@/tools/hooks/useLocalStorage'
+import { StorageKeys } from '@/tools/types'
 
 import i18Config from '../next-i18next.config'
 
-import { wrapper } from '@/api/store'
-import { LOCAL_STORAGE } from '@/tools/constants'
-import * as LocalStorage from '@/tools/localstorage'
+import 'dayjs/locale/ru'
+
+import '@/styles/dark.css'
+import '@/styles/light.css'
+import '@/styles/globals.sass'
 
 export const POLING_INTERVAL_CURRENT = 10 * 60 * 1000
 export const POLING_INTERVAL_FORECAST = 10 * 60 * 1000
-
-const locale = LocalStorage.getItem(LOCAL_STORAGE.LOCALE as any)
 
 const App = ({ Component, pageProps }: AppProps) => {
     const router = useRouter()
     const { i18n } = useTranslation()
     const { store } = wrapper.useWrappedStore(pageProps)
 
+    const [storageLocale] = useLocalStorage<StorageKeys, string>(StorageKeys.LOCALE)
+
     useEffect(() => {
-        if (i18n.language !== locale && i18Config.i18n.locales.includes(locale) && router.pathname !== '/404') {
-            router.replace(router.asPath, router.asPath, { locale })
+        if (
+            storageLocale &&
+            i18n.language !== storageLocale &&
+            i18Config.i18n.locales.includes(storageLocale) &&
+            router.pathname !== '/404'
+        ) {
+            void router.replace({ pathname: router.pathname, query: { ...router.query, storageLocale } })
         }
     }, [])
 

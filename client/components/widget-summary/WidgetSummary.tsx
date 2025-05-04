@@ -1,14 +1,15 @@
 import React from 'react'
-import { useTranslation } from 'next-i18next'
 import { Badge, Icon, Skeleton } from 'simple-react-ui-kit'
 
-import styles from './styles.module.sass'
+import { useTranslation } from 'next-i18next'
 
 import { ApiModel } from '@/api'
 import WeatherIcon from '@/components/weather-icon'
 import { getWeatherI18nKey } from '@/tools/conditions'
 import { round } from '@/tools/helpers'
 import { convertHpaToMmHg } from '@/tools/weather'
+
+import styles from './styles.module.sass'
 
 interface WidgetSummaryProps {
     loading?: boolean

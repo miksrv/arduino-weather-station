@@ -1,11 +1,12 @@
 import React from 'react'
 
+import { render } from '@testing-library/react'
+
+import WindDirectionIcon from './WindDirectionIcon'
+
 import '@testing-library/jest-dom'
 
 import styles from './styles.module.sass'
-import WindDirectionIcon from './WindDirectionIcon'
-
-import { render } from '@testing-library/react'
 
 describe('WindDirectionIcon', () => {
     it('renders SVG element with correct viewBox attribute', () => {

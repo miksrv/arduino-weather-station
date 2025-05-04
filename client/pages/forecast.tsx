@@ -1,16 +1,18 @@
 import React from 'react'
+
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
 
-import { API } from '@/api'
-import { setLocale } from '@/api/applicationSlice'
+import { API, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WidgetForecastTable from '@/components/widget-forecast-table'
 import WidgetMeteogram from '@/components/widget-meteogram'
 import { POLING_INTERVAL_FORECAST } from '@/pages/_app'
+import { LocaleType } from '@/tools/types'
+
 type IndexPageProps = object
 
 const IndexPage: NextPage<IndexPageProps> = () => {
@@ -69,16 +71,12 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context): Promise<GetServerSidePropsResult<IndexPageProps>> => {
-            const locale = context.locale ?? 'en'
+            const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
             const translations = await serverSideTranslations(locale)
 
             store.dispatch(setLocale(locale))
 
-            return {
-                props: {
-                    ...translations
-                }
-            }
+            return { props: { ...translations } }
         }
 )
 

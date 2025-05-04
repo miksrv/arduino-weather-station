@@ -2,6 +2,7 @@ import React from 'react'
 import { Skeleton } from 'simple-react-ui-kit'
 
 import Meteogram, { MeteogramProps } from './Meteogram'
+
 import styles from './styles.module.sass'
 
 interface WidgetProps extends MeteogramProps {

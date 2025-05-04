@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import NextNProgress from 'nextjs-progressbar'
 import { cn } from 'simple-react-ui-kit'
 
-import Menu from './Menu'
-import styles from './styles.module.sass'
+import NextNProgress from 'nextjs-progressbar'
 
 import { useAppSelector } from '@/api/store'
 import AppBar from '@/components/app-bar'
 import Footer from '@/components/footer'
 import LanguageSwitcher from '@/components/language-switcher'
+
+import Menu from './Menu'
+
+import styles from './styles.module.sass'
 
 interface AppLayoutProps {
     className?: string

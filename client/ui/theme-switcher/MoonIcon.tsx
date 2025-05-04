@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 
 import { TRANSITION_TIME } from '@/ui/theme-switcher/constants'
-import styles from '@/ui/theme-switcher/styles.module.sass'
 import { ToggleSwitchProps } from '@/ui/theme-switcher/ThemeSwitcher'
+
+import styles from '@/ui/theme-switcher/styles.module.sass'
 
 const MoonIcon: React.FC<ToggleSwitchProps> = ({ isClicked }) => {
     const [value, setValue] = useState(isClicked ? 1 : 0)

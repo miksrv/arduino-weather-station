@@ -3,15 +3,17 @@ import { CustomSeriesRenderItemAPI, CustomSeriesRenderItemParams, EChartsOption 
 import { CustomSeriesRenderItemReturn } from 'echarts/types/dist/echarts'
 import { LabelOption } from 'echarts/types/src/util/types'
 import ReactECharts from 'echarts-for-react'
+
 import { useTranslation } from 'next-i18next'
 import { useTheme } from 'next-themes'
 
 import { ApiModel } from '@/api'
 import { getWeatherIconUrl } from '@/components/weather-icon/WeatherIcon'
-import styles from '@/components/widget-chart/styles.module.sass'
 import { colors, getSensorColor } from '@/tools/colors'
 import { formatDate, formatDateFromUTC } from '@/tools/date'
 import { findMaxValue, findMinValue, getSampledData } from '@/tools/weather'
+
+import styles from '@/components/widget-chart/styles.module.sass'
 
 const WEATHER_ICON_SIZE = 40
 const WEATHER_ICON_SPACING = 40
@@ -94,18 +96,10 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
     }
 
     const axisBaseConfig = {
-        axisTick: {
-            show: false
-        },
-        axisLine: {
-            show: false
-        },
-        axisLabel: {
-            show: false
-        },
-        splitLine: {
-            show: false
-        }
+        axisTick: { show: false },
+        axisLine: { show: false },
+        axisLabel: { show: false },
+        splitLine: { show: false }
     }
 
     const config: EChartsOption = useMemo(
@@ -123,6 +117,7 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
                 trigger: 'axis',
                 backgroundColor,
                 borderColor,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 formatter: (params: any) => {
                     // An array of strings that will be concatenated and returned as the contents of the tooltip
                     const tooltipContent: string[] = []
@@ -135,13 +130,17 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
                     }
 
                     // Loop through each element in params to display the values (yAxis)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     params.forEach((item: any) => {
                         if (item.seriesIndex === 5) {
                             return
                         }
 
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                         const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                         const seriesValue = `<span class="${styles.value}">${item.value?.[1] ?? '---'}</span>`
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                         const seriesName = `<span class="${styles.label}">${item.seriesName}${seriesValue}</span>`
 
                         const row = `<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`
@@ -216,9 +215,7 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
                         color: getSensorColor('temperature')[0],
                         width: 1
                     },
-                    itemStyle: {
-                        color: getSensorColor('temperature')[0]
-                    },
+                    itemStyle: { color: getSensorColor('temperature')[0] },
                     data: data?.map((item) => [item.date, item.temperature])
                 },
                 {
@@ -232,9 +229,7 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
                         color: getSensorColor('pressure')[0],
                         width: 1
                     },
-                    itemStyle: {
-                        color: getSensorColor('pressure')[0]
-                    },
+                    itemStyle: { color: getSensorColor('pressure')[0] },
                     data: data?.map((item) => [item.date, item.pressure])
                 },
                 {
@@ -245,9 +240,7 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
                         color: getSensorColor('precipitation')[0],
                         width: 1
                     },
-                    itemStyle: {
-                        color: getSensorColor('precipitation')[0]
-                    },
+                    itemStyle: { color: getSensorColor('precipitation')[0] },
                     data: data?.map((item) => [item.date, item.precipitation])
                 },
                 {

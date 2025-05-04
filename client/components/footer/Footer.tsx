@@ -1,11 +1,12 @@
 import React from 'react'
-import Image from 'next/image'
 
-import styles from './styles.module.sass'
+import Image from 'next/image'
 
 import packageInfo from '@/package.json'
 import { formatDate } from '@/tools/date'
 import { update } from '@/update'
+
+import styles from './styles.module.sass'
 
 const Footer: React.FC = () => (
     <footer className={styles.footer}>
