@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
+
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NextSeo } from 'next-seo'
 
-import { API, ApiModel } from '@/api'
-import { setLocale } from '@/api/applicationSlice'
+import { API, ApiModel, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WidgetChart from '@/components/widget-chart'
@@ -15,6 +15,7 @@ import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
 import { POLING_INTERVAL_CURRENT, POLING_INTERVAL_FORECAST } from '@/pages/_app'
 import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
+import { LocaleType } from '@/tools/types'
 import { filterRecentData, getMinMaxValues } from '@/tools/weather'
 
 type IndexPageProps = object
@@ -152,16 +153,12 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context): Promise<GetServerSidePropsResult<IndexPageProps>> => {
-            const locale = context.locale ?? 'en'
+            const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
             const translations = await serverSideTranslations(locale)
 
             store.dispatch(setLocale(locale))
 
-            return {
-                props: {
-                    ...translations
-                }
-            }
+            return { props: { ...translations } }
         }
 )
 

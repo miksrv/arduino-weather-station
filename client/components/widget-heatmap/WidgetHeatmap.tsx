@@ -1,10 +1,11 @@
 import React from 'react'
 import { Skeleton } from 'simple-react-ui-kit'
 
-import Heatmap from './Heatmap'
-import styles from './styles.module.sass'
-
 import { ApiModel, ApiType } from '@/api'
+
+import Heatmap from './Heatmap'
+
+import styles from './styles.module.sass'
 
 interface WidgetProps {
     type: ApiType.Heatmap.SensorType

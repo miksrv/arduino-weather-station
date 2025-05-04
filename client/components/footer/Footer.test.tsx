@@ -1,20 +1,19 @@
 import React from 'react'
 
-import '@testing-library/jest-dom'
+import { render, screen } from '@testing-library/react'
+
+import { formatDate } from '@/tools/date'
 
 import Footer from './Footer'
 
-import { formatDate } from '@/tools/date'
-import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 
 jest.mock('@/package.json', () => ({
     name: 'TestApp',
     version: '1.0.0'
 }))
 
-jest.mock('@/tools/date', () => ({
-    formatDate: jest.fn()
-}))
+jest.mock('@/tools/date', () => ({ formatDate: jest.fn() }))
 
 jest.mock('@/update', () => new Date(2023, 0, 1, 12, 0, 0))
 

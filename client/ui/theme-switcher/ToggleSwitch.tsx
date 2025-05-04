@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import Circle from '@/ui/theme-switcher/Circle'
 import Stars from '@/ui/theme-switcher/Stars'
-import styles from '@/ui/theme-switcher/styles.module.sass'
 import { ToggleSwitchProps } from '@/ui/theme-switcher/ThemeSwitcher'
+
+import styles from '@/ui/theme-switcher/styles.module.sass'
 
 const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ isClicked }) => {
     const ref = useRef<HTMLDivElement>(null)

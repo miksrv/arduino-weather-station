@@ -73,6 +73,9 @@ export const getSensorColorType = (sensor?: keyof ApiModel.Sensors): keyof typeo
             return 'olive'
         default:
             return 'grey'
+        case undefined: {
+            throw new Error('Not implemented yet: undefined case')
+        }
     }
 }
 

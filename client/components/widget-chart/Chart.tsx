@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react'
-import { EChartsOption } from 'echarts'
+import { EChartsOption, SeriesOption } from 'echarts'
+import { YAXisOption } from 'echarts/types/dist/shared'
 import ReactECharts from 'echarts-for-react'
+
 import { useTranslation } from 'next-i18next'
 import { useTheme } from 'next-themes'
-
-import styles from './styles.module.sass'
 
 import { ApiModel } from '@/api'
 import { ChartTypes } from '@/components/widget-chart/WidgetChart'
@@ -12,6 +12,8 @@ import { getSensorColor } from '@/tools/colors'
 import { formatDateFromUTC } from '@/tools/date'
 import { round } from '@/tools/helpers'
 import { findMaxValue, findMinValue } from '@/tools/weather'
+
+import styles from './styles.module.sass'
 
 interface ChartProps {
     type: ChartTypes
@@ -70,21 +72,26 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
             },
             backgroundColor,
             borderColor,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             formatter: (params: any) => {
                 // An array of strings that will be concatenated and returned as the contents of the tooltip
                 const tooltipContent: string[] = []
 
                 //Format the header - let's assume it's a date (xAxis)
                 if (params.length > 0) {
-                    // const header = `<div class="${styles.chartTooltipTitle}">${formatDate(params[0].axisValueLabel, t('date-chart-tooltip'))}</div>`
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     const header = `<div class="${styles.chartTooltipTitle}">${params[0].axisValueLabel}</div>`
                     tooltipContent.push(header)
                 }
 
                 // Loop through each element in params to display the values (yAxis)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 params.forEach((item: any) => {
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     const seriesValue = `<span class="${styles.value}">${item.value?.[1] ?? '---'}</span>`
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     const seriesName = `<span class="${styles.label}">${item.seriesName}${seriesValue}</span>`
 
                     const row = `<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`
@@ -104,9 +111,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                 fontSize: '11px',
                 formatter: (value: number) => formatDateFromUTC(value, dateFormat ?? t('date-only-hour'))
             },
-            axisTick: {
-                show: true
-            },
+            axisTick: { show: true },
             axisLine: {
                 show: true,
                 lineStyle: {
@@ -124,9 +129,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
         yAxis: {
             type: 'value',
             nameGap: 50,
-            axisTick: {
-                show: true
-            },
+            axisTick: { show: true },
             axisLine: {
                 show: true,
                 lineStyle: {
@@ -158,7 +161,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
     }
 
     const getChartLineConfig = (source: keyof ApiModel.Sensors, name?: string, axis?: number, area?: boolean) => ({
-        ...(baseConfig.series as any)[0],
+        ...(baseConfig.series as SeriesOption[])[0],
         data: data?.map(({ date, [source]: sensorData }) => [date, sensorData]),
         name: name ?? '',
         yAxisIndex: axis ?? 0,
@@ -166,17 +169,11 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
             color: getSensorColor(source)[0],
             width: 1
         },
-        itemStyle: {
-            color: getSensorColor(source)[0]
-        },
-        areaStyle: area
-            ? {
-                  color: getSensorColor(source)[1]
-              }
-            : undefined
+        itemStyle: { color: getSensorColor(source)[0] },
+        areaStyle: area ? { color: getSensorColor(source)[1] } : undefined
     })
 
-    const config: EChartsOption = useMemo(() => {
+    const config: Omit<EChartsOption, 'type'> = useMemo(() => {
         switch (type) {
             default:
             case 'temperature':
@@ -186,7 +183,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                         {
                             ...baseConfig.yAxis,
                             axisLabel: {
-                                ...(baseConfig.yAxis as any).axisLabel,
+                                ...(baseConfig.yAxis as YAXisOption).axisLabel,
                                 formatter: '{value}°C'
                             }
                         }
@@ -205,14 +202,14 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                         {
                             ...baseConfig.yAxis,
                             axisLabel: {
-                                ...(baseConfig.yAxis as any).axisLabel,
+                                ...(baseConfig.yAxis as YAXisOption).axisLabel,
                                 formatter: '{value}%'
                             }
                         },
                         {
                             ...baseConfig.yAxis,
                             axisLabel: {
-                                ...(baseConfig.yAxis as any).axisLabel,
+                                ...(baseConfig.yAxis as YAXisOption).axisLabel,
                                 formatter: `{value}${t('meters-per-second')}`
                             }
                         }
@@ -232,14 +229,14 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                             min: findMinValue(data, 'pressure'),
                             max: findMaxValue(data, 'pressure'),
                             axisLabel: {
-                                ...(baseConfig.yAxis as any).axisLabel,
+                                ...(baseConfig.yAxis as YAXisOption).axisLabel,
                                 formatter: '{value}'
                             }
                         },
                         {
                             ...baseConfig.yAxis,
                             axisLabel: {
-                                ...(baseConfig.yAxis as any).axisLabel,
+                                ...(baseConfig.yAxis as YAXisOption).axisLabel,
                                 formatter: `{value} ${t('millimeters')}`
                             }
                         }

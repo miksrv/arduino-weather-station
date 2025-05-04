@@ -7,47 +7,54 @@
     --link-color-hover: #2483e4;
     --link-color-active: #237edd;
 
-    --overlay-background: rgba(0,0,0,.4);
+    /* Element Heights for `size` props */
+    --size-small: 24px;
+    --size-medium: 28px;
+    --size-large: 32px;
 
     /* Primary Colors */
-    --color-contrast: #FFF;
+    --color-contrast: #fff;
 
     --color-green: #4bb34b;
-    --color-green-hover: #48AC4A;
-    --color-green-active: #45A64A;
+    --color-green-hover: #48ac4a;
+    --color-green-active: #45a64a;
     --color-green-background: #e5ffe5;
 
-    --color-orange: #F8A01C;
-    --color-orange-hover: #EE9A1D;
-    --color-orange-active: #E4941F;
+    --color-orange: #f8a01c;
+    --color-orange-hover: #ee9a1d;
+    --color-orange-active: #e4941f;
     --color-orange-background: #fff2db;
 
     --color-red: #e64646;
-    --color-red-hover: #DD4446;
-    --color-red-active: #D44245;
+    --color-red-hover: #dd4446;
+    --color-red-active: #d44245;
     --color-red-background: #ffdddd;
 
     --color-main: #2688eb;
-    --color-main-hover: #2483e4;
+    --color-main-hover: #4c96ea;
     --color-main-active: #237edd;
     --color-main-background: #d6eaff;
 
     /* Text and Typography */
     --font-size: 14px;
     --font-size-small: 12px;
-    --font-family: -apple-system, system-ui, 'Helvetica Neue', Roboto, sans-serif;
+    --font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI (Custom)', Roboto, 'Helvetica Neue', 'Open Sans (Custom)',
+        system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
     --text-color-primary: rgba(0, 0, 0, 0.9);
     --text-color-secondary: #818c99;
-    --text-color-secondary-hover: #939CA9;
+    --text-color-secondary-hover: #939ca9;
 
     /* Layout and Containers */
-    --body-background: #ebedf0;
     --border-radius: 6px;
+    --body-background: #ebedf0;
+    --modal-background: #ffffff;
+    --overlay-background: rgba(0, 0, 0, 0.4);
     --container-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.12);
     --container-background-color: #fff;
-    --container-error-background-color: #FFE9E9;
+    --container-error-background-color: #ffe9e9;
     --container-error-color: var(--color-red);
-    --container-success-background-color: #E8F9E8;
+    --container-success-background-color: #e8f9e8;
     --container-success-color: var(--color-green);
 
     /* Input Fields and Dropdowns */
@@ -58,6 +65,7 @@
     --input-label-color: #6d7885;
     --input-border-color: #cbcccd;
     --input-border: 0.5px solid var(--input-border-color);
+    --input-border-focus-color: var(--color-main);
 
     /* Buttons */
     --button-font-weight: 500;
@@ -71,22 +79,22 @@
     --button-primary-background-hover: var(--color-main-hover);
     --button-primary-background-active: var(--color-main-active);
 
-    --button-secondary-background: rgba(235,242,250,.99);
-    --button-secondary-background-hover: rgba(223,234,246,.99);
-    --button-secondary-background-active: rgba(213,226,241,.99);
+    --button-secondary-background: rgba(235, 242, 250, 0.99);
+    --button-secondary-background-hover: rgba(223, 234, 246, 0.99);
+    --button-secondary-background-active: rgba(213, 226, 241, 0.99);
     --button-secondary-color: var(--color-main);
     --button-secondary-color-hover: var(--color-main-hover);
     --button-secondary-color-active: var(--color-main-active);
 
     /* Popout */
-    --popout-shadow: 0 0 2px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.08);
+    --popout-shadow: 0 0 2px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.08);
 
     /* Table */
-    --table-font-size: var(--font-size-small);
-    --table-header-background: #f2f3f5;
+    --table-header-background: #f9f9fb;
     --table-header-background-hover: rgba(255, 255, 255, 0.1);
     --table-border-color: var(--input-border-color);
+    --table-row-box-shadow: inset 0 -1px var(--input-border-color);
 
     /* Skeleton */
-    --skeleton-background-animation: linear-gradient( 90deg, transparent, rgba(0, 0, 0, 0.04), transparent);
+    --skeleton-background-animation: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.04), transparent);
 }

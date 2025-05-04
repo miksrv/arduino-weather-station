@@ -1,11 +1,12 @@
 import React from 'react'
-import Link from 'next/link'
 import { Icon, IconTypes, Skeleton } from 'simple-react-ui-kit'
 
-import styles from './styles.module.sass'
+import Link from 'next/link'
 
 import { formatDate } from '@/tools/date'
 import { MinMaxResult } from '@/tools/weather'
+
+import styles from './styles.module.sass'
 
 export interface WidgetSensorProps {
     title?: string

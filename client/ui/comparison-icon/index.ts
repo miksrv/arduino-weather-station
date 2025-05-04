@@ -1,2 +1,2 @@
-export { default } from './ComparisonIcon'
 export type { ComparisonIconProps } from './ComparisonIcon'
+export { default } from './ComparisonIcon'

@@ -1,15 +1,16 @@
 import React from 'react'
-import { useTranslation } from 'next-i18next'
-import { useTheme } from 'next-themes'
 import { Icon, Spinner } from 'simple-react-ui-kit'
 
-import styles from './styles.module.sass'
+import { useTranslation } from 'next-i18next'
+import { useTheme } from 'next-themes'
 
 import { API } from '@/api'
 import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
 import { formatDate, minutesAgo, timeAgo } from '@/tools/date'
 import useClientOnly from '@/tools/hooks/useClientOnly'
 import ThemeSwitcher from '@/ui/theme-switcher'
+
+import styles from './styles.module.sass'
 
 interface HeaderProps {
     fullSize?: boolean

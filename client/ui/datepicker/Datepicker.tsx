@@ -3,8 +3,9 @@ import dayjs from 'dayjs'
 import { Button } from 'simple-react-ui-kit'
 
 import Calendar, { CalendarProps } from './Calendar'
-import styles from './styles.module.sass'
 import { CalendarPresetType, enPresets, PresetOption, ruPresets } from './utils'
+
+import styles from './styles.module.sass'
 
 type DatePickerProps = CalendarProps & {
     hidePresets?: PresetOption[]

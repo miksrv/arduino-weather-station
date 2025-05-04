@@ -3,9 +3,10 @@ import dayjs, { Dayjs } from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { cn, Icon } from 'simple-react-ui-kit'
 
-import styles from './styles.module.sass'
-
+import { LocaleType } from '@/tools/types'
 import { enDaysOfWeek, enMonths, ruDaysOfWeek, ruMonths } from '@/ui/datepicker/utils'
+
+import styles from './styles.module.sass'
 
 dayjs.extend(utc)
 
@@ -15,7 +16,7 @@ export interface CalendarProps {
     endDate?: string
     minDate?: string
     maxDate?: string
-    locale?: 'en' | 'ru' | string
+    locale?: LocaleType
     onPeriodSelect?: (startDate?: string, endDate?: string) => void
 }
 

@@ -2,14 +2,15 @@ import React, { useMemo } from 'react'
 import dayjs from 'dayjs'
 import { EChartsOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
+
 import { useTranslation } from 'next-i18next'
 import { useTheme } from 'next-themes'
-
-import styles from './styles.module.sass'
 
 import { ApiModel, ApiType } from '@/api'
 import { formatDate } from '@/tools/date'
 import useClientOnly from '@/tools/hooks/useClientOnly'
+
+import styles from './styles.module.sass'
 
 interface ChartProps {
     type: ApiType.Heatmap.SensorType
@@ -141,16 +142,17 @@ const HeatmapChart: React.FC<ChartProps> = ({ type, data, title, subTitle, heigh
                 fontWeight: 400,
                 color: textPrimaryColor
             },
-            subtextStyle: {
-                color: textSecondaryColor
-            }
+            subtextStyle: { color: textSecondaryColor }
         },
         tooltip: {
             backgroundColor: backgroundColor,
             borderColor: borderColor,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             formatter: (params: any) => {
                 const tooltipContent: string[] = []
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 const colorSquare = `<span class="${styles.icon}" style="background-color: ${params.color};"></span>`
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 const seriesValue = `<span class="${styles.value}">${params.value?.[2]} ${chartUnit}</span>`
                 const seriesName = `<span class="${styles.label}">${t(type)}${seriesValue}</span>`
 
@@ -173,9 +175,7 @@ const HeatmapChart: React.FC<ChartProps> = ({ type, data, title, subTitle, heigh
         xAxis: {
             type: 'category',
             data: xData,
-            splitArea: {
-                show: true
-            },
+            splitArea: { show: true },
             axisLabel: {
                 show: true,
                 hideOverlap: true,
@@ -187,9 +187,7 @@ const HeatmapChart: React.FC<ChartProps> = ({ type, data, title, subTitle, heigh
         yAxis: {
             type: 'category',
             data: yData,
-            splitArea: {
-                show: true
-            },
+            splitArea: { show: true },
             axisLabel: {
                 show: true,
                 formatter: '{value}',
@@ -205,9 +203,7 @@ const HeatmapChart: React.FC<ChartProps> = ({ type, data, title, subTitle, heigh
             right: 10,
             top: 5,
             padding: 0,
-            inRange: {
-                color: chartColors
-            },
+            inRange: { color: chartColors },
             textStyle: {
                 color: textPrimaryColor,
                 fontSize: '10px'
@@ -228,9 +224,7 @@ const HeatmapChart: React.FC<ChartProps> = ({ type, data, title, subTitle, heigh
             }
         ],
         backgroundColor: backgroundColor,
-        textStyle: {
-            color: textPrimaryColor
-        }
+        textStyle: { color: textPrimaryColor }
     }
 
     return (

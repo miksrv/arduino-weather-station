@@ -29,9 +29,7 @@ const WeatherChart: React.FC<Props> = ({ data, source }) => {
     )
 
     const option: EChartsOption = {
-        tooltip: {
-            show: false
-        },
+        tooltip: { show: false },
         grid: {
             left: 0,
             right: 0,
@@ -42,35 +40,19 @@ const WeatherChart: React.FC<Props> = ({ data, source }) => {
         xAxis: {
             type: 'category',
             data: weatherFormatedData?.map((item) => item.date),
-            axisLine: {
-                show: false
-            },
-            axisTick: {
-                show: false
-            },
-            axisLabel: {
-                show: false
-            },
-            splitLine: {
-                show: false
-            }
+            axisLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: { show: false },
+            splitLine: { show: false }
         },
         yAxis: {
             type: 'value',
             min: findMinValue(weatherData, source),
             max: findMaxValue(weatherData, source),
-            axisLine: {
-                show: false
-            },
-            axisTick: {
-                show: false
-            },
-            axisLabel: {
-                show: false
-            },
-            splitLine: {
-                show: false
-            }
+            axisLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: { show: false },
+            splitLine: { show: false }
         },
         series: [
             {
@@ -83,9 +65,7 @@ const WeatherChart: React.FC<Props> = ({ data, source }) => {
                     color: colorsData[0],
                     width: 2
                 },
-                itemStyle: {
-                    color: colorsData[0]
-                },
+                itemStyle: { color: colorsData[0] },
                 areaStyle: {
                     color: new graphic.LinearGradient(0, 0, 0, 1, [
                         {

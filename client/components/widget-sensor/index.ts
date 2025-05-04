@@ -1,2 +1,2 @@
-export { default } from './WidgetSensor'
 export type { WidgetSensorProps } from './WidgetSensor'
+export { default } from './WidgetSensor'

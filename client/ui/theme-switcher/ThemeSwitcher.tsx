@@ -1,8 +1,8 @@
 import React from 'react'
 
-import styles from './styles.module.sass'
-
 import ToggleSwitch from '@/ui/theme-switcher/ToggleSwitch'
+
+import styles from './styles.module.sass'
 
 type ThemesType = 'dark' | 'light'
 

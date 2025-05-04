@@ -25,6 +25,7 @@
     margin: 15px 0 0 0
 
     a
+        margin-bottom: 5px
         padding: 8px 16px
         width: 100%
         display: flex
@@ -37,13 +38,16 @@
         transition: background-color .15s ease-out,opacity .15s ease-out
 
         &:hover
-            background-color: var(--body-background)
+            background-color: var(--modal-background)
 
         svg
             fill: var(--link-color)
             margin: -10px 10px -10px 0
             width: 22px
             height: 22px
+
+    .active
+        background-color: var(--body-background)
 
 .appLayout
     width: 100%

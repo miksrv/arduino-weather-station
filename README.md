@@ -172,29 +172,41 @@ cd arduino-weather-station
    ```bash
    cd ../client
    ```
-
-2. Install frontend dependencies:
+   
+2. Copy file `env` to `.env.local` and set the following environment variables:
 
    ```bash
-   npm install
+   cp .env .env
+   ```
+   
+    ```bash
+    NEXT_PUBLIC_API_HOST = 'http://localhost:8080/'
+    NEXT_PUBLIC_SITE_LINK = 'http://localhost:3000/'
+    NEXT_PUBLIC_STORAGE_KEY = 'meteo'
+    ```
+
+3. Install frontend dependencies:
+
+   ```bash
+   yarn install
    ```
 
-3. Run the frontend in development mode:
+4. Run the frontend in development mode:
 
    ```bash
-   npm run dev
+   yarn run dev
    ```
 
-4. To build the project for production:
+5. To build the project for production:
 
    ```bash
-   npm run build
+   yarn run build
    ```
 
-5. Optionally, start the production build:
+6. Optionally, start the production build:
 
    ```bash
-   npm start
+   yarn start
    ```
 
 ### 4. Arduino Setup
