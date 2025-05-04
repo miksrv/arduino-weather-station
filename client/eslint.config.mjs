@@ -1,363 +1,398 @@
-import globals from 'globals'
-import pluginJs from '@eslint/js'
+import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
-import importPlugin from 'eslint-plugin-import'
-import nextPlugin from '@next/eslint-plugin-next'
-// import nextCoreWebVitals from '@next/core-web-vitals';
 import jestPlugin from 'eslint-plugin-jest'
-import { fixupConfigRules } from '@eslint/compat'
-import eslintCommentsPlugin from 'eslint-plugin-eslint-comments'
-import pluginReactConfig from 'eslint-plugin-react/configs/recommended.js'
+import reactPlugin from 'eslint-plugin-react'
+import nextPlugin from '@next/eslint-plugin-next'
+import reactHooksPlugin from 'eslint-plugin-react-hooks'
+import importPlugin from 'eslint-plugin-import'
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort'
+import prettierPlugin from 'eslint-plugin-prettier'
+import prettierConfig from 'eslint-config-prettier'
 
-export default [
+export default defineConfig([
     // register all the plugins up-front
     {
         // note - intentionally uses computed syntax to make it easy to sort the keys
         plugins: {
             ['@typescript-eslint']: tseslint.plugin,
-            ['eslint-comments']: eslintCommentsPlugin,
+            ['react']: reactPlugin,
+            ['react-hooks']: reactHooksPlugin,
             ['import']: importPlugin,
             ['jest']: jestPlugin,
+            ['prettier']: prettierPlugin,
+            ['simple-import-sort']: simpleImportSortPlugin,
             ['next']: nextPlugin,
             // ['jsx-a11y']: jsxA11yPlugin,
-            // ['react-hooks']: reactHooksPlugin,
-            // ['react']: reactPlugin,
-            ['simple-import-sort']: simpleImportSortPlugin
             // ['unicorn']: unicornPlugin,
-        }
+        },
+        extends: [prettierConfig],
     },
 
+    // register all the configs up-front
     {
-        // config with just ignores is the replacement for `.eslintignore`
         ignores: [
             '**/.yarn/**',
             '**/eslint.config.mjs',
-            '**/eslint.config.js',
-            '**/jest.config.ts',
+            '**/declarations.d.ts',
             '**/node_modules/**',
-            '**/dist/**',
-            '**/fixtures/**',
-            '**/coverage/**',
-            '**/__snapshots__/**',
-            '**/.docusaurus/**',
             '**/build/**',
+            '**/dist/**',
+            '**/coverage/**',
+
+            // WebPack
+            // '**/webpack.config.js',
+
+            // RollUp
+            '**/rollup.config.js',
+
             // PM2 Server
             '**/ecosystem.config.js',
+
             // NextJS
             '**/next-i18next.config.js',
             '**/next.config.js',
             '**/.next/**',
             '**/next-env.d.ts',
-            '**/middleware.ts'
-        ]
+            '**/middleware.ts',
+
+            // Storybook
+            '**/.storybook/main.js',
+            '**/.storybook/preview.js',
+            '**/storybook-static/',
+
+            // Jest
+            '**/jest.config.ts',
+            '**/jest.setup.ts',
+        ],
     },
 
     // extends ...
-    pluginJs.configs.recommended,
-    ...tseslint.configs.recommended,
-    ...fixupConfigRules(pluginReactConfig),
-    // ...tseslint.configs.strictTypeChecked,
-    // ...tseslint.configs.stylisticTypeChecked,
+    tseslint.configs.recommended,
 
-    // base config
     {
         languageOptions: {
-            globals: {
-                ...globals.es2022,
-                ...globals.node
-            },
             parserOptions: {
                 allowAutomaticSingleRunInference: true,
-                cacheLifetime: {
-                    // we pretty well never create/change tsconfig structure - so no need to ever evict the cache
-                    // in the rare case that we do - just need to manually restart their IDE.
-                    glob: 'Infinity'
-                },
+                warnOnUnsupportedTypeScriptVersion: false,
                 project: ['tsconfig.json'],
-                warnOnUnsupportedTypeScriptVersion: false
-            }
+            },
         },
 
         settings: {
             react: {
                 version: 'detect',
-            }
+            },
         },
 
         rules: {
             //
             // eslint-base
             //
+            // ✅ Requires curly braces for all control statements
             curly: ['error', 'all'],
+            // ✅ Disallow semicolons
             semi: ['error', 'never'],
-            eqeqeq: [
-                'error',
-                'always',
-                {
-                    null: 'never'
-                }
-            ],
-            'no-duplicate-imports': 'warn',
+            // ✅ Require === and !== except when comparing to null
+            eqeqeq: ['error', 'always', { null: 'never' }],
+            // ✅ Error when the same module is imported multiple times
+            'no-duplicate-imports': 'error',
+            // ✅ Enforce using logical assignment operators (&&=, ||=, ??=)
             'logical-assignment-operators': 'error',
+            // ✅ Disallow return in else after if with return
             'no-else-return': 'error',
-            // 'no-mixed-operators': 'warn',
-            'no-console': [
-                'error',
-                {
-                    allow: ['warn', 'error']
-                }
-            ],
+            // ✅ Disallow console except console.warn and console.error
+            'no-console': ['error', { allow: ['warn', 'error'] }],
+            // ✅ Disallow process.exit()
             'no-process-exit': 'error',
+            // ✅ Disallow fallthrough in switch/case unless marked with a comment
             'no-fallthrough': [
                 'error',
-                { commentPattern: '.*intentional fallthrough.*' }
+                { commentPattern: '.*intentional fallthrough.*' },
             ],
-            'comma-dangle': ['warn', 'never'],
+            // ✅ Warn if double quotes are used instead of single quotes
             quotes: ['warn', 'single'],
-            'jsx-quotes': ['warn', 'prefer-single'],
+            // ❌ Warn if trailing commas are used (Prettier Config)
+            // -> 'comma-dangle': ['warn', 'never'],
+            // ❌ Prefer single quotes in JSX (Prettier Config)
+            // -> 'jsx-quotes': ['warn', 'prefer-single'],
+            // ✅ Disallow declaring multiple variables in one statement
+            'one-var': ['error', 'never'],
+            // ✅ Warn if lines exceed 120 characters, ignoring strings, templates, and comments
             'max-len': [
                 'warn',
                 {
                     code: 120,
+                    ignoreUrls: true,
                     ignoreTemplateLiterals: true,
                     ignoreStrings: true,
                     ignoreComments: true,
-                    ignoreUrls: true
-                }
+                },
             ],
-            'one-var': ['error', 'never'],
+            // ✅ Enforce consistent indentation (2 spaces)
+            'object-curly-spacing': ['error', 'always'],
+            // ❌ Enforce consistent spacing inside braces
+            'object-curly-newline': [
+                'off',
+                // {
+                //     ObjectExpression: {
+                //         multiline: true,
+                //         minProperties: 6, // Wrap to new lines if there are more than 5 properties
+                //     },
+                //     ImportDeclaration: {
+                //         multiline: true,
+                //         minProperties: 6, // Wrap to new lines if there are more than 5 imports
+                //     },
+                // },
+            ],
+            // ✅ Enforce consistent line breaks inside braces
+            'padding-line-between-statements': [
+                'error',
+                // Add an empty line after the last import
+                { blankLine: 'always', prev: 'import', next: '*' },
+                // Allow multiple consecutive imports without empty lines
+                { blankLine: 'any', prev: 'import', next: 'import' },
+            ],
+
+            //
+            // eslint-plugin-prettier
+            //
+            'prettier/prettier': 'error',
 
             //
             // typescript-eslint
             //
-            // '@typescript-eslint/consistent-type-imports': [
-            //     'error',
-            //     { prefer: 'type-imports', disallowTypeAnnotations: true },
-            // ],
-            // '@typescript-eslint/explicit-function-return-type': [
-            //     'error',
-            //     { allowIIFEs: true },
-            // ],
-            '@typescript-eslint/no-explicit-any': 'off',
-            'no-constant-condition': 'off',
+            // ❌ Not require explicit return types on functions and class methods
+            '@typescript-eslint/explicit-function-return-type': ['off'],
+            // ❌ Typescript unnecessary conditions
             '@typescript-eslint/no-unnecessary-condition': 'off',
-            // '@typescript-eslint/no-unnecessary-condition': [
-            //     'error',
-            //     { allowConstantLoopConditions: true },
-            // ],
-            '@typescript-eslint/no-var-requires': 'off',
+            // ✅ Disallow usage of any type
+            '@typescript-eslint/no-explicit-any': 'warn',
+            // ✅ Disallow constant conditions (e.g., while(true) or if(1))
+            'no-constant-condition': 'error',
+            // ✅ Disallow require() in TypeScript files
+            '@typescript-eslint/no-var-requires': 'warn',
+            // ✅ Prefer literal enum members, allow bitwise expressions
             '@typescript-eslint/prefer-literal-enum-member': [
                 'error',
-                {
-                    allowBitwiseExpressions: true
-                }
+                { allowBitwiseExpressions: true },
             ],
+            // ✅ Prefer startsWith/endsWith over indexOf or substr comparisons
             '@typescript-eslint/prefer-string-starts-ends-with': [
                 'error',
-                {
-                    allowSingleElementEquality: 'always'
-                }
+                { allowSingleElementEquality: 'always' },
             ],
+            // ✅ Allow unbound methods (without this)
             '@typescript-eslint/unbound-method': 'off',
-            // '@typescript-eslint/restrict-template-expressions': [
-            //     'error',
-            //     {
-            //         allowNumber: true,
-            //         allowBoolean: true,
-            //         allowAny: true,
-            //         allowNullish: true,
-            //         allowRegExp: true,
-            //     },
-            // ],
+            // ✅ Require explicit accessibility modifiers on class properties and methods (public, private, protected)
+            '@typescript-eslint/explicit-member-accessibility': [
+                'error',
+                { accessibility: 'explicit' },
+            ],
+            // ✅ Disallow floating promises (promises that are not awaited or handled)
+            '@typescript-eslint/no-floating-promises': 'error',
+            // ✅ Disallow calling `await` on non-Promise values
+            '@typescript-eslint/await-thenable': 'warn',
+            // ✅ Require using `Promise.allSettled` or `Promise.all` with proper handling
+            '@typescript-eslint/no-misused-promises': [
+                'error',
+                { checksVoidReturn: false },
+            ],
+            // ✅ Require `this` to be used only inside classes or objects where it makes sense
+            '@typescript-eslint/no-invalid-this': 'error',
+            // ✅ Prefer using `Array<T>` or `T[]` instead of `Array<any>`
+            '@typescript-eslint/array-type': [
+                'error',
+                { default: 'array-simple' },
+            ],
+            // ✅ Ban `// @ts-ignore` unless justified with a comment
+            '@typescript-eslint/ban-ts-comment': [
+                'error',
+                { 'ts-ignore': 'allow-with-description' },
+            ],
+            // ✅ Require all switch-case statements to have a `default` case
+            '@typescript-eslint/switch-exhaustiveness-check': 'error',
+            // ✅ Require type-safe use of template expressions (avoid accidentally adding numbers, booleans, etc.)
+            '@typescript-eslint/restrict-template-expressions': [
+                'error',
+                { allowNumber: true, allowBoolean: false, allowAny: false },
+            ],
+            // ✅ Disallow unused variables, ignore variables or args starting with underscore
             '@typescript-eslint/no-unused-vars': [
                 'error',
                 {
+                    vars: 'all',
                     caughtErrors: 'all',
                     varsIgnorePattern: '^_',
-                    argsIgnorePattern: '^_'
-                }
-            ],
-            // '@typescript-eslint/prefer-nullish-coalescing': [
-            //     'error',
-            //     {
-            //         ignoreConditionalTests: true,
-            //         ignorePrimitives: true,
-            //     },
-            // ],
-
-            //
-            // eslint-plugin-eslint-comment
-            //
-            // require a eslint-enable comment for every eslint-disable comment
-            'eslint-comments/disable-enable-pair': [
-                'error',
-                {
-                    allowWholeFile: true
-                }
-            ],
-            // disallow a eslint-enable comment for multiple eslint-disable comments
-            'eslint-comments/no-aggregating-enable': 'error',
-            // disallow duplicate eslint-disable comments
-            'eslint-comments/no-duplicate-disable': 'error',
-            // disallow eslint-disable comments without rule names
-            'eslint-comments/no-unlimited-disable': 'error',
-            // disallow unused eslint-disable comments
-            'eslint-comments/no-unused-disable': 'error',
-            // disallow unused eslint-enable comments
-            'eslint-comments/no-unused-enable': 'error',
-            // disallow ESLint directive-comments
-            'eslint-comments/no-use': [
-                'error',
-                {
-                    allow: [
-                        'eslint-disable',
-                        'eslint-disable-line',
-                        'eslint-disable-next-line',
-                        'eslint-enable',
-                        'global'
-                    ]
-                }
+                    argsIgnorePattern: '^_',
+                    ignoreRestSiblings: false,
+                },
             ],
 
             //
             // react
             //
+            // ❌ Check hook dependencies
+            'react-hooks/exhaustive-deps': 'off',
+            // Turn off prop-types checks (TypeScript handles this)
             'react/prop-types': 'off',
-            'react/jsx-max-props-per-line': [1, { 'when': 'always' }],
-
-            //
-            // next
-            //
-            'next/google-font-display': 'warn',
-            'next/google-font-preconnect': 'warn',
-            'next/next-script-for-ga': 'warn',
-            'next/no-async-client-component': 'warn',
-            'next/no-before-interactive-script-outside-document': 'warn',
-            'next/no-css-tags': 'warn',
-            'next/no-head-element': 'warn',
-            'next/no-html-link-for-pages': 'warn',
-            // 'next/no-img-element': 'warn',
-            'next/no-styled-jsx-in-document': 'warn',
-            'next/no-sync-scripts': 'warn',
-            'next/no-title-in-document-head': 'warn',
-            'next/no-typos': 'warn',
-            'next/no-unwanted-polyfillio': 'warn',
-            'next/inline-script-id': 'error',
-            'next/no-assign-module-variable': 'error',
-            'next/no-document-import-in-page': 'error',
-            'next/no-head-import-in-document': 'error',
-            'next/no-script-component-in-head': 'error',
+            // ✅ Disallow unsafe lifecycle methods
+            'react/no-unsafe': 'error',
+            // ✅ Disallow this.state inside setState
+            'react/no-access-state-in-setstate': 'error',
+            // ✅ Check hook usage rules
+            'react-hooks/rules-of-hooks': 'error',
+            // ✅ Prefer function components over class components
+            'react/prefer-stateless-function': [
+                'warn',
+                { ignorePureComponents: true },
+            ],
+            // ✅ Check for keys in maps
+            'react/jsx-key': 'error',
+            // ✅ Limit max JSX nesting
+            'react/jsx-max-depth': ['warn', { max: 4 }],
+            // ✅ Ensure readability of JSX elements with multiple props
+            'react/jsx-max-props-per-line': [
+                'warn',
+                { maximum: 1, when: 'multiline' },
+            ],
+            // ✅ Prefer using shorthand <></> for Fragment
+            'react/jsx-fragments': ['warn', 'syntax'],
 
             //
             // eslint-plugin-import
             //
-            // enforces consistent type specifier style for named imports
-            'import/consistent-type-specifier-style': 'error',
-            // disallow non-import statements appearing before import statements
+            // ✅ Enforce all import statements to appear at the top of the file
             'import/first': 'error',
-            // Forbid import of modules using absolute paths
+            // ✅ Error if importing a module that is not in package.json
+            'import/no-extraneous-dependencies': [
+                'error',
+                {
+                    devDependencies: [
+                        '**/*.test.{ts,tsx}',
+                        '**/*.spec.{ts,tsx}',
+                        '**/stories/*.stories.{ts,tsx}',
+                        '**/storybook/**/*.stories.{ts,tsx}',
+                        '**/setupTests.ts',
+                    ],
+                },
+            ],
+            // ✅ Warning if there are cyclic dependencies
+            'import/no-cycle': ['warn', { maxDepth: Infinity }],
+            // ✅ Error if absolute paths are specified instead of relative ones (can be disabled if necessary)
             'import/no-absolute-path': 'error',
-            // forbid default exports - we want to standardize on named exports so that imported names are consistent
-            // 'import/no-default-export': 'error',
-            // disallow imports from duplicate paths
-            'import/no-duplicates': 'error',
-            // Forbid the use of extraneous packages
-            // 'import/no-extraneous-dependencies': [
-            //     'error',
-            //     {
-            //         devDependencies: true,
-            //         peerDependencies: true,
-            //         optionalDependencies: false,
-            //     },
-            // ],
-            // Prevent importing the default as if it were named
-            'import/no-named-default': 'error',
-            // Prohibit named exports
-            'import/no-named-export': 'off', // we want everything to be a named export
-            // Forbid a module from importing itself
+            // ❌ Error if non-existent files/modules are imported
+            'import/no-unresolved': 'off',
+            // ✅ Warning if there are duplicate imports
+            'import/no-duplicates': 'warn',
+            // ✅ Disallow a module importing itself
             'import/no-self-import': 'error',
-            // Require modules with a single export to use a default export
-            'import/prefer-default-export': 'off', // we want everything to be named
-        }
-    },
+            // ✅ Enforce a consistent type specifier style in imports
+            'import/consistent-type-specifier-style': 'error',
 
-    {
-        files: ['**/*.{ts,tsx}'],
-        rules: {
+            //
+            // eslint-plugin-simple-import-sort
+            //
+            // ✅ Automatic sorting of exports
+            'simple-import-sort/exports': 'error',
+            // ✅ Automatic sorting of imports
             'simple-import-sort/imports': [
                 'error',
                 {
                     groups: [
                         // Packages `react` related packages come first.
                         ['^react', '^\\w', '^@hookform', '^@radix-ui'],
-                        // npm packages
-                        // Anything that starts with a letter (or digit or underscore), or `@` followed by a letter.
-                        ['^\\w'],
-                        // Internal packages.
-                        ['^@store(/.*|$)'],
-                        ['^@api(/.*|$)'],
-                        ['^@components(/.*|$)'],
-                        ['^@ui(/.*|$)'],
-                        ['^@lib(/.*|$)'],
-                        ['^@pages(/.*|$)'],
-                        ['^@utils(/.*|$)'],
-                        ['^@hooks(/.*|$)'],
-                        ['^@services(/.*|$)'],
-                        // Side effect imports.
-                        ['^\\u0000'],
-                        // Parent imports. Put `..` last.
+                        // Node.js builtin модули (fs, path, etc.)
+                        ['^node:'],
+                        [
+                            '^(assert|buffer|child_process|cluster|crypto|dgram|dns|domain|events|fs|http|https|net|os|path|punycode|querystring|readline|stream|string_decoder|timers|tls|tty|url|util|v8|vm|zlib)(/.*|$)',
+                        ],
+                        // npm packages (others external)
+                        ['^next', '^@?\\w'],
+                        // aliases (@/ or src/)
+                        ['^@/', '^src/'],
+                        // relative imports (parent)
                         ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
-                        // Other relative imports. Put same-folder imports and `.` last.
+                        // relative imports (current folder and index)
                         ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
-                        // Style imports.
-                        ['^.+\\.?(css,sass)$'],
-                        // SASS modules
+                        // type-only imports (sometimes .d.ts or import type)
+                        ['^.+\\.d\\.ts$', '^\\u0000'],
+                        // styles
+                        [
+                            '^.+\\.css$',
+                            '^.+\\.scss$',
+                            '^.+\\.sass$',
+                            '^.+\\.less$',
+                        ],
                     ],
                 },
             ],
+
+            //
+            // jest
+            //
+            // ✅ Prevent disabled tests
+            'jest/no-disabled-tests': 'warn',
+            // ✅ Prevent focused tests (like .only)
+            'jest/no-focused-tests': 'error',
+            // ✅ Ensure expect() is called in a test
+            'jest/valid-expect': 'error',
+            // ✅ Avoid identical titles in tests
+            'jest/no-identical-title': 'error',
+            // ✅ Warn about large snapshots
+            'jest/no-large-snapshots': ['warn', { maxSize: 50 }],
+            // ✅ Disallow hooks outside describing
+            'jest/no-hooks': ['error', { allow: ['beforeEach', 'afterEach'] }],
+            // ✅ Prefer toHaveLength over comparing .length
+            'jest/prefer-to-have-length': 'warn',
+            // ✅ Prefer using toBeNull, toBeUndefined, etc.
+            'jest/prefer-to-be': 'warn',
+            // ✅ Prefer using toContain() over indexOf
+            'jest/prefer-to-contain': 'warn',
+            // ✅ Suggest using toStrictEqual
+            'jest/prefer-strict-equal': 'warn',
+
+            //
+            // next
+            //
+            // ✅ Enforce google font display strategy
+            'next/google-font-display': 'warn',
+            // ✅ Warn if google fonts are not preconnected
+            'next/google-font-preconnect': 'warn',
+            // ✅ Warn if next/script is not used for Google Analytics
+            'next/next-script-for-ga': 'warn',
+            // ✅ Warn about async client components
+            'next/no-async-client-component': 'warn',
+            // ✅ Warn about beforeInteractive scripts outside _document.js
+            'next/no-before-interactive-script-outside-document': 'warn',
+            // ✅ Warn about CSS <link> tags
+            'next/no-css-tags': 'warn',
+            // ✅ Warn about <head> elements outside _document.js
+            'next/no-head-element': 'warn',
+            // ✅ Warn about <a href> pointing to pages directory
+            'next/no-html-link-for-pages': 'warn',
+            // ✅ Warn about styled-jsx in _document.js
+            'next/no-styled-jsx-in-document': 'warn',
+            // ✅ Warn about synchronous scripts
+            'next/no-sync-scripts': 'warn',
+            // ✅ Enforce using <Image> instead of <img>
+            'next/no-img-element': 'warn',
+            // ✅ Warn about <title> in _document.js
+            'next/no-title-in-document-head': 'warn',
+            // ✅ Warn about typos in Next.js specific APIs
+            'next/no-typos': 'warn',
+            // ✅ Warn about unwanted Polyfill.io usage
+            'next/no-unwanted-polyfillio': 'warn',
+            // ✅ Require unique inline script IDs
+            'next/inline-script-id': 'error',
+            // ✅ Disallow assignment to module variable
+            'next/no-assign-module-variable': 'error',
+            // ✅ Disallow _document.js import in pages
+            'next/no-document-import-in-page': 'error',
+            // ✅ Disallow <Head> import in _document.js
+            'next/no-head-import-in-document': 'error',
+            // ✅ Disallow <Script> component in <Head>
+            'next/no-script-component-in-head': 'error',
+
         },
     },
-
-    //
-    // test file linting
-    // define the jest globals for all test files
-    //
-    {
-        files: ['**/*.{ts,tsx,cts,mts}'],
-        languageOptions: {
-            globals: {
-                ...jestPlugin.environments.globals.globals
-            }
-        }
-    },
-    // test file specific configuration
-    {
-        files: ['**/*.spec.{ts,tsx,cts,mts}', '*.test.{ts,tsx,cts,mts}'],
-        rules: {
-            '@typescript-eslint/no-empty-function': [
-                'error',
-                { allow: ['arrowFunctions'] }
-            ],
-            '@typescript-eslint/no-non-null-assertion': 'off',
-            '@typescript-eslint/no-unsafe-assignment': 'off',
-            '@typescript-eslint/no-unsafe-call': 'off',
-            '@typescript-eslint/no-unsafe-member-access': 'off',
-            '@typescript-eslint/no-unsafe-return': 'off',
-            'jest/no-disabled-tests': 'error',
-            'jest/no-focused-tests': 'error',
-            'jest/no-alias-methods': 'error',
-            'jest/no-identical-title': 'error',
-            'jest/no-jasmine-globals': 'error',
-            'jest/no-test-prefixes': 'error',
-            'jest/no-done-callback': 'error',
-            'jest/no-test-return-statement': 'error',
-            'jest/prefer-to-be': 'error',
-            'jest/prefer-to-contain': 'error',
-            'jest/prefer-to-have-length': 'error',
-            'jest/prefer-spy-on': 'error',
-            'jest/valid-expect': 'error',
-            'jest/no-deprecated-functions': 'error'
-        }
-    }
-]
+])

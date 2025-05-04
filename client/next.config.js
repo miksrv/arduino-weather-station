@@ -9,12 +9,6 @@ const nextConfig = {
         // https://nextjs.org/docs/pages/api-reference/components/image
         remotePatterns: [
             {
-                hostname: 'api.geometki.com',
-                pathname: '/uploads/**',
-                port: '',
-                protocol: 'https'
-            },
-            {
                 hostname: 'miksoft.pro',
                 port: '',
                 protocol: 'https'
@@ -26,7 +20,7 @@ const nextConfig = {
                 protocol: 'http'
             }
         ],
-        // unoptimized - When true, the source image will be served as-is instead of changing quality,
+        // Unoptimized - When true, the source image will be served as-is instead of changing quality,
         // size, or format. Defaults to false.
         unoptimized: false
     },
