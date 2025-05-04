@@ -1,11 +1,11 @@
 import { HYDRATE } from 'next-redux-wrapper'
+import type { Action, PayloadAction } from '@reduxjs/toolkit'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 import { ApiType } from '@/api'
 import { RootState } from '@/api/store'
 import { APIErrorType, Maybe } from '@/api/types'
 import { encodeQueryData } from '@/tools/helpers'
-import type { Action, PayloadAction } from '@reduxjs/toolkit'
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 const isHydrateAction = (action: Action): action is PayloadAction<RootState> => action.type === HYDRATE
 
@@ -38,12 +38,12 @@ export const API = createApi({
         }),
         getHistory: builder.query<ApiType.History.Response, Maybe<ApiType.History.Request>>({
             providesTags: ['History'],
-            query: (params) => `history${encodeQueryData(params)}`,
+            query: (params) => `history${encodeQueryData<ApiType.History.Request>(params)}`,
             transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
         }),
         getHeatmap: builder.query<ApiType.Heatmap.Response, Maybe<ApiType.Heatmap.Request>>({
             providesTags: ['Heatmap'],
-            query: (params) => `heatmap${encodeQueryData(params)}`,
+            query: (params) => `heatmap${encodeQueryData<ApiType.Heatmap.Request>(params)}`,
             transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
         }),
         getForecast: builder.query<ApiType.Forecast.Response, 'hourly' | 'daily'>({
@@ -52,6 +52,7 @@ export const API = createApi({
             transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
         })
     }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     extractRehydrationInfo(action, { reducerPath }): any {
         if (isHydrateAction(action)) {
             return action.payload[reducerPath]

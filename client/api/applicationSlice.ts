@@ -1,34 +1,24 @@
-import i18Config from '../next-i18next.config'
-
-import { LOCAL_STORAGE } from '@/tools/constants'
-import * as LocalStorage from '@/tools/localstorage'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
+import { LocaleType } from '@/tools/types'
+
+import i18Config from '../next-i18next.config'
+
 type ApplicationStateProps = {
-    locale?: 'ru' | 'en' | string
+    locale?: LocaleType
     showOverlay?: boolean
 }
 
-export const getStorageLocale = (): string | undefined =>
-    typeof window !== 'undefined'
-        ? (LocalStorage.getItem(LOCAL_STORAGE.LOCALE as any) ?? i18Config.i18n.defaultLocale)
-        : i18Config.i18n.defaultLocale
-
 const applicationSlice = createSlice({
-    initialState: {
-        locale: getStorageLocale()
-    } as ApplicationStateProps,
+    initialState: { locale: i18Config.i18n.defaultLocale } as ApplicationStateProps,
     name: 'application',
     reducers: {
-        setLocale: (state, { payload }: PayloadAction<'ru' | 'en' | string>) => {
+        setLocale: (state, { payload }: PayloadAction<LocaleType>) => {
             state.locale = payload
-        },
-        toggleOverlay: (state, { payload }: PayloadAction<boolean>) => {
-            state.showOverlay = payload
         }
     }
 })
 
-export const { setLocale, toggleOverlay } = applicationSlice.actions
+export const { setLocale } = applicationSlice.actions
 
 export default applicationSlice.reducer

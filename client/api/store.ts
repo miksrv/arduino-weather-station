@@ -1,10 +1,11 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
-import { createWrapper } from 'next-redux-wrapper'
 
-import { API } from './api'
+import { createWrapper } from 'next-redux-wrapper'
+import { configureStore } from '@reduxjs/toolkit'
 
 import applicationSlice from '@/api/applicationSlice'
-import { configureStore } from '@reduxjs/toolkit'
+
+import { API } from './api'
 
 export const store = () =>
     configureStore({
