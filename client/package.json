@@ -37,7 +37,7 @@
         "react-i18next": "^15.5.2",
         "react-redux": "^9.2.0",
         "sharp": "^0.34.2",
-        "simple-react-ui-kit": "^1.5.3"
+        "simple-react-ui-kit": "^1.5.0"
     },
     "devDependencies": {
         "@eslint/compat": "^1.2.9",
