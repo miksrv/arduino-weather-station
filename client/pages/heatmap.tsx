@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Dropdown, Popout, PopoutHandleProps, Spinner } from 'simple-react-ui-kit'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Dropdown, Spinner } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -10,48 +10,43 @@ import { API, ApiType, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
 import { Maybe } from '@/api/types'
 import AppLayout from '@/components/app-layout'
+import PeriodSelector from '@/components/period-selector'
 import WidgetHeatmap from '@/components/widget-heatmap'
-import { currentDate, formatDate, halfYearDate } from '@/tools/date'
+import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
 import { LocaleType } from '@/tools/types'
-import Datepicker, { findPresetByDate, PresetOption } from '@/ui/datepicker'
+import { findPresetByDate } from '@/ui/datepicker'
 
 type HeatmapPageProps = object
-
-const MIN_DATE = '2021-01-01'
 
 const HeatmapPage: NextPage<HeatmapPageProps> = () => {
     const { i18n, t } = useTranslation()
 
-    const popoutRef = useRef<PopoutHandleProps>(null)
-
-    const [startDate, setStartDate] = useState<string>()
-    const [endDate, setEndDate] = useState<string>()
+    const [period, setPeriod] = useState<string[]>()
     const [sensor, setSensor] = useState<ApiType.Heatmap.SensorType>('temperature')
 
     const historyDateParam: Maybe<ApiType.Heatmap.Request> = useMemo(
         () => ({
-            start_date: startDate ?? '',
-            end_date: endDate ?? '',
+            start_date: period?.[0] ?? '',
+            end_date: period?.[1] ?? '',
             type: sensor
         }),
-        [startDate, endDate, sensor]
+        [period, sensor]
     )
 
     const {
         data: history,
         isLoading: historyLoading,
         isFetching: historyFetching
-    } = API.useGetHeatmapQuery(historyDateParam, { skip: !startDate?.length || !endDate?.length })
+    } = API.useGetHeatmapQuery(historyDateParam, { skip: !period?.[0] || !period?.[1] })
 
     const currentDatePreset = useMemo((): string => {
-        const preset = findPresetByDate(startDate, endDate, i18n.language as LocaleType)
+        const preset = findPresetByDate(period?.[0], period?.[1], i18n.language as LocaleType)
 
-        return preset ? preset : startDate && endDate ? `${startDate} - ${endDate}` : ''
-    }, [startDate, endDate, i18n.language])
+        return preset ? preset : period?.[0] && period?.[1] ? `${period?.[0]} - ${period?.[1]}` : ''
+    }, [period, i18n.language])
 
     useEffect(() => {
-        setStartDate(formatDate(halfYearDate, 'YYYY-MM-DD'))
-        setEndDate(formatDate(currentDate.toDate(), 'YYYY-MM-DD'))
+        setPeriod([formatDate(yesterdayDate, 'YYYY-MM-DD'), formatDate(currentDate.toDate(), 'YYYY-MM-DD')])
     }, [])
 
     return (
@@ -78,35 +73,11 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
             />
 
             <div className={'toolbar'}>
-                <Popout
-                    ref={popoutRef}
-                    position={'left'}
-                    trigger={
-                        <Button
-                            mode={'secondary'}
-                            disabled={historyLoading || historyFetching}
-                        >
-                            {currentDatePreset}
-                        </Button>
-                    }
-                >
-                    <Datepicker
-                        locale={i18n.language as LocaleType}
-                        startDate={startDate}
-                        endDate={endDate}
-                        minDate={MIN_DATE}
-                        maxDate={formatDate(currentDate.toDate(), 'YYYY-MM-DD')}
-                        hidePresets={[PresetOption.TODAY, PresetOption.DAY]}
-                        onPeriodSelect={(startDate, endDate) => {
-                            setStartDate(startDate)
-                            setEndDate(endDate)
-
-                            if (popoutRef.current) {
-                                popoutRef.current.close()
-                            }
-                        }}
-                    />
-                </Popout>
+                <PeriodSelector
+                    disabled={historyLoading || historyFetching}
+                    periodDates={period}
+                    onSetPeriod={setPeriod}
+                />
 
                 <Dropdown<ApiType.Heatmap.SensorType>
                     required={true}

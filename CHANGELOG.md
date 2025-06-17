@@ -6,6 +6,7 @@
 -   Updated UI Libraries
 -   Fixed `thunderstorm` weather icons
 -   Improved UI `Popout` component
+-   Created `PeriodSelector` UI component
 
 ## 3.4.9
 
