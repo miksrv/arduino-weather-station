@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Dropdown, Popout, PopoutHandleProps, Spinner } from 'simple-react-ui-kit'
+import { Button, Dropdown, Popout, PopoutHandleProps, Spinner } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -80,9 +80,15 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
             <div className={'toolbar'}>
                 <Popout
                     ref={popoutRef}
-                    action={currentDatePreset}
-                    mode={'secondary'}
                     position={'left'}
+                    trigger={
+                        <Button
+                            mode={'secondary'}
+                            disabled={historyLoading || historyFetching}
+                        >
+                            {currentDatePreset}
+                        </Button>
+                    }
                 >
                     <Datepicker
                         locale={i18n.language as LocaleType}

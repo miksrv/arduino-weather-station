@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 3.4.10
+
+### Path Changes
+-   Updated UI Libraries
+-   Fixed `thunderstorm` weather icons
+-   Improved UI `Popout` component
+
 ## 3.4.9
 
 ### Path Changes

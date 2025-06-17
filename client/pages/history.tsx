@@ -89,9 +89,15 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
             <div className={'toolbar'}>
                 <Popout
                     ref={popoutRef}
-                    action={currentDatePreset}
-                    mode={'secondary'}
                     position={'left'}
+                    trigger={
+                        <Button
+                            mode={'secondary'}
+                            disabled={historyLoading || historyFetching}
+                        >
+                            {currentDatePreset}
+                        </Button>
+                    }
                 >
                     <Datepicker
                         locale={i18n.language as LocaleType}
