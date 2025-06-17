@@ -12,7 +12,7 @@ import { Maybe } from '@/api/types'
 import AppLayout from '@/components/app-layout'
 import PeriodSelector from '@/components/period-selector'
 import WidgetHeatmap from '@/components/widget-heatmap'
-import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
+import { currentDate, formatDate, halfYearDate } from '@/tools/date'
 import { LocaleType } from '@/tools/types'
 import { findPresetByDate } from '@/ui/datepicker'
 
@@ -46,7 +46,7 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
     }, [period, i18n.language])
 
     useEffect(() => {
-        setPeriod([formatDate(yesterdayDate, 'YYYY-MM-DD'), formatDate(currentDate.toDate(), 'YYYY-MM-DD')])
+        setPeriod([formatDate(halfYearDate, 'YYYY-MM-DD'), formatDate(currentDate.toDate(), 'YYYY-MM-DD')])
     }, [])
 
     return (

@@ -31,6 +31,7 @@ const PeriodSelector: React.FC<PeriodSelectorProps> = ({ disabled, minDate, peri
         <Popout
             ref={popoutRef}
             position={'left'}
+            disabled={disabled}
             trigger={
                 <Button
                     mode={'secondary'}

@@ -84,7 +84,6 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
                 <Button
                     mode={'secondary'}
                     icon={'Download'}
-                    disabled={historyLoading || historyFetching}
                     link={`${urlAPI}history/export${encodeQueryData(historyDateParam)}`}
                 >
                     {t('download-csv')}

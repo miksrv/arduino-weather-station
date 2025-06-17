@@ -7321,14 +7321,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-react-ui-kit@npm:^1.5.3":
-  version: 1.5.3
-  resolution: "simple-react-ui-kit@npm:1.5.3"
+"simple-react-ui-kit@npm:^1.5.5":
+  version: 1.5.5
+  resolution: "simple-react-ui-kit@npm:1.5.5"
   dependencies:
     lodash-es: "npm:^4.17.21"
     react: "npm:^19.1.0"
     react-dom: "npm:^19.1.0"
-  checksum: 10c0/f02691a3d1778e3159a69c062110d2f9321ec20cbec691c835aa7e920cf2f4c261c1ef3e41da6b7013cce2e2fa010d7324b9bc2e6156f8f3c7131c6f12e283b4
+  checksum: 10c0/d5fa8cc786be8d54e6e2b36301144a57d1051c8837c26535286ffff7b1d0c027ed6a8c4dff40c43e6b932b74a03a2b605dbe2feefce4453ca24aea7ebbf83d67
   languageName: node
   linkType: hard
 
@@ -8215,7 +8215,7 @@ __metadata:
     sass: "npm:^1.89.2"
     schema-dts: "npm:^1.1.5"
     sharp: "npm:^0.34.2"
-    simple-react-ui-kit: "npm:^1.5.3"
+    simple-react-ui-kit: "npm:^1.5.5"
     ts-jest: "npm:^29.4.0"
     ts-node: "npm:^10.9.2"
     typescript: "npm:5.8.3"
