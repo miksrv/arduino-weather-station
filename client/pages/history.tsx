@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Popout, PopoutHandleProps, Spinner } from 'simple-react-ui-kit'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Button, Spinner } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -11,31 +11,26 @@ import { urlAPI } from '@/api/api'
 import { wrapper } from '@/api/store'
 import { Maybe } from '@/api/types'
 import AppLayout from '@/components/app-layout'
+import PeriodSelector from '@/components/period-selector'
 import WidgetChart from '@/components/widget-chart'
 import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
 import { currentDate, formatDate, getDateTimeFormat, yesterdayDate } from '@/tools/date'
 import { encodeQueryData } from '@/tools/helpers'
 import { LocaleType } from '@/tools/types'
-import Datepicker, { findPresetByDate } from '@/ui/datepicker'
 
 type HistoryPageProps = object
-
-const MIN_DATE = '2021-01-01'
 
 const HistoryPage: NextPage<HistoryPageProps> = () => {
     const { i18n, t } = useTranslation()
 
-    const popoutRef = useRef<PopoutHandleProps>(null)
-
-    const [startDate, setStartDate] = useState<string>()
-    const [endDate, setEndDate] = useState<string>()
+    const [period, setPeriod] = useState<string[]>()
 
     const historyDateParam: Maybe<ApiType.History.Request> = useMemo(
         () => ({
-            start_date: startDate ?? '',
-            end_date: endDate ?? ''
+            start_date: period?.[0] ?? '',
+            end_date: period?.[1] ?? ''
         }),
-        [startDate, endDate]
+        [period]
     )
 
     const {
@@ -44,23 +39,16 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
         isFetching: historyFetching
     } = API.useGetHistoryQuery(historyDateParam, {
         pollingInterval: POLING_INTERVAL_CURRENT,
-        skip: !startDate?.length || !endDate?.length
+        skip: !period?.[0] || !period?.[1]
     })
 
-    const currentDatePreset = useMemo((): string => {
-        const preset = findPresetByDate(startDate, endDate, i18n.language as LocaleType)
-
-        return preset ? preset : startDate && endDate ? `${startDate} - ${endDate}` : ''
-    }, [startDate, endDate, i18n.language])
-
     const dateFormat = useMemo(
-        () => getDateTimeFormat(startDate, endDate, i18n.language === 'en'),
-        [startDate, endDate, i18n.language]
+        () => getDateTimeFormat(period?.[0], period?.[1], i18n.language === 'en'),
+        [period, i18n.language]
     )
 
     useEffect(() => {
-        setStartDate(formatDate(yesterdayDate, 'YYYY-MM-DD'))
-        setEndDate(formatDate(currentDate.toDate(), 'YYYY-MM-DD'))
+        setPeriod([formatDate(yesterdayDate, 'YYYY-MM-DD'), formatDate(currentDate.toDate(), 'YYYY-MM-DD')])
     }, [])
 
     return (
@@ -87,33 +75,15 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
             />
 
             <div className={'toolbar'}>
-                <Popout
-                    ref={popoutRef}
-                    action={currentDatePreset}
-                    mode={'secondary'}
-                    position={'left'}
-                >
-                    <Datepicker
-                        locale={i18n.language as LocaleType}
-                        startDate={startDate}
-                        endDate={endDate}
-                        minDate={MIN_DATE}
-                        maxDate={formatDate(currentDate.toDate(), 'YYYY-MM-DD')}
-                        onPeriodSelect={(startDate, endDate) => {
-                            setStartDate(startDate)
-                            setEndDate(endDate)
-
-                            if (popoutRef.current) {
-                                popoutRef.current.close()
-                            }
-                        }}
-                    />
-                </Popout>
+                <PeriodSelector
+                    disabled={historyLoading || historyFetching}
+                    periodDates={period}
+                    onSetPeriod={setPeriod}
+                />
 
                 <Button
                     mode={'secondary'}
                     icon={'Download'}
-                    disabled={historyLoading || historyFetching}
                     link={`${urlAPI}history/export${encodeQueryData(historyDateParam)}`}
                 >
                     {t('download-csv')}

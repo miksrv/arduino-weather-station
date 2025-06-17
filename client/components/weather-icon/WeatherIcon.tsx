@@ -80,7 +80,7 @@ export const getWeatherIconUrl = (weatherId: number, date?: string): string => {
     }
 
     // Here are weather conditions that are not divided into day and night
-    const withoutDayIcon = ['hurricane']
+    const withoutDayIcon = ['hurricane', 'thunderstorm']
 
     const name = weatherIconsMapping[weatherId]
     const time = !date || withoutDayIcon.includes(name) ? '' : isDayTime(date) ? '-day' : '-night'
