@@ -26,7 +26,7 @@
         "echarts-for-react": "^3.0.2",
         "i18next": "^25.3.2",
         "lodash-es": "^4.17.21",
-        "next": "^15.3.5",
+        "next": "^15.4.6",
         "next-i18next": "^15.4.2",
         "next-redux-wrapper": "^8.1.0",
         "next-seo": "^6.8.0",
@@ -54,12 +54,12 @@
         "@types/react-dom": "19.1.6",
         "@types/redux-mock-store": "^1.5.0",
         "@typescript-eslint/eslint-plugin": "^8.36.0",
-        "eslint": "^9.32.0",
+        "eslint": "^9.33.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-eslint-plugin": "^6.5.0",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-jest": "^29.0.1",
-        "eslint-plugin-prettier": "^5.5.3",
+        "eslint-plugin-prettier": "^5.5.4",
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-simple-import-sort": "^12.1.1",
@@ -74,7 +74,7 @@
         "ts-jest": "^29.4.1",
         "ts-node": "^10.9.2",
         "typescript": "5.9.2",
-        "typescript-eslint": "^8.38.0"
+        "typescript-eslint": "^8.39.0"
     },
     "packageManager": "yarn@4.9.2"
 }
