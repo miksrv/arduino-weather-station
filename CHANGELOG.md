@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 3.4.11
+
+### Path Changes
+-   Updated UI Dependencies
+
 ## 3.4.10
 
 ### Path Changes
