@@ -7,4 +7,5 @@ module.exports = {
             'data-name': name,
             'data-class': className,
         }),
+    cn: (...args) => args.filter(Boolean).join(' '),
 };
