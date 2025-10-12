@@ -39,19 +39,19 @@ describe('ruPresets', () => {
 
 describe('enDaysOfWeek', () => {
     it('should contain 7 English day abbreviations', () => {
-        expect(enDaysOfWeek).toEqual(['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'])
+        expect(enDaysOfWeek).toStrictEqual(['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'])
     })
 })
 
 describe('ruDaysOfWeek', () => {
     it('should contain 7 Russian day abbreviations', () => {
-        expect(ruDaysOfWeek).toEqual(['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'])
+        expect(ruDaysOfWeek).toStrictEqual(['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'])
     })
 })
 
 describe('enMonths', () => {
     it('should contain 12 English month names', () => {
-        expect(enMonths).toEqual([
+        expect(enMonths).toStrictEqual([
             'January',
             'February',
             'March',
@@ -70,7 +70,7 @@ describe('enMonths', () => {
 
 describe('ruMonths', () => {
     it('should contain 12 Russian month names', () => {
-        expect(ruMonths).toEqual([
+        expect(ruMonths).toStrictEqual([
             'Январь',
             'Февраль',
             'Март',

@@ -7,6 +7,7 @@ import { TRANSITION_TIME } from './constants'
 
 import '@testing-library/jest-dom'
 
+// @ts-ignore (ignore missing types for mocked component)
 jest.mock('./MoonIcon', () => (props: any) => (
     <div
         data-testid='moon-icon'
