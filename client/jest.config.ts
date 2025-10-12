@@ -5,7 +5,8 @@ const config: Config = {
     testEnvironment: 'jsdom',
     moduleNameMapper: {
         '\\.(css|sass|scss|jpg|jpeg|png)$': 'identity-obj-proxy',
-        '^@/(.*)$': '<rootDir>/$1'
+        '^@/(.*)$': '<rootDir>/$1',
+        '^simple-react-ui-kit$': '<rootDir>/__mocks__/simple-react-ui-kit.js'
     },
     transform: {
         '^.+\\.tsx?$': [
