@@ -8,4 +8,7 @@ module.exports = {
             'data-class': className,
         }),
     cn: (...args) => args.filter(Boolean).join(' '),
+    Button: ({ children, ...props }) => (
+        React.createElement('button', props, children)
+    ),
 };
