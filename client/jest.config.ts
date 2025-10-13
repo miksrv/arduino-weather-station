@@ -17,7 +17,7 @@ const config: Config = {
             }
         ]
     },
-    collectCoverageFrom: ['components/**/*.{ts,tsx}', '!components/**/*.d.ts', '!components/**/*.test.tsx', '!*.d.ts'],
+    collectCoverageFrom: ['**/*.{ts,tsx}', '!**/*.test.tsx', '!*.d.ts', '!pages/**/*.{ts,tsx}', '!.next/**/*', '!**/index.ts'],
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
     transformIgnorePatterns: ['node_modules/(?!(module-to-transform)/)', '/.next/']
 }
