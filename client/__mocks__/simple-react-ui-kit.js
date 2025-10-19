@@ -11,4 +11,8 @@ module.exports = {
     Button: ({ children, ...props }) => (
         React.createElement('button', props, children)
     ),
+    Table: (props) =>
+        React.createElement('table', { 'data-testid': 'table', ...props }),
+    TableProps: {},
+    ColumnProps: {}
 };

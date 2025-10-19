@@ -16,6 +16,7 @@ jest.mock('next/router', () => ({
         pathname: '/history'
     })
 }))
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock('next/link', () => ({ children, ...props }: any) => <a {...props}>{children}</a>)
 
 describe('Menu', () => {

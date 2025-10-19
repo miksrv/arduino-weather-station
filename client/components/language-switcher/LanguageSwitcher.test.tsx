@@ -51,7 +51,7 @@ describe('LanguageSwitcher', () => {
     })
 
     it('does not call changeLanguage if the selected language is already active', async () => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
         const i18n = require('next-i18next').useTranslation().i18n
         render(<LanguageSwitcher />)
         fireEvent.click(screen.getByText('Eng'))
@@ -59,7 +59,7 @@ describe('LanguageSwitcher', () => {
     })
 
     it('dispatches setLocale on mount', () => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
         const setLocale = require('@/api').setLocale
         render(<LanguageSwitcher />)
         expect(setLocale).toHaveBeenCalled()

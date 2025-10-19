@@ -25,11 +25,12 @@ jest.mock('./Menu', () =>
 )
 jest.mock('nextjs-progressbar', () => jest.fn(() => <div data-testid='progressbar' />))
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const useAppSelector = require('@/api/store').useAppSelector
 
 describe('AppLayout', () => {
     beforeEach(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         useAppSelector.mockImplementation((fn: any) => fn({ application: { showOverlay: false } }))
         jest.clearAllMocks()
     })
