@@ -7,12 +7,14 @@ import ToggleSwitch from './ToggleSwitch'
 import '@testing-library/jest-dom'
 
 // Mock child components
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock('@/ui/theme-switcher/Circle', () => (props: any) => (
     <div
         data-testid='circle'
         {...props}
     />
 ))
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock('@/ui/theme-switcher/Stars', () => (props: any) => (
     <div
         data-testid='stars'

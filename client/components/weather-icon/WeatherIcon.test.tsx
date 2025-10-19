@@ -7,6 +7,7 @@ import WeatherIcon, { getWeatherIconUrl } from './WeatherIcon'
 import '@testing-library/jest-dom'
 
 // Mock next/image to render a simple img
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,next/no-img-element
 jest.mock('next/image', () => (props: any) => <img {...props} />)
 
 // Mock getDate to control hour

@@ -6,24 +6,28 @@ import WidgetForecastTable, { TABLE_COLUMNS } from './WidgetForecastTable'
 
 import '@testing-library/jest-dom'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock('next/link', () => (props: any) => <a {...props} />)
 jest.mock('next-i18next', () => ({
     useTranslation: () => ({
         t: (key: string) => key
     })
 }))
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock('@/components/weather-icon', () => (props: any) => (
     <span
         data-testid='weather-icon'
         {...props}
     />
 ))
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock('@/components/wind-direction-icon', () => (props: any) => (
     <span
         data-testid='wind-icon'
         {...props}
     />
 ))
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock('@/ui/comparison-icon', () => (props: any) => (
     <span
         data-testid='comparison-icon'
@@ -31,7 +35,8 @@ jest.mock('@/ui/comparison-icon', () => (props: any) => (
     />
 ))
 jest.mock('@/tools/conditions', () => ({
-    getWeatherI18nKey: (id: any) => `weather-${id}`
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    getWeatherI18nKey: (id: any) => `weather-${String(id)}`
 }))
 jest.mock('@/tools/date', () => ({
     formatDate: (date: string, format: string) => `${date}-${format}`
