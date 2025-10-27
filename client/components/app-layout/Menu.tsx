@@ -46,6 +46,11 @@ const Menu: React.FC<MenuProps> = ({ onClick }) => {
             icon: 'BarChart',
             link: '/heatmap',
             text: t('heatmap')
+        },
+        {
+            icon: 'Thermometer',
+            link: '/climate',
+            text: t('climate-changes')
         }
     ]
 
