@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { render } from '@testing-library/react'
+import { act, render } from '@testing-library/react'
 
 import Stars from './Stars'
 
@@ -41,11 +39,15 @@ describe('Stars', () => {
         const starsContainer = container.querySelector('.stars')
         expect(starsContainer).toHaveStyle('opacity: 0')
         rerender(<Stars isClicked={true} />)
-        jest.advanceTimersByTime(100)
-        expect(starsContainer).toHaveStyle('opacity: 0')
-        rerender(<Stars isClicked={false} />)
-        jest.advanceTimersByTime(100)
+        act(() => {
+            jest.advanceTimersByTime(100)
+        })
         expect(starsContainer).toHaveStyle('opacity: 1')
+        rerender(<Stars isClicked={false} />)
+        act(() => {
+            jest.advanceTimersByTime(100)
+        })
+        expect(starsContainer).toHaveStyle('opacity: 0')
     })
 
     it('renders 4 star elements with correct styles', () => {

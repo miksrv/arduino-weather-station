@@ -51,7 +51,7 @@ describe('Menu', () => {
         render(<Menu />)
         const menu = screen.getByRole('list', { hidden: true }) || screen.getByTestId('menu')
         expect(menu?.tagName.toLowerCase()).toBe('menu')
-        expect(menu?.querySelectorAll('li').length).toBe(5)
+        expect(menu?.querySelectorAll('li').length).toBe(6)
     })
 
     it('links have correct href attributes', () => {
