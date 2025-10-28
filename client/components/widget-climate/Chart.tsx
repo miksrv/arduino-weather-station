@@ -4,7 +4,7 @@ import ReactECharts from 'echarts-for-react'
 
 import { useTheme } from 'next-themes'
 
-// import { colors, getSensorColor } from '@/tools/colors'
+import { formatDateFromUTC } from '@/tools/date'
 import { round } from '@/tools/helpers'
 
 import { ClimateType } from './type'
@@ -53,8 +53,7 @@ const Chart: React.FC<ChartProps> = ({ data, height }) => {
                 label: {
                     formatter: function (params) {
                         if (params.axisDimension === 'x') {
-                            const date = new Date(params.value as number)
-                            return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`
+                            return formatDateFromUTC(params?.value as number, 'DD MMMM')
                         }
                         return round(Number(params.value), 2)?.toString() ?? ''
                     }
@@ -80,7 +79,7 @@ const Chart: React.FC<ChartProps> = ({ data, height }) => {
                     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
                     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                    const seriesValue = `<span class="${styles.value}">${item.value?.[1] ?? '---'}</span>`
+                    const seriesValue = `<span class="${styles.value}">${item.value?.[1] ?? '---'} °C</span>`
                     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     const seriesName = `<span class="${styles.label}">${item.seriesName}${seriesValue}</span>`
 
