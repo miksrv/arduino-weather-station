@@ -98,10 +98,7 @@ const Chart: React.FC<ChartProps> = ({ data, height }) => {
                 hideOverlap: true,
                 color: textSecondaryColor,
                 fontSize: 11,
-                formatter: (value: number) => {
-                    const d = new Date(value)
-                    return `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`
-                }
+                formatter: (value: number) => formatDateFromUTC(value, 'DD MMM')
             },
             axisTick: { show: true },
             axisLine: {
@@ -152,25 +149,17 @@ const Chart: React.FC<ChartProps> = ({ data, height }) => {
 
         return {
             ...baseConfig,
-            series: data.map((item) => {
-                // const color = colors[Object.keys(colors)[index + 6] as keyof typeof colors]
-
-                return {
-                    ...(baseConfig.series as SeriesOption[])[0],
-                    name: item.year,
-                    type: 'line',
-                    showSymbol: false,
-                    connectNulls: false,
-
-                    lineStyle: {
-                        // color: color[0],
-                        width: 1
-                    },
-                    // itemStyle: { color: color[0] },
-
-                    data: item.weather?.map(({ date, temperature }) => [normalizeDateToBaseYear(date), temperature])
-                }
-            })
+            series: data.map((item) => ({
+                ...(baseConfig.series as SeriesOption[])[0],
+                name: item.year,
+                type: 'line',
+                showSymbol: false,
+                connectNulls: false,
+                lineStyle: {
+                    width: 1
+                },
+                data: item.weather?.map(({ date, temperature }) => [normalizeDateToBaseYear(date), temperature])
+            }))
         }
     }, [data, theme])
 
