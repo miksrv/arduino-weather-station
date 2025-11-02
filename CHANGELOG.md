@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 3.5.0
+
+### Minor Changes
+-   Added new UI Page - `climate`
+-   Updated UI Dependencies
+-   Implemented some UI Unit tests
+-   Fixed ESLinter and Prettier
+-   Fixed collect coverage method for UI Jest
+-   Update sonar-project.properties
+-   Upgraded NextJS from `15` to `16`
+-   Updated UI locales
+
 ## 3.4.11
 
 ### Path Changes
