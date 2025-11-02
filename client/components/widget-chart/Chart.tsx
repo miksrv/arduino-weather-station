@@ -50,7 +50,6 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
             itemWidth: 20, // Ширина значка линии в легенде
             itemHeight: 2, // Высота значка линии в легенде (делает линию тоньше)
             textStyle: {
-                // fontFamily: '-apple-system, system-ui, \'Helvetica Neue\', Roboto, sans-serif',
                 color: textPrimaryColor, // Цвет текста легенды
                 fontSize: '12px'
             },

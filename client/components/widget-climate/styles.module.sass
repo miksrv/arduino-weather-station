@@ -1,0 +1,41 @@
+.widget
+    flex-basis: 100%
+    width: 100%
+    background: var(--container-background-color)
+    color: var(--text-color-primary)
+    border-radius: var(--border-radius)
+    box-shadow: var(--container-shadow)
+    overflow: hidden
+
+.chartTooltipTitle
+    font-family: (--font-family), sans-serif
+    font-size: 12px
+    color: var(--text-color-primary)
+    margin-bottom: 10px
+    margin-top: -5px
+    min-width: 160px
+
+    &:first-letter
+        text-transform: uppercase
+
+.chartTooltipItem
+    margin-top: 0
+
+    &:last-of-type
+        margin-bottom: -5px
+
+    .icon
+        float: left
+        display: inline-block
+        margin-right: 5px
+        margin-top: 7px
+        border-radius: 2px
+        width: 6px
+        height: 6px
+
+    .label
+        font-size: 12px
+        display: flex
+        justify-content: space-between
+        align-items: center
+        color: var(--text-color-secondary)
