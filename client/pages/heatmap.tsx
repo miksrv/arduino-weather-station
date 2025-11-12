@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Dropdown, Spinner } from 'simple-react-ui-kit'
+import dayjs from 'dayjs'
+import { DatePicker, Dropdown, findPresetByDate, Spinner } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -10,18 +11,16 @@ import { API, ApiType, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
 import { Maybe } from '@/api/types'
 import AppLayout from '@/components/app-layout'
-import PeriodSelector from '@/components/period-selector'
 import WidgetHeatmap from '@/components/widget-heatmap'
 import { currentDate, formatDate, halfYearDate } from '@/tools/date'
 import { LocaleType } from '@/tools/types'
-import { findPresetByDate } from '@/ui/datepicker'
 
 type HeatmapPageProps = object
 
 const HeatmapPage: NextPage<HeatmapPageProps> = () => {
     const { i18n, t } = useTranslation()
 
-    const [period, setPeriod] = useState<string[]>()
+    const [period, setPeriod] = useState<[string?, string?]>()
     const [sensor, setSensor] = useState<ApiType.Heatmap.SensorType>('temperature')
 
     const historyDateParam: Maybe<ApiType.Heatmap.Request> = useMemo(
@@ -40,7 +39,11 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
     } = API.useGetHeatmapQuery(historyDateParam, { skip: !period?.[0] || !period?.[1] })
 
     const currentDatePreset = useMemo((): string => {
-        const preset = findPresetByDate(period?.[0], period?.[1], i18n.language as LocaleType)
+        if (!period?.[0] || !period?.[1]) {
+            return ''
+        }
+
+        const preset = findPresetByDate(dayjs.utc(), period[0], period[1], i18n.language as LocaleType)
 
         return preset ? preset : period?.[0] && period?.[1] ? `${period?.[0]} - ${period?.[1]}` : ''
     }, [period, i18n.language])
@@ -73,10 +76,15 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
             />
 
             <div className={'toolbar'}>
-                <PeriodSelector
+                <DatePicker
                     disabled={historyLoading || historyFetching}
-                    periodDates={period}
-                    onSetPeriod={setPeriod}
+                    datePeriod={period}
+                    locale={i18n.language === 'en' ? 'en' : 'ru'}
+                    buttonMode={'secondary'}
+                    minDate={'2021-01-01'}
+                    maxDate={formatDate(currentDate.toDate(), 'YYYY-MM-DD')}
+                    selectDateCaption={t('select-date-range')}
+                    onPeriodSelect={(startDate, endDate) => setPeriod([startDate, endDate])}
                 />
 
                 <Dropdown<ApiType.Heatmap.SensorType>

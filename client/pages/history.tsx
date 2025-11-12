@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Spinner } from 'simple-react-ui-kit'
+import { Button, DatePicker, Spinner } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -11,19 +11,16 @@ import { urlAPI } from '@/api/api'
 import { wrapper } from '@/api/store'
 import { Maybe } from '@/api/types'
 import AppLayout from '@/components/app-layout'
-import PeriodSelector from '@/components/period-selector'
 import WidgetChart from '@/components/widget-chart'
 import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
 import { currentDate, formatDate, getDateTimeFormat, yesterdayDate } from '@/tools/date'
 import { encodeQueryData } from '@/tools/helpers'
 import { LocaleType } from '@/tools/types'
 
-type HistoryPageProps = object
-
-const HistoryPage: NextPage<HistoryPageProps> = () => {
+const HistoryPage: NextPage<object> = () => {
     const { i18n, t } = useTranslation()
 
-    const [period, setPeriod] = useState<string[]>()
+    const [period, setPeriod] = useState<[string?, string?]>()
 
     const historyDateParam: Maybe<ApiType.History.Request> = useMemo(
         () => ({
@@ -75,10 +72,15 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
             />
 
             <div className={'toolbar'}>
-                <PeriodSelector
+                <DatePicker
                     disabled={historyLoading || historyFetching}
-                    periodDates={period}
-                    onSetPeriod={setPeriod}
+                    datePeriod={period}
+                    locale={i18n.language === 'en' ? 'en' : 'ru'}
+                    buttonMode={'secondary'}
+                    minDate={'2021-01-01'}
+                    maxDate={formatDate(currentDate.toDate(), 'YYYY-MM-DD')}
+                    selectDateCaption={t('select-date-range')}
+                    onPeriodSelect={(startDate, endDate) => setPeriod([startDate, endDate])}
                 />
 
                 <Button
@@ -127,7 +129,7 @@ const HistoryPage: NextPage<HistoryPageProps> = () => {
 
 export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
-        async (context): Promise<GetServerSidePropsResult<HistoryPageProps>> => {
+        async (context): Promise<GetServerSidePropsResult<object>> => {
             const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
             const translations = await serverSideTranslations(locale)
 
