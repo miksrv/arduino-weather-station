@@ -51,6 +51,7 @@
     "date-full-format": "D MMMM YYYY, h:mm a",
     "date-chart-tooltip": "dddd, DD MMM YYYY, h:mm a",
     "date-chart-label": "D MMM YYYY, h:mm a",
+    "select-date-range": "Select date range",
     "conditions": {
         "thunderstorm_with_light_rain": "Thunderstorm with light rain",
         "thunderstorm_with_rain": "Thunderstorm with rain",
