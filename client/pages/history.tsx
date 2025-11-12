@@ -44,8 +44,6 @@ const HistoryPage: NextPage<object> = () => {
         [period, i18n.language]
     )
 
-    console.log('period', period)
-
     useEffect(() => {
         setPeriod([formatDate(yesterdayDate, 'YYYY-MM-DD'), formatDate(currentDate.toDate(), 'YYYY-MM-DD')])
     }, [])
