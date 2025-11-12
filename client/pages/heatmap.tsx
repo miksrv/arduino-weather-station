@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { DatePicker, Dropdown, Spinner } from 'simple-react-ui-kit'
+import dayjs from 'dayjs'
+import { DatePicker, Dropdown, findPresetByDate, Spinner } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -13,7 +14,6 @@ import AppLayout from '@/components/app-layout'
 import WidgetHeatmap from '@/components/widget-heatmap'
 import { currentDate, formatDate, halfYearDate } from '@/tools/date'
 import { LocaleType } from '@/tools/types'
-import { findPresetByDate } from '@/ui/datepicker'
 
 type HeatmapPageProps = object
 
@@ -39,7 +39,11 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
     } = API.useGetHeatmapQuery(historyDateParam, { skip: !period?.[0] || !period?.[1] })
 
     const currentDatePreset = useMemo((): string => {
-        const preset = findPresetByDate(period?.[0], period?.[1], i18n.language as LocaleType)
+        if (!period?.[0] || !period?.[1]) {
+            return ''
+        }
+
+        const preset = findPresetByDate(dayjs.utc(), period[0], period[1], i18n.language as LocaleType)
 
         return preset ? preset : period?.[0] && period?.[1] ? `${period?.[0]} - ${period?.[1]}` : ''
     }, [period, i18n.language])
