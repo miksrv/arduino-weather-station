@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
-import { DatePicker, Dropdown, findPresetByDate, Spinner } from 'simple-react-ui-kit'
+import { DatePicker, findPresetByDate, Select, Spinner } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import { useTranslation } from 'next-i18next'
@@ -83,13 +83,12 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
                     buttonMode={'secondary'}
                     minDate={'2021-01-01'}
                     maxDate={formatDate(currentDate.toDate(), 'YYYY-MM-DD')}
-                    selectDateCaption={t('select-date-range')}
+                    placeholder={t('select-date-range')}
                     onPeriodSelect={(startDate, endDate) => setPeriod([startDate, endDate])}
                 />
 
-                <Dropdown<ApiType.Heatmap.SensorType>
-                    required={true}
-                    mode={'secondary'}
+                <Select<ApiType.Heatmap.SensorType>
+                    style={{ width: 170 }}
                     disabled={historyFetching || historyLoading}
                     value={sensor}
                     options={[
@@ -99,7 +98,7 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
                         { key: 'precipitation', value: t('precipitation'), icon: 'WaterDrop' },
                         { key: 'clouds', value: t('clouds'), icon: 'Cloud' }
                     ]}
-                    onSelect={(value) => setSensor(value?.key ?? 'temperature')}
+                    onSelect={(value) => setSensor(value?.[0]?.key ?? 'temperature')}
                 />
 
                 {historyFetching && !historyLoading && (
