@@ -79,7 +79,7 @@ const HistoryPage: NextPage<object> = () => {
                     buttonMode={'secondary'}
                     minDate={'2021-01-01'}
                     maxDate={formatDate(currentDate.toDate(), 'YYYY-MM-DD')}
-                    selectDateCaption={t('select-date-range')}
+                    placeholder={t('select-date-range')}
                     onPeriodSelect={(startDate, endDate) => setPeriod([startDate, endDate])}
                 />
 
