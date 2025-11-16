@@ -2297,12 +2297,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:19.2.4":
-  version: 19.2.4
-  resolution: "@types/react@npm:19.2.4"
+"@types/react@npm:19.2.5":
+  version: 19.2.5
+  resolution: "@types/react@npm:19.2.5"
   dependencies:
     csstype: "npm:^3.0.2"
-  checksum: 10c0/c878262c4bce047e53a44ef644088fce359ebdfdca7060a4ac1717c8362563b9506a7ebae145977836e95d5948b8f8b426dcd516044c3a3c0563a6f1b60408ce
+  checksum: 10c0/1f9a92c73a5ea5b167f59cd0b5b9460fde65bd22b63b6d23bfaace8ad38537df127c97657418b4912a7a03a66e6451e82a41b84718d638ec1c8e4f0515d94793
   languageName: node
   linkType: hard
 
@@ -7575,15 +7575,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-react-ui-kit@npm:^1.7.2":
-  version: 1.7.2
-  resolution: "simple-react-ui-kit@npm:1.7.2"
+"simple-react-ui-kit@npm:^1.7.3":
+  version: 1.7.3
+  resolution: "simple-react-ui-kit@npm:1.7.3"
   dependencies:
     dayjs: "npm:^1.11.19"
     lodash-es: "npm:^4.17.21"
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
-  checksum: 10c0/95088ce7388e5ae37c9f618fabc97c90ead1c1d58afacb1ed2df86a36d49a3ce787305c06658eccec0892a3136479d52c0179ed828f52c13dbe5f3e4d05578cd
+  checksum: 10c0/af4aee41a3a13046314220811e7c2c85085bbccb57b4e742aada70918504b689ef7401c5c6567ca8aed597d659605f164bf86458f11d2c5ff7a8e446514a27ba
   languageName: node
   linkType: hard
 
@@ -8445,7 +8445,7 @@ __metadata:
     "@types/jest": "npm:^30.0.0"
     "@types/lodash-es": "npm:^4.17.12"
     "@types/node": "npm:24.10.1"
-    "@types/react": "npm:19.2.4"
+    "@types/react": "npm:19.2.5"
     "@types/react-dom": "npm:19.2.3"
     "@types/redux-mock-store": "npm:^1.5.0"
     "@typescript-eslint/eslint-plugin": "npm:^8.46.4"
@@ -8483,7 +8483,7 @@ __metadata:
     sass: "npm:^1.94.0"
     schema-dts: "npm:^1.1.5"
     sharp: "npm:^0.34.5"
-    simple-react-ui-kit: "npm:^1.7.2"
+    simple-react-ui-kit: "npm:^1.7.3"
     ts-jest: "npm:^29.4.5"
     ts-node: "npm:^10.9.2"
     typescript: "npm:5.9.3"
