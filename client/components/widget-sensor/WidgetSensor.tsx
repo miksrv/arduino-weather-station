@@ -43,7 +43,11 @@ const WidgetSensor: React.FC<WidgetSensorProps> = ({
                         href={link?.href || ''}
                         {...link}
                     >
-                        {title}
+                        {title}{' '}
+                        <Icon
+                            name={'External'}
+                            className={styles.externalLinkIcon}
+                        />
                     </Link>
                 ) : (
                     title

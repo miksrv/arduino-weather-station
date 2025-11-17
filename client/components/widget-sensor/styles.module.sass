@@ -41,13 +41,22 @@
             text-decoration: none
             transition: color 0.3s
 
-        a:hover
-            color: var(--text-color-primary)
-
         svg
             fill: var(--text-color-secondary)
             width: 18px
             height: 18px
+
+        a:hover
+            color: var(--text-color-primary)
+
+            svg
+                fill: var(--text-color-primary)
+
+        .externalLinkIcon
+            vertical-align: middle
+            width: 12px
+            height: 12px
+            transition: fill 0.3s
 
     .value
         padding: 0 16px
