@@ -1,6 +1,6 @@
 {
     "name": "weather-station",
-    "version": "3.4.11",
+    "version": "3.5.1",
     "engines": {
         "node": ">=20.11.0"
     },
@@ -37,10 +37,10 @@
         "react-i18next": "^16.3.3",
         "react-redux": "^9.2.0",
         "sharp": "^0.34.5",
-        "simple-react-ui-kit": "^1.7.3"
+        "simple-react-ui-kit": "^1.7.6"
     },
     "devDependencies": {
-        "@eslint/compat": "^1.4.1",
+        "@eslint/compat": "^2.0.0",
         "@eslint/js": "^9.39.1",
         "@next/eslint-plugin-next": "^16.0.3",
         "@testing-library/dom": "^10.4.1",
@@ -53,7 +53,7 @@
         "@types/react": "19.2.5",
         "@types/react-dom": "19.2.3",
         "@types/redux-mock-store": "^1.5.0",
-        "@typescript-eslint/eslint-plugin": "^8.46.4",
+        "@typescript-eslint/eslint-plugin": "^8.47.0",
         "eslint": "^9.39.1",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-eslint-plugin": "^7.2.0",
@@ -74,7 +74,7 @@
         "ts-jest": "^29.4.5",
         "ts-node": "^10.9.2",
         "typescript": "5.9.3",
-        "typescript-eslint": "^8.46.4"
+        "typescript-eslint": "^8.47.0"
     },
     "packageManager": "yarn@4.9.2"
 }

@@ -41,6 +41,7 @@
     "forecast": "Weather forecast",
     "heat-map-data-shown-period": "Heat map data is shown for the period {{period}}",
     "please-wait-loading": "Please wait, loading...",
+    "meters_short": "m",
     "meters-per-second": "m/s",
     "millimeters": "mm",
     "mm-hg": "mm Hg",
