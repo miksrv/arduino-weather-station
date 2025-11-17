@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 3.5.1
+
+### Minor Changes
+
+-   Updated UI Dependencies
+-   Replaced DatePicker UI component from UI Kit
+-   Migrate from node `20` to `22`
+-   Improved WidgetSensor - added new prop `size`
+-   Added new Sensor - `visibility`
+-   Updated Sensors page - added link for the Sensor Widget
+
 ## 3.5.0
 
 ### Minor Changes
