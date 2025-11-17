@@ -96,11 +96,9 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
                 {widgets?.map((widget) => (
                     <WidgetSensor
+                        {...widget}
                         key={`widget-${widget.source}`}
                         link={{ href: '/sensors', title: t('weather-sensors') + ' - ' + widget.title }}
-                        unit={widget.unit}
-                        title={widget.title}
-                        icon={widget.icon}
                         loading={currentLoading}
                         chartLoading={historyLoading}
                         minMax={getMinMaxValues(history12HoursData, widget.source)}

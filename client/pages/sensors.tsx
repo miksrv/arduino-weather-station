@@ -17,7 +17,7 @@ import { convertHpaToMmHg, filterRecentData, getMinMaxValues } from '@/tools/wea
 
 type IndexPageProps = object
 
-type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon' | 'formatter' | 'size'> & {
+type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon' | 'formatter' | 'size' | 'link'> & {
     source: keyof ApiModel.Sensors
 }
 
@@ -45,19 +45,22 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             unit: '°C',
             icon: 'Thermometer',
             source: 'temperature',
-            size: 'x2'
+            size: 'x2',
+            link: { href: '/history' }
         },
         {
             title: t('feels-like'),
             unit: '°C',
             icon: 'Thermometer',
-            source: 'feelsLike'
+            source: 'feelsLike',
+            link: { href: '/history' }
         },
         {
             title: t('dew-point'),
             unit: '°C',
             icon: 'Thermometer',
-            source: 'dewPoint'
+            source: 'dewPoint',
+            link: { href: '/history' }
         },
         {
             title: t('pressure'),
@@ -65,13 +68,15 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             icon: 'Pressure',
             source: 'pressure',
             formatter: convertHpaToMmHg,
-            size: 'x2'
+            size: 'x2',
+            link: { href: '/history' }
         },
         {
             title: t('cloudiness'),
             unit: '%',
             icon: 'Cloud',
-            source: 'clouds'
+            source: 'clouds',
+            link: { href: '/history' }
         },
         {
             title: t('visibility'),
@@ -83,13 +88,15 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             title: t('humidity'),
             unit: '%',
             icon: 'Water',
-            source: 'humidity'
+            source: 'humidity',
+            link: { href: '/history' }
         },
         {
             title: t('wind-speed'),
             unit: t('meters-per-second'),
             icon: 'Wind',
-            source: 'windSpeed'
+            source: 'windSpeed',
+            link: { href: '/history' }
         },
         {
             title: t('wind-gust'),
@@ -101,13 +108,15 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             title: t('wind-deg'),
             unit: '°',
             icon: 'Compass',
-            source: 'windDeg'
+            source: 'windDeg',
+            link: { href: '/history' }
         },
         {
             title: t('precipitation'),
             unit: t('millimeters'),
             icon: 'WaterDrop',
-            source: 'precipitation'
+            source: 'precipitation',
+            link: { href: '/history' }
         },
         {
             title: t('uv-index'),
