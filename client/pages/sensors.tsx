@@ -17,7 +17,7 @@ import { convertHpaToMmHg, filterRecentData, getMinMaxValues } from '@/tools/wea
 
 type IndexPageProps = object
 
-type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon' | 'formatter'> & {
+type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon' | 'formatter' | 'size'> & {
     source: keyof ApiModel.Sensors
 }
 
@@ -44,7 +44,8 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             title: t('temperature'),
             unit: '°C',
             icon: 'Thermometer',
-            source: 'temperature'
+            source: 'temperature',
+            size: 'x2'
         },
         {
             title: t('feels-like'),
@@ -59,17 +60,30 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             source: 'dewPoint'
         },
         {
-            title: t('humidity'),
-            unit: '%',
-            icon: 'Water',
-            source: 'humidity'
-        },
-        {
             title: t('pressure'),
             unit: t('mm-hg'),
             icon: 'Pressure',
             source: 'pressure',
-            formatter: convertHpaToMmHg
+            formatter: convertHpaToMmHg,
+            size: 'x2'
+        },
+        {
+            title: t('cloudiness'),
+            unit: '%',
+            icon: 'Cloud',
+            source: 'clouds'
+        },
+        {
+            title: t('visibility'),
+            unit: t('meters_short'),
+            icon: 'Eye',
+            source: 'visibility'
+        },
+        {
+            title: t('humidity'),
+            unit: '%',
+            icon: 'Water',
+            source: 'humidity'
         },
         {
             title: t('wind-speed'),
@@ -77,23 +91,17 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             icon: 'Wind',
             source: 'windSpeed'
         },
-        // {
-        //     title: t('wind-gust'),
-        //     unit: t('meters-per-second'),
-        //     icon: 'Wind',
-        //     source: 'windGust'
-        // },
+        {
+            title: t('wind-gust'),
+            unit: t('meters-per-second'),
+            icon: 'Wind',
+            source: 'windGust'
+        },
         {
             title: t('wind-deg'),
             unit: '°',
             icon: 'Compass',
             source: 'windDeg'
-        },
-        {
-            title: t('cloudiness'),
-            unit: '%',
-            icon: 'Cloud',
-            source: 'clouds'
         },
         {
             title: t('precipitation'),
@@ -146,10 +154,8 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             <div className={'widgets-list'}>
                 {widgets?.map((widget) => (
                     <WidgetSensor
+                        {...widget}
                         key={`widget-${widget.source}`}
-                        unit={widget.unit}
-                        title={widget.title}
-                        icon={widget.icon}
                         loading={currentLoading}
                         chartLoading={historyLoading}
                         minMax={getMinMaxValues(history12HoursData, widget.source)}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icon, IconTypes, Skeleton } from 'simple-react-ui-kit'
+import { cn, Icon, IconTypes, Skeleton } from 'simple-react-ui-kit'
 
 import Link from 'next/link'
 
@@ -11,6 +11,7 @@ import styles from './styles.module.sass'
 export interface WidgetSensorProps {
     title?: string
     unit?: string
+    size?: 'x1' | 'x2'
     icon?: IconTypes
     loading?: boolean
     chartLoading?: boolean
@@ -24,6 +25,7 @@ export interface WidgetSensorProps {
 const WidgetSensor: React.FC<WidgetSensorProps> = ({
     title,
     icon,
+    size = 'x1',
     loading,
     chartLoading,
     currentValue,
@@ -33,7 +35,7 @@ const WidgetSensor: React.FC<WidgetSensorProps> = ({
     formatter,
     chart
 }) => (
-    <div className={styles.widget}>
+    <div className={cn(styles.widget, styles[size])}>
         <div className={styles.header}>
             <h3>
                 {link ? (
