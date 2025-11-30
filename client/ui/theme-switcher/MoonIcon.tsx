@@ -5,16 +5,16 @@ import { ToggleSwitchProps } from '@/ui/theme-switcher/ThemeSwitcher'
 
 import styles from '@/ui/theme-switcher/styles.module.sass'
 
-const MoonIcon: React.FC<ToggleSwitchProps> = ({ isClicked }) => {
-    const [value, setValue] = useState(isClicked ? 1 : 0)
+const MoonIcon: React.FC<ToggleSwitchProps> = ({ checked }) => {
+    const [value, setValue] = useState(checked ? 1 : 0)
 
     useEffect(() => {
         const timeout = setTimeout(() => {
-            setValue(isClicked ? 1 : 0)
+            setValue(checked ? 1 : 0)
         }, TRANSITION_TIME)
 
         return () => clearTimeout(timeout)
-    }, [isClicked])
+    }, [checked])
 
     return (
         <div

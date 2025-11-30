@@ -7,7 +7,7 @@ import styles from './styles.module.sass'
 type ThemesType = 'dark' | 'light'
 
 export type ToggleSwitchProps = {
-    isClicked: boolean
+    checked: boolean
 }
 
 interface ThemeSwitcherProps {
@@ -32,7 +32,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ theme, onChangeTheme }) =
                 }
             }}
         >
-            <ToggleSwitch isClicked={theme === 'dark'} />
+            <ToggleSwitch checked={theme === 'dark'} />
         </div>
     )
 }
