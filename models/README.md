@@ -35,28 +35,28 @@ One of the main plate elements of the radiation shield. Forms the layered struct
 
 **Quantity:** 4 pcs (minimum required to fit the sensor adapter).
 
-![rad_shd](./radiation shield/rad_shd.jpg)
+![rad_shd](./radiation-shield/rad_shd.jpg)
 
 ### **rad_shd_base.stl** - bottom base
 The bottom foundation of the shield assembly. The first layer onto which the plates are stacked.
 
 **Quantity:** 1 pc.
 
-![rad_shd_base](./radiation shield/rad_shd_base.jpg)
+![rad_shd_base](./radiation-shield/rad_shd_base.jpg)
 
 ### **rad_shd_top.stl** - top cover
 The uppermost element that closes the radiation shield. Protects from precipitation and locks the structure together.
 
 **Quantity:** 1 pc.
 
-![rad_shd_top](./radiation shield/rad_shd_top.jpg)
+![rad_shd_top](./radiation-shield/rad_shd_top.jpg)
 
 ### **rad_shd_vert_mount.stl** - vertical mount
 Mounting bracket for attaching the radiation shield to a pipe or vertical pole.
 
 **Quantity:** 1 pc.
 
-![rad_shd_vert_mount](./radiation shield/rad_shd_vert_mount.jpg)
+![rad_shd_vert_mount](./radiation-shield/rad_shd_vert_mount.jpg)
 
 ---
 
@@ -66,7 +66,7 @@ The mount is sized to fit directly inside the **Radiation Shield**, ensuring pro
 
 **Quantity:** 1 pc.
 
-![DHT22_and_BMP085_Mount](./DHT22 BMP085 mount/DHT22_and_BMP085_Mount.jpg)
+![DHT22_and_BMP085_Mount](./dht22-bmp085-mount/DHT22_and_BMP085_Mount.jpg)
 
 ---
 
@@ -128,7 +128,7 @@ A simple **sensor holder arm** used to mount both the **anemometer** and **wind 
 
 **Quantity summary:** 3 printed parts total.
 
-![sensors_holder_preview](./sensors holder/sensor-holder.webp)
+![sensors_holder_preview](./sensors-holder/sensor-holder.webp)
 
 ---
 
@@ -143,7 +143,7 @@ The vane uses a **5×3 mm round magnet** mounted in the rotating part and eight 
 - **1× 5×3 mm round neodymium magnet**
 - **1× PCF8574 port expander**
 
-![wind_direction_preview](./wind direction/wind-direction.webp)
+![wind_direction_preview](./wind-direction/wind-direction.webp)
 
 ---
 
