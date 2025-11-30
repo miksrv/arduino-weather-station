@@ -17,6 +17,7 @@ const ClimatePage: NextPage = () => {
     const [yearPeriods, setYearPeriods] = useState<string[][]>([])
     const [currentPeriodIndex, setCurrentPeriodIndex] = useState(0)
     const [allData, setAllData] = useState<ClimateType[]>([])
+    // const [averageTemperatures, setAverageTemperatures] = useState<Array<{ year: string; avgTemp: number }>>([])
 
     useEffect(() => {
         const currentYear = new Date().getFullYear()
@@ -46,6 +47,68 @@ const ClimatePage: NextPage = () => {
                     weather: yearHistories
                 }
             ])
+
+            // Calculate average temperature for the year
+            // if (Array.isArray(yearHistories) && yearHistories.length > 0) {
+            //     const months = Array.from({ length: 12 }, (_, i) => i + 1)
+            //     const currentYear = yearPeriods?.[currentIndex]?.[0]?.split('-')[0]
+            //     const monthTemps: number[] = []
+            //
+            //     months.forEach((month) => {
+            //         const monthData = yearHistories.filter((item: any) => {
+            //             const date = new Date(item.date)
+            //             return date.getMonth() + 1 === month
+            //         })
+            //         if (monthData.length > 0) {
+            //             const temps = monthData
+            //                 .map((item: any) => item.temperature)
+            //                 .filter((t: number) => typeof t === 'number')
+            //             const avg = temps.length
+            //                 ? temps.reduce((a: number, b: number) => a + b, 0) / temps.length
+            //                 : null
+            //             if (avg != null) {
+            //                 monthTemps.push(avg)
+            //             }
+            //         } else {
+            //             const prevTemps: number[] = []
+            //             allData.forEach((yearData) => {
+            //                 const prevMonthData = yearData.weather.filter((item: any) => {
+            //                     const date = new Date(item.date)
+            //                     return date.getMonth() + 1 === month
+            //                 })
+            //                 prevMonthData.forEach((item: any) => {
+            //                     if (typeof item.temperature === 'number') {
+            //                         prevTemps.push(item.temperature)
+            //                     }
+            //                 })
+            //             })
+            //             const prevAvg = prevTemps.length
+            //                 ? prevTemps.reduce((a, b) => a + b, 0) / prevTemps.length
+            //                 : null
+            //             if (prevAvg != null) {
+            //                 monthTemps.push(prevAvg)
+            //             }
+            //         }
+            //     })
+            //
+            //     const avgTemp = monthTemps.length ? monthTemps.reduce((a, b) => a + b, 0) / monthTemps.length : null
+            //     if (avgTemp != null) {
+            //         setAverageTemperatures((prev) => {
+            //             const existingIndex = prev.findIndex((item) => item.year === currentYear)
+            //             if (existingIndex !== -1) {
+            //                 // Если год уже существует, не добавляем его повторно
+            //                 return prev
+            //             }
+            //             return [
+            //                 ...prev,
+            //                 {
+            //                     year: currentYear,
+            //                     avgTemp: avgTemp
+            //                 }
+            //             ]
+            //         })
+            //     }
+            // }
 
             if (currentIndex < yearPeriods.length - 1) {
                 setTimeout(() => {
