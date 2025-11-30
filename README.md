@@ -1,7 +1,8 @@
 <a id="top"></a>
 
 <!-- PROJECT TITLE -->
-Arduino Weather Station is an automated weather monitoring project built on Arduino for collecting environmental data, featuring an API (PHP + MySQL + CodeIgniter) and a web interface (Next.js + Redux RTK) for real-time and historical weather data analysis. Please give the project a star :)
+Arduino Weather Station is a complete DIY weather-monitoring project powered by Arduino or ESP32. It collects real environmental data and provides a full backend API (PHP + MySQL + CodeIgniter) and a modern web interface (Next.js + Redux RTK) for real-time and historical weather analysis.
+You can use this repository to build your own fully-featured weather station - and if you like it, please give the project a star :)
 
 <div align="center">
   <img src="https://miksoft.pro/_next/static/media/meteostation.de6617a7.jpg" alt="Arduino Weather Station" width="150" height="150">
@@ -45,6 +46,11 @@ Arduino Weather Station is an automated weather monitoring project built on Ardu
     - [Key Features](#key-features)
     - [Measured Parameters](#measured-parameters)
     - [Built With](#built-with)
+- [Build Guide](#build-guide)
+    - [3D Printing the Enclosure](#3d-printing-the-enclosure)
+    - Assembling the Weather Station Hardware 
+    - Server Setup & Configuration (PHP + MySQL + CodeIgniter)
+    - Client Setup & Configuration (Next.js + Redux RTK)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Screenshots and Demos](#screenshots-and-demos)
@@ -56,16 +62,16 @@ Arduino Weather Station is an automated weather monitoring project built on Ardu
 <!-- ABOUT OF PROJECT -->
 ## About of Project
 
-The Arduino Weather Station is an advanced, automated weather monitoring system designed to collect, process, and display real-time environmental data. The weather station is built using an Arduino microcontroller to handle sensor input and transmit data to a backend server. This data is then made available through an API built on PHP, MySQL, and CodeIgniter, with a frontend developed using Next.js and Redux RTK.
+Arduino Weather Station is a modular DIY platform for collecting and analyzing weather data. It supports Arduino or ESP32, works with a wide range of sensors, and sends real-time measurements to a backend server. Data is processed, stored, and exposed through a clean REST API and a modern Next.js dashboard.
 
 ![Arduino Weather Station](./docs/arduino-weather-station-1.jpg)
 
 ### Key Features:
-- **Real-time Data Collection:** The weather station continuously monitors various atmospheric parameters using multiple sensors.
-- **Historical Data Storage:** Weather data is stored in a database, allowing users to view and analyze past conditions over selected periods.
-- **Remote Access:** A web-based interface allows users to access weather information from anywhere, displaying current readings and historical trends.
-- **Data Visualization:** Users can view live graphs of parameters such as temperature, humidity, pressure, and more, along with detailed statistics for selected time frames.
-- **API Integration:** The backend provides an API for developers to access weather data for integration into external applications.
+- **Live data**: continuous sensor monitoring.
+- **Historical logging**: long-term storage in MySQL with detailed analytics.
+- **Web dashboard**: access your station from anywhere — charts, stats, trends.
+- **REST API**: integrate weather data into external apps or services.
+- **Modular design**: easily add new sensors or expand the system.
 
 ### Measured Parameters:
 - Temperature
@@ -80,7 +86,7 @@ The Arduino Weather Station is an advanced, automated weather monitoring system 
 - Precipitation levels
 - Cloud cover
 
-The system is highly customizable, and additional sensors can be integrated to expand its functionality. This project demonstrates how microcontrollers, web development, and real-time data processing can be combined to create a fully functional, real-world application.
+The system is highly customizable - from a small indoor sensor hub to a full outdoor weather station with complete data logging and visualization.
 
 <p align="right">
   (<a href="#top">Back to top</a>)
@@ -107,6 +113,20 @@ This project also includes custom-designed components for measuring airflow, vol
 <p align="right">
   (<a href="#top">Back to top</a>)
 </p>
+
+<!-- BUILD GUIDE -->
+## Build Guide
+This project is fairly extensive and includes hardware, firmware, backend, and frontend components. You can choose to build the entire weather station from start to finish, or you can use only the parts you need - whether it's the Arduino/ESP32 firmware, the server API, the 3D-printed enclosure, or the web dashboard.
+
+The guide below walks you through each stage step by step: printing the enclosure, assembling the hardware, setting up the server, and configuring the client application.
+
+### 3D Printing the Enclosure
+All 3D-printable parts for the weather station are located in the [models](https://github.com/miksrv/arduino-weather-station/tree/main/models)
+directory, which includes a detailed guide on recommended print settings, assembly notes, and an overview of each component.
+
+The enclosure is fully modular and allows you to print only the parts needed for your specific sensor configuration. Most models are optimized for FDM 3D printers and require no supports unless otherwise noted.
+
+Before printing, review the [Models README](./models/README.md) to choose the correct components and verify recommended materials and orientation.
 
 <!-- INSTALLATION -->
 ## Installation

@@ -19,7 +19,6 @@ interface HeaderProps {
 
 const OFFLINE_TIME = 30
 
-// TODO: Sometimes the date is shown as in the future (ie in X minutes), needs to be fixed
 const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
     const isClient = useClientOnly()
     const { theme, setTheme } = useTheme()
