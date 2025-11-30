@@ -4,6 +4,7 @@ import ReactECharts from 'echarts-for-react'
 
 import { useTheme } from 'next-themes'
 
+import { getEChartBaseConfig } from '@/tools'
 import { formatDateFromUTC } from '@/tools/date'
 import { round } from '@/tools/helpers'
 
@@ -21,31 +22,10 @@ const Chart: React.FC<ChartProps> = ({ data, height }) => {
 
     const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff'
     const borderColor = theme === 'dark' ? '#444546' : '#cbcccd'
-    const textPrimaryColor = theme === 'dark' ? '#e1e3e6' : '#000000E5'
     const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99'
 
     const baseConfig: EChartsOption = {
-        backgroundColor,
-        grid: {
-            left: 10,
-            right: 10,
-            top: 15,
-            bottom: 25,
-            containLabel: true
-        },
-        legend: {
-            type: 'plain',
-            orient: 'horizontal',
-            left: 5,
-            bottom: 0,
-            itemWidth: 20,
-            itemHeight: 2,
-            textStyle: {
-                color: textPrimaryColor,
-                fontSize: 12
-            },
-            icon: 'rect'
-        },
+        ...getEChartBaseConfig(theme),
         tooltip: {
             trigger: 'axis',
             axisPointer: {

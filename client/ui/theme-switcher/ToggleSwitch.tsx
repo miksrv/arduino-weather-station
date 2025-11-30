@@ -6,7 +6,7 @@ import { ToggleSwitchProps } from '@/ui/theme-switcher/ThemeSwitcher'
 
 import styles from '@/ui/theme-switcher/styles.module.sass'
 
-const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ isClicked }) => {
+const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ checked }) => {
     const ref = useRef<HTMLDivElement>(null)
     const [isHovered, setIsHovered] = useState(false)
     const [isActive, setIsActive] = useState(false)
@@ -16,14 +16,14 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ isClicked }) => {
         ref.current!.style.transform = `scale(${scaleValue})`
     }, [isHovered, isActive])
 
-    const backgroundColor = isClicked ? '#595dde' : '#80c7cb'
+    const backgroundColor = checked ? '#595dde' : '#80c7cb'
 
     return (
         <div
             ref={ref}
             className={styles.dayNightSwitch}
             style={{
-                backgroundColor: isHovered ? (isClicked ? '#5559cc' : '#79bfc3') : backgroundColor,
+                backgroundColor: isHovered ? (checked ? '#5559cc' : '#79bfc3') : backgroundColor,
                 transform: `scale(${isActive ? 1.03 : isHovered ? 1.05 : 1})`
             }}
             onMouseEnter={() => setIsHovered(true)}
@@ -31,8 +31,8 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ isClicked }) => {
             onMouseDown={() => setIsActive(true)}
             onMouseUp={() => setIsActive(false)}
         >
-            <Stars isClicked={isClicked} />
-            <Circle isClicked={isClicked} />
+            <Stars checked={checked} />
+            <Circle checked={checked} />
         </div>
     )
 }

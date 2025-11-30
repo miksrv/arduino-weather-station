@@ -22,28 +22,28 @@ describe('Stars', () => {
         jest.useRealTimers()
     })
 
-    it('renders with isClicked=false (opacity 0)', () => {
-        const { container } = render(<Stars isClicked={false} />)
+    it('renders with checked=false (opacity 0)', () => {
+        const { container } = render(<Stars checked={false} />)
         const starsContainer = container.querySelector('.stars')
         expect(starsContainer).toHaveStyle('opacity: 0')
     })
 
-    it('renders with isClicked=true (opacity 1)', () => {
-        const { container } = render(<Stars isClicked={true} />)
+    it('renders with checked=true (opacity 1)', () => {
+        const { container } = render(<Stars checked={true} />)
         const starsContainer = container.querySelector('.stars')
         expect(starsContainer).toHaveStyle('opacity: 1')
     })
 
-    it('transitions opacity when isClicked changes', () => {
-        const { container, rerender } = render(<Stars isClicked={false} />)
+    it('transitions opacity when checked changes', () => {
+        const { container, rerender } = render(<Stars checked={false} />)
         const starsContainer = container.querySelector('.stars')
         expect(starsContainer).toHaveStyle('opacity: 0')
-        rerender(<Stars isClicked={true} />)
+        rerender(<Stars checked={true} />)
         act(() => {
             jest.advanceTimersByTime(100)
         })
         expect(starsContainer).toHaveStyle('opacity: 1')
-        rerender(<Stars isClicked={false} />)
+        rerender(<Stars checked={false} />)
         act(() => {
             jest.advanceTimersByTime(100)
         })
@@ -51,7 +51,7 @@ describe('Stars', () => {
     })
 
     it('renders 4 star elements with correct styles', () => {
-        const { container } = render(<Stars isClicked={true} />)
+        const { container } = render(<Stars checked={true} />)
         const stars = container.querySelectorAll('.star')
         expect(stars).toHaveLength(4)
         expect(stars[0]).toHaveStyle('top: 8px')

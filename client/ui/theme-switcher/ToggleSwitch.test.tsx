@@ -23,22 +23,22 @@ jest.mock('@/ui/theme-switcher/Stars', () => (props: any) => (
 ))
 
 describe('ToggleSwitch', () => {
-    it('renders with isClicked=false', () => {
-        render(<ToggleSwitch isClicked={false} />)
+    it('renders with checked=false', () => {
+        render(<ToggleSwitch checked={false} />)
         expect(screen.getByTestId('circle')).toBeInTheDocument()
         expect(screen.getByTestId('stars')).toBeInTheDocument()
         const div = screen.getByTestId('circle').parentElement as HTMLElement
         expect(div).toHaveStyle('background-color: #80c7cb')
     })
 
-    it('renders with isClicked=true', () => {
-        render(<ToggleSwitch isClicked={true} />)
+    it('renders with checked=true', () => {
+        render(<ToggleSwitch checked={true} />)
         const div = screen.getByTestId('circle').parentElement
         expect(div).toHaveStyle('background-color: #595dde')
     })
 
-    it('changes background on hover (isClicked=false)', () => {
-        render(<ToggleSwitch isClicked={false} />)
+    it('changes background on hover (checked=false)', () => {
+        render(<ToggleSwitch checked={false} />)
         const div = screen.getByTestId('circle').parentElement as HTMLElement
         fireEvent.mouseEnter(div)
         expect(div).toHaveStyle('background-color: #79bfc3')
@@ -46,8 +46,8 @@ describe('ToggleSwitch', () => {
         expect(div).toHaveStyle('background-color: #80c7cb')
     })
 
-    it('changes background on hover (isClicked=true)', () => {
-        render(<ToggleSwitch isClicked={true} />)
+    it('changes background on hover (checked=true)', () => {
+        render(<ToggleSwitch checked={true} />)
         const div = screen.getByTestId('circle').parentElement as HTMLElement
         fireEvent.mouseEnter(div)
         expect(div).toHaveStyle('background-color: #5559cc')
@@ -56,7 +56,7 @@ describe('ToggleSwitch', () => {
     })
 
     it('scales on hover and active', () => {
-        render(<ToggleSwitch isClicked={false} />)
+        render(<ToggleSwitch checked={false} />)
         const div = screen.getByTestId('circle').parentElement as HTMLElement
         fireEvent.mouseEnter(div)
         expect(div).toHaveStyle('transform: scale(1.05)')

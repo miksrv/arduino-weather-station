@@ -12,7 +12,7 @@ import '@testing-library/jest-dom'
 jest.mock('./MoonIcon', () => (props: any) => (
     <div
         data-testid='moon-icon'
-        data-clicked={props.isClicked ? '1' : '0'}
+        data-clicked={props.checked ? '1' : '0'}
     />
 ))
 
@@ -25,8 +25,8 @@ describe('Circle', () => {
         jest.useRealTimers()
     })
 
-    it('renders with initial isClicked=false styles', () => {
-        render(<Circle isClicked={false} />)
+    it('renders with initial checked=false styles', () => {
+        render(<Circle checked={false} />)
         const circle = screen.getByTestId('moon-icon').parentElement
         expect(circle).toHaveStyle({
             transform: 'translateX(5px)',
@@ -36,8 +36,8 @@ describe('Circle', () => {
         expect(screen.getByTestId('moon-icon')).toHaveAttribute('data-clicked', '0')
     })
 
-    it('renders with initial isClicked=true styles', () => {
-        render(<Circle isClicked={true} />)
+    it('renders with initial checked=true styles', () => {
+        render(<Circle checked={true} />)
         const circle = screen.getByTestId('moon-icon').parentElement
         expect(circle).toHaveStyle({
             transform: 'translateX(calc(100% + 15px))',
@@ -47,9 +47,9 @@ describe('Circle', () => {
         expect(screen.getByTestId('moon-icon')).toHaveAttribute('data-clicked', '1')
     })
 
-    it('updates styles after isClicked changes (with delay)', () => {
-        const { rerender } = render(<Circle isClicked={false} />)
-        rerender(<Circle isClicked={true} />)
+    it('updates styles after checked changes (with delay)', () => {
+        const { rerender } = render(<Circle checked={false} />)
+        rerender(<Circle checked={true} />)
         // Before timeout, still old style
         let circle = screen.getByTestId('moon-icon').parentElement
         expect(circle).toHaveStyle({ transform: 'translateX(5px)' })
@@ -57,13 +57,13 @@ describe('Circle', () => {
         act(() => {
             jest.advanceTimersByTime(TRANSITION_TIME)
         })
-        rerender(<Circle isClicked={true} />)
+        rerender(<Circle checked={true} />)
         circle = screen.getByTestId('moon-icon').parentElement
         expect(circle).toHaveStyle({ transform: 'translateX(calc(100% + 15px))' })
     })
 
     it('cleans up timeout on unmount', () => {
-        const { unmount } = render(<Circle isClicked={false} />)
+        const { unmount } = render(<Circle checked={false} />)
         unmount()
         // No errors should occur
     })

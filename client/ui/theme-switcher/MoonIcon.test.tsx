@@ -16,8 +16,8 @@ describe('MoonIcon', () => {
         jest.useRealTimers()
     })
 
-    it('renders with initial isClicked=false', () => {
-        render(<MoonIcon isClicked={false} />)
+    it('renders with initial checked=false', () => {
+        render(<MoonIcon checked={false} />)
         const div = document.querySelector('.moonSvg') as HTMLElement
         expect(div).toHaveStyle({
             opacity: '0',
@@ -25,8 +25,8 @@ describe('MoonIcon', () => {
         })
     })
 
-    it('renders with initial isClicked=true', () => {
-        render(<MoonIcon isClicked={true} />)
+    it('renders with initial checked=true', () => {
+        render(<MoonIcon checked={true} />)
         const div = document.querySelector('.moonSvg') as HTMLElement
         expect(div).toHaveStyle({
             opacity: '1',
@@ -34,9 +34,9 @@ describe('MoonIcon', () => {
         })
     })
 
-    it('updates style after isClicked changes (with delay)', () => {
-        const { rerender, container } = render(<MoonIcon isClicked={false} />)
-        rerender(<MoonIcon isClicked={true} />)
+    it('updates style after checked changes (with delay)', () => {
+        const { rerender, container } = render(<MoonIcon checked={false} />)
+        rerender(<MoonIcon checked={true} />)
         const div = container.firstChild as HTMLElement
         // Before timer, still old style
         expect(div).toHaveStyle({ opacity: '0', transform: 'translateY(32px)' })
@@ -49,7 +49,7 @@ describe('MoonIcon', () => {
     })
 
     it('cleans up timeout on unmount', () => {
-        const { unmount } = render(<MoonIcon isClicked={false} />)
+        const { unmount } = render(<MoonIcon checked={false} />)
         expect(() => unmount()).not.toThrow()
     })
 })

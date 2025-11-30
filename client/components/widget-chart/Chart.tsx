@@ -8,6 +8,7 @@ import { useTheme } from 'next-themes'
 
 import { ApiModel } from '@/api'
 import { ChartTypes } from '@/components/widget-chart/WidgetChart'
+import { getEChartBaseConfig } from '@/tools'
 import { getSensorColor } from '@/tools/colors'
 import { formatDateFromUTC } from '@/tools/date'
 import { round } from '@/tools/helpers'
@@ -29,32 +30,10 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
 
     const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff' // --container-background-color
     const borderColor = theme === 'dark' ? '#444546' : '#cbcccd' // --input-border-color
-    const textPrimaryColor = theme === 'dark' ? '#e1e3e6' : '#000000E5' // --text-color-primary
     const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99' // --text-color-secondary
 
     const baseConfig: EChartsOption = {
-        backgroundColor,
-        grid: {
-            left: 10,
-            right: 10,
-            top: 15,
-            bottom: 25,
-            containLabel: true,
-            borderColor: borderColor
-        },
-        legend: {
-            type: 'plain',
-            orient: 'horizontal', // Горизонтальное расположение легенды
-            left: 5, // Выравнивание по левому краю
-            bottom: 0, // Размещение легенды под графиком
-            itemWidth: 20, // Ширина значка линии в легенде
-            itemHeight: 2, // Высота значка линии в легенде (делает линию тоньше)
-            textStyle: {
-                color: textPrimaryColor, // Цвет текста легенды
-                fontSize: '12px'
-            },
-            icon: 'rect' // Используем короткую линию в качестве значка
-        },
+        ...getEChartBaseConfig(theme),
         tooltip: {
             trigger: 'axis',
             axisPointer: {
