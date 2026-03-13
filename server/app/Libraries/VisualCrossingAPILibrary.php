@@ -83,7 +83,7 @@ class VisualCrossingAPILibrary
      */
     public function getWeatherData(): array|false
     {
-        $data = $this->request('/today');
+        $data = $this->request('today');
         return $data ? $this->mapWeatherData($data) : false;
     }
 
