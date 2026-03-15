@@ -57,7 +57,7 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
         updateIconCount()
         window.addEventListener('resize', updateIconCount)
         return () => window.removeEventListener('resize', updateIconCount)
-    }, [containerRef.current])
+    }, [])
 
     const renderArrow = (
         _: CustomSeriesRenderItemParams,

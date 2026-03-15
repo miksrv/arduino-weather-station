@@ -5,7 +5,7 @@ Arduino Weather Station is a complete DIY weather-monitoring project powered by 
 You can use this repository to build your own fully-featured weather station - and if you like it, please give the project a star :)
 
 <div align="center">
-  <img src="https://miksoft.pro/_next/static/media/meteostation.de6617a7.jpg" alt="Arduino Weather Station" width="150" height="150">
+  <img src="https://miksoft.pro/projects/meteostation.webp" alt="Arduino Weather Station" width="150" height="150">
 
 <h3>Arduino Weather Station</h3>
 
@@ -58,6 +58,16 @@ You can use this repository to build your own fully-featured weather station - a
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
 - [Contact](#contact)
+
+## Documentation
+
+Detailed documentation lives in the [`/docs`](./docs) directory:
+
+- [Architecture](./docs/architecture.md) — system design, data flow, external services
+- [Backend](./docs/backend.md) — PHP/CodeIgniter API reference and setup
+- [Frontend](./docs/frontend.md) — Next.js app structure and development
+- [Development Guide](./docs/development.md) — local setup, commands, conventions
+- [Testing Guide](./docs/testing.md) — running tests, coverage, CI pipeline
 
 <!-- ABOUT OF PROJECT -->
 ## About of Project
@@ -138,7 +148,7 @@ Follow these steps to install and run the Arduino Weather Station project on you
 Make sure you have the following installed on your system:
 - **Node.js** (v20 or higher)
 - **NPM** or **Yarn** (for frontend dependencies)
-- **PHP** (v8.0 or higher)
+- **PHP** (v8.2 or higher)
 - **Composer** (for backend dependencies)
 - **MySQL** (or any compatible database)
 - **Arduino IDE** (for programming the Arduino microcontroller)
@@ -155,7 +165,7 @@ cd arduino-weather-station
 1. Navigate to the `server` folder:
 
    ```bash
-   cd backend
+   cd server
    ```
 
 2. Install PHP dependencies using Composer:
@@ -167,7 +177,7 @@ cd arduino-weather-station
 3. Create a `.env` file and configure your environment variables, such as database connection settings:
 
    ```bash
-   cp .env.example .env
+   cp env .env
    ```
 
     Don't forget to set the parameter `app.arduino.token` = '' in the .env file. This token will be used for proper authentication of the Arduino weather station when transmitting data to the server. The same token will need to be set in the Arduino sketch, which will be described in step 4.
@@ -196,7 +206,7 @@ cd arduino-weather-station
 2. Copy file `env` to `.env.local` and set the following environment variables:
 
    ```bash
-   cp .env .env
+   cp env .env.local
    ```
    
     ```bash
@@ -296,7 +306,7 @@ After successfully installing and setting up the Arduino Weather Station project
 
 ### 3. Historical Data
 
-- Navigate to the **History** or **Statistics** page from the main menu.
+- Navigate to the **History** page from the main menu.
 - Choose a date range to view weather trends and archived data, including charts for various metrics like temperature, wind, and humidity.
 
 <div align="center">
@@ -316,7 +326,7 @@ After successfully installing and setting up the Arduino Weather Station project
 
 ### 6. Data Export
 
-- Weather data can be exported from the **Statistics** page in various formats (e.g., CSV) to analyze trends further.
+- Weather data can be exported from the **History** page in various formats (e.g., CSV) to analyze trends further.
 
 ### 7. System Maintenance
 
