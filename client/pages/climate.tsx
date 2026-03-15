@@ -41,7 +41,9 @@ const ClimatePage: NextPage = () => {
             const currentIndex = currentPeriodIndex
             const year = yearPeriods[currentIndex][0].split('-')[0]
 
-            setAllData((prev) => (prev.some((d) => d.year === year) ? prev : [...prev, { year, weather: yearHistories }]))
+            setAllData((prev) =>
+                prev.some((d) => d.year === year) ? prev : [...prev, { year, weather: yearHistories }]
+            )
 
             if (currentIndex < yearPeriods.length - 1) {
                 const timerId = setTimeout(() => {

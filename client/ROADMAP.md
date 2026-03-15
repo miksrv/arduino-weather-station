@@ -7,11 +7,11 @@ Scope: `/client` directory (Next.js 16, React 19, TypeScript 5.9, RTK Query, ECh
 
 ## Legend
 
-| Priority | Meaning |
-|---|---|
-| **High** | Bug or convention violation that affects correctness, SEO, or user experience now |
-| **Medium** | Quality issue, missing coverage, or UX gap with clear value |
-| **Low** | Nice-to-have improvement or cleanup with low urgency |
+| Priority   | Meaning                                                                           |
+| ---------- | --------------------------------------------------------------------------------- |
+| **High**   | Bug or convention violation that affects correctness, SEO, or user experience now |
+| **Medium** | Quality issue, missing coverage, or UX gap with clear value                       |
+| **Low**    | Nice-to-have improvement or cleanup with low urgency                              |
 
 ---
 
@@ -22,7 +22,7 @@ Scope: `/client` directory (Next.js 16, React 19, TypeScript 5.9, RTK Query, ECh
 **File:** `tools/weather.ts` — lines 36–53
 
 ```ts
-let minValue = data[0][parameter] as number  // could be undefined
+let minValue = data[0][parameter] as number // could be undefined
 ```
 
 If the first item's sensor field is `undefined`, `minValue` is `undefined` cast to `number`. All subsequent comparisons (`value < minValue`) are `NaN`-comparisons and return `false`, so the result is the first-item value regardless of the array. Fix by pre-filtering out `undefined` values before iteration, mirroring `findMinValue`.
@@ -67,6 +67,7 @@ This is a deliberate `eslint-disable` with a comment acknowledging the type esca
 ### QC-01 · `any` types in ECharts tooltip formatters — 4 files [High]
 
 **Files:**
+
 - `components/widget-chart/Chart.tsx` lines 54, 67 — `formatter: (params: any)`, `params.forEach((item: any)`
 - `components/widget-meteogram/Meteogram.tsx` lines 121, 134 — same pattern
 - `components/widget-climate/Chart.tsx` lines 45, 58 — same pattern
@@ -81,6 +82,7 @@ All four have `// eslint-disable-next-line @typescript-eslint/no-explicit-any` o
 **Convention:** CSS Modules only — no inline styles.
 
 Inline `style={{ ... }}` props exist in:
+
 - `components/widget-sensor/WidgetSensor.tsx` — 7 occurrences (all `Skeleton` props)
 - `components/widget-summary/WidgetSummary.tsx` — 6 occurrences (all `Skeleton` props)
 - `components/widget-chart/WidgetChart.tsx` — 1 occurrence (`Skeleton`)
@@ -120,8 +122,12 @@ These are user-facing strings that should use `useTranslation()`. Add `min` and 
 **File:** `components/language-switcher/LanguageSwitcher.tsx` — lines 49, 55
 
 ```tsx
-{'Eng'}
-{'Rus'}
+{
+    ;('Eng')
+}
+{
+    ;('Rus')
+}
 ```
 
 These short labels are intentional abbreviations and effectively language-agnostic, but they still bypass i18n conventions. Add `lang-en` and `lang-ru` keys to both locale files so they can be changed without touching component code.
@@ -291,6 +297,7 @@ This function has a known bug (BUG-07: skips `undefined` values incorrectly) and
 **File:** `tools/weather.ts`
 
 Five exported functions used in chart rendering lack test coverage:
+
 - `invertData` — transforms temperature data; edge cases include all-positive, all-negative, mixed arrays
 - `getTemperatureColor` — large lookup table; test boundary values and `undefined` input
 - `convertHpaToMmHg` — unit conversion; test zero, typical range, string input
@@ -355,6 +362,7 @@ These three components are the most user-visible output on every page. Basic ren
 **File:** `pages/climate.tsx`
 
 The sequential-fetch pattern (fetch year 0 → set index 1 → fetch year 1 → …) works but has UX gaps:
+
 - While loading subsequent years the chart shows partial data with no progress indicator
 - Fast navigation away and back resets all accumulated state and re-fetches from year 0
 - The `loading` prop passed to `WidgetClimate` is only `true` for the first year
@@ -424,8 +432,7 @@ All meaningful content on these pages is rendered by ECharts inside `<canvas>`. 
 **File:** `components/widget-sensor/WidgetSensor.tsx` — lines 62–64
 
 ```tsx
-formatter(currentValue ?? '??')
-(currentValue ?? '??')
+formatter(currentValue ?? '??')(currentValue ?? '??')
 ```
 
 The `'??'` placeholder is a hardcoded non-localised string. It could be replaced with `t('no-data')` or an em-dash if a consistent "no data" pattern is desired across the application.
@@ -436,54 +443,54 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 
 ### High (fix first)
 
-| ID | Summary |
-|---|---|
-| BUG-07 | `getMinMaxValues` does not skip undefined values |
-| BUG-08 | `round(0)` returns `undefined` |
-| QC-01 | `any` types in ECharts tooltip formatters |
-| QC-02 | Inline styles violate CSS Modules convention |
-| QC-07 | `date-only-hour` key missing from English locale |
-| TEST-01 | `getMinMaxValues` has no tests |
-| TEST-02 | 5 weather utility functions have no tests |
+| ID      | Summary                                            |
+| ------- | -------------------------------------------------- |
+| BUG-07  | `getMinMaxValues` does not skip undefined values   |
+| BUG-08  | `round(0)` returns `undefined`                     |
+| QC-01   | `any` types in ECharts tooltip formatters          |
+| QC-02   | Inline styles violate CSS Modules convention       |
+| QC-07   | `date-only-hour` key missing from English locale   |
+| TEST-01 | `getMinMaxValues` has no tests                     |
+| TEST-02 | 5 weather utility functions have no tests          |
 | FEAT-03 | No error state handling for any RTK Query endpoint |
 
 ### Medium (address in regular sprints)
 
-| ID | Summary |
-|---|---|
-| BUG-09 | `extractRehydrationInfo` typed as `any` |
-| BUG-10 | Empty-string query params before period is set |
-| QC-03 | `showOverlay` redux field is never dispatched |
-| QC-04 | `Min`/`Max` labels not translated |
-| QC-05 | `Eng`/`Rus` labels not translated |
-| QC-06 | `(GMT+5)` hardcoded in WidgetSummary |
-| QC-08 | `weather-icon` i18n key missing from both locales |
-| QC-10 | `isValidJSON` duplicated in two files |
-| QC-13 | `undefined` case after `default` in switch is unreachable |
-| PERF-01 | `tableConfig` recreated on every render |
-| PERF-02 | `dayjs.extend` called inside render cycle |
-| PERF-03 | `currentDate` / `yesterdayDate` never refresh |
-| TEST-03 | `getWeatherIconUrl` has no tests |
-| TEST-04 | `formatDateFromUTC` / `timeAgo` have no tests |
-| TEST-05 | `encodeQueryData` missing falsy-value edge case |
-| TEST-06 | `useLocalStorage` hook has no tests |
-| TEST-08 | Key widgets have no component tests |
-| FEAT-04 | `WeatherIcon` renders broken image for unknown IDs |
-| FEAT-06 | Heatmap `isMobile` stale after window resize |
+| ID      | Summary                                                   |
+| ------- | --------------------------------------------------------- |
+| BUG-09  | `extractRehydrationInfo` typed as `any`                   |
+| BUG-10  | Empty-string query params before period is set            |
+| QC-03   | `showOverlay` redux field is never dispatched             |
+| QC-04   | `Min`/`Max` labels not translated                         |
+| QC-05   | `Eng`/`Rus` labels not translated                         |
+| QC-06   | `(GMT+5)` hardcoded in WidgetSummary                      |
+| QC-08   | `weather-icon` i18n key missing from both locales         |
+| QC-10   | `isValidJSON` duplicated in two files                     |
+| QC-13   | `undefined` case after `default` in switch is unreachable |
+| PERF-01 | `tableConfig` recreated on every render                   |
+| PERF-02 | `dayjs.extend` called inside render cycle                 |
+| PERF-03 | `currentDate` / `yesterdayDate` never refresh             |
+| TEST-03 | `getWeatherIconUrl` has no tests                          |
+| TEST-04 | `formatDateFromUTC` / `timeAgo` have no tests             |
+| TEST-05 | `encodeQueryData` missing falsy-value edge case           |
+| TEST-06 | `useLocalStorage` hook has no tests                       |
+| TEST-08 | Key widgets have no component tests                       |
+| FEAT-04 | `WeatherIcon` renders broken image for unknown IDs        |
+| FEAT-06 | Heatmap `isMobile` stale after window resize              |
 
 ### Low (backlog)
 
-| ID | Summary |
-|---|---|
-| QC-11 | `for...in` in `encodeQueryData` — use `Object.keys` |
-| QC-12 | `normalizeDateToBaseYear` defined after first use |
-| QC-14 | Yandex Metrika should use `next/script` |
-| PERF-04 | `widgets` array recreated on every render in pages |
-| PERF-05 | `baseConfig` in Chart.tsx not memoised |
-| PERF-06 | No `keepUnusedDataFor` tuning on RTK Query |
-| TEST-07 | `useClientOnly` hook has no tests |
-| FEAT-01 | Climate page loading progress UX |
-| FEAT-02 | History page missing humidity / wind charts |
-| FEAT-05 | AppBar duplicate RTK Query subscription awareness |
-| FEAT-07 | No `<noscript>` fallback for chart pages |
-| FEAT-08 | `'??'` fallback not i18n-aware in WidgetSensor |
+| ID      | Summary                                             |
+| ------- | --------------------------------------------------- |
+| QC-11   | `for...in` in `encodeQueryData` — use `Object.keys` |
+| QC-12   | `normalizeDateToBaseYear` defined after first use   |
+| QC-14   | Yandex Metrika should use `next/script`             |
+| PERF-04 | `widgets` array recreated on every render in pages  |
+| PERF-05 | `baseConfig` in Chart.tsx not memoised              |
+| PERF-06 | No `keepUnusedDataFor` tuning on RTK Query          |
+| TEST-07 | `useClientOnly` hook has no tests                   |
+| FEAT-01 | Climate page loading progress UX                    |
+| FEAT-02 | History page missing humidity / wind charts         |
+| FEAT-05 | AppBar duplicate RTK Query subscription awareness   |
+| FEAT-07 | No `<noscript>` fallback for chart pages            |
+| FEAT-08 | `'??'` fallback not i18n-aware in WidgetSensor      |

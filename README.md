@@ -5,7 +5,7 @@ Arduino Weather Station is a complete DIY weather-monitoring project powered by 
 You can use this repository to build your own fully-featured weather station - and if you like it, please give the project a star :)
 
 <div align="center">
-  <img src="https://miksoft.pro/_next/static/media/meteostation.de6617a7.jpg" alt="Arduino Weather Station" width="150" height="150">
+  <img src="https://miksoft.pro/projects/meteostation.webp" alt="Arduino Weather Station" width="150" height="150">
 
 <h3>Arduino Weather Station</h3>
 
