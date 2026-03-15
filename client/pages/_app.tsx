@@ -41,9 +41,11 @@ const App = ({ Component, pageProps }: AppProps) => {
             i18Config.i18n.locales.includes(storageLocale) &&
             router.pathname !== '/404'
         ) {
-            void router.replace({ pathname: router.pathname, query: { ...router.query, storageLocale } })
+            void router.push({ pathname: router.pathname, query: router.query }, router.asPath, {
+                locale: storageLocale
+            })
         }
-    }, [])
+    }, [storageLocale, i18n.language, router])
 
     dayjs.extend(utc)
     dayjs.extend(timezone)

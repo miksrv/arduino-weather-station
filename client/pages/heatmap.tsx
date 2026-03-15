@@ -57,7 +57,7 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
             <NextSeo
                 title={t('heatmap')}
                 description={t('heatmap-page-description')}
-                canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/history`}
+                canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/heatmap`}
                 openGraph={{
                     description: t('site-description'),
                     images: [

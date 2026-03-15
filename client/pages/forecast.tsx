@@ -31,7 +31,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             <NextSeo
                 title={t('forecast-weather-in-orenburg')}
                 description={t('forecast-page-description')}
-                canonical={process.env.NEXT_PUBLIC_SITE_LINK}
+                canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/forecast`}
                 openGraph={{
                     description: t('site-description'),
                     images: [
