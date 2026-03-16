@@ -6,7 +6,7 @@
         stopOnError="false"
         stopOnFailure="false"
         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd">
-    <coverage includeUncoveredFiles="true">
+    <source>
         <include>
             <directory suffix=".php">./app</directory>
         </include>
@@ -14,6 +14,8 @@
             <directory suffix=".php">./app/Views</directory>
             <file>./app/Config/Routes.php</file>
         </exclude>
+    </source>
+    <coverage>
         <report>
             <clover outputFile="build/logs/clover.xml"/>
             <html outputDirectory="build/logs/html"/>

@@ -25,7 +25,7 @@ jobs:
         with:
           php-version: '8.2'
           extensions: mbstring, intl, mysqli, curl
-          coverage: xdebug
+          coverage: none
 
       - name: Cache Composer packages
         uses: actions/cache@v4
@@ -42,5 +42,5 @@ jobs:
         working-directory: server
 
       - name: PHPUnit Tests
-        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+        run: vendor/bin/phpunit
         working-directory: server
