@@ -32,27 +32,6 @@ All four have `// eslint-disable-next-line @typescript-eslint/no-explicit-any` o
 
 ---
 
-### QC-02 · Inline styles in many components violate CSS Modules convention [High]
-
-**Convention:** CSS Modules only — no inline styles.
-
-Inline `style={{ ... }}` props exist in:
-
-- `components/widget-sensor/WidgetSensor.tsx` — 7 occurrences (all `Skeleton` props)
-- `components/widget-summary/WidgetSummary.tsx` — 6 occurrences (all `Skeleton` props)
-- `components/widget-chart/WidgetChart.tsx` — 1 occurrence (`Skeleton`)
-- `components/widget-heatmap/WidgetHeatmap.tsx` — 1 occurrence (`Skeleton`)
-- `components/widget-meteogram/WidgetMeteogram.tsx` — 1 occurrence (`Skeleton`)
-- `components/widget-climate/WidgetClimate.tsx` — 1 occurrence (`Skeleton`)
-- `components/app-layout/AppLayout.tsx` — 2 occurrences (overlay/sidebar height)
-- `components/wind-direction-icon/WindDirectionIcon.tsx` — 1 (`transform: rotate`)
-- `pages/heatmap.tsx` line 91 — `<Select style={{ width: 170 }}>`
-- `ui/theme-switcher/Stars.tsx` — 5 occurrences (star positions)
-
-The `Skeleton` occurrences are the most widespread. Extract them to CSS Module classes. The `transform: rotate` in `WindDirectionIcon` and star positions in `Stars` are dynamic values that need CSS custom properties.
-
----
-
 ### QC-03 · `showOverlay` state in Redux slice is never dispatched [Medium]
 
 **File:** `api/applicationSlice.ts` — the `showOverlay?: boolean` field exists in `ApplicationStateProps` but there is no `setShowOverlay` action and nothing dispatches it. `AppLayout` reads `application.showOverlay` which is always `undefined` (falsy). Either add the missing action or remove the dead field and the overlay check in `AppLayout`.
@@ -69,31 +48,6 @@ The `Skeleton` occurrences are the most widespread. Extract them to CSS Module c
 ```
 
 These are user-facing strings that should use `useTranslation()`. Add `min` and `max` keys to both locale files.
-
----
-
-### QC-05 · `'Eng'` and `'Rus'` language labels are hardcoded strings [Medium]
-
-**File:** `components/language-switcher/LanguageSwitcher.tsx` — lines 49, 55
-
-```tsx
-{
-    ;('Eng')
-}
-{
-    ;('Rus')
-}
-```
-
-These short labels are intentional abbreviations and effectively language-agnostic, but they still bypass i18n conventions. Add `lang-en` and `lang-ru` keys to both locale files so they can be changed without touching component code.
-
----
-
-### QC-06 · `'(GMT+5)'` hardcoded in `WidgetSummary` [Medium]
-
-**File:** `components/widget-summary/WidgetSummary.tsx` — line 29
-
-The timezone offset string `'(GMT+5)'` is hardcoded. If the server timezone changes or users in a different region see this widget, the label will be misleading. Derive the offset from `TIME_ZONE` in `tools/date.ts` at runtime, or add a `timezone-label` i18n key.
 
 ---
 
