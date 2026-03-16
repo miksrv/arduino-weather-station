@@ -11,41 +11,99 @@ import AppLayout from '@/components/app-layout'
 import WidgetClimate, { ClimateType } from '@/components/widget-climate'
 import { LocaleType } from '@/tools/types'
 
+const CLIMATE_CACHE_KEY = 'climate_data_cache'
+const START_YEAR = 2022
+
+const readSessionCache = (): ClimateType[] | null => {
+    if (typeof window === 'undefined') {
+        return null
+    }
+
+    try {
+        const raw = sessionStorage.getItem(CLIMATE_CACHE_KEY)
+        if (!raw) {
+            return null
+        }
+
+        const parsed: unknown = JSON.parse(raw)
+        if (!Array.isArray(parsed)) {
+            return null
+        }
+
+        return parsed as ClimateType[]
+    } catch {
+        return null
+    }
+}
+
+const writeSessionCache = (data: ClimateType[]): void => {
+    if (typeof window === 'undefined') {
+        return
+    }
+
+    try {
+        sessionStorage.setItem(CLIMATE_CACHE_KEY, JSON.stringify(data))
+    } catch {
+        // sessionStorage may be unavailable (private mode quota exceeded etc.)
+    }
+}
+
 const ClimatePage: NextPage = () => {
     const { i18n, t } = useTranslation()
 
     const [yearPeriods, setYearPeriods] = useState<string[][]>([])
     const [currentPeriodIndex, setCurrentPeriodIndex] = useState(0)
     const [allData, setAllData] = useState<ClimateType[]>([])
-    // const [averageTemperatures, setAverageTemperatures] = useState<Array<{ year: string; avgTemp: number }>>([])
+    const [isCacheRestored, setIsCacheRestored] = useState(false)
 
     useEffect(() => {
         const currentYear = new Date().getFullYear()
         const periods: string[][] = []
-        for (let year = 2022; year <= currentYear; year++) {
+        for (let year = START_YEAR; year <= currentYear; year++) {
             periods.push([`${year}-01-01`, `${year}-12-31`])
+        }
+
+        const cached = readSessionCache()
+        if (cached && cached.length > 0) {
+            const cachedYears = new Set(cached.map((d) => d.year))
+            const allYearsCovered = periods.every((p) => cachedYears.has(p[0].split('-')[0]))
+
+            if (allYearsCovered) {
+                setAllData(cached)
+                setIsCacheRestored(true)
+                setYearPeriods(periods)
+                setCurrentPeriodIndex(periods.length)
+                return
+            }
         }
 
         setYearPeriods(periods)
     }, [])
 
+    const isFetchingComplete = isCacheRestored || (yearPeriods.length > 0 && currentPeriodIndex >= yearPeriods.length)
+
     const { data: yearHistories, isLoading } = API.useGetHistoryQuery(
         yearPeriods[currentPeriodIndex]
             ? { start_date: yearPeriods[currentPeriodIndex][0], end_date: yearPeriods[currentPeriodIndex][1] }
             : undefined,
-        { skip: !yearPeriods[currentPeriodIndex], refetchOnMountOrArgChange: true }
+        { skip: !yearPeriods[currentPeriodIndex] || isFetchingComplete, refetchOnMountOrArgChange: true }
     )
 
     useEffect(() => {
-        if (yearHistories) {
-            const currentIndex = currentPeriodIndex
-            const year = yearPeriods[currentIndex][0].split('-')[0]
+        if (yearHistories && yearPeriods[currentPeriodIndex]) {
+            const year = yearPeriods[currentPeriodIndex][0].split('-')[0]
 
-            setAllData((prev) =>
-                prev.some((d) => d.year === year) ? prev : [...prev, { year, weather: yearHistories }]
-            )
+            setAllData((prev) => {
+                const next = prev.some((d) => d.year === year) ? prev : [...prev, { year, weather: yearHistories }]
 
-            if (currentIndex < yearPeriods.length - 1) {
+                if (currentPeriodIndex === yearPeriods.length - 1) {
+                    writeSessionCache(next)
+                }
+
+                return next
+            })
+
+            if (currentPeriodIndex < yearPeriods.length - 1) {
                 const timerId = setTimeout(() => {
                     setCurrentPeriodIndex((prev) => prev + 1)
                 }, 500)
@@ -54,6 +112,11 @@ const ClimatePage: NextPage = () => {
             }
         }
     }, [yearHistories])
+
+    const isStillLoading = !isFetchingComplete && (isLoading || currentPeriodIndex < yearPeriods.length)
+
+    const loadedYears = isCacheRestored ? yearPeriods.length : allData.length
+    const totalYears = yearPeriods.length
 
     return (
         <AppLayout>
@@ -81,7 +144,9 @@ const ClimatePage: NextPage = () => {
             <div className={'widgets-list'}>
                 <WidgetClimate
                     data={allData}
-                    loading={isLoading}
+                    loading={isStillLoading}
+                    loadedYears={loadedYears}
+                    totalYears={totalYears}
                 />
             </div>
         </AppLayout>

@@ -42,8 +42,7 @@ RTK Query is the exclusive API layer. All endpoints live in `api/api.ts`. The `L
 - `round(0)` returns `undefined` due to falsy check — FIXED 2026-03-15 (BUG-08).
 - `extractRehydrationInfo` in `api/api.ts` uses `: any` return type. The `eslint-disable` is intentional: adding any explicit return-type annotation causes TS to widen the Definitions generic and break all endpoint hook inference. Root cause: circular dependency api.ts ↔ store.ts. Cannot be fixed without extracting store types to a third file. (BUG-09)
 - `heatmap.tsx` / `history.tsx` historyDateParam was always a non-null object before useEffect ran — FIXED 2026-03-15 by returning undefined when period is unset (BUG-10).
-- Climate page accumulates duplicate year entries without dedup guard.
-- `setTimeout` in climate page is never cleared (memory leak risk).
+- Climate page: dedup guard added, setTimeout cleared, sessionStorage cache added, loading progress fixed (FEAT-01 completed 2026-03-15).
 - Canonical URLs wrong on `/climate` (→ `/history`), `/heatmap` (→ `/history`), `/forecast` (→ `/`) — FIXED 2026-03-14 (BUG-06), QC-09 removed from ROADMAP 2026-03-15.
 
 ## Styling

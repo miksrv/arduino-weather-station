@@ -163,20 +163,6 @@ These three components are the most user-visible output on every page. Basic ren
 
 ## 5. Features / Enhancements
 
-### FEAT-01 · Climate page has no deduplication or loading state while fetching years sequentially [Medium]
-
-**File:** `pages/climate.tsx`
-
-The sequential-fetch pattern (fetch year 0 → set index 1 → fetch year 1 → …) works but has UX gaps:
-
-- While loading subsequent years the chart shows partial data with no progress indicator
-- Fast navigation away and back resets all accumulated state and re-fetches from year 0
-- The `loading` prop passed to `WidgetClimate` is only `true` for the first year
-
-Add a progress indicator (e.g. "Loading 2/3 years…") and consider caching accumulated results in `sessionStorage` or RTK Query with manual cache updates.
-
----
-
 ### FEAT-02 · History page has no chart for humidity, wind, or UV index [Low]
 
 **File:** `pages/history.tsx`
@@ -281,7 +267,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | QC-14   | Yandex Metrika should use `next/script`             |
 | PERF-06 | No `keepUnusedDataFor` tuning on RTK Query          |
 | TEST-07 | `useClientOnly` hook has no tests                   |
-| FEAT-01 | Climate page loading progress UX                    |
 | FEAT-02 | History page missing humidity / wind charts         |
 | FEAT-05 | AppBar duplicate RTK Query subscription awareness   |
 | FEAT-07 | No `<noscript>` fallback for chart pages            |
