@@ -50,20 +50,23 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     const history12HoursData = useMemo(() => filterRecentData(history, 12), [history])
     const history24HoursData = useMemo(() => filterRecentData(history, 24), [history])
 
-    const widgets: WidgetType[] = [
-        {
-            title: t('humidity'),
-            unit: '%',
-            icon: 'Water',
-            source: 'humidity'
-        },
-        {
-            title: t('temperature'),
-            unit: '°C',
-            icon: 'Thermometer',
-            source: 'temperature'
-        }
-    ]
+    const widgets: WidgetType[] = useMemo(
+        () => [
+            {
+                title: t('humidity'),
+                unit: '%',
+                icon: 'Water',
+                source: 'humidity'
+            },
+            {
+                title: t('temperature'),
+                unit: '°C',
+                icon: 'Thermometer',
+                source: 'temperature'
+            }
+        ],
+        [t]
+    )
 
     return (
         <AppLayout>

@@ -124,14 +124,6 @@ Fix: convert to functions (`getCurrentDate()`, `getYesterdayDate()`) and call th
 
 ---
 
-### PERF-04 · `widgets` array in sensors and index pages is recreated on every render [Low]
-
-**Files:** `pages/sensors.tsx` — lines 42–138, `pages/index.tsx` — lines 53–66
-
-Both pages define a `widgets: WidgetType[]` array inside the component function, but it depends only on `t`. Wrapping in `useMemo` with `[t]` as dependency prevents recreation on every re-render triggered by polling updates.
-
----
-
 ### PERF-05 · ECharts config `baseConfig` in `widget-chart/Chart.tsx` is not memoised [Low]
 
 **File:** `components/widget-chart/Chart.tsx` — lines 35–139
@@ -334,7 +326,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | QC-11   | `for...in` in `encodeQueryData` — use `Object.keys` |
 | QC-12   | `normalizeDateToBaseYear` defined after first use   |
 | QC-14   | Yandex Metrika should use `next/script`             |
-| PERF-04 | `widgets` array recreated on every render in pages  |
 | PERF-05 | `baseConfig` in Chart.tsx not memoised              |
 | PERF-06 | No `keepUnusedDataFor` tuning on RTK Query          |
 | TEST-07 | `useClientOnly` hook has no tests                   |
