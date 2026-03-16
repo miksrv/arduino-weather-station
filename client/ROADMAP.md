@@ -124,14 +124,6 @@ Fix: convert to functions (`getCurrentDate()`, `getYesterdayDate()`) and call th
 
 ---
 
-### PERF-05 · ECharts config `baseConfig` in `widget-chart/Chart.tsx` is not memoised [Low]
-
-**File:** `components/widget-chart/Chart.tsx` — lines 35–139
-
-`baseConfig` is a large `EChartsOption` object created inline on every render. It is a dependency of the memoised `config` but is itself not memoised — so `config` recalculates on every render regardless of whether `type`, `data`, or translations changed.
-
----
-
 ### PERF-06 · No RTK Query `keepUnusedDataFor` tuning [Low]
 
 **File:** `api/api.ts`
@@ -326,7 +318,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | QC-11   | `for...in` in `encodeQueryData` — use `Object.keys` |
 | QC-12   | `normalizeDateToBaseYear` defined after first use   |
 | QC-14   | Yandex Metrika should use `next/script`             |
-| PERF-05 | `baseConfig` in Chart.tsx not memoised              |
 | PERF-06 | No `keepUnusedDataFor` tuning on RTK Query          |
 | TEST-07 | `useClientOnly` hook has no tests                   |
 | FEAT-01 | Climate page loading progress UX                    |

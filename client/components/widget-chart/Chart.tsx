@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { EChartsOption, SeriesOption } from 'echarts'
 import { YAXisOption } from 'echarts/types/dist/shared'
 import ReactECharts from 'echarts-for-react'
@@ -32,124 +32,130 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
     const borderColor = theme === 'dark' ? '#444546' : '#cbcccd' // --input-border-color
     const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99' // --text-color-secondary
 
-    const baseConfig: EChartsOption = {
-        ...getEChartBaseConfig(theme),
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'cross',
-                label: {
-                    formatter: function (params) {
-                        if (params?.axisDimension === 'x') {
-                            return formatDateFromUTC(params?.value as number, t('date-chart-label'))
-                        }
+    const baseConfig: EChartsOption = useMemo(
+        () => ({
+            ...getEChartBaseConfig(theme),
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        formatter: function (params) {
+                            if (params?.axisDimension === 'x') {
+                                return formatDateFromUTC(params?.value as number, t('date-chart-label'))
+                            }
 
-                        return round(Number(params?.value), 2)?.toString() ?? ''
+                            return round(Number(params?.value), 2)?.toString() ?? ''
+                        }
+                    }
+                },
+                backgroundColor,
+                borderColor,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                formatter: (params: any) => {
+                    // An array of strings that will be concatenated and returned as the contents of the tooltip
+                    const tooltipContent: string[] = []
+
+                    //Format the header - let's assume it's a date (xAxis)
+                    if (params.length > 0) {
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                        const header = `<div class="${styles.chartTooltipTitle}">${params[0].axisValueLabel}</div>`
+                        tooltipContent.push(header)
+                    }
+
+                    // Loop through each element in params to display the values (yAxis)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    params.forEach((item: any) => {
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                        const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                        const seriesValue = `<span class="${styles.value}">${item.value?.[1] ?? '---'}</span>`
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                        const seriesName = `<span class="${styles.label}">${item.seriesName}${seriesValue}</span>`
+
+                        const row = `<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`
+                        tooltipContent.push(row)
+                    })
+
+                    // Return the merged contents of the tooltip
+                    return tooltipContent.join('')
+                }
+            },
+            xAxis: {
+                type: 'time',
+                axisLabel: {
+                    show: true,
+                    hideOverlap: true,
+                    color: textSecondaryColor, // Color of X-axis labels
+                    fontSize: '11px',
+                    formatter: (value: number) => formatDateFromUTC(value, dateFormat ?? t('date-only-hour'))
+                },
+                axisTick: { show: true },
+                axisLine: {
+                    show: true,
+                    lineStyle: {
+                        color: borderColor // X axis color
+                    }
+                },
+                splitLine: {
+                    show: true,
+                    lineStyle: {
+                        width: 1,
+                        color: borderColor // Grid line color
                     }
                 }
             },
-            backgroundColor,
-            borderColor,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            formatter: (params: any) => {
-                // An array of strings that will be concatenated and returned as the contents of the tooltip
-                const tooltipContent: string[] = []
-
-                //Format the header - let's assume it's a date (xAxis)
-                if (params.length > 0) {
-                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                    const header = `<div class="${styles.chartTooltipTitle}">${params[0].axisValueLabel}</div>`
-                    tooltipContent.push(header)
-                }
-
-                // Loop through each element in params to display the values (yAxis)
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                params.forEach((item: any) => {
-                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                    const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
-                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                    const seriesValue = `<span class="${styles.value}">${item.value?.[1] ?? '---'}</span>`
-                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                    const seriesName = `<span class="${styles.label}">${item.seriesName}${seriesValue}</span>`
-
-                    const row = `<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`
-                    tooltipContent.push(row)
-                })
-
-                // Return the merged contents of the tooltip
-                return tooltipContent.join('')
-            }
-        },
-        xAxis: {
-            type: 'time',
-            axisLabel: {
-                show: true,
-                hideOverlap: true,
-                color: textSecondaryColor, // Color of X-axis labels
-                fontSize: '11px',
-                formatter: (value: number) => formatDateFromUTC(value, dateFormat ?? t('date-only-hour'))
-            },
-            axisTick: { show: true },
-            axisLine: {
-                show: true,
-                lineStyle: {
-                    color: borderColor // X axis color
+            yAxis: {
+                type: 'value',
+                nameGap: 50,
+                axisTick: { show: true },
+                axisLine: {
+                    show: true,
+                    lineStyle: {
+                        color: borderColor // Y axis color
+                    }
+                },
+                axisLabel: {
+                    show: true,
+                    formatter: '{value}%',
+                    color: textSecondaryColor, // Color of Y axis labels
+                    fontSize: '11px'
+                },
+                splitLine: {
+                    show: true,
+                    lineStyle: {
+                        width: 1,
+                        color: borderColor // Grid line color
+                    }
                 }
             },
-            splitLine: {
-                show: true,
-                lineStyle: {
-                    width: 1,
-                    color: borderColor // Grid line color
+            series: [
+                {
+                    type: 'line',
+                    showSymbol: false,
+                    smooth: false,
+                    connectNulls: true
                 }
-            }
-        },
-        yAxis: {
-            type: 'value',
-            nameGap: 50,
-            axisTick: { show: true },
-            axisLine: {
-                show: true,
-                lineStyle: {
-                    color: borderColor // Y axis color
-                }
-            },
-            axisLabel: {
-                show: true,
-                formatter: '{value}%',
-                color: textSecondaryColor, // Color of Y axis labels
-                fontSize: '11px'
-            },
-            splitLine: {
-                show: true,
-                lineStyle: {
-                    width: 1,
-                    color: borderColor // Grid line color
-                }
-            }
-        },
-        series: [
-            {
-                type: 'line',
-                showSymbol: false,
-                smooth: false,
-                connectNulls: true
-            }
-        ]
-    }
+            ]
+        }),
+        [theme, backgroundColor, borderColor, textSecondaryColor, dateFormat, t]
+    )
 
-    const getChartLineConfig = (source: keyof ApiModel.Sensors, name?: string, axis?: number, area?: boolean) => ({
-        ...(baseConfig.series as SeriesOption[])[0],
-        data: data?.map(({ date, [source]: sensorData }) => [date, sensorData]),
-        name: name ?? '',
-        yAxisIndex: axis ?? 0,
-        lineStyle: {
-            color: getSensorColor(source)[0],
-            width: 1
-        },
-        itemStyle: { color: getSensorColor(source)[0] },
-        areaStyle: area ? { color: getSensorColor(source)[1] } : undefined
-    })
+    const getChartLineConfig = useCallback(
+        (source: keyof ApiModel.Sensors, name?: string, axis?: number, area?: boolean) => ({
+            ...(baseConfig.series as SeriesOption[])[0],
+            data: data?.map(({ date, [source]: sensorData }) => [date, sensorData]),
+            name: name ?? '',
+            yAxisIndex: axis ?? 0,
+            lineStyle: {
+                color: getSensorColor(source)[0],
+                width: 1
+            },
+            itemStyle: { color: getSensorColor(source)[0] },
+            areaStyle: area ? { color: getSensorColor(source)[1] } : undefined
+        }),
+        [baseConfig, data]
+    )
 
     const config: Omit<EChartsOption, 'type'> = useMemo(() => {
         switch (type) {
@@ -228,7 +234,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                     ]
                 }
         }
-    }, [type, data])
+    }, [type, data, baseConfig, getChartLineConfig, t])
 
     return (
         <ReactECharts
