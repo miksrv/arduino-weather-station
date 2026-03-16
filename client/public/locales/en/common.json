@@ -53,6 +53,8 @@
     "date-only-hour": "h a",
     "date-chart-tooltip": "dddd, DD MMM YYYY, h:mm a",
     "date-chart-label": "D MMM YYYY, h:mm a",
+    "min": "Min",
+    "max": "Max",
     "select-date-range": "Select date range",
     "conditions": {
         "thunderstorm_with_light_rain": "Thunderstorm with light rain",

@@ -38,19 +38,6 @@ All four have `// eslint-disable-next-line @typescript-eslint/no-explicit-any` o
 
 ---
 
-### QC-04 · `'Min'` and `'Max'` labels are hardcoded strings, not translated [Medium]
-
-**File:** `components/widget-sensor/WidgetSensor.tsx` — lines 71, 91
-
-```tsx
-<span className={styles.title}>Min</span>
-<span className={styles.title}>Max</span>
-```
-
-These are user-facing strings that should use `useTranslation()`. Add `min` and `max` keys to both locale files.
-
----
-
 ### QC-08 · `'weather-icon'` i18n key used in Meteogram but not defined in either locale [Medium]
 
 **File:** `components/widget-meteogram/Meteogram.tsx` — line 270
@@ -326,7 +313,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | ID      | Summary                                                   |
 | ------- | --------------------------------------------------------- |
 | QC-03   | `showOverlay` redux field is never dispatched             |
-| QC-04   | `Min`/`Max` labels not translated                         |
 | QC-05   | `Eng`/`Rus` labels not translated                         |
 | QC-06   | `(GMT+5)` hardcoded in WidgetSummary                      |
 | QC-08   | `weather-icon` i18n key missing from both locales         |
