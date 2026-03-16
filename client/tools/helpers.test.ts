@@ -54,6 +54,14 @@ describe('helpers', () => {
         it('handles rounding of negative numbers', () => {
             expect(round(-1.234567, 2)).toBe(-1.23)
         })
+
+        it('returns 0 when value is 0', () => {
+            expect(round(0, 1)).toBe(0)
+        })
+
+        it('returns 0 when value is 0 with default digits', () => {
+            expect(round(0)).toBe(0)
+        })
     })
 
     describe('isValidJSON', () => {

@@ -17,39 +17,6 @@ Scope: `/client` directory (Next.js 16, React 19, TypeScript 5.9, RTK Query, ECh
 
 ## 1. Bugs
 
-### BUG-08 · `round()` returns `undefined` when value is `0` [Medium]
-
-**File:** `tools/helpers.ts` — line 33
-
-```ts
-export const round = (value?: number, digits: number = 4): number | undefined =>
-    value ? Number(value.toFixed(digits)) : undefined
-```
-
-`value = 0` is falsy, so `round(0, 1)` returns `undefined` instead of `0`. This silently drops a legitimate `0°C` temperature reading in `WidgetSummary` (`round(weather?.temperature || 0, 1)`), and any zero value passed through `convertHpaToMmHg`. Fix: check `value !== undefined && value !== null` instead of truthiness.
-
----
-
-### BUG-09 · `extractRehydrationInfo` typed as `any` breaks strict TypeScript [Medium]
-
-**File:** `api/api.ts` — line 56
-
-```ts
-extractRehydrationInfo(action, { reducerPath }): any {
-```
-
-This is a deliberate `eslint-disable` with a comment acknowledging the type escape. The RTK Query `createApi` options type accepts the proper return type `Partial<RootState['api']>`. This should be typed correctly to keep the module fully strict.
-
----
-
-### BUG-10 · `heatmap.tsx` passes empty strings as `start_date`/`end_date` before period is set [Low]
-
-**File:** `pages/heatmap.tsx` — lines 26–32
-
-`historyDateParam` is memoized to `{ start_date: '', end_date: '', type: sensor }` before `period` is initialised by the `useEffect`. The `skip` option (`skip: !period?.[0] || !period?.[1]`) should prevent the query from firing, but because `historyDateParam` always has a non-null object shape the RTK Query cache key changes on every render until the `useEffect` runs, which can cause a transient un-skippable query. Same pattern exists in `pages/history.tsx`. Fix: pass `undefined` instead of `{ start_date: '', end_date: '' }` when period is not yet set, consistent with `Maybe<T>` which is `T | void`.
-
----
-
 ## 2. Code Quality
 
 ### QC-01 · `any` types in ECharts tooltip formatters — 4 files [High]
@@ -425,7 +392,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 
 | ID      | Summary                                            |
 | ------- | -------------------------------------------------- |
-| BUG-08  | `round(0)` returns `undefined`                     |
 | QC-01   | `any` types in ECharts tooltip formatters          |
 | QC-02   | Inline styles violate CSS Modules convention       |
 | QC-07   | `date-only-hour` key missing from English locale   |
@@ -436,8 +402,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 
 | ID      | Summary                                                   |
 | ------- | --------------------------------------------------------- |
-| BUG-09  | `extractRehydrationInfo` typed as `any`                   |
-| BUG-10  | Empty-string query params before period is set            |
 | QC-03   | `showOverlay` redux field is never dispatched             |
 | QC-04   | `Min`/`Max` labels not translated                         |
 | QC-05   | `Eng`/`Rus` labels not translated                         |
