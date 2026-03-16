@@ -52,6 +52,11 @@ export const API = createApi({
             transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
         })
     }),
+    // The `any` return type is intentional: adding an explicit return type annotation causes
+    // TypeScript to widen the `Definitions` generic and break all endpoint hook inference.
+    // This is a known limitation of the RTK Query + next-redux-wrapper circular dependency
+    // (api.ts → RootState → store.ts → API → api.ts). Resolving it requires extracting the
+    // store type derivation to a separate file so it no longer circularly depends on `api.ts`.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     extractRehydrationInfo(action, { reducerPath }): any {
         if (isHydrateAction(action)) {

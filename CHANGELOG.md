@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 3.5.2
+
+### Path Changes
+
+- Added a shared `getEChartBaseConfig` function and refactored chart configuration for improved maintainability.
+- Updated UI unit tests and introduced new summary images for 3D models.
+- Created a README for the models section and integrated project documentation with Claude.AI.
+- Fixed multiple bugs, including locale redirects, duplicate year entries, unmounted component updates, React ref dependencies, call-stack overflow in Heatmap, and canonical URL issues.
+- Improved value filtering and min/max calculations in weather utilities, with additional unit tests for edge cases.
+- Enhanced i18n support by adding missing keys and replacing hardcoded strings with translations.
+- Optimized React performance by memoizing arrays and configs, moving `dayjs.extend` calls to module level, and stabilizing dependency arrays.
+- Added and expanded unit test coverage for weather utilities and date formatting functions.
+- Introduced a loading progress indicator and sessionStorage caching for the climate page, improving user experience during sequential data fetches.
+- Cleaned up ROADMAP tracking entries and removed duplicate or obsolete code.
+
 ## 3.5.1
 
 ### Minor Changes

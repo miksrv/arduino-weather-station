@@ -41,6 +41,7 @@
     "forecast": "Прогноз погоды",
     "heat-map-data-shown-period": "Данные тепловой карты показаны за период {{period}}",
     "please-wait-loading": "Подождите, идет загрузка...",
+    "loading-years": "Загрузка {{current}} из {{total}} лет...",
     "meters_short": "м.",
     "meters-per-second": "м/с",
     "millimeters": "мм",
@@ -53,6 +54,8 @@
     "date-only-hour": "HH a",
     "date-chart-tooltip": "dddd, DD MMM YYYY, HH:mm",
     "date-chart-label": "D MMM YYYY, HH:mm",
+    "min": "Мин",
+    "max": "Макс",
     "select-date-range": "Выберите диапазон дат",
     "conditions": {
         "thunderstorm_with_light_rain": "Гроза с небольшим дождем",

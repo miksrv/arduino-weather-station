@@ -23,10 +23,7 @@ const HistoryPage: NextPage<object> = () => {
     const [period, setPeriod] = useState<[string?, string?]>()
 
     const historyDateParam: Maybe<ApiType.History.Request> = useMemo(
-        () => ({
-            start_date: period?.[0] ?? '',
-            end_date: period?.[1] ?? ''
-        }),
+        () => (period?.[0] && period?.[1] ? { end_date: period[1], start_date: period[0] } : undefined),
         [period]
     )
 
@@ -36,7 +33,7 @@ const HistoryPage: NextPage<object> = () => {
         isFetching: historyFetching
     } = API.useGetHistoryQuery(historyDateParam, {
         pollingInterval: POLING_INTERVAL_CURRENT,
-        skip: !period?.[0] || !period?.[1]
+        skip: !historyDateParam
     })
 
     const dateFormat = useMemo(

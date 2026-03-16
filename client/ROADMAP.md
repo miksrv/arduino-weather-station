@@ -17,51 +17,6 @@ Scope: `/client` directory (Next.js 16, React 19, TypeScript 5.9, RTK Query, ECh
 
 ## 1. Bugs
 
-### BUG-07 · `getMinMaxValues` does not skip `undefined`/`null` sensor values [Medium]
-
-**File:** `tools/weather.ts` — lines 36–53
-
-```ts
-let minValue = data[0][parameter] as number // could be undefined
-```
-
-If the first item's sensor field is `undefined`, `minValue` is `undefined` cast to `number`. All subsequent comparisons (`value < minValue`) are `NaN`-comparisons and return `false`, so the result is the first-item value regardless of the array. Fix by pre-filtering out `undefined` values before iteration, mirroring `findMinValue`.
-
----
-
-### BUG-08 · `round()` returns `undefined` when value is `0` [Medium]
-
-**File:** `tools/helpers.ts` — line 33
-
-```ts
-export const round = (value?: number, digits: number = 4): number | undefined =>
-    value ? Number(value.toFixed(digits)) : undefined
-```
-
-`value = 0` is falsy, so `round(0, 1)` returns `undefined` instead of `0`. This silently drops a legitimate `0°C` temperature reading in `WidgetSummary` (`round(weather?.temperature || 0, 1)`), and any zero value passed through `convertHpaToMmHg`. Fix: check `value !== undefined && value !== null` instead of truthiness.
-
----
-
-### BUG-09 · `extractRehydrationInfo` typed as `any` breaks strict TypeScript [Medium]
-
-**File:** `api/api.ts` — line 56
-
-```ts
-extractRehydrationInfo(action, { reducerPath }): any {
-```
-
-This is a deliberate `eslint-disable` with a comment acknowledging the type escape. The RTK Query `createApi` options type accepts the proper return type `Partial<RootState['api']>`. This should be typed correctly to keep the module fully strict.
-
----
-
-### BUG-10 · `heatmap.tsx` passes empty strings as `start_date`/`end_date` before period is set [Low]
-
-**File:** `pages/heatmap.tsx` — lines 26–32
-
-`historyDateParam` is memoized to `{ start_date: '', end_date: '', type: sensor }` before `period` is initialised by the `useEffect`. The `skip` option (`skip: !period?.[0] || !period?.[1]`) should prevent the query from firing, but because `historyDateParam` always has a non-null object shape the RTK Query cache key changes on every render until the `useEffect` runs, which can cause a transient un-skippable query. Same pattern exists in `pages/history.tsx`. Fix: pass `undefined` instead of `{ start_date: '', end_date: '' }` when period is not yet set, consistent with `Maybe<T>` which is `T | void`.
-
----
-
 ## 2. Code Quality
 
 ### QC-01 · `any` types in ECharts tooltip formatters — 4 files [High]
@@ -77,76 +32,9 @@ All four have `// eslint-disable-next-line @typescript-eslint/no-explicit-any` o
 
 ---
 
-### QC-02 · Inline styles in many components violate CSS Modules convention [High]
-
-**Convention:** CSS Modules only — no inline styles.
-
-Inline `style={{ ... }}` props exist in:
-
-- `components/widget-sensor/WidgetSensor.tsx` — 7 occurrences (all `Skeleton` props)
-- `components/widget-summary/WidgetSummary.tsx` — 6 occurrences (all `Skeleton` props)
-- `components/widget-chart/WidgetChart.tsx` — 1 occurrence (`Skeleton`)
-- `components/widget-heatmap/WidgetHeatmap.tsx` — 1 occurrence (`Skeleton`)
-- `components/widget-meteogram/WidgetMeteogram.tsx` — 1 occurrence (`Skeleton`)
-- `components/widget-climate/WidgetClimate.tsx` — 1 occurrence (`Skeleton`)
-- `components/app-layout/AppLayout.tsx` — 2 occurrences (overlay/sidebar height)
-- `components/wind-direction-icon/WindDirectionIcon.tsx` — 1 (`transform: rotate`)
-- `pages/heatmap.tsx` line 91 — `<Select style={{ width: 170 }}>`
-- `ui/theme-switcher/Stars.tsx` — 5 occurrences (star positions)
-
-The `Skeleton` occurrences are the most widespread. Extract them to CSS Module classes. The `transform: rotate` in `WindDirectionIcon` and star positions in `Stars` are dynamic values that need CSS custom properties.
-
----
-
 ### QC-03 · `showOverlay` state in Redux slice is never dispatched [Medium]
 
 **File:** `api/applicationSlice.ts` — the `showOverlay?: boolean` field exists in `ApplicationStateProps` but there is no `setShowOverlay` action and nothing dispatches it. `AppLayout` reads `application.showOverlay` which is always `undefined` (falsy). Either add the missing action or remove the dead field and the overlay check in `AppLayout`.
-
----
-
-### QC-04 · `'Min'` and `'Max'` labels are hardcoded strings, not translated [Medium]
-
-**File:** `components/widget-sensor/WidgetSensor.tsx` — lines 71, 91
-
-```tsx
-<span className={styles.title}>Min</span>
-<span className={styles.title}>Max</span>
-```
-
-These are user-facing strings that should use `useTranslation()`. Add `min` and `max` keys to both locale files.
-
----
-
-### QC-05 · `'Eng'` and `'Rus'` language labels are hardcoded strings [Medium]
-
-**File:** `components/language-switcher/LanguageSwitcher.tsx` — lines 49, 55
-
-```tsx
-{
-    ;('Eng')
-}
-{
-    ;('Rus')
-}
-```
-
-These short labels are intentional abbreviations and effectively language-agnostic, but they still bypass i18n conventions. Add `lang-en` and `lang-ru` keys to both locale files so they can be changed without touching component code.
-
----
-
-### QC-06 · `'(GMT+5)'` hardcoded in `WidgetSummary` [Medium]
-
-**File:** `components/widget-summary/WidgetSummary.tsx` — line 29
-
-The timezone offset string `'(GMT+5)'` is hardcoded. If the server timezone changes or users in a different region see this widget, the label will be misleading. Derive the offset from `TIME_ZONE` in `tools/date.ts` at runtime, or add a `timezone-label` i18n key.
-
----
-
-### QC-07 · `'date-only-hour'` key is missing from English locale [High]
-
-**File:** `public/locales/en/common.json`
-
-The key `date-only-hour` is present in `ru/common.json` (`"HH a"`) but absent from `en/common.json`. The English locale uses `"date-full-format": "D MMMM YYYY, h:mm a"` and similar patterns, but `date-only-hour` used in `Chart.tsx` and `Meteogram.tsx` will silently fall back to the key string itself (`"date-only-hour"`) in English. Add `"date-only-hour": "h a"` to `en/common.json`.
 
 ---
 
@@ -159,20 +47,6 @@ name: t('weather-icon'),
 ```
 
 Neither `en/common.json` nor `ru/common.json` defines a `weather-icon` key. The ECharts series name falls back to the raw key string `"weather-icon"`. Add the key to both locale files (e.g. `"Weather icon"` / `"Иконка погоды"`).
-
----
-
-### QC-09 · Climate page `canonical` URL uses `/history` path [Medium]
-
-See BUG-06 above — tracked separately here as a code quality / SEO issue.
-
----
-
-### QC-10 · `isValidJSON` is duplicated — exists in both `tools/helpers.ts` and `tools/hooks/useLocalStorage.ts` [Medium]
-
-**Files:** `tools/helpers.ts` (exported), `tools/hooks/useLocalStorage.ts` (local, private copy)
-
-The same function is implemented twice. `useLocalStorage` should import from `tools/helpers` to eliminate the duplication.
 
 ---
 
@@ -220,29 +94,6 @@ The analytics snippet is injected via `dangerouslySetInnerHTML`, which bypasses 
 
 ## 3. Performance
 
-### PERF-01 · `tableConfig` array in `WidgetForecastTable` is recreated on every render [Medium]
-
-**File:** `components/widget-forecast-table/WidgetForecastTable.tsx` — lines 48–151
-
-`tableConfig` is a plain array literal inside the component function body, not wrapped in `useMemo`. Every parent re-render creates a new array reference and passes it to `<Table>`. Wrap `tableConfig` in `useMemo` (with `[t]` as dependency) to stabilise the reference and prevent `Table` from re-rendering unnecessarily.
-
----
-
-### PERF-02 · `dayjs.extend()` is called on every render in `_app.tsx` [Medium]
-
-**File:** `pages/_app.tsx` — lines 48–51
-
-```ts
-dayjs.extend(utc)
-dayjs.extend(timezone)
-dayjs.extend(relativeTime)
-dayjs.locale(...)
-```
-
-`dayjs.extend` is idempotent but each call still does a hash-map lookup. These calls belong at module level outside the component, not inside the render cycle.
-
----
-
 ### PERF-03 · `currentDate` and `yesterdayDate` are module-level constants evaluated once at import time [Medium]
 
 **File:** `tools/date.ts` — lines 10–12
@@ -258,22 +109,6 @@ Fix: convert to functions (`getCurrentDate()`, `getYesterdayDate()`) and call th
 
 ---
 
-### PERF-04 · `widgets` array in sensors and index pages is recreated on every render [Low]
-
-**Files:** `pages/sensors.tsx` — lines 42–138, `pages/index.tsx` — lines 53–66
-
-Both pages define a `widgets: WidgetType[]` array inside the component function, but it depends only on `t`. Wrapping in `useMemo` with `[t]` as dependency prevents recreation on every re-render triggered by polling updates.
-
----
-
-### PERF-05 · ECharts config `baseConfig` in `widget-chart/Chart.tsx` is not memoised [Low]
-
-**File:** `components/widget-chart/Chart.tsx` — lines 35–139
-
-`baseConfig` is a large `EChartsOption` object created inline on every render. It is a dependency of the memoised `config` but is itself not memoised — so `config` recalculates on every render regardless of whether `type`, `data`, or translations changed.
-
----
-
 ### PERF-06 · No RTK Query `keepUnusedDataFor` tuning [Low]
 
 **File:** `api/api.ts`
@@ -284,40 +119,11 @@ The default RTK Query `keepUnusedDataFor` is 60 seconds. For a weather station w
 
 ## 4. Testing
 
-### TEST-01 · `getMinMaxValues` in `tools/weather.ts` has no tests [High]
-
-**File:** `tools/weather.ts` — exported function `getMinMaxValues`
-
-This function has a known bug (BUG-07: skips `undefined` values incorrectly) and zero test coverage. Add test cases covering: normal operation, `undefined` data, `undefined` parameter, all-undefined values, and the zero-value edge case.
-
----
-
-### TEST-02 · `invertData`, `getTemperatureColor`, `convertHpaToMmHg`, `findMinValue`, `findMaxValue` have no tests [High]
-
-**File:** `tools/weather.ts`
-
-Five exported functions used in chart rendering lack test coverage:
-
-- `invertData` — transforms temperature data; edge cases include all-positive, all-negative, mixed arrays
-- `getTemperatureColor` — large lookup table; test boundary values and `undefined` input
-- `convertHpaToMmHg` — unit conversion; test zero, typical range, string input
-- `findMinValue` / `findMaxValue` — used to set chart Y-axis bounds; test `undefined` data, missing key
-
----
-
 ### TEST-03 · `getWeatherIconUrl` in `WeatherIcon.tsx` has no tests [Medium]
 
 **File:** `components/weather-icon/WeatherIcon.tsx` — exported function `getWeatherIconUrl`
 
 `getWeatherIconUrl` is used in both `WeatherIcon` and `Meteogram`. It has day/night and special-case logic that warrants unit tests: unknown `weatherId`, daytime vs. nighttime URLs, `withoutDayIcon` condition, missing `date`.
-
----
-
-### TEST-04 · `formatDateFromUTC`, `timeAgo` in `tools/date.ts` have no tests [Medium]
-
-**File:** `tools/date.ts`
-
-`formatDateFromUTC` (used in chart formatters) and `timeAgo` (used in `AppBar`) are not covered by `date.test.ts`. Add tests covering `undefined` input, valid timestamps, and zero values.
 
 ---
 
@@ -356,20 +162,6 @@ These three components are the most user-visible output on every page. Basic ren
 ---
 
 ## 5. Features / Enhancements
-
-### FEAT-01 · Climate page has no deduplication or loading state while fetching years sequentially [Medium]
-
-**File:** `pages/climate.tsx`
-
-The sequential-fetch pattern (fetch year 0 → set index 1 → fetch year 1 → …) works but has UX gaps:
-
-- While loading subsequent years the chart shows partial data with no progress indicator
-- Fast navigation away and back resets all accumulated state and re-fetches from year 0
-- The `loading` prop passed to `WidgetClimate` is only `true` for the first year
-
-Add a progress indicator (e.g. "Loading 2/3 years…") and consider caching accumulated results in `sessionStorage` or RTK Query with manual cache updates.
-
----
 
 ### FEAT-02 · History page has no chart for humidity, wind, or UV index [Low]
 
@@ -445,33 +237,19 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 
 | ID      | Summary                                            |
 | ------- | -------------------------------------------------- |
-| BUG-07  | `getMinMaxValues` does not skip undefined values   |
-| BUG-08  | `round(0)` returns `undefined`                     |
 | QC-01   | `any` types in ECharts tooltip formatters          |
 | QC-02   | Inline styles violate CSS Modules convention       |
-| QC-07   | `date-only-hour` key missing from English locale   |
-| TEST-01 | `getMinMaxValues` has no tests                     |
-| TEST-02 | 5 weather utility functions have no tests          |
 | FEAT-03 | No error state handling for any RTK Query endpoint |
 
 ### Medium (address in regular sprints)
 
 | ID      | Summary                                                   |
 | ------- | --------------------------------------------------------- |
-| BUG-09  | `extractRehydrationInfo` typed as `any`                   |
-| BUG-10  | Empty-string query params before period is set            |
 | QC-03   | `showOverlay` redux field is never dispatched             |
-| QC-04   | `Min`/`Max` labels not translated                         |
-| QC-05   | `Eng`/`Rus` labels not translated                         |
-| QC-06   | `(GMT+5)` hardcoded in WidgetSummary                      |
 | QC-08   | `weather-icon` i18n key missing from both locales         |
-| QC-10   | `isValidJSON` duplicated in two files                     |
 | QC-13   | `undefined` case after `default` in switch is unreachable |
-| PERF-01 | `tableConfig` recreated on every render                   |
-| PERF-02 | `dayjs.extend` called inside render cycle                 |
 | PERF-03 | `currentDate` / `yesterdayDate` never refresh             |
 | TEST-03 | `getWeatherIconUrl` has no tests                          |
-| TEST-04 | `formatDateFromUTC` / `timeAgo` have no tests             |
 | TEST-05 | `encodeQueryData` missing falsy-value edge case           |
 | TEST-06 | `useLocalStorage` hook has no tests                       |
 | TEST-08 | Key widgets have no component tests                       |
@@ -485,11 +263,8 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | QC-11   | `for...in` in `encodeQueryData` — use `Object.keys` |
 | QC-12   | `normalizeDateToBaseYear` defined after first use   |
 | QC-14   | Yandex Metrika should use `next/script`             |
-| PERF-04 | `widgets` array recreated on every render in pages  |
-| PERF-05 | `baseConfig` in Chart.tsx not memoised              |
 | PERF-06 | No `keepUnusedDataFor` tuning on RTK Query          |
 | TEST-07 | `useClientOnly` hook has no tests                   |
-| FEAT-01 | Climate page loading progress UX                    |
 | FEAT-02 | History page missing humidity / wind charts         |
 | FEAT-05 | AppBar duplicate RTK Query subscription awareness   |
 | FEAT-07 | No `<noscript>` fallback for chart pages            |

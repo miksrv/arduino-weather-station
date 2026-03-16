@@ -24,11 +24,7 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
     const [sensor, setSensor] = useState<ApiType.Heatmap.SensorType>('temperature')
 
     const historyDateParam: Maybe<ApiType.Heatmap.Request> = useMemo(
-        () => ({
-            start_date: period?.[0] ?? '',
-            end_date: period?.[1] ?? '',
-            type: sensor
-        }),
+        () => (period?.[0] && period?.[1] ? { end_date: period[1], start_date: period[0], type: sensor } : undefined),
         [period, sensor]
     )
 
@@ -36,7 +32,7 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
         data: history,
         isLoading: historyLoading,
         isFetching: historyFetching
-    } = API.useGetHeatmapQuery(historyDateParam, { skip: !period?.[0] || !period?.[1] })
+    } = API.useGetHeatmapQuery(historyDateParam, { skip: !historyDateParam })
 
     const currentDatePreset = useMemo((): string => {
         if (!period?.[0] || !period?.[1]) {

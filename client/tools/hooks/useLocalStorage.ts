@@ -1,5 +1,7 @@
 import React, { useDebugValue, useEffect, useState } from 'react'
 
+import { isValidJSON } from '@/tools/helpers'
+
 export const DEFAULT_STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'mikApp'
 
 /**
@@ -99,28 +101,6 @@ export const useLocalStorage = <K extends string, S>(
     }
 
     return [state, setState, remove]
-}
-
-/**
- * Checks if a given string is a valid JSON.
- *
- * @param string - The string to be checked.
- * @returns `true` if the string is a valid JSON, otherwise `false`.
- */
-const isValidJSON = (string: string) => {
-    if (!string || !string.length) {
-        return true
-    }
-
-    try {
-        JSON.parse(string)
-    } catch (e) {
-        console.error(e)
-
-        return false
-    }
-
-    return true
 }
 
 export default useLocalStorage

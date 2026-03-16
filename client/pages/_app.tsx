@@ -24,6 +24,10 @@ import '@/styles/dark.css'
 import '@/styles/light.css'
 import '@/styles/globals.sass'
 
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(relativeTime)
+
 export const POLING_INTERVAL_CURRENT = 10 * 60 * 1000
 export const POLING_INTERVAL_FORECAST = 10 * 60 * 1000
 
@@ -47,10 +51,9 @@ const App = ({ Component, pageProps }: AppProps) => {
         }
     }, [storageLocale, i18n.language, router])
 
-    dayjs.extend(utc)
-    dayjs.extend(timezone)
-    dayjs.extend(relativeTime)
-    dayjs.locale(i18n.language ?? i18Config.i18n.defaultLocale)
+    useEffect(() => {
+        dayjs.locale(i18n.language ?? i18Config.i18n.defaultLocale)
+    }, [i18n.language])
 
     // useReportWebVitals((metric) => {
     //     console.log(metric)
