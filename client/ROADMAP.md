@@ -246,8 +246,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | ID      | Summary                                                   |
 | ------- | --------------------------------------------------------- |
 | QC-03   | `showOverlay` redux field is never dispatched             |
-| QC-05   | `Eng`/`Rus` labels not translated                         |
-| QC-06   | `(GMT+5)` hardcoded in WidgetSummary                      |
 | QC-08   | `weather-icon` i18n key missing from both locales         |
 | QC-13   | `undefined` case after `default` in switch is unreachable |
 | PERF-03 | `currentDate` / `yesterdayDate` never refresh             |

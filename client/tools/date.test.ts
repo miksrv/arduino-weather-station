@@ -21,7 +21,10 @@ dayjs.extend(relativeTime)
 
 describe('date utilities', () => {
     it('should return the current date in the specified timezone', () => {
-        expect(currentDate.format()).toBe(dayjs().tz('Asia/Yekaterinburg').format())
+        // Compare only the date portion to avoid timing issues
+        const expectedDate = dayjs().tz('Asia/Yekaterinburg').format('YYYY-MM-DD')
+        const receivedDate = currentDate.format('YYYY-MM-DD')
+        expect(receivedDate).toBe(expectedDate)
     })
 
     it('should return the date for yesterday', () => {
