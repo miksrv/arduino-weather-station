@@ -127,14 +127,6 @@ The default RTK Query `keepUnusedDataFor` is 60 seconds. For a weather station w
 
 ---
 
-### TEST-04 · `formatDateFromUTC`, `timeAgo` in `tools/date.ts` have no tests [Medium]
-
-**File:** `tools/date.ts`
-
-`formatDateFromUTC` (used in chart formatters) and `timeAgo` (used in `AppBar`) are not covered by `date.test.ts`. Add tests covering `undefined` input, valid timestamps, and zero values.
-
----
-
 ### TEST-05 · `encodeQueryData` edge case: falsy non-null values (`0`, `false`) [Medium]
 
 **File:** `tools/helpers.ts` — line 17
@@ -274,7 +266,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | QC-13   | `undefined` case after `default` in switch is unreachable |
 | PERF-03 | `currentDate` / `yesterdayDate` never refresh             |
 | TEST-03 | `getWeatherIconUrl` has no tests                          |
-| TEST-04 | `formatDateFromUTC` / `timeAgo` have no tests             |
 | TEST-05 | `encodeQueryData` missing falsy-value edge case           |
 | TEST-06 | `useLocalStorage` hook has no tests                       |
 | TEST-08 | Key widgets have no component tests                       |
