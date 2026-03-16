@@ -44,8 +44,24 @@ jest.mock('@/tools/weather', () => ({
 }))
 
 const mockData = [
-    { date: '2024-01-01T12:00:00Z', temperature: 20, feelsLike: 18, windSpeed: 5, windDeg: 90, weatherId: 800, precipitation: 0 },
-    { date: '2024-01-01T15:00:00Z', temperature: 22, feelsLike: 20, windSpeed: 7, windDeg: 180, weatherId: 801, precipitation: 1 }
+    {
+        date: '2024-01-01T12:00:00Z',
+        temperature: 20,
+        feelsLike: 18,
+        windSpeed: 5,
+        windDeg: 90,
+        weatherId: 800,
+        precipitation: 0
+    },
+    {
+        date: '2024-01-01T15:00:00Z',
+        temperature: 22,
+        feelsLike: 20,
+        windSpeed: 7,
+        windDeg: 180,
+        weatherId: 801,
+        precipitation: 1
+    }
 ]
 
 describe('Meteogram', () => {

@@ -70,9 +70,7 @@ describe('WidgetSensor', () => {
 
     it('renders min/max stats when minMax is provided', () => {
         render(
-            <WidgetSensor
-                minMax={{ min: { value: 10, date: '2024-01-01' }, max: { value: 30, date: '2024-01-02' } }}
-            />
+            <WidgetSensor minMax={{ min: { value: 10, date: '2024-01-01' }, max: { value: 30, date: '2024-01-02' } }} />
         )
         expect(screen.getByText('min')).toBeInTheDocument()
         expect(screen.getByText('max')).toBeInTheDocument()
@@ -82,9 +80,7 @@ describe('WidgetSensor', () => {
 
     it('renders time labels in min/max stats', () => {
         render(
-            <WidgetSensor
-                minMax={{ min: { value: 5, date: '2024-01-01' }, max: { value: 25, date: '2024-01-02' } }}
-            />
+            <WidgetSensor minMax={{ min: { value: 5, date: '2024-01-01' }, max: { value: 25, date: '2024-01-02' } }} />
         )
         expect(screen.getAllByText('12:00')).toHaveLength(2)
     })

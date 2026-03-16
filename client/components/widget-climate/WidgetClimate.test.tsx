@@ -7,7 +7,9 @@ import WidgetClimate from './WidgetClimate'
 import '@testing-library/jest-dom'
 
 jest.mock('next-i18next', () => ({
-    useTranslation: () => ({ t: (key: string, params?: Record<string, unknown>) => (params ? `${key}:${JSON.stringify(params)}` : key) })
+    useTranslation: () => ({
+        t: (key: string, params?: Record<string, unknown>) => (params ? `${key}:${JSON.stringify(params)}` : key)
+    })
 }))
 jest.mock('@/components/widget-climate/Chart', () => () => <div data-testid='climate-chart' />)
 

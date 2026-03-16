@@ -48,7 +48,16 @@ jest.mock('@/tools/weather', () => ({
 }))
 
 const mockData = [
-    { date: '2024-01-01T00:00:00Z', temperature: 20, feelsLike: 18, dewPoint: 15, clouds: 50, windSpeed: 5, pressure: 1013, precipitation: 2 }
+    {
+        date: '2024-01-01T00:00:00Z',
+        temperature: 20,
+        feelsLike: 18,
+        dewPoint: 15,
+        clouds: 50,
+        windSpeed: 5,
+        pressure: 1013,
+        precipitation: 2
+    }
 ]
 
 describe('Chart (widget-chart)', () => {
