@@ -34,7 +34,7 @@ RTK Query is the exclusive API layer. All endpoints live in `api/api.ts`. The `L
 - `useTranslation()` (no namespace arg) is used everywhere — defaults to `common`.
 - Weather condition codes map to `conditions.*` nested keys (e.g. `conditions.clear_sky`).
 - Date format strings are translated (e.g. `date-full-format`, `date-only-hour`) to allow locale-specific formats.
-- **Known gaps (as of 2026-03-14):** `date-only-hour` missing from `en/common.json`; `weather-icon` missing from both locales.
+- **Known gaps (as of 2026-03-14):** `weather-icon` missing from both locales. (`date-only-hour` gap was fixed 2026-03-15 — QC-07.)
 
 ## Known Bugs (as of 2026-03-14 audit — see ROADMAP.md)
 
@@ -44,8 +44,7 @@ RTK Query is the exclusive API layer. All endpoints live in `api/api.ts`. The `L
 - `heatmap.tsx` / `history.tsx` historyDateParam was always a non-null object before useEffect ran — FIXED 2026-03-15 by returning undefined when period is unset (BUG-10).
 - Climate page accumulates duplicate year entries without dedup guard.
 - `setTimeout` in climate page is never cleared (memory leak risk).
-- Canonical URLs wrong on `/climate` (→ `/history`), `/heatmap` (→ `/history`), `/forecast` (→ `/`).
-- `date-only-hour` i18n key missing from English locale.
+- Canonical URLs wrong on `/climate` (→ `/history`), `/heatmap` (→ `/history`), `/forecast` (→ `/`) — FIXED 2026-03-14 (BUG-06), QC-09 removed from ROADMAP 2026-03-15.
 
 ## Styling
 

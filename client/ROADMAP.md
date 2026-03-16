@@ -51,14 +51,6 @@ These are user-facing strings that should use `useTranslation()`. Add `min` and 
 
 ---
 
-### QC-07 · `'date-only-hour'` key is missing from English locale [High]
-
-**File:** `public/locales/en/common.json`
-
-The key `date-only-hour` is present in `ru/common.json` (`"HH a"`) but absent from `en/common.json`. The English locale uses `"date-full-format": "D MMMM YYYY, h:mm a"` and similar patterns, but `date-only-hour` used in `Chart.tsx` and `Meteogram.tsx` will silently fall back to the key string itself (`"date-only-hour"`) in English. Add `"date-only-hour": "h a"` to `en/common.json`.
-
----
-
 ### QC-08 · `'weather-icon'` i18n key used in Meteogram but not defined in either locale [Medium]
 
 **File:** `components/widget-meteogram/Meteogram.tsx` — line 270
@@ -68,20 +60,6 @@ name: t('weather-icon'),
 ```
 
 Neither `en/common.json` nor `ru/common.json` defines a `weather-icon` key. The ECharts series name falls back to the raw key string `"weather-icon"`. Add the key to both locale files (e.g. `"Weather icon"` / `"Иконка погоды"`).
-
----
-
-### QC-09 · Climate page `canonical` URL uses `/history` path [Medium]
-
-See BUG-06 above — tracked separately here as a code quality / SEO issue.
-
----
-
-### QC-10 · `isValidJSON` is duplicated — exists in both `tools/helpers.ts` and `tools/hooks/useLocalStorage.ts` [Medium]
-
-**Files:** `tools/helpers.ts` (exported), `tools/hooks/useLocalStorage.ts` (local, private copy)
-
-The same function is implemented twice. `useLocalStorage` should import from `tools/helpers` to eliminate the duplication.
 
 ---
 
@@ -348,7 +326,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | ------- | -------------------------------------------------- |
 | QC-01   | `any` types in ECharts tooltip formatters          |
 | QC-02   | Inline styles violate CSS Modules convention       |
-| QC-07   | `date-only-hour` key missing from English locale   |
 | TEST-02 | 5 weather utility functions have no tests          |
 | FEAT-03 | No error state handling for any RTK Query endpoint |
 
@@ -361,7 +338,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | QC-05   | `Eng`/`Rus` labels not translated                         |
 | QC-06   | `(GMT+5)` hardcoded in WidgetSummary                      |
 | QC-08   | `weather-icon` i18n key missing from both locales         |
-| QC-10   | `isValidJSON` duplicated in two files                     |
 | QC-13   | `undefined` case after `default` in switch is unreachable |
 | PERF-01 | `tableConfig` recreated on every render                   |
 | PERF-02 | `dayjs.extend` called inside render cycle                 |
