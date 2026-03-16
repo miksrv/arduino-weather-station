@@ -3,11 +3,84 @@ import utc from 'dayjs/plugin/utc'
 
 import { ApiModel } from '@/api'
 
-import { filterRecentData, getCloudinessColor, getSampledData } from './weather'
+import { filterRecentData, getCloudinessColor, getMinMaxValues, getSampledData } from './weather'
 
 dayjs.extend(utc)
 
 describe('weather', () => {
+    describe('getMinMaxValues', () => {
+        const makeItem = (temperature: number | undefined, date: string): ApiModel.Weather => ({
+            date,
+            temperature,
+            windSpeed: undefined,
+            windDeg: undefined,
+            pressure: undefined,
+            precipitation: undefined,
+            clouds: undefined,
+            weatherId: undefined
+        })
+
+        it('returns empty object when data is undefined', () => {
+            expect(getMinMaxValues(undefined, 'temperature')).toStrictEqual({})
+        })
+
+        it('returns empty object when data is empty array', () => {
+            expect(getMinMaxValues([], 'temperature')).toStrictEqual({})
+        })
+
+        it('returns empty object when parameter is undefined', () => {
+            expect(getMinMaxValues([makeItem(10, '2024-01-01')], undefined)).toStrictEqual({})
+        })
+
+        it('returns empty object when all values for the parameter are undefined', () => {
+            const data: ApiModel.Weather[] = [makeItem(undefined, '2024-01-01'), makeItem(undefined, '2024-01-02')]
+            expect(getMinMaxValues(data, 'temperature')).toStrictEqual({})
+        })
+
+        it('finds correct min and max from normal data', () => {
+            const data: ApiModel.Weather[] = [
+                makeItem(10, '2024-01-01'),
+                makeItem(-5, '2024-01-02'),
+                makeItem(20, '2024-01-03')
+            ]
+            const result = getMinMaxValues(data, 'temperature')
+            expect(result.min?.value).toBe(-5)
+            expect(result.min?.date).toBe('2024-01-02')
+            expect(result.max?.value).toBe(20)
+            expect(result.max?.date).toBe('2024-01-03')
+        })
+
+        it('skips undefined values and uses remaining items for min/max', () => {
+            const data: ApiModel.Weather[] = [
+                makeItem(undefined, '2024-01-01'),
+                makeItem(5, '2024-01-02'),
+                makeItem(15, '2024-01-03'),
+                makeItem(undefined, '2024-01-04')
+            ]
+            const result = getMinMaxValues(data, 'temperature')
+            expect(result.min?.value).toBe(5)
+            expect(result.min?.date).toBe('2024-01-02')
+            expect(result.max?.value).toBe(15)
+            expect(result.max?.date).toBe('2024-01-03')
+        })
+
+        it('handles a zero value correctly (zero is not treated as undefined)', () => {
+            const data: ApiModel.Weather[] = [makeItem(0, '2024-01-01'), makeItem(5, '2024-01-02')]
+            const result = getMinMaxValues(data, 'temperature')
+            expect(result.min?.value).toBe(0)
+            expect(result.min?.date).toBe('2024-01-01')
+            expect(result.max?.value).toBe(5)
+            expect(result.max?.date).toBe('2024-01-02')
+        })
+
+        it('returns equal min and max when only one valid value exists', () => {
+            const data: ApiModel.Weather[] = [makeItem(undefined, '2024-01-01'), makeItem(7, '2024-01-02')]
+            const result = getMinMaxValues(data, 'temperature')
+            expect(result.min?.value).toBe(7)
+            expect(result.max?.value).toBe(7)
+        })
+    })
+
     describe('getCloudinessColor', () => {
         it('returns empty string when cloudiness is undefined', () => {
             expect(getCloudinessColor()).toBe('')

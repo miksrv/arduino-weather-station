@@ -17,18 +17,6 @@ Scope: `/client` directory (Next.js 16, React 19, TypeScript 5.9, RTK Query, ECh
 
 ## 1. Bugs
 
-### BUG-07 · `getMinMaxValues` does not skip `undefined`/`null` sensor values [Medium]
-
-**File:** `tools/weather.ts` — lines 36–53
-
-```ts
-let minValue = data[0][parameter] as number // could be undefined
-```
-
-If the first item's sensor field is `undefined`, `minValue` is `undefined` cast to `number`. All subsequent comparisons (`value < minValue`) are `NaN`-comparisons and return `false`, so the result is the first-item value regardless of the array. Fix by pre-filtering out `undefined` values before iteration, mirroring `findMinValue`.
-
----
-
 ### BUG-08 · `round()` returns `undefined` when value is `0` [Medium]
 
 **File:** `tools/helpers.ts` — line 33
@@ -284,14 +272,6 @@ The default RTK Query `keepUnusedDataFor` is 60 seconds. For a weather station w
 
 ## 4. Testing
 
-### TEST-01 · `getMinMaxValues` in `tools/weather.ts` has no tests [High]
-
-**File:** `tools/weather.ts` — exported function `getMinMaxValues`
-
-This function has a known bug (BUG-07: skips `undefined` values incorrectly) and zero test coverage. Add test cases covering: normal operation, `undefined` data, `undefined` parameter, all-undefined values, and the zero-value edge case.
-
----
-
 ### TEST-02 · `invertData`, `getTemperatureColor`, `convertHpaToMmHg`, `findMinValue`, `findMaxValue` have no tests [High]
 
 **File:** `tools/weather.ts`
@@ -445,12 +425,10 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 
 | ID      | Summary                                            |
 | ------- | -------------------------------------------------- |
-| BUG-07  | `getMinMaxValues` does not skip undefined values   |
 | BUG-08  | `round(0)` returns `undefined`                     |
 | QC-01   | `any` types in ECharts tooltip formatters          |
 | QC-02   | Inline styles violate CSS Modules convention       |
 | QC-07   | `date-only-hour` key missing from English locale   |
-| TEST-01 | `getMinMaxValues` has no tests                     |
 | TEST-02 | 5 weather utility functions have no tests          |
 | FEAT-03 | No error state handling for any RTK Query endpoint |
 
