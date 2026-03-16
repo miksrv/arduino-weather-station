@@ -119,19 +119,6 @@ The default RTK Query `keepUnusedDataFor` is 60 seconds. For a weather station w
 
 ## 4. Testing
 
-### TEST-02 · `invertData`, `getTemperatureColor`, `convertHpaToMmHg`, `findMinValue`, `findMaxValue` have no tests [High]
-
-**File:** `tools/weather.ts`
-
-Five exported functions used in chart rendering lack test coverage:
-
-- `invertData` — transforms temperature data; edge cases include all-positive, all-negative, mixed arrays
-- `getTemperatureColor` — large lookup table; test boundary values and `undefined` input
-- `convertHpaToMmHg` — unit conversion; test zero, typical range, string input
-- `findMinValue` / `findMaxValue` — used to set chart Y-axis bounds; test `undefined` data, missing key
-
----
-
 ### TEST-03 · `getWeatherIconUrl` in `WeatherIcon.tsx` has no tests [Medium]
 
 **File:** `components/weather-icon/WeatherIcon.tsx` — exported function `getWeatherIconUrl`
@@ -274,7 +261,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | ------- | -------------------------------------------------- |
 | QC-01   | `any` types in ECharts tooltip formatters          |
 | QC-02   | Inline styles violate CSS Modules convention       |
-| TEST-02 | 5 weather utility functions have no tests          |
 | FEAT-03 | No error state handling for any RTK Query endpoint |
 
 ### Medium (address in regular sprints)

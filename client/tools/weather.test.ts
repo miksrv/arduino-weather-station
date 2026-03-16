@@ -3,7 +3,17 @@ import utc from 'dayjs/plugin/utc'
 
 import { ApiModel } from '@/api'
 
-import { filterRecentData, getCloudinessColor, getMinMaxValues, getSampledData } from './weather'
+import {
+    convertHpaToMmHg,
+    filterRecentData,
+    findMaxValue,
+    findMinValue,
+    getCloudinessColor,
+    getMinMaxValues,
+    getSampledData,
+    getTemperatureColor,
+    invertData
+} from './weather'
 
 dayjs.extend(utc)
 
@@ -231,6 +241,218 @@ describe('weather', () => {
             expect(result).toHaveLength(2)
             expect(result[0].date).toBe(mockData[0].date)
             expect(result[1].date).toBe(mockData[3].date)
+        })
+    })
+
+    describe('invertData', () => {
+        const makeItem = (temperature: number | undefined, date: string): ApiModel.Weather => ({
+            date,
+            temperature,
+            windSpeed: undefined,
+            windDeg: undefined,
+            pressure: undefined,
+            precipitation: undefined,
+            clouds: undefined,
+            weatherId: undefined
+        })
+
+        it('returns original array when key is undefined', () => {
+            const data = [makeItem(5, '2024-01-01'), makeItem(-3, '2024-01-02')]
+            expect(invertData(data, undefined)).toStrictEqual(data)
+        })
+
+        it('returns empty array when input is empty', () => {
+            expect(invertData([], 'temperature')).toStrictEqual([])
+        })
+
+        it('does not shift values when all temperatures are positive', () => {
+            const data = [makeItem(5, '2024-01-01'), makeItem(10, '2024-01-02'), makeItem(20, '2024-01-03')]
+            const result = invertData(data, 'temperature')
+            expect(result[0].temperature).toBe(5)
+            expect(result[1].temperature).toBe(10)
+            expect(result[2].temperature).toBe(20)
+        })
+
+        it('shifts all values up so minimum becomes 0 when all temperatures are negative', () => {
+            const data = [makeItem(-10, '2024-01-01'), makeItem(-5, '2024-01-02'), makeItem(-1, '2024-01-03')]
+            const result = invertData(data, 'temperature')
+            expect(result[0].temperature).toBe(0)
+            expect(result[1].temperature).toBe(5)
+            expect(result[2].temperature).toBe(9)
+        })
+
+        it('shifts mixed positive and negative values so minimum becomes 0', () => {
+            const data = [makeItem(-3, '2024-01-01'), makeItem(0, '2024-01-02'), makeItem(7, '2024-01-03')]
+            const result = invertData(data, 'temperature')
+            expect(result[0].temperature).toBe(0)
+            expect(result[1].temperature).toBeUndefined()
+            expect(result[2].temperature).toBe(10)
+        })
+
+        it('preserves undefined values in the output', () => {
+            const data = [makeItem(undefined, '2024-01-01'), makeItem(-2, '2024-01-02')]
+            const result = invertData(data, 'temperature')
+            expect(result[0].temperature).toBeUndefined()
+            expect(result[1].temperature).toBe(0)
+        })
+    })
+
+    describe('getTemperatureColor', () => {
+        it('returns empty string when temperature is undefined', () => {
+            expect(getTemperatureColor(undefined)).toBe('')
+        })
+
+        it('returns correct color for temperature above 48.9°C (> 120°F range)', () => {
+            expect(getTemperatureColor(50)).toBe('#3d0216')
+        })
+
+        it('returns correct color for temperature exactly at 48.9°C boundary', () => {
+            expect(getTemperatureColor(48.9)).toBe('#3d0216')
+        })
+
+        it('returns correct color for temperature in 35–37.8°C range (95–100°F)', () => {
+            expect(getTemperatureColor(36)).toBe('#af4d4c')
+        })
+
+        it('returns correct color for temperature near 0°C (30–35°F range)', () => {
+            expect(getTemperatureColor(0)).toBe('#25436f')
+        })
+
+        it('returns correct color for temperature below -51.1°C (< -60°F range)', () => {
+            expect(getTemperatureColor(-55)).toBe('#e4f1ff')
+        })
+
+        it('returns correct color for temperature exactly at -40°C boundary (inclusive lower bound of range)', () => {
+            // Range { min: -40, max: -37.2 } uses color '#b8cdea'; -40 satisfies temp >= -40
+            expect(getTemperatureColor(-40)).toBe('#b8cdea')
+        })
+
+        it('accepts temperature as a string', () => {
+            expect(getTemperatureColor('25')).toBe('#c3ab75')
+        })
+
+        it('returns empty string for temperature not matched by any range', () => {
+            // All ranges are covered from -Infinity to +Infinity, so this should not happen in practice.
+            // Verify the lookup returns the lowest range for a very cold value.
+            expect(getTemperatureColor(-100)).toBe('#e4f1ff')
+        })
+    })
+
+    describe('convertHpaToMmHg', () => {
+        it('returns 0 when input is undefined', () => {
+            expect(convertHpaToMmHg(undefined)).toBe(0)
+        })
+
+        it('returns 0 when input is 0', () => {
+            expect(convertHpaToMmHg(0)).toBe(0)
+        })
+
+        it('converts a typical pressure value correctly', () => {
+            // 1013.25 hPa = 760 mmHg exactly
+            expect(convertHpaToMmHg(1013.25)).toBe(760)
+        })
+
+        it('converts a pressure string correctly', () => {
+            const result = convertHpaToMmHg('1013.25')
+            expect(result).toBe(760)
+        })
+
+        it('converts a low pressure value', () => {
+            // 980 hPa ≈ 735.06 mmHg → rounded to 1 decimal = 735.1
+            const result = convertHpaToMmHg(980)
+            expect(typeof result).toBe('number')
+            expect(result).toBeCloseTo(735.1, 0)
+        })
+
+        it('converts a high pressure value', () => {
+            // 1040 hPa ≈ 780.05 mmHg
+            const result = convertHpaToMmHg(1040)
+            expect(typeof result).toBe('number')
+            expect(result).toBeCloseTo(780.1, 0)
+        })
+    })
+
+    describe('findMinValue', () => {
+        const makeItem = (temperature: number | undefined, date: string): ApiModel.Weather => ({
+            date,
+            temperature,
+            windSpeed: undefined,
+            windDeg: undefined,
+            pressure: undefined,
+            precipitation: undefined,
+            clouds: undefined,
+            weatherId: undefined
+        })
+
+        it('returns undefined when weatherData is undefined', () => {
+            expect(findMinValue(undefined, 'temperature')).toBeUndefined()
+        })
+
+        it('returns Infinity when weatherData is an empty array', () => {
+            // reduce with no items returns the initial value (Infinity) when array is empty after filter
+            expect(findMinValue([], 'temperature')).toBe(Infinity)
+        })
+
+        it('returns minimum temperature from a normal dataset', () => {
+            const data = [makeItem(10, '2024-01-01'), makeItem(-5, '2024-01-02'), makeItem(20, '2024-01-03')]
+            expect(findMinValue(data, 'temperature')).toBe(-5)
+        })
+
+        it('ignores undefined values in the dataset', () => {
+            const data = [makeItem(undefined, '2024-01-01'), makeItem(8, '2024-01-02'), makeItem(3, '2024-01-03')]
+            expect(findMinValue(data, 'temperature')).toBe(3)
+        })
+
+        it('defaults to temperature key when key is undefined', () => {
+            const data = [makeItem(7, '2024-01-01'), makeItem(2, '2024-01-02')]
+            expect(findMinValue(data, undefined)).toBe(2)
+        })
+
+        it('returns the single value when only one item exists', () => {
+            const data = [makeItem(15, '2024-01-01')]
+            expect(findMinValue(data, 'temperature')).toBe(15)
+        })
+    })
+
+    describe('findMaxValue', () => {
+        const makeItem = (temperature: number | undefined, date: string): ApiModel.Weather => ({
+            date,
+            temperature,
+            windSpeed: undefined,
+            windDeg: undefined,
+            pressure: undefined,
+            precipitation: undefined,
+            clouds: undefined,
+            weatherId: undefined
+        })
+
+        it('returns undefined when weatherData is undefined', () => {
+            expect(findMaxValue(undefined, 'temperature')).toBeUndefined()
+        })
+
+        it('returns -Infinity when weatherData is an empty array', () => {
+            // reduce with no items returns the initial value (-Infinity) when array is empty after filter
+            expect(findMaxValue([], 'temperature')).toBe(-Infinity)
+        })
+
+        it('returns maximum temperature from a normal dataset', () => {
+            const data = [makeItem(10, '2024-01-01'), makeItem(-5, '2024-01-02'), makeItem(20, '2024-01-03')]
+            expect(findMaxValue(data, 'temperature')).toBe(20)
+        })
+
+        it('ignores undefined values in the dataset', () => {
+            const data = [makeItem(undefined, '2024-01-01'), makeItem(8, '2024-01-02'), makeItem(3, '2024-01-03')]
+            expect(findMaxValue(data, 'temperature')).toBe(8)
+        })
+
+        it('defaults to temperature key when key is undefined', () => {
+            const data = [makeItem(7, '2024-01-01'), makeItem(2, '2024-01-02')]
+            expect(findMaxValue(data, undefined)).toBe(7)
+        })
+
+        it('returns the single value when only one item exists', () => {
+            const data = [makeItem(15, '2024-01-01')]
+            expect(findMaxValue(data, 'temperature')).toBe(15)
         })
     })
 })
