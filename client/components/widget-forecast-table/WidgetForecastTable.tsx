@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { cn, ColumnProps, Table, TableProps } from 'simple-react-ui-kit'
 
 import Link from 'next/link'
@@ -45,7 +45,7 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ columnsPreset, title, link
     const titleRef = useRef<HTMLDivElement | null>(null)
     const [tableHeight, setTableHeight] = useState<number | null>(null)
 
-    const tableConfig: Array<ExtendedColumnProps<ApiModel.Weather>> = [
+    const tableConfig: Array<ExtendedColumnProps<ApiModel.Weather>> = useMemo(() => [
         {
             column: 'date',
             header: t('date'),
@@ -148,7 +148,7 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ columnsPreset, title, link
                     ''
                 )
         }
-    ]
+    ], [t])
 
     useEffect(() => {
         const calculateTableHeight = () => {

@@ -107,14 +107,6 @@ The analytics snippet is injected via `dangerouslySetInnerHTML`, which bypasses 
 
 ## 3. Performance
 
-### PERF-01 · `tableConfig` array in `WidgetForecastTable` is recreated on every render [Medium]
-
-**File:** `components/widget-forecast-table/WidgetForecastTable.tsx` — lines 48–151
-
-`tableConfig` is a plain array literal inside the component function body, not wrapped in `useMemo`. Every parent re-render creates a new array reference and passes it to `<Table>`. Wrap `tableConfig` in `useMemo` (with `[t]` as dependency) to stabilise the reference and prevent `Table` from re-rendering unnecessarily.
-
----
-
 ### PERF-02 · `dayjs.extend()` is called on every render in `_app.tsx` [Medium]
 
 **File:** `pages/_app.tsx` — lines 48–51
@@ -339,7 +331,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | QC-06   | `(GMT+5)` hardcoded in WidgetSummary                      |
 | QC-08   | `weather-icon` i18n key missing from both locales         |
 | QC-13   | `undefined` case after `default` in switch is unreachable |
-| PERF-01 | `tableConfig` recreated on every render                   |
 | PERF-02 | `dayjs.extend` called inside render cycle                 |
 | PERF-03 | `currentDate` / `yesterdayDate` never refresh             |
 | TEST-03 | `getWeatherIconUrl` has no tests                          |
