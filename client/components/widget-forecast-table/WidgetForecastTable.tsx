@@ -45,110 +45,113 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ columnsPreset, title, link
     const titleRef = useRef<HTMLDivElement | null>(null)
     const [tableHeight, setTableHeight] = useState<number | null>(null)
 
-    const tableConfig: Array<ExtendedColumnProps<ApiModel.Weather>> = useMemo(() => [
-        {
-            column: 'date',
-            header: t('date'),
-            accessor: 'date',
-            className: styles.cellDate,
-            isSortable: true,
-            formatter: (date) => formatDate(date as string, 'dd, MMM D')
-        },
-        {
-            column: 'time',
-            header: t('time'),
-            accessor: 'date',
-            className: styles.cellDate,
-            isSortable: true,
-            formatter: (date) => formatDate(date as string, t('date-only-hour'))
-        },
-        {
-            column: 'weather',
-            header: t('weather'),
-            accessor: 'weatherId',
-            className: styles.cellCondition,
-            formatter: (weatherId) => (
-                <>
-                    <WeatherIcon weatherId={weatherId as number} />
-                    {t(getWeatherI18nKey(weatherId || ''))}
-                </>
-            )
-        },
-        {
-            column: 'weatherIcon',
-            header: t('weather'),
-            accessor: 'weatherId',
-            className: styles.cellWeather,
-            formatter: (weatherId, data, i) => (
-                <WeatherIcon
-                    weatherId={weatherId as number}
-                    date={data[i].date}
-                />
-            )
-        },
-        {
-            column: 'temperature',
-            header: t('temperature-short'),
-            accessor: 'temperature',
-            className: styles.cellTemperature,
-            isSortable: true,
-            background: (temperature) => getTemperatureColor(temperature),
-            formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>
-        },
-        {
-            column: 'clouds',
-            header: t('clouds'),
-            accessor: 'clouds',
-            className: styles.cellClouds,
-            isSortable: true,
-            background: (clouds) => getCloudinessColor(clouds),
-            formatter: (clouds) => <>{clouds}%</>
-        },
-        {
-            column: 'pressure',
-            header: t('pressure'),
-            accessor: 'pressure',
-            className: styles.cellPressure,
-            isSortable: true,
-            formatter: (pressure, data, i) => (
-                <>
-                    <span>{convertHpaToMmHg(pressure)}</span>
-                    <ComparisonIcon
-                        currentValue={pressure}
-                        previousValue={data[i - 1]?.pressure}
-                    />
-                </>
-            )
-        },
-        {
-            column: 'wind',
-            header: t('wind'),
-            accessor: 'windSpeed',
-            className: styles.cellWind,
-            isSortable: true,
-            formatter: (windSpeed, data, i) => (
-                <>
-                    <WindDirectionIcon direction={Number(data[i]?.windDeg)} />
-                    {round(Number(windSpeed), 1)} {t('meters-per-second')}
-                </>
-            )
-        },
-        {
-            column: 'precipitation',
-            header: t('precipitation'),
-            accessor: 'precipitation',
-            className: styles.cellClouds,
-            isSortable: true,
-            formatter: (precipitation) =>
-                precipitation ? (
+    const tableConfig: Array<ExtendedColumnProps<ApiModel.Weather>> = useMemo(
+        () => [
+            {
+                column: 'date',
+                header: t('date'),
+                accessor: 'date',
+                className: styles.cellDate,
+                isSortable: true,
+                formatter: (date) => formatDate(date as string, 'dd, MMM D')
+            },
+            {
+                column: 'time',
+                header: t('time'),
+                accessor: 'date',
+                className: styles.cellDate,
+                isSortable: true,
+                formatter: (date) => formatDate(date as string, t('date-only-hour'))
+            },
+            {
+                column: 'weather',
+                header: t('weather'),
+                accessor: 'weatherId',
+                className: styles.cellCondition,
+                formatter: (weatherId) => (
                     <>
-                        {precipitation} {t('millimeters')}
+                        <WeatherIcon weatherId={weatherId as number} />
+                        {t(getWeatherI18nKey(weatherId || ''))}
                     </>
-                ) : (
-                    ''
                 )
-        }
-    ], [t])
+            },
+            {
+                column: 'weatherIcon',
+                header: t('weather'),
+                accessor: 'weatherId',
+                className: styles.cellWeather,
+                formatter: (weatherId, data, i) => (
+                    <WeatherIcon
+                        weatherId={weatherId as number}
+                        date={data[i].date}
+                    />
+                )
+            },
+            {
+                column: 'temperature',
+                header: t('temperature-short'),
+                accessor: 'temperature',
+                className: styles.cellTemperature,
+                isSortable: true,
+                background: (temperature) => getTemperatureColor(temperature),
+                formatter: (temperature) => <>{round(Number(temperature), 1)} °C</>
+            },
+            {
+                column: 'clouds',
+                header: t('clouds'),
+                accessor: 'clouds',
+                className: styles.cellClouds,
+                isSortable: true,
+                background: (clouds) => getCloudinessColor(clouds),
+                formatter: (clouds) => <>{clouds}%</>
+            },
+            {
+                column: 'pressure',
+                header: t('pressure'),
+                accessor: 'pressure',
+                className: styles.cellPressure,
+                isSortable: true,
+                formatter: (pressure, data, i) => (
+                    <>
+                        <span>{convertHpaToMmHg(pressure)}</span>
+                        <ComparisonIcon
+                            currentValue={pressure}
+                            previousValue={data[i - 1]?.pressure}
+                        />
+                    </>
+                )
+            },
+            {
+                column: 'wind',
+                header: t('wind'),
+                accessor: 'windSpeed',
+                className: styles.cellWind,
+                isSortable: true,
+                formatter: (windSpeed, data, i) => (
+                    <>
+                        <WindDirectionIcon direction={Number(data[i]?.windDeg)} />
+                        {round(Number(windSpeed), 1)} {t('meters-per-second')}
+                    </>
+                )
+            },
+            {
+                column: 'precipitation',
+                header: t('precipitation'),
+                accessor: 'precipitation',
+                className: styles.cellClouds,
+                isSortable: true,
+                formatter: (precipitation) =>
+                    precipitation ? (
+                        <>
+                            {precipitation} {t('millimeters')}
+                        </>
+                    ) : (
+                        ''
+                    )
+            }
+        ],
+        [t]
+    )
 
     useEffect(() => {
         const calculateTableHeight = () => {

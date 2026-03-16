@@ -33,7 +33,7 @@ export const getMinMaxValues = (data?: ApiModel.Weather[], parameter?: keyof Api
         return {}
     }
 
-    const validItems = data.filter((item) => item[parameter] !== undefined && item[parameter] !== null)
+    const validItems = data.filter((item) => item[parameter] !== undefined && item[parameter] != null)
 
     if (!validItems.length) {
         return {}

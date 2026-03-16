@@ -30,7 +30,7 @@ export const encodeQueryData = <T extends Record<keyof T, string | number | bool
  * @returns The rounded number or undefined if the value is undefined.
  */
 export const round = (value?: number, digits: number = 4): number | undefined =>
-    value !== undefined && value !== null ? Number(value.toFixed(digits)) : undefined
+    value !== undefined && value != null ? Number(value.toFixed(digits)) : undefined
 
 /**
  * Checks if a given string is a valid JSON.
