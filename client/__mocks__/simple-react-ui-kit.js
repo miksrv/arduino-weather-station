@@ -14,5 +14,11 @@ module.exports = {
     Table: (props) =>
         React.createElement('table', { 'data-testid': 'table', ...props }),
     TableProps: {},
-    ColumnProps: {}
+    ColumnProps: {},
+    Skeleton: ({ style }) =>
+        React.createElement('div', { 'data-testid': 'skeleton', style }),
+    Spinner: () =>
+        React.createElement('div', { 'data-testid': 'spinner' }),
+    Badge: ({ icon, label }) =>
+        React.createElement('span', { 'data-testid': 'badge', 'data-icon': icon }, label),
 };
