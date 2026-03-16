@@ -75,13 +75,21 @@ describe('date utilities', () => {
         it('should format a UTC millisecond timestamp using the default format', () => {
             // 2024-06-15 12:00:00 UTC — in milliseconds
             const utcMs = 1718452800000
-            const expected = dayjs.unix(utcMs / 1000).utc(true).tz('Asia/Yekaterinburg').format('D MMMM YYYY, HH:mm')
+            const expected = dayjs
+                .unix(utcMs / 1000)
+                .utc(true)
+                .tz('Asia/Yekaterinburg')
+                .format('D MMMM YYYY, HH:mm')
             expect(formatDateFromUTC(utcMs)).toBe(expected)
         })
 
         it('should format a UTC millisecond timestamp using a custom format', () => {
             const utcMs = 1718452800000
-            const expected = dayjs.unix(utcMs / 1000).utc(true).tz('Asia/Yekaterinburg').format('DD.MM.YYYY')
+            const expected = dayjs
+                .unix(utcMs / 1000)
+                .utc(true)
+                .tz('Asia/Yekaterinburg')
+                .format('DD.MM.YYYY')
             expect(formatDateFromUTC(utcMs, 'DD.MM.YYYY')).toBe(expected)
         })
     })
