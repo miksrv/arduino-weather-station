@@ -94,21 +94,6 @@ The analytics snippet is injected via `dangerouslySetInnerHTML`, which bypasses 
 
 ## 3. Performance
 
-### PERF-02 · `dayjs.extend()` is called on every render in `_app.tsx` [Medium]
-
-**File:** `pages/_app.tsx` — lines 48–51
-
-```ts
-dayjs.extend(utc)
-dayjs.extend(timezone)
-dayjs.extend(relativeTime)
-dayjs.locale(...)
-```
-
-`dayjs.extend` is idempotent but each call still does a hash-map lookup. These calls belong at module level outside the component, not inside the render cycle.
-
----
-
 ### PERF-03 · `currentDate` and `yesterdayDate` are module-level constants evaluated once at import time [Medium]
 
 **File:** `tools/date.ts` — lines 10–12
@@ -301,7 +286,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | QC-06   | `(GMT+5)` hardcoded in WidgetSummary                      |
 | QC-08   | `weather-icon` i18n key missing from both locales         |
 | QC-13   | `undefined` case after `default` in switch is unreachable |
-| PERF-02 | `dayjs.extend` called inside render cycle                 |
 | PERF-03 | `currentDate` / `yesterdayDate` never refresh             |
 | TEST-03 | `getWeatherIconUrl` has no tests                          |
 | TEST-04 | `formatDateFromUTC` / `timeAgo` have no tests             |
