@@ -238,7 +238,6 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 | ID      | Summary                                            |
 | ------- | -------------------------------------------------- |
 | QC-01   | `any` types in ECharts tooltip formatters          |
-| QC-02   | Inline styles violate CSS Modules convention       |
 | FEAT-03 | No error state handling for any RTK Query endpoint |
 
 ### Medium (address in regular sprints)
