@@ -42,5 +42,5 @@ jobs:
         working-directory: server
 
       - name: PHPUnit Tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit --no-coverage
         working-directory: server
