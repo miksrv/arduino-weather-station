@@ -14,12 +14,15 @@ jest.mock('next-themes', () => ({
     useTheme: jest.fn(() => ({ theme: 'light' }))
 }))
 
-jest.mock('echarts-for-react', () => ({ onChartReady, style }: { onChartReady?: () => void; style?: React.CSSProperties }) => (
-    <div
-        data-testid='echarts'
-        style={style}
-    />
-))
+jest.mock('echarts-for-react', () =>
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ({ onChartReady, style }: { onChartReady?: () => void; style?: React.CSSProperties }) => (
+        <div
+            data-testid='echarts'
+            style={style}
+        />
+    )
+)
 
 jest.mock('echarts', () => ({
     connect: jest.fn(),

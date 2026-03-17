@@ -19,7 +19,6 @@ describe('conditions', () => {
         })
     })
 
-
     it('returns "conditions.unknown" when weatherId is undefined', () => {
         expect(getWeatherI18nKey(undefined)).toBe('conditions.unknown')
     })

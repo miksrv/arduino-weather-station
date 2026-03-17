@@ -35,7 +35,7 @@ RTK Query is the exclusive API layer. All endpoints live in `api/api.ts`. The `L
 - `useTranslation()` (no namespace arg) is used everywhere — defaults to `common`.
 - Weather condition codes map to `conditions.*` nested keys (e.g. `conditions.clear_sky`).
 - Date format strings are translated (e.g. `date-full-format`, `date-only-hour`) to allow locale-specific formats.
-- **Known gaps (as of 2026-03-14):** `weather-icon` missing from both locales. (`date-only-hour` gap was fixed 2026-03-15 — QC-07.)
+- **I18n audit 2026-03-17:** `toggle-sidebar` (aria-label) and `weather-icon` (Meteogram series name) added to both locales. Dead keys removed: `direction`, `anomaly-monitoring`, `anomaly-calendar-title`, `z-score-label`, `swe-flood-year`. Both locale files are now fully symmetric at 137 top-level + 56 `conditions` keys = 193 entries each.
 
 ## Known Bugs (as of 2026-03-14 audit — see ROADMAP.md)
 

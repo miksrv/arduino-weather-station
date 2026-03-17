@@ -44,7 +44,7 @@ describe('WidgetAnomalyCalendar', () => {
         // cells are rendered as divs inside the grid div
         const grid = container.querySelector('[class*="grid"]')
         expect(grid).not.toBeNull()
-        expect(grid!.children.length).toBe(364)
+        expect(grid!.children).toHaveLength(364)
     })
 
     it('renders month labels', () => {

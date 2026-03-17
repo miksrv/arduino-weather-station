@@ -7,7 +7,9 @@ import WidgetAnomalyCard from './WidgetAnomalyCard'
 import '@testing-library/jest-dom'
 
 jest.mock('next-i18next', () => ({
-    useTranslation: () => ({ t: (key: string, opts?: Record<string, unknown>) => (opts ? `${key}:${JSON.stringify(opts)}` : key) })
+    useTranslation: () => ({
+        t: (key: string, opts?: Record<string, unknown>) => (opts ? `${key}:${JSON.stringify(opts)}` : key)
+    })
 }))
 
 describe('WidgetAnomalyCard', () => {

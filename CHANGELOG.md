@@ -1,5 +1,33 @@
 # CHANGELOG
 
+## 3.6.0
+
+### Minor Changes
+
+- Implemented Meteorological Anomaly Feature, including API endpoint and UI components.
+- Add PHPUnit test suite and API Checks CI workflow
+- Fix PHPUnit CI failure and integrate PHP coverage into SonarCloud
+- Fix PHPUnit warning: no code coverage driver in api-checks workflow
+- Updated PHP Packages
+- Add UI unit tests for maximum frontend code coverage
+- Fixed UI Prettier issues
+- Add WidgetAnomalyCalendar component and tests
+- Add anomaly API, types and menu badge
+- Add anomaly detection CLI, controller, migration
+- Add anomaly detection, snowpack & logging
+- Add unit tests for anomaly detection and models
+- Add feature requirements and agent-memory docs
+- Add Snowpack chart widget and tests
+- Add WidgetParameterZScore component and tests
+- Add flood-risk widget, utils, styles & tests
+- Add WidgetAnomalyHistory component and tests
+- Add WidgetAnomalyCard, utils, styles, tests
+- Refactor widgets; add FloodRisk and rename files
+- Add Anomaly Monitor docs and update README
+- Extract anomaly i18n helper and memoize chart
+- Add widget unit tests and testing notes
+- I18n sync, AppBar aria i18n and test fixes
+
 ## 3.5.2
 
 ### Path Changes
@@ -17,7 +45,7 @@
 
 ## 3.5.1
 
-### Minor Changes
+### Patch Changes
 
 -   Updated UI Dependencies
 -   Replaced DatePicker UI component from UI Kit
