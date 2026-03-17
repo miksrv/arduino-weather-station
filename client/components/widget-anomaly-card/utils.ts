@@ -1,11 +1,4 @@
-/**
- * Converts an anomaly ID (underscore-separated) to the corresponding i18n key
- * segment (hyphen-separated).
- *
- * @example anomalyIdToI18nKey('heat_wave') // 'heat-wave'
- * @example anomalyIdToI18nKey('drought_spi30') // 'drought-spi30'
- */
-export const anomalyIdToI18nKey = (id: string): string => id.replace(/_/g, '-')
+export { anomalyTypeToI18nKey as anomalyIdToI18nKey } from '@/tools/conditions'
 
 /**
  * Returns an i18n key describing the Z-score deviation in plain language.

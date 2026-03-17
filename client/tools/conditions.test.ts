@@ -1,6 +1,25 @@
-import { getWeatherI18nKey } from './conditions'
+import { anomalyTypeToI18nKey, getWeatherI18nKey } from './conditions'
 
 describe('conditions', () => {
+    describe('anomalyTypeToI18nKey', () => {
+        it('replaces underscores with hyphens', () => {
+            expect(anomalyTypeToI18nKey('heat_wave')).toBe('heat-wave')
+        })
+
+        it('handles multiple underscores', () => {
+            expect(anomalyTypeToI18nKey('drought_spi_30')).toBe('drought-spi-30')
+        })
+
+        it('returns the string unchanged when there are no underscores', () => {
+            expect(anomalyTypeToI18nKey('heatwave')).toBe('heatwave')
+        })
+
+        it('handles an empty string', () => {
+            expect(anomalyTypeToI18nKey('')).toBe('')
+        })
+    })
+
+
     it('returns "conditions.unknown" when weatherId is undefined', () => {
         expect(getWeatherI18nKey(undefined)).toBe('conditions.unknown')
     })

@@ -1,3 +1,5 @@
+export { anomalyTypeToI18nKey } from '@/tools/conditions'
+
 export const getDuration = (startDate: string, endDate: string | null): string => {
     if (!endDate) {
         return ''
@@ -9,8 +11,6 @@ export const getDuration = (startDate: string, endDate: string | null): string =
 
     return `${days}d`
 }
-
-export const anomalyTypeToI18nKey = (type: string): string => type.replace(/_/g, '-')
 
 export const isActiveToday = (endDate: string | null): boolean => {
     if (endDate == null) {

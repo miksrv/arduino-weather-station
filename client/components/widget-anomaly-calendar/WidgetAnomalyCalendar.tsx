@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'next-i18next'
 
 import { ApiType } from '@/api'
+import { anomalyTypeToI18nKey } from '@/tools/conditions'
 import { formatDate } from '@/tools/date'
 
 import { formatDateStr, getIntensityClass, isFutureDate } from './utils'
@@ -142,7 +143,5 @@ const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ data }) =
         </div>
     )
 }
-
-export const anomalyTypeToI18nKey = (type: string): string => type.replace(/_/g, '-')
 
 export default WidgetAnomalyCalendar

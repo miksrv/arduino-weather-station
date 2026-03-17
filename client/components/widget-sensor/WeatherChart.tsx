@@ -12,8 +12,6 @@ interface Props {
 }
 
 const WeatherChart: React.FC<Props> = ({ data, source }) => {
-    const colorsData = getSensorColor(source)
-
     const weatherData = useMemo(
         () => (source && ['temperature', 'feelsLike', 'dewPoint'].includes(source) ? invertData(data, source) : data),
         [data, source]
@@ -28,59 +26,63 @@ const WeatherChart: React.FC<Props> = ({ data, source }) => {
         [weatherData]
     )
 
-    const option: EChartsOption = {
-        tooltip: { show: false },
-        grid: {
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            containLabel: true
-        },
-        xAxis: {
-            type: 'category',
-            data: weatherFormatedData?.map((item) => item.date),
-            axisLine: { show: false },
-            axisTick: { show: false },
-            axisLabel: { show: false },
-            splitLine: { show: false }
-        },
-        yAxis: {
-            type: 'value',
-            min: findMinValue(weatherData, source),
-            max: findMaxValue(weatherData, source),
-            axisLine: { show: false },
-            axisTick: { show: false },
-            axisLabel: { show: false },
-            splitLine: { show: false }
-        },
-        series: [
-            {
-                data: weatherFormatedData?.map((item) => item.value),
-                type: 'line',
-                smooth: false,
-                showSymbol: false,
-                connectNulls: true,
-                lineStyle: {
-                    color: colorsData[0],
-                    width: 2
-                },
-                itemStyle: { color: colorsData[0] },
-                areaStyle: {
-                    color: new graphic.LinearGradient(0, 0, 0, 1, [
-                        {
-                            offset: 0,
-                            color: colorsData[0]
-                        },
-                        {
-                            offset: 1,
-                            color: colorsData[1]
-                        }
-                    ])
+    const option: EChartsOption = useMemo(() => {
+        const colorsData = getSensorColor(source)
+
+        return {
+            tooltip: { show: false },
+            grid: {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: weatherFormatedData?.map((item) => item.date),
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: { show: false },
+                splitLine: { show: false }
+            },
+            yAxis: {
+                type: 'value',
+                min: findMinValue(weatherData, source),
+                max: findMaxValue(weatherData, source),
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: { show: false },
+                splitLine: { show: false }
+            },
+            series: [
+                {
+                    data: weatherFormatedData?.map((item) => item.value),
+                    type: 'line',
+                    smooth: false,
+                    showSymbol: false,
+                    connectNulls: true,
+                    lineStyle: {
+                        color: colorsData[0],
+                        width: 2
+                    },
+                    itemStyle: { color: colorsData[0] },
+                    areaStyle: {
+                        color: new graphic.LinearGradient(0, 0, 0, 1, [
+                            {
+                                offset: 0,
+                                color: colorsData[0]
+                            },
+                            {
+                                offset: 1,
+                                color: colorsData[1]
+                            }
+                        ])
+                    }
                 }
-            }
-        ]
-    }
+            ]
+        }
+    }, [weatherFormatedData, weatherData, source])
 
     return (
         <ReactECharts

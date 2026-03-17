@@ -86,4 +86,8 @@ All used in `pages/anomaly.tsx` via `API.useGetAnomalyQuery`.
 
 Utility helpers for `widget-anomaly-history` live in `components/widget-anomaly-history/utils.ts`:
 - `getDuration(startDate, endDate)` — returns `'${days}d'` or `''` when endDate is null (component renders `t('in-progress')` for empty string)
-- `anomalyTypeToI18nKey(type)` — converts `snake_case` to `kebab-case` for i18n key lookup
+- `anomalyTypeToI18nKey(type)` — re-exported from `@/tools/conditions` (canonical location after 2026-03-17 refactor)
+
+## Canonical String-Conversion Helpers (tools/)
+
+- `anomalyTypeToI18nKey(type)` in `tools/conditions.ts` — converts `snake_case` anomaly IDs to `kebab-case` i18n key segments (e.g. `heat_wave` → `heat-wave`). Used by `widget-anomaly-history/utils.ts` (re-export), `widget-anomaly-calendar/WidgetAnomalyCalendar.tsx` (direct import), and `widget-anomaly-card/utils.ts` (re-exported as `anomalyIdToI18nKey` for backward compatibility).
