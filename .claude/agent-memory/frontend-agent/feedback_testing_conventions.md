@@ -46,3 +46,29 @@ ESLint enforces `eqeqeq` in "smart" mode: use `!= null` (not `!== null` and not 
 **Why:** Codebase ESLint config uses `"eqeqeq": ["error", "smart"]` which specifically prefers `!= null` for nullish comparisons.
 
 **How to apply:** In any JSX conditional like `{prop !== undefined && prop !== null && (...)}`, simplify to `{prop != null && (...)}`. This applies to optional component props in render guards.
+
+---
+
+When testing elements whose text is split across multiple sibling text nodes in a single DOM element (e.g. `{sign}{value}{'σ'}` in a `<span>`), `screen.getByText('value')` will fail because Testing Library matches against full textContent. Use a regex: `screen.getByText(/value/)`.
+
+**Why:** React renders JSX expressions as separate text nodes. `getByText('2.50')` fails when the span also contains `−` and `σ` as sibling nodes — the element's textContent is `−2.50σ`.
+
+**How to apply:** Use regex patterns (`/2\.50σ/`, `/anomaly-calendar-tooltip/`) when matching elements with mixed-content text. Use exact string only when the element contains a single text child.
+
+---
+
+`isActiveToday()` in `widget-anomaly-history/utils.ts` compares dates using local-time getters (`getFullYear/getMonth/getDate`) but `new Date('YYYY-MM-DD')` parses as UTC midnight. In UTC+ timezones the date shifts to the previous local day. To test "today" reliably, pass `'YYYY-MM-DDT12:00:00'` (no Z) so the date is parsed as local time.
+
+**Why:** A test using the bare date string `2026-03-17` fails in UTC+5 because it parses to 2026-03-16 local time.
+
+**How to apply:** In any test that builds a "today" date string for a function that uses local-time getters, append `T12:00:00` (noon, no Z suffix) to ensure the parsed Date lands on the correct local day across all timezones.
+
+---
+
+When mocking `echarts-for-react` for components that also use `echarts.connect()` (e.g. `WidgetSnowpackChart`), also mock the `echarts` module:
+```ts
+jest.mock('echarts', () => ({ connect: jest.fn(), ECharts: {} }))
+```
+**Why:** `WidgetSnowpackChart` calls `echarts.connect('snowpack')` inside `onChartReady` callbacks. Without the mock the import succeeds but the function call may cause issues in jsdom.
+
+**How to apply:** For any chart component that imports directly from `echarts` (not just `echarts-for-react`), add an `echarts` mock alongside the `echarts-for-react` mock.
