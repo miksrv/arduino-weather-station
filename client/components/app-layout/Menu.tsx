@@ -5,12 +5,17 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
 
+import { API } from '@/api'
+
 import styles from './styles.module.sass'
+
+const ANOMALY_POLLING_INTERVAL = 300_000
 
 export type MenuItemType = {
     icon?: IconTypes
     link?: string
     text: string
+    badge?: boolean
 }
 
 interface MenuProps {
@@ -20,6 +25,16 @@ interface MenuProps {
 const Menu: React.FC<MenuProps> = ({ onClick }) => {
     const { t } = useTranslation()
     const router = useRouter()
+
+    const { data: anomalyData } = API.useGetAnomalyQuery(undefined, {
+        pollingInterval: ANOMALY_POLLING_INTERVAL
+    })
+
+    const hasAnomalyBadge = anomalyData
+        ? anomalyData.anomalies.some((a) => a.active) ||
+          ((anomalyData.floodRisk.level === 'high' || anomalyData.floodRisk.level === 'critical') &&
+              anomalyData.floodRisk.season === 'active')
+        : false
 
     const menuItems: MenuItemType[] = [
         {
@@ -51,6 +66,12 @@ const Menu: React.FC<MenuProps> = ({ onClick }) => {
             icon: 'Thermometer',
             link: '/climate',
             text: t('climate-changes')
+        },
+        {
+            badge: hasAnomalyBadge,
+            icon: 'Bell',
+            link: '/anomaly',
+            text: t('anomaly-monitor')
         }
     ]
 
@@ -66,7 +87,10 @@ const Menu: React.FC<MenuProps> = ({ onClick }) => {
                             className={cn(router.pathname === item.link && styles.active)}
                             onClick={() => onClick?.()}
                         >
-                            {item.icon && <Icon name={item.icon} />}
+                            <span className={styles.iconWrapper}>
+                                {item.icon && <Icon name={item.icon} />}
+                                {item.badge && <span className={styles.badge} />}
+                            </span>
                             {item.text}
                         </Link>
                     </li>
