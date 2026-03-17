@@ -1,0 +1,45 @@
+@use '../../styles/variables'
+
+.card
+    background: var(--container-background-color)
+    color: var(--text-color-primary)
+    border-radius: var(--border-radius)
+    box-shadow: var(--container-shadow)
+    overflow: hidden
+    padding: 12px 14px
+    display: flex
+    flex-direction: column
+    gap: 6px
+
+.header
+    display: flex
+    align-items: center
+    gap: 6px
+
+.icon
+    width: 16px
+    height: 16px
+    fill: var(--link-color)
+    flex-shrink: 0
+
+.paramLabel
+    font-size: 12px
+    color: var(--text-color-secondary)
+    text-transform: capitalize
+
+.zScore
+    font-size: 22px
+    font-weight: 700
+    line-height: 1
+
+.dots
+    display: flex
+    gap: 4px
+
+.dotFilled, .dotEmpty
+    width: 8px
+    height: 8px
+    border-radius: 50%
+
+.dotEmpty
+    background: var(--input-border-color)
