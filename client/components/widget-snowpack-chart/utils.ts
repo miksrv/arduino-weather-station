@@ -21,6 +21,26 @@ export const dateToSeasonDay = (dateStr: string): number => {
 }
 
 /**
+ * Converts a 0-based day index within the snow season back to a date string (DD.MM format).
+ * Oct 1 = 0, Nov 1 = 31, …, May 31 = 241.
+ */
+export const seasonDayToDate = (dayIndex: number): string => {
+    let remaining = dayIndex
+    let monthIdx = 0
+
+    while (monthIdx < DAYS_IN_SEASON_MONTHS.length && remaining >= DAYS_IN_SEASON_MONTHS[monthIdx]) {
+        remaining -= DAYS_IN_SEASON_MONTHS[monthIdx]
+        monthIdx++
+    }
+
+    const dayOfMonth = remaining + 1
+    // Convert month index back to calendar month (0=Oct, 1=Nov, ..., 4=Feb, 5=Mar, 6=Apr, 7=May)
+    const calendarMonth = monthIdx < 3 ? SEASON_START_MONTH + monthIdx + 1 : monthIdx - 3 + 1
+
+    return `${String(calendarMonth).padStart(2, '0')}-${String(dayOfMonth).padStart(2, '0')}-2000`
+}
+
+/**
  * Returns true when the given season label matches the designated flood-reference year.
  */
 export const isFloodYear = (year: string, floodYear: string): boolean => year === floodYear

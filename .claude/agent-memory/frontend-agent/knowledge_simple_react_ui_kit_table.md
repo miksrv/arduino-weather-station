@@ -86,11 +86,26 @@ return (
 )
 ```
 
+## Row-level Conditional Styling
+
+`ColumnProps` has no row-class callback — `className` is a static `string`. To apply conditional per-row styles, use `formatter` to wrap the cell content in a `<span>` with `cn(condition && styles.myClass)`:
+
+```tsx
+formatter: (value, data, i) => (
+    <span className={cn(isSpecialRow(data[i]) && styles.highlightCell)}>
+        {value as string}
+    </span>
+)
+```
+
+Apply this pattern to every column that needs the row highlight. Name the CSS class `*Cell` (e.g., `floodYearCell`) to distinguish it from the old `*Row` pattern on `<tr>`.
+
 ## Reference Components
 
 - `client/components/widget-forecast-table/WidgetForecastTable.tsx` — full-featured example with columnsPreset, stickyHeader, title/link, background colors, multi-field formatters
 - `client/components/widget-anomaly-history/index.tsx` — simpler example showing 5-column history table with pure data display
+- `client/components/widget-snowpack-chart/ComparisonTable.tsx` — minimal 3-column table with conditional per-row cell styling via formatter + `cn`
 
 ## Mock (\_\_mocks\_\_/simple-react-ui-kit.js)
 
-The existing mock renders `<table data-testid='table' />`. Use `screen.getByTestId('table')` in component tests to verify table presence.
+The existing mock renders `<table data-testid='table' />` but does NOT call formatters or render row cells. Component tests should only assert `screen.getByTestId('table')` presence. Do NOT write tests that query for cell text content or cell classes when using this mock — those will always fail. If deeper cell-level assertions are needed, write them by calling formatters directly or using a custom mock.

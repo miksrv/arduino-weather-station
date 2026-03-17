@@ -3,15 +3,14 @@ import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'next-i18next'
 
 import { ApiType } from '@/api'
+import { formatDate } from '@/tools/date'
 
 import { formatDateStr, getIntensityClass, isFutureDate } from './utils'
 
 import styles from './styles.module.sass'
 
-type AnomalyCalendarPoint = ApiType.Anomaly.AnomalyCalendarPoint
-
-interface Props {
-    data: AnomalyCalendarPoint[]
+interface WidgetAnomalyCalendarProps {
+    data: ApiType.Anomaly.AnomalyCalendarPoint[]
 }
 
 const WEEKS = 52
@@ -26,7 +25,7 @@ interface TooltipState {
     types: string[]
 }
 
-const WidgetAnomalyCalendar: React.FC<Props> = ({ data }) => {
+const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ data }) => {
     const { t } = useTranslation()
     const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
@@ -107,6 +106,7 @@ const WidgetAnomalyCalendar: React.FC<Props> = ({ data }) => {
                     </span>
                 ))}
             </div>
+
             <div className={styles.grid}>
                 {cells.map(({ dateStr, count, types, isFuture }) => (
                     <div
@@ -117,17 +117,23 @@ const WidgetAnomalyCalendar: React.FC<Props> = ({ data }) => {
                     />
                 ))}
             </div>
+
             {tooltip && (
                 <div
                     className={styles.tooltip}
                     style={{ left: tooltip.x, top: tooltip.y }}
                 >
-                    <div className={styles.tooltipDate}>{tooltip.date}</div>
-                    <div className={styles.tooltipCount}>{t('anomaly-calendar-tooltip', { count: tooltip.count })}</div>
+                    <div className={styles.tooltipDate}>{formatDate(tooltip.date, t('date-no-time'))}</div>
+                    <div className={styles.tooltipCount}>
+                        {t('anomaly-calendar-tooltip')}
+                        {': '}
+                        {tooltip.count}
+                    </div>
+
                     {tooltip.types.length > 0 && (
                         <ul className={styles.tooltipList}>
                             {tooltip.types.map((type, idx) => (
-                                <li key={idx}>{t(`anomaly-type-${type}`, type)}</li>
+                                <li key={idx}>{t(`anomaly-${anomalyTypeToI18nKey(type as string)}`, type)}</li>
                             ))}
                         </ul>
                     )}
@@ -136,5 +142,7 @@ const WidgetAnomalyCalendar: React.FC<Props> = ({ data }) => {
         </div>
     )
 }
+
+export const anomalyTypeToI18nKey = (type: string): string => type.replace(/_/g, '-')
 
 export default WidgetAnomalyCalendar

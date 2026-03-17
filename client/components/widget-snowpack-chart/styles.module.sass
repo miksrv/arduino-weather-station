@@ -38,26 +38,42 @@
 
 .table
     width: 100%
-    border-collapse: collapse
     margin-top: 12px
-    font-size: 13px
 
-    th
-        text-align: left
-        padding: 6px 10px
-        background: var(--table-header-background)
-        color: var(--text-color-secondary)
-        font-weight: 500
-        border-bottom: 1px solid var(--table-border-color)
-
-    td
-        padding: 6px 10px
-        border-bottom: 1px solid var(--table-border-color)
-        color: var(--text-color-primary)
-
-    tr:last-child td
-        border-bottom: none
-
-.floodYearRow td
+.floodYearCell
     color: var(--color-red)
     font-weight: 600
+
+.chartTooltipTitle
+    font-size: 13px
+    font-weight: 600
+    color: var(--text-color-primary)
+    margin-bottom: 6px
+
+.chartTooltipItem
+    display: flex
+    align-items: center
+    gap: 6px
+    font-size: 12px
+    color: var(--text-color-primary)
+    line-height: 1.5
+
+.icon
+    display: inline-block
+    width: 8px
+    height: 8px
+    border-radius: 50%
+    flex-shrink: 0
+
+.label
+    flex-grow: 1
+    display: flex
+    justify-content: space-between
+    align-items: center
+    color: var(--text-color-secondary)
+
+.value
+    font-weight: 600
+    margin-left: 4px
+    color: var(--text-color-primary)
+

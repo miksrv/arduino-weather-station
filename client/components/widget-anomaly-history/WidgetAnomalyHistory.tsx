@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { cn, ColumnProps, Table } from 'simple-react-ui-kit'
+import { ColumnProps, Table } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 
@@ -59,7 +59,7 @@ const WidgetAnomalyHistory: React.FC<WidgetAnomalyHistoryProps> = ({ rows }) => 
     )
 
     return (
-        <div className={cn(styles.widgetAnomalyHistory)}>
+        <div className={styles.widgetAnomalyHistory}>
             <Table<ApiType.Anomaly.AnomalyHistoryEntry>
                 data={rows}
                 columns={columns}

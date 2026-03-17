@@ -768,7 +768,7 @@ interface Props {
 - 52-week × 7-day cell grid (GitHub contribution calendar layout).
 - Cell fill intensity driven by `activeCount`: 0 = neutral grey, 1 = light, 2 = medium, ≥ 3 = full intensity (use the theme's accent colour at opacity levels 0.2 / 0.5 / 0.8 / 1.0).
 - Month labels rendered above the corresponding columns on the x-axis.
-- Tooltip on hover: date + `anomaly-calendar-tooltip` / `anomaly-calendar-tooltip_plural` i18n string.
+- Tooltip on hover: date + `anomaly-calendar-tooltip` i18n string.
 - Days in the future (after today) are rendered as neutral without tooltip.
 
 **Done when:** Component renders correctly with a 365-day mock dataset.

@@ -7,27 +7,30 @@ import { useTheme } from 'next-themes'
 
 import { ApiType } from '@/api'
 import { getEChartBaseConfig } from '@/tools'
+import { formatDate } from '@/tools/date'
 
-import { dateToSeasonDay, isFloodYear } from './utils'
+import { ComparisonTable } from './ComparisonTable'
+import { DAYS_IN_SEASON_MONTHS, FLOOD_YEAR, MONTH_LABELS, SEASON_COLORS } from './constants'
+import { dateToSeasonDay, isFloodYear, seasonDayToDate } from './utils'
 
 import styles from './styles.module.sass'
 
 type SnowpackPoint = ApiType.Anomaly.SnowpackPoint
 type SeasonComparison = ApiType.Anomaly.SeasonComparison
 
-interface Props {
+interface WidgetSnowpackChartProps {
     currentSeries: SnowpackPoint[]
     comparisonYears: SeasonComparison[]
     estimatedSWE: number
     historicalAvgSWE: number
 }
 
-const FLOOD_YEAR = '2023-2024'
-const SEASON_COLORS = ['#5470c6', '#91cc75', '#fac858', '#73c0de', '#fc8452']
-const MONTH_LABELS = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May']
-const DAYS_IN_SEASON_MONTHS = [31, 30, 31, 31, 28, 31, 30, 31]
-
-const WidgetSnowpackChart: React.FC<Props> = ({ currentSeries, comparisonYears, estimatedSWE, historicalAvgSWE }) => {
+const WidgetSnowpackChart: React.FC<WidgetSnowpackChartProps> = ({
+    currentSeries,
+    comparisonYears,
+    estimatedSWE,
+    historicalAvgSWE
+}) => {
     const { t } = useTranslation()
     const { theme } = useTheme()
 
@@ -115,6 +118,12 @@ const WidgetSnowpackChart: React.FC<Props> = ({ currentSeries, comparisonYears, 
     const option: echarts.EChartsOption = useMemo(
         () => ({
             ...getEChartBaseConfig(theme),
+            grid: {
+                left: 27,
+                right: 20,
+                top: 0,
+                bottom: 50
+            },
             tooltip: {
                 trigger: 'axis',
                 backgroundColor: theme === 'dark' ? '#2c2d2e' : '#ffffff',
@@ -128,11 +137,24 @@ const WidgetSnowpackChart: React.FC<Props> = ({ currentSeries, comparisonYears, 
                     if (!paramsArr.length) {
                         return ''
                     }
+
+                    const tooltipContent: string[] = []
                     const day = paramsArr[0].value[0]
-                    const rows = paramsArr
-                        .map((p) => `<div>${p.seriesName}: <b>${p.value[1]} ${t('swe-unit')}</b></div>`)
-                        .join('')
-                    return `<div>Day ${day}</div>${rows}`
+                    const dateStr = seasonDayToDate(day)
+
+                    tooltipContent.push(
+                        `<div class="${styles.chartTooltipTitle}">${t('swe-day')}: ${day} (${formatDate(dateStr, 'D MMMM')})</div>`
+                    )
+
+                    paramsArr.forEach((item) => {
+                        const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
+                        const seriesValue = `<span class="${styles.value}">${item.value?.[1] !== undefined ? Math.round(item.value[1] * 100) / 100 : '---'} ${t('swe-unit')}</span>`
+                        const seriesName = `<span class="${styles.label}">${item.seriesName}${seriesValue}</span>`
+                        const row = `<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`
+                        tooltipContent.push(row)
+                    })
+
+                    return tooltipContent.join('')
                 }
             },
             xAxis: {
@@ -171,7 +193,12 @@ const WidgetSnowpackChart: React.FC<Props> = ({ currentSeries, comparisonYears, 
                         symbol: 'none',
                         lineStyle: { type: 'dashed', color: textSecondaryColor },
                         data: [{ yAxis: historicalAvgSWE, name: t('swe-historical-avg') }],
-                        label: { formatter: t('swe-historical-avg'), color: textSecondaryColor, fontSize: 10 }
+                        label: {
+                            position: 'insideEndTop',
+                            formatter: t('swe-historical-avg'),
+                            color: textSecondaryColor,
+                            fontSize: 10
+                        }
                     }
                 },
                 ...comparisonSeries
@@ -183,6 +210,12 @@ const WidgetSnowpackChart: React.FC<Props> = ({ currentSeries, comparisonYears, 
     const tempOption: echarts.EChartsOption = useMemo(
         () => ({
             ...getEChartBaseConfig(theme),
+            grid: {
+                left: 0,
+                right: 20,
+                top: 30,
+                bottom: 10
+            },
             legend: {
                 show: false
             },
@@ -201,12 +234,23 @@ const WidgetSnowpackChart: React.FC<Props> = ({ currentSeries, comparisonYears, 
                         return ''
                     }
 
+                    const tooltipContent: string[] = []
                     const day = arr[0].value[0]
-                    const rows = arr
-                        .filter((p) => p.value[1] !== undefined)
-                        .map((p) => `<div style="color:${p.color}">${p.seriesName}: <b>${p.value[1]} °C</b></div>`)
-                        .join('')
-                    return `<div>Day ${day}</div>${rows}`
+                    const dateStr = seasonDayToDate(day)
+
+                    tooltipContent.push(
+                        `<div class="${styles.chartTooltipTitle}">${t('swe-day')}: ${day} (${formatDate(dateStr, 'D MMMM')})</div>`
+                    )
+
+                    arr.filter((p) => p.value[1] !== undefined).forEach((item) => {
+                        const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
+                        const seriesValue = `<span class="${styles.value}">${item.value?.[1] ?? '---'} °C</span>`
+                        const seriesName = `<span class="${styles.label}">${item.seriesName}${seriesValue}</span>`
+                        const row = `<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`
+                        tooltipContent.push(row)
+                    })
+
+                    return tooltipContent.join('')
                 }
             },
             xAxis: {
@@ -214,12 +258,7 @@ const WidgetSnowpackChart: React.FC<Props> = ({ currentSeries, comparisonYears, 
                 min: 0,
                 max: 242,
                 axisLabel: {
-                    color: textSecondaryColor,
-                    fontSize: 11,
-                    formatter: (value: number) => {
-                        const found = xAxisLabels.find((l) => Math.abs(l.value - value) < 15)
-                        return found ? found.label : ''
-                    }
+                    show: false
                 },
                 axisLine: { lineStyle: { color: borderColor } },
                 splitLine: { lineStyle: { color: borderColor, width: 1 } }
@@ -242,7 +281,12 @@ const WidgetSnowpackChart: React.FC<Props> = ({ currentSeries, comparisonYears, 
                         symbol: 'none',
                         lineStyle: { type: 'dashed' as const, color: '#5470c6', width: 1 },
                         data: [{ yAxis: 0 }],
-                        label: { formatter: '0 °C', color: '#5470c6', fontSize: 10 }
+                        label: {
+                            position: 'insideEndTop',
+                            formatter: '0 °C',
+                            color: '#5470c6',
+                            fontSize: 10
+                        }
                     }
                 },
                 ...comparisonTempSeries
@@ -269,56 +313,21 @@ const WidgetSnowpackChart: React.FC<Props> = ({ currentSeries, comparisonYears, 
                     {t('swe-current')}: <strong>{Math.round(estimatedSWE)}</strong> {t('swe-unit')}
                 </span>
             </div>
+
             <ReactECharts
                 onChartReady={handleTempReady}
                 option={tempOption}
-                style={{ height: '180px', width: '100%' }}
+                style={{ height: '180px', width: '100%', marginBottom: '-20px' }}
             />
+
             <ReactECharts
                 onChartReady={handleSweReady}
                 option={option}
                 style={{ height: '280px', width: '100%' }}
             />
+
             <ComparisonTable rows={comparisonYears} />
         </div>
-    )
-}
-
-interface ComparisonTableProps {
-    rows: SeasonComparison[]
-}
-
-const ComparisonTable: React.FC<ComparisonTableProps> = ({ rows }) => {
-    const { t } = useTranslation()
-
-    return (
-        <table className={styles.table}>
-            <thead>
-                <tr>
-                    <th>{t('winter-comparison')}</th>
-                    <th>{t('swe-unit')}</th>
-                    <th>{t('flood-occurred')}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows.map((row) => (
-                    <tr
-                        key={row.year}
-                        className={isFloodYear(row.year, FLOOD_YEAR) ? styles.floodYearRow : undefined}
-                    >
-                        <td>{row.year}</td>
-                        <td>{row.maxSWE}</td>
-                        <td>
-                            {row.floodOccurred === true
-                                ? t('flood-occurred')
-                                : row.floodOccurred === false
-                                  ? t('no-flood')
-                                  : t('season-in-progress')}
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
     )
 }
 

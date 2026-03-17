@@ -69,8 +69,9 @@ const WidgetParameterZScore: React.FC<Props> = ({ parameter, zScore, sparklineDa
                     name={icon}
                     className={styles.icon}
                 />
-                <span className={styles.paramLabel}>{t(i18nKey)}</span>
+                <h3>{t(i18nKey)}</h3>
             </div>
+
             <div
                 className={styles.zScore}
                 style={{ color }}
@@ -78,6 +79,7 @@ const WidgetParameterZScore: React.FC<Props> = ({ parameter, zScore, sparklineDa
                 {zScore > 0 ? '+' : ''}
                 {zScore?.toFixed(2)}
             </div>
+
             <div className={styles.dots}>
                 {Array.from({ length: TOTAL_DOTS }, (_, i) => (
                     <span
@@ -87,6 +89,7 @@ const WidgetParameterZScore: React.FC<Props> = ({ parameter, zScore, sparklineDa
                     />
                 ))}
             </div>
+
             {sparklineData.length > 0 && (
                 <ReactECharts
                     option={sparkOption}
