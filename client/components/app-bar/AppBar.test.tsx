@@ -46,13 +46,13 @@ describe('AppBar', () => {
 
     it('renders the hamburger button', () => {
         render(<AppBar />)
-        expect(screen.getByLabelText('Toggle Sidebar')).toBeInTheDocument()
+        expect(screen.getByLabelText('toggle-sidebar')).toBeInTheDocument()
     })
 
     it('calls onMenuClick when hamburger is clicked', () => {
         const onMenuClick = jest.fn()
         render(<AppBar onMenuClick={onMenuClick} />)
-        screen.getByLabelText('Toggle Sidebar').click()
+        screen.getByLabelText('toggle-sidebar').click()
         expect(onMenuClick).toHaveBeenCalled()
     })
 

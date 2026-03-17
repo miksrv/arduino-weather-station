@@ -50,7 +50,19 @@ export const API = createApi({
             providesTags: ['Forecast'],
             query: (period) => `forecast/${period}`,
             transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
-        })
+        }),
+        getAnomaly: builder.query<ApiType.Anomaly.AnomalyResponse, void>({
+            providesTags: ['Anomaly'],
+            query: () => 'anomaly',
+            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+        }),
+        getAnomalyHistory: builder.query<ApiType.Anomaly.AnomalyHistoryResponse, ApiType.Anomaly.AnomalyHistoryRequest>(
+            {
+                providesTags: ['Anomaly'],
+                query: (params) => `anomaly/history${encodeQueryData<ApiType.Anomaly.AnomalyHistoryRequest>(params)}`,
+                transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+            }
+        )
     }),
     // The `any` return type is intentional: adding an explicit return type annotation causes
     // TypeScript to widen the `Definitions` generic and break all endpoint hook inference.
@@ -64,5 +76,5 @@ export const API = createApi({
         }
     },
     reducerPath: 'api',
-    tagTypes: ['Current', 'History', 'Heatmap', 'Forecast']
+    tagTypes: ['Current', 'History', 'Heatmap', 'Forecast', 'Anomaly']
 })

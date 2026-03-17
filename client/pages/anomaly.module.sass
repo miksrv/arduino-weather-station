@@ -1,0 +1,73 @@
+@use '../styles/variables'
+
+.sectionHeader
+    width: 100%
+    margin: 8px 0 4px
+
+    h2
+        margin: 0
+        font-size: 16px
+        font-weight: 600
+        color: var(--text-color-primary)
+
+.floodRiskRow
+    display: flex
+    align-items: flex-start
+    gap: 10px
+    width: 100%
+
+    > :first-child
+        flex-shrink: 0
+
+    .zScoreGrid
+        flex: 1
+        display: grid
+        grid-template-columns: repeat(2, 1fr)
+        gap: 10px
+        width: 100%
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        flex-direction: column
+
+        > :first-child
+            width: 100%
+
+        .zScoreGrid
+            grid-template-columns: repeat(2, 1fr)
+
+.inactiveGrid
+    display: grid
+    grid-template-columns: repeat(3, 1fr)
+    gap: 10px
+    width: 100%
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        grid-template-columns: 1fr
+
+.fullWidth
+    width: 100%
+
+.historyTable
+    width: 100%
+    border-collapse: collapse
+    font-size: 13px
+    background: var(--container-background-color)
+    border-radius: var(--border-radius)
+    box-shadow: var(--container-shadow)
+    overflow: hidden
+
+    th
+        text-align: left
+        padding: 8px 12px
+        background: var(--table-header-background)
+        color: var(--text-color-secondary)
+        font-weight: 500
+        border-bottom: 1px solid var(--table-border-color)
+
+    td
+        padding: 8px 12px
+        border-bottom: 1px solid var(--table-border-color)
+        color: var(--text-color-primary)
+
+    tr:last-child td
+        border-bottom: none

@@ -1,0 +1,79 @@
+@use '../../styles/variables'
+
+.widget
+    flex-basis: 100%
+    width: 100%
+    background: var(--container-background-color)
+    color: var(--text-color-primary)
+    border-radius: var(--border-radius)
+    box-shadow: var(--container-shadow)
+    overflow: hidden
+    padding: 16px
+
+.header
+    display: flex
+    align-items: center
+    justify-content: space-between
+    margin-bottom: 8px
+    flex-wrap: wrap
+    gap: 4px
+
+.title
+    font-size: 15px
+    font-weight: 600
+    color: var(--text-color-primary)
+
+.sweValue
+    font-size: 13px
+    color: var(--text-color-secondary)
+
+    strong
+        color: var(--text-color-primary)
+
+.chartLabel
+  font-size: 12px
+  color: var(--color-secondary)
+  padding: 4px 0 2px 0
+  margin-top: 4px
+
+.table
+    width: 100%
+    margin-top: 12px
+
+.floodYearCell
+    color: var(--color-red)
+    font-weight: 600
+
+.chartTooltipTitle
+    font-size: 13px
+    font-weight: 600
+    color: var(--text-color-primary)
+    margin-bottom: 6px
+
+.chartTooltipItem
+    display: flex
+    align-items: center
+    gap: 6px
+    font-size: 12px
+    color: var(--text-color-primary)
+    line-height: 1.5
+
+.icon
+    display: inline-block
+    width: 8px
+    height: 8px
+    border-radius: 50%
+    flex-shrink: 0
+
+.label
+    flex-grow: 1
+    display: flex
+    justify-content: space-between
+    align-items: center
+    color: var(--text-color-secondary)
+
+.value
+    font-weight: 600
+    margin-left: 4px
+    color: var(--text-color-primary)
+

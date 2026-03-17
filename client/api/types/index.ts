@@ -1,3 +1,4 @@
+export * as Anomaly from './anomaly'
 export * as Current from './current'
 export * as Forecast from './forecast'
 export * as Heatmap from './heatmap'

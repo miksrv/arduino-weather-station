@@ -32,7 +32,7 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     <button
                         className={styles.hamburgerButton}
                         onClick={onMenuClick}
-                        aria-label={'Toggle Sidebar'}
+                        aria-label={t('toggle-sidebar')}
                     >
                         <Icon name={'Menu'} />
                     </button>
