@@ -68,6 +68,7 @@ Detailed documentation lives in the [`/docs`](./docs) directory:
 - [Frontend](./docs/frontend.md) — Next.js app structure and development
 - [Development Guide](./docs/development.md) — local setup, commands, conventions
 - [Testing Guide](./docs/testing.md) — running tests, coverage, CI pipeline
+- [Anomaly Monitor](./docs/anomaly-monitor.md) — meteorological anomaly detection, flood risk scoring, and visualization
 
 <!-- ABOUT OF PROJECT -->
 ## About of Project
