@@ -18,6 +18,8 @@ jest.mock('@/pages/_app', () => ({ POLING_INTERVAL_CURRENT: 600000 }))
 ```
 **Why:** `pages/_app.tsx` imports `appWithTranslation` from `next-i18next` and creates a Redux store, causing test suite failure if not mocked.
 
+Preferred alternative: avoid importing constants from `@/pages/_app` in components entirely. Define polling interval constants inline or in a dedicated constants file. Only `AppBar.tsx` has this pattern — do not replicate it in new components.
+
 ---
 
 ECharts components (`Chart.tsx`, `Heatmap.tsx`, `Meteogram.tsx`) use `ReactECharts` from `echarts-for-react`. Mock it with a simple div:
@@ -36,3 +38,11 @@ jest.mock('echarts', () => ({ graphic: { LinearGradient: jest.fn((_,_,_,_, stops
 ---
 
 `useClientOnly` hook: In Testing Library's `renderHook`, the `useEffect` that sets `isClient=true` runs before the first result check, so `result.current` is always `true` in tests. Test the final state (true) rather than an initial false state.
+
+---
+
+ESLint enforces `eqeqeq` in "smart" mode: use `!= null` (not `!== null` and not `!== undefined`) to check for both `null` and `undefined`. The linter will error on `!== null` when you mean a nullish check — use `!= null` throughout JSX conditions that guard optional props.
+
+**Why:** Codebase ESLint config uses `"eqeqeq": ["error", "smart"]` which specifically prefers `!= null` for nullish comparisons.
+
+**How to apply:** In any JSX conditional like `{prop !== undefined && prop !== null && (...)}`, simplify to `{prop != null && (...)}`. This applies to optional component props in render guards.

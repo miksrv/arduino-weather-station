@@ -27,6 +27,7 @@ RTK Query is the exclusive API layer. All endpoints live in `api/api.ts`. The `L
 - Theme colors are derived inline in each chart component by comparing `theme === 'dark'`.
 - Tooltip formatters currently use `any` types (known tech debt — see ROADMAP BUG QC-01).
 - `ReactECharts` from `echarts-for-react` 3.0.6 is the rendering component.
+- **CSS variables must NOT be passed directly to ECharts options** — ECharts renders to `<canvas>` and cannot resolve CSS custom properties (they produce black/invalid). Resolve them at runtime via `resolveCssVar(variable, fallback)` (see `widget-flood-risk/utils.ts`) or by comparing `theme === 'dark'` inline. `resolveCssVar` uses `getComputedStyle(document.documentElement)` and returns the fallback when called server-side (SSR guard via `typeof window === 'undefined'`).
 
 ## i18n Conventions
 
@@ -57,3 +58,32 @@ RTK Query is the exclusive API layer. All endpoints live in `api/api.ts`. The `L
 - `jest.config.ts` with `ts-jest` + `jsdom`.
 - Well-covered: `helpers`, `date`, `conditions`, `colors`, `filterRecentData`, `getSampledData`, `getCloudinessColor`.
 - **Not covered:** `getMinMaxValues`, `invertData`, `getTemperatureColor`, `convertHpaToMmHg`, `findMinValue`, `findMaxValue`, `getWeatherIconUrl`, `useLocalStorage`, `useClientOnly`.
+- Jest hooks: only `beforeEach`/`afterEach` allowed — ESLint `jest/no-hooks` forbids `beforeAll`/`afterAll`.
+- Use `jest.useFakeTimers()` + `jest.setSystemTime()` in `beforeEach`/`afterEach` for date-dependent tests.
+- Standard component mock pattern: ECharts → `jest.mock('echarts-for-react', () => (props) => <div data-testid='echarts' />)`, i18next → `{ useTranslation: () => ({ t: (key) => key }) }`.
+
+## ESLint Notable Rules
+
+- `eqeqeq: ['error', 'always', { null: 'never' }]` — null comparisons must use `!=` / `==` (not `!==` / `===`).
+- `jest/no-hooks` allows only `beforeEach`/`afterEach` — never `beforeAll`/`afterAll`.
+
+## Date Parsing
+
+- Never use `new Date(isoString).getMonth()/.getDate()` for calendar math on ISO date strings — timezone shifts cause off-by-one errors in Node.js test environments.
+- Parse ISO date strings manually: `dateStr.split('-')` + `parseInt(parts[n], 10)`.
+
+## Feature 7 Anomaly Components (added 2026-03-16)
+
+Six components in `client/components/`:
+- `widget-flood-risk/` — gauge + bar chart; risk levels: low/elevated/high/critical
+- `widget-snowpack-chart/` — seasonal SWE line chart + comparison table; 2023-2024 is designated flood year
+- `widget-anomaly-card/` — active/inactive anomaly card with dot indicator
+- `widget-parameter-z-score/` — parameter Z-score with severity dots + sparkline
+- `widget-anomaly-calendar/` — GitHub-style heatmap (52 weeks × 7 days = 364 cells, `grid-auto-flow: column`)
+- `widget-anomaly-history/` — Table widget showing anomaly history rows; uses `simple-react-ui-kit` Table with 5 columns; logic extracted from inline component in `pages/anomaly.tsx`
+
+All used in `pages/anomaly.tsx` via `API.useGetAnomalyQuery`.
+
+Utility helpers for `widget-anomaly-history` live in `components/widget-anomaly-history/utils.ts`:
+- `getDuration(startDate, endDate)` — returns `'${days}d'` or `''` when endDate is null (component renders `t('in-progress')` for empty string)
+- `anomalyTypeToI18nKey(type)` — converts `snake_case` to `kebab-case` for i18n key lookup
