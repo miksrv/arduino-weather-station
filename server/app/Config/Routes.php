@@ -47,3 +47,9 @@ $routes->group('sensors', static function ($routes) {
     $routes->post('/', 'Sensors::setWeather');
     $routes->options('/', static function () {});
 });
+
+/** Anomaly Controller **/
+$routes->get('anomaly',         'Anomaly::index');
+$routes->get('anomaly/history', 'Anomaly::history');
+$routes->options('anomaly',         static function () {});
+$routes->options('anomaly/history', static function () {});
