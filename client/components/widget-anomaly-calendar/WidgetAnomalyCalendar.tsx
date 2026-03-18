@@ -29,7 +29,7 @@ interface TooltipState {
 }
 
 const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ loading, data }) => {
-    const { t } = useTranslation()
+    const { i18n, t } = useTranslation()
     const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
     const today = useMemo(() => new Date(), [])
@@ -69,14 +69,14 @@ const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ loading, 
             const month = cellDate.getMonth()
             if (month !== prevMonth) {
                 labels.push({
-                    label: cellDate.toLocaleString('en', { month: 'short' }),
+                    label: cellDate.toLocaleString(i18n.language, { month: 'short' }),
                     weekIndex: w
                 })
                 prevMonth = month
             }
         }
         return labels
-    }, [gridStart])
+    }, [gridStart, i18n.language])
 
     const handleMouseEnter = (
         e: React.MouseEvent<HTMLDivElement>,

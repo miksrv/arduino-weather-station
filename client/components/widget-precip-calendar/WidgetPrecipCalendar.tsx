@@ -1,13 +1,21 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 
 import { ApiType } from '@/api'
+import { formatDate } from '@/tools/date'
 
 import { getCellColor, isLeapYear } from './utils'
 
 import styles from './styles.module.sass'
+
+interface TooltipState {
+    x: number
+    y: number
+    date: string
+    total: number
+}
 
 interface WidgetPrecipCalendarProps {
     loading?: boolean
@@ -17,11 +25,25 @@ interface WidgetPrecipCalendarProps {
 
 const MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-const MONTH_ABBRS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const DAY_NUMBERS = Array.from({ length: 31 }, (_, i) => i + 1)
 
 const WidgetPrecipCalendar: React.FC<WidgetPrecipCalendarProps> = ({ loading, year, days }) => {
-    const { t } = useTranslation()
+    const { i18n, t } = useTranslation()
+
+    const monthAbbrs = useMemo(
+        () => Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleString(i18n.language, { month: 'short' })),
+        [i18n.language]
+    )
+    const [tooltip, setTooltip] = useState<TooltipState | null>(null)
+
+    const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>, dateKey: string, cellTotal: number) => {
+        const rect = e.currentTarget.getBoundingClientRect()
+        setTooltip({ x: rect.left + rect.width / 2, y: rect.top - 8, date: dateKey, total: cellTotal })
+    }
+
+    const handleMouseLeave = () => {
+        setTooltip(null)
+    }
 
     const dayMap = useMemo<Map<string, number>>(() => {
         const map = new Map<string, number>()
@@ -64,7 +86,7 @@ const WidgetPrecipCalendar: React.FC<WidgetPrecipCalendarProps> = ({ loading, ye
                     ))}
                 </div>
 
-                {MONTH_ABBRS.map((abbr, monthIndex) => {
+                {monthAbbrs.map((abbr, monthIndex) => {
                     const maxDays = daysInMonth[monthIndex]
                     return (
                         <div
@@ -88,14 +110,14 @@ const WidgetPrecipCalendar: React.FC<WidgetPrecipCalendarProps> = ({ loading, ye
                                 const hasData = total != null
                                 const cellTotal = total ?? 0
                                 const color = hasData ? getCellColor(cellTotal) : 'var(--input-border-color)'
-                                const title = hasData ? `${dateKey}: ${cellTotal.toFixed(1)} mm` : dateKey
 
                                 return (
                                     <div
                                         key={day}
                                         className={styles.cell}
                                         style={{ backgroundColor: color }}
-                                        title={title}
+                                        onMouseEnter={(e) => handleMouseEnter(e, dateKey, cellTotal)}
+                                        onMouseLeave={handleMouseLeave}
                                     />
                                 )
                             })}
@@ -145,6 +167,16 @@ const WidgetPrecipCalendar: React.FC<WidgetPrecipCalendarProps> = ({ loading, ye
                     <span className={styles.legendLabel}>{t('precip-level-heavy')}</span>
                 </div>
             </div>
+
+            {tooltip && (
+                <div
+                    className={styles.tooltip}
+                    style={{ left: tooltip.x, top: tooltip.y }}
+                >
+                    <div className={styles.tooltipDate}>{formatDate(tooltip.date, t('date-no-time'))}</div>
+                    <div className={styles.tooltipValue}>{tooltip.total.toFixed(1)} mm</div>
+                </div>
+            )}
         </div>
     )
 }

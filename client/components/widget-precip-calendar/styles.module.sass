@@ -9,6 +9,7 @@
     box-shadow: var(--container-shadow)
     overflow: hidden
     padding: 14px
+    position: relative
 
 .grid
     width: 100%
@@ -41,7 +42,10 @@
     border-radius: 2px
 
 .cell
-    cursor: default
+    cursor: pointer
+
+    &:hover
+        outline: 1px solid var(--text-color-secondary)
 
 .cellEmpty
     background: transparent
@@ -65,4 +69,24 @@
 
 .legendLabel
     font-size: 11px
+    color: var(--text-color-secondary)
+
+.tooltip
+    position: fixed
+    transform: translateX(-50%) translateY(-100%)
+    background: var(--container-background-color)
+    border: 1px solid var(--input-border-color)
+    border-radius: var(--border-radius)
+    padding: 6px 10px
+    font-size: 11px
+    color: var(--text-color-primary)
+    pointer-events: none
+    z-index: 9999
+    box-shadow: var(--popout-shadow)
+
+.tooltipDate
+    font-weight: 600
+    margin-bottom: 2px
+
+.tooltipValue
     color: var(--text-color-secondary)

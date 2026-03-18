@@ -15,8 +15,6 @@ import WidgetPrecipStatCard from '@/components/widget-precip-stat-card'
 import WidgetStreakCard from '@/components/widget-streak-card'
 import { LocaleType } from '@/tools/types'
 
-import styles from './precipitation.module.sass'
-
 type PrecipitationPageProps = object
 
 const PrecipitationPage: NextPage<PrecipitationPageProps> = () => {
@@ -54,7 +52,7 @@ const PrecipitationPage: NextPage<PrecipitationPageProps> = () => {
             />
 
             {availableYears.length > 0 && (
-                <div className={styles.yearSelector}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', margin: '5px 0 10px' }}>
                     {availableYears.map((y) => (
                         <Button
                             key={y}
@@ -106,7 +104,6 @@ const PrecipitationPage: NextPage<PrecipitationPageProps> = () => {
                 <WidgetPrecipChart
                     loading={isFetching}
                     monthlyTotals={data?.stats.monthlyTotals}
-                    locale={i18n.language}
                 />
             </div>
         </AppLayout>

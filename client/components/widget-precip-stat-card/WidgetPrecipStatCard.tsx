@@ -11,14 +11,14 @@ interface StatCardProps {
 }
 
 const WidgetPrecipStatCard: React.FC<StatCardProps> = ({ loading, title, value, sub }) => (
-    <div className={styles.statCard}>
+    <div className={styles.widget}>
         {loading ? (
             <Skeleton style={{ width: '100%', height: 80 }} />
         ) : (
             <>
-                <div className={styles.statTitle}>{title}</div>
-                <div className={styles.statValue}>{value}</div>
-                {sub && <div className={styles.statSub}>{sub}</div>}
+                <div className={styles.title}>{title}</div>
+                <div className={styles.value}>{value}</div>
+                {sub && <div className={styles.description}>{sub}</div>}
             </>
         )}
     </div>
