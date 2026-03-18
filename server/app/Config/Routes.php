@@ -41,6 +41,10 @@ $routes->group('sensors', static function ($routes) {
     $routes->options('/', static function () {});
 });
 
+/** Precipitation Controller **/
+$routes->get('precipitation',         'Precipitation::index');
+$routes->options('precipitation',     static function () {});
+
 /** Anomaly Controller **/
 $routes->get('anomaly',         'Anomaly::index');
 $routes->get('anomaly/history', 'Anomaly::history');
