@@ -40,13 +40,17 @@ describe('Menu', () => {
         expect(screen.getByText('t:historical-data')).toBeInTheDocument()
         expect(screen.getByText('t:forecast')).toBeInTheDocument()
         expect(screen.getByText('t:heatmap')).toBeInTheDocument()
+        expect(screen.getByText('t:precipitation-calendar')).toBeInTheDocument()
+        expect(screen.getByText('t:climate-changes')).toBeInTheDocument()
         expect(screen.getByText('t:anomaly-monitor')).toBeInTheDocument()
         expect(screen.getAllByTestId('icon')[0]).toHaveAttribute('data-name', 'Cloud')
         expect(screen.getAllByTestId('icon')[1]).toHaveAttribute('data-name', 'Pressure')
         expect(screen.getAllByTestId('icon')[2]).toHaveAttribute('data-name', 'Chart')
         expect(screen.getAllByTestId('icon')[3]).toHaveAttribute('data-name', 'Time')
         expect(screen.getAllByTestId('icon')[4]).toHaveAttribute('data-name', 'BarChart')
-        expect(screen.getAllByTestId('icon')[6]).toHaveAttribute('data-name', 'Bell')
+        expect(screen.getAllByTestId('icon')[5]).toHaveAttribute('data-name', 'WaterDrop')
+        expect(screen.getAllByTestId('icon')[6]).toHaveAttribute('data-name', 'Thermometer')
+        expect(screen.getAllByTestId('icon')[7]).toHaveAttribute('data-name', 'Bell')
     })
 
     it('applies active class to the current route', () => {
@@ -66,7 +70,7 @@ describe('Menu', () => {
         render(<Menu />)
         const menu = screen.getByRole('list', { hidden: true }) || screen.getByTestId('menu')
         expect(menu?.tagName.toLowerCase()).toBe('menu')
-        expect(menu?.querySelectorAll('li').length).toBe(7)
+        expect(menu?.querySelectorAll('li').length).toBe(8)
     })
 
     it('links have correct href attributes', () => {
@@ -76,6 +80,8 @@ describe('Menu', () => {
         expect(screen.getByText('t:historical-data').closest('a')).toHaveAttribute('href', '/history')
         expect(screen.getByText('t:forecast').closest('a')).toHaveAttribute('href', '/forecast')
         expect(screen.getByText('t:heatmap').closest('a')).toHaveAttribute('href', '/heatmap')
+        expect(screen.getByText('t:precipitation-calendar').closest('a')).toHaveAttribute('href', '/precipitation')
+        expect(screen.getByText('t:climate-changes').closest('a')).toHaveAttribute('href', '/climate')
         expect(screen.getByText('t:anomaly-monitor').closest('a')).toHaveAttribute('href', '/anomaly')
     })
 

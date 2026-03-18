@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 3.7.0
+
+### Minor Changes
+
+- Add Precipitation Calendar feature: full-stack implementation with PHP controller, two-level aggregation model, RTK Query endpoint, calendar grid, stat cards, streak cards, and monthly bar chart
+- Add CLI weather commands (`system:getCurrentWeather`, `system:getForecastWeather`, `system:sendNarodmonData`); remove `System.php` controller
+- Add skeleton loading states to anomaly page widgets
+- Add active anomaly cards to homepage before forecast table, with full-width layout
+- Localize month labels in `WidgetPrecipCalendar`, `WidgetAnomalyCalendar`, and `WidgetPrecipChart` using `i18n.language`
+- Add precipitation calendar tooltip matching anomaly calendar pattern
+- Fix daily precipitation totals computed from hourly averages to eliminate multi-source inflation
+- Fix dry streak calculation by expanding sparse precipitation data into a full calendar before streak detection
+- Add `forecast_time` column to forecast inserts; remove redundant type cast
+- Rename generic `Props` interfaces to component-specific names across widgets
+- Add widget unit tests for maximum frontend code coverage
+
 ## 3.6.0
 
 ### Minor Changes

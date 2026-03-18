@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react'
+import { Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 
@@ -11,6 +12,7 @@ import { formatDateStr, getIntensityClass, isFutureDate } from './utils'
 import styles from './styles.module.sass'
 
 interface WidgetAnomalyCalendarProps {
+    loading?: boolean
     data: ApiType.Anomaly.AnomalyCalendarPoint[]
 }
 
@@ -26,8 +28,8 @@ interface TooltipState {
     types: string[]
 }
 
-const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ data }) => {
-    const { t } = useTranslation()
+const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ loading, data }) => {
+    const { i18n, t } = useTranslation()
     const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
     const today = useMemo(() => new Date(), [])
@@ -67,14 +69,14 @@ const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ data }) =
             const month = cellDate.getMonth()
             if (month !== prevMonth) {
                 labels.push({
-                    label: cellDate.toLocaleString('en', { month: 'short' }),
+                    label: cellDate.toLocaleString(i18n.language, { month: 'short' }),
                     weekIndex: w
                 })
                 prevMonth = month
             }
         }
         return labels
-    }, [gridStart])
+    }, [gridStart, i18n.language])
 
     const handleMouseEnter = (
         e: React.MouseEvent<HTMLDivElement>,
@@ -92,6 +94,14 @@ const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ data }) =
 
     const handleMouseLeave = () => {
         setTooltip(null)
+    }
+
+    if (loading) {
+        return (
+            <div className={styles.wrapper}>
+                <Skeleton style={{ width: '100%', height: 120 }} />
+            </div>
+        )
     }
 
     return (

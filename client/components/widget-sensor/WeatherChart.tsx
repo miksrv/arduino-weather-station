@@ -6,12 +6,12 @@ import { ApiModel } from '@/api'
 import { getSensorColor } from '@/tools/colors'
 import { findMaxValue, findMinValue, invertData } from '@/tools/weather'
 
-interface Props {
+interface WeatherChartProps {
     data?: ApiModel.Weather[]
     source?: keyof ApiModel.Sensors
 }
 
-const WeatherChart: React.FC<Props> = ({ data, source }) => {
+const WeatherChart: React.FC<WeatherChartProps> = ({ data, source }) => {
     const weatherData = useMemo(
         () => (source && ['temperature', 'feelsLike', 'dewPoint'].includes(source) ? invertData(data, source) : data),
         [data, source]

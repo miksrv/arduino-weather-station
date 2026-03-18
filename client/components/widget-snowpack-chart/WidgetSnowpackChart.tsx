@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 import * as echarts from 'echarts'
 import ReactECharts from 'echarts-for-react'
+import { Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 import { useTheme } from 'next-themes'
@@ -19,6 +20,7 @@ type SnowpackPoint = ApiType.Anomaly.SnowpackPoint
 type SeasonComparison = ApiType.Anomaly.SeasonComparison
 
 interface WidgetSnowpackChartProps {
+    loading?: boolean
     currentSeries: SnowpackPoint[]
     comparisonYears: SeasonComparison[]
     estimatedSWE: number
@@ -26,6 +28,7 @@ interface WidgetSnowpackChartProps {
 }
 
 const WidgetSnowpackChart: React.FC<WidgetSnowpackChartProps> = ({
+    loading,
     currentSeries,
     comparisonYears,
     estimatedSWE,
@@ -304,6 +307,14 @@ const WidgetSnowpackChart: React.FC<WidgetSnowpackChartProps> = ({
         instance.group = 'snowpack'
         echarts.connect('snowpack')
     }, [])
+
+    if (loading) {
+        return (
+            <div className={styles.widget}>
+                <Skeleton style={{ width: '100%', height: 460 }} />
+            </div>
+        )
+    }
 
     return (
         <div className={styles.widget}>

@@ -69,6 +69,7 @@ Detailed documentation lives in the [`/docs`](./docs) directory:
 - [Development Guide](./docs/development.md) — local setup, commands, conventions
 - [Testing Guide](./docs/testing.md) — running tests, coverage, CI pipeline
 - [Anomaly Monitor](./docs/anomaly-monitor.md) — meteorological anomaly detection, flood risk scoring, and visualization
+- [Precipitation Calendar](./docs/precipitation-calendar.md) — annual rainfall calendar, daily totals, wet/dry streaks, and monthly breakdown
 
 <!-- ABOUT OF PROJECT -->
 ## About of Project
@@ -340,6 +341,57 @@ After successfully installing and setting up the Arduino Weather Station project
 - **Historical Data**: Review weather history with customizable date ranges.
 - **Graphical Visualizations**: View weather trends and patterns using interactive charts.
 - **Sensor Readings**: Monitor multiple environmental factors, such as UV Index, wind speed, and solar radiation.
+
+## CLI Commands & Cron Jobs
+
+The backend exposes several `php spark` commands for pulling external weather data, computing aggregates, and maintaining the anomaly log. These are intended to be scheduled via cron on the server running the PHP backend.
+
+### Available Commands
+
+| Command | Description |
+|---|---|
+| `php spark system:getCurrentWeather` | Fetches current weather observations from all configured external APIs (VisualCrossing, WeatherAPI, OpenWeatherMap), saves new records to `raw_weather_data`, and recalculates hourly and daily averages. |
+| `php spark system:getForecastWeather` | Fetches forecast data from all configured external APIs and bulk-upserts records into `forecast_weather_data`. |
+| `php spark system:sendNarodmonData` | Retrieves the latest sensor reading from the database and pushes it to the [narodmon.ru](https://narodmon.ru) monitoring service. |
+| `php spark system:detectAnomalies` | Runs all meteorological anomaly checks against today's daily and hourly data and updates the `anomaly_log` table. Must run after daily averages are available. |
+| `php spark system:backfillAnomalyLog` | Iterates all historical daily records and populates `anomaly_log` from scratch. Intended for initial bootstrapping. Accepts `--force` to bypass the non-empty table guard. |
+
+### Recommended Schedule
+
+| Command | Frequency | Rationale |
+|---|---|---|
+| `system:getCurrentWeather` | Every hour | Keeps raw observations and hourly/daily averages up to date. |
+| `system:getForecastWeather` | Every 3–6 hours | Forecast data changes slowly; 4-hour intervals balance freshness against API quota. |
+| `system:sendNarodmonData` | Every 15 minutes | Near-real-time push to the public monitoring network. |
+| `system:detectAnomalies` | Once daily (e.g. 01:30) | Runs after midnight when the previous day's daily averages are fully computed. |
+| `system:backfillAnomalyLog` | One-time / manual | Run once on a fresh deployment to seed historical anomaly records. |
+
+### Example Crontab
+
+Add the entries below to your server's crontab (`crontab -e`). Adjust `/var/www/project/server` to match your actual deployment path.
+
+```cron
+# Fetch current weather from external APIs and recalculate averages — every hour
+0 * * * * cd /var/www/project/server && php spark system:getCurrentWeather >> /var/log/weather.log 2>&1
+
+# Fetch forecast data — every 4 hours
+0 */4 * * * cd /var/www/project/server && php spark system:getForecastWeather >> /var/log/weather.log 2>&1
+
+# Push latest reading to narodmon.ru — every 15 minutes
+*/15 * * * * cd /var/www/project/server && php spark system:sendNarodmonData >> /var/log/weather.log 2>&1
+
+# Run anomaly detection — daily at 01:30 (after daily averages are ready)
+30 1 * * * cd /var/www/project/server && php spark system:detectAnomalies >> /var/log/weather.log 2>&1
+```
+
+> **Note:** `system:backfillAnomalyLog` is a one-time maintenance command and should not be added to cron. Run it manually once after a fresh deployment:
+> ```bash
+> cd /var/www/project/server && php spark system:backfillAnomalyLog
+> ```
+
+<p align="right">
+  (<a href="#top">Back to top</a>)
+</p>
 
 ## Screenshots and Demos
 

@@ -63,6 +63,11 @@ const Menu: React.FC<MenuProps> = ({ onClick }) => {
             text: t('heatmap')
         },
         {
+            icon: 'WaterDrop',
+            link: '/precipitation',
+            text: t('precipitation-calendar')
+        },
+        {
             icon: 'Thermometer',
             link: '/climate',
             text: t('climate-changes')
