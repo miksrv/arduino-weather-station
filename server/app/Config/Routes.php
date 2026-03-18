@@ -6,13 +6,6 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-/** System Controller **/
-$routes->group('system', static function ($routes) {
-    $routes->cli('current', 'System::getCurrentWeather'); // php index.php system current
-    $routes->cli('forecast', 'System::getForecastWeather'); // php index.php system forecast
-    $routes->cli('narodmon', 'System::sendNarodmonData'); // php index.php system narodmon
-});
-
 /** Current Controller **/
 $routes->group('current', static function ($routes) {
     $routes->get('/', 'Current::getCurrentWeather');
