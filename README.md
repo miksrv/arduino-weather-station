@@ -69,6 +69,7 @@ Detailed documentation lives in the [`/docs`](./docs) directory:
 - [Development Guide](./docs/development.md) — local setup, commands, conventions
 - [Testing Guide](./docs/testing.md) — running tests, coverage, CI pipeline
 - [Anomaly Monitor](./docs/anomaly-monitor.md) — meteorological anomaly detection, flood risk scoring, and visualization
+- [Precipitation Calendar](./docs/precipitation-calendar.md) — annual rainfall calendar, daily totals, wet/dry streaks, and monthly breakdown
 
 <!-- ABOUT OF PROJECT -->
 ## About of Project

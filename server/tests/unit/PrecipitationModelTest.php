@@ -59,7 +59,12 @@ final class PrecipitationModelTest extends CIUnitTestCase
 
     /**
      * Jan 1–3 wet (1.5 mm each), Jan 4–10 dry (0 mm), Jan 11–12 wet (2 mm each).
-     * Expected: longestWetStreak = 3 days (Jan 1–3), longestDryStreak = 7 days (Jan 4–10).
+     *
+     * _buildFullCalendar() fills all 366 days of 2024 (leap year). Days Jan 13–Dec 31
+     * (354 days) are filled with 0.0, so the longest dry streak is Jan 13 – Dec 31
+     * (354 days), not the 7-day Jan 4–10 window that the sparse input alone would imply.
+     *
+     * Expected: longestWetStreak = 3 days (Jan 1–3), longestDryStreak = 354 days (Jan 13–Dec 31).
      */
     public function testStreakDetectionSimpleWetThenDry(): void
     {
@@ -76,10 +81,11 @@ final class PrecipitationModelTest extends CIUnitTestCase
         $this->assertSame('2024-01-01', $wet['start']);
         $this->assertSame('2024-01-03', $wet['end']);
 
+        // Jan 13 – Dec 31 2024 = 354 days of 0.0 mm (calendar fill) — longer than Jan 4–10
         $dry = $stats['longestDryStreak'];
-        $this->assertSame(7, $dry['days']);
-        $this->assertSame('2024-01-04', $dry['start']);
-        $this->assertSame('2024-01-10', $dry['end']);
+        $this->assertSame(354, $dry['days']);
+        $this->assertSame('2024-01-13', $dry['start']);
+        $this->assertSame('2024-12-31', $dry['end']);
     }
 
     // -------------------------------------------------------------------------
@@ -113,6 +119,10 @@ final class PrecipitationModelTest extends CIUnitTestCase
     /**
      * A day with total = 0.1 is NOT rainy (threshold is strictly > 0.1).
      * A day with total = 0.11 IS rainy.
+     *
+     * _buildFullCalendar() fills all 366 days of 2024 (leap year). The 3 explicit
+     * days are included; the remaining 363 days are filled with 0.0 and counted as
+     * dry. Total: 1 rainy day, 365 dry days (2 explicit non-rainy + 363 filled).
      */
     public function testRainyDayThreshold(): void
     {
@@ -125,7 +135,8 @@ final class PrecipitationModelTest extends CIUnitTestCase
         $stats = $this->model->getStats(2024, $days);
 
         $this->assertSame(1, $stats['rainyDays']);
-        $this->assertSame(2, $stats['dryDays']);
+        // 366 days total (2024 leap year) minus 1 rainy day = 365 dry days
+        $this->assertSame(365, $stats['dryDays']);
     }
 
     // -------------------------------------------------------------------------
@@ -137,7 +148,11 @@ final class PrecipitationModelTest extends CIUnitTestCase
      *
      * The 0.1 mm on Jan 6 must break the dry streak even though it is not
      * counted as a "rainy day" in the rainyDays counter (threshold > 0.1).
-     * Expected: longestDryStreak = 5 days (Jan 1–5), NOT 10.
+     *
+     * _buildFullCalendar() fills all 366 days of 2024 (leap year). Days Jan 11–Dec 31
+     * (356 days) are filled with 0.0, extending the post-trace dry run from 4 (Jan 7–10)
+     * to 360 consecutive dry days (Jan 7 – Dec 31). That run is longer than Jan 1–5 (5 days).
+     * Expected: longestDryStreak = 360 days (Jan 7 – Dec 31 2024).
      */
     public function testTraceAmountBreaksDryStreak(): void
     {
@@ -149,10 +164,12 @@ final class PrecipitationModelTest extends CIUnitTestCase
 
         $stats = $this->model->getStats(2024, $days);
 
+        // The trace on Jan 6 breaks the Jan 1–5 dry streak (correct behaviour).
+        // After calendar fill, the post-trace dry run (Jan 7 – Dec 31) is the longest.
         $dry = $stats['longestDryStreak'];
-        $this->assertSame(5, $dry['days'], 'Trace amount (0.1 mm) must break the dry streak');
-        $this->assertSame('2024-01-01', $dry['start']);
-        $this->assertSame('2024-01-05', $dry['end']);
+        $this->assertSame(360, $dry['days'], 'Trace amount (0.1 mm) must break the dry streak');
+        $this->assertSame('2024-01-07', $dry['start']);
+        $this->assertSame('2024-12-31', $dry['end']);
     }
 
     // -------------------------------------------------------------------------
@@ -232,7 +249,11 @@ final class PrecipitationModelTest extends CIUnitTestCase
     // -------------------------------------------------------------------------
 
     /**
-     * getStats() with an empty $dailyTotals array must return safe zero-value defaults.
+     * getStats() with an empty $dailyTotals array for a fully-elapsed year (2024).
+     *
+     * _buildFullCalendar() fills all 366 days of 2024 (leap year) with 0.0 mm.
+     * Therefore: totalYear = 0.0, rainyDays = 0, dryDays = 366, no max date,
+     * longestWetStreak.days = 0, longestDryStreak.days = 366 (entire year).
      */
     public function testEmptyDailyTotalsReturnsZeroDefaults(): void
     {
@@ -240,11 +261,13 @@ final class PrecipitationModelTest extends CIUnitTestCase
 
         $this->assertSame(0.0, $stats['totalYear']);
         $this->assertSame(0, $stats['rainyDays']);
-        $this->assertSame(0, $stats['dryDays']);
+        // All 366 days of 2024 are filled with 0.0 mm by _buildFullCalendar()
+        $this->assertSame(366, $stats['dryDays']);
         $this->assertSame(0.0, $stats['maxDailyTotal']['value']);
         $this->assertSame('', $stats['maxDailyTotal']['date']);
         $this->assertSame(0, $stats['longestWetStreak']['days']);
-        $this->assertSame(0, $stats['longestDryStreak']['days']);
+        // Dry streak spans all 366 days
+        $this->assertSame(366, $stats['longestDryStreak']['days']);
     }
 
     // -------------------------------------------------------------------------
