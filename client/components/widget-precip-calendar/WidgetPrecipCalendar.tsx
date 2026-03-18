@@ -31,7 +31,10 @@ const WidgetPrecipCalendar: React.FC<WidgetPrecipCalendarProps> = ({ loading, ye
     const { i18n, t } = useTranslation()
 
     const monthAbbrs = useMemo(
-        () => Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleString(i18n.language, { month: 'short' })),
+        () =>
+            Array.from({ length: 12 }, (_, i) =>
+                new Date(2000, i, 1).toLocaleString(i18n.language, { month: 'short' })
+            ),
         [i18n.language]
     )
     const [tooltip, setTooltip] = useState<TooltipState | null>(null)

@@ -23,7 +23,9 @@ const WidgetPrecipChart: React.FC<WidgetPrecipChartProps> = ({ loading, monthlyT
 
     const monthlyChartOption: EChartsOption = useMemo(() => {
         const totals = monthlyTotals ?? []
-        const labels = Array.from({ length: 12 }, (_, idx) => new Date(2000, idx, 1).toLocaleString(i18n.language, { month: 'short' }))
+        const labels = Array.from({ length: 12 }, (_, idx) =>
+            new Date(2000, idx, 1).toLocaleString(i18n.language, { month: 'short' })
+        )
         const values = Array.from({ length: 12 }, (_, idx) => {
             const entry = totals.find((m) => m.month === idx + 1)
             return entry ? entry.total : 0
@@ -55,6 +57,7 @@ const WidgetPrecipChart: React.FC<WidgetPrecipChartProps> = ({ loading, monthlyT
 
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     params.forEach((item: any) => {
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                         const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
                         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                         const seriesValue = `<span class="${styles.value}">${item.value ?? '---'} ${t('millimeters')}</span>`
