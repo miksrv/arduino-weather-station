@@ -72,6 +72,18 @@ RTK Query is the exclusive API layer. All endpoints live in `api/api.ts`. The `L
 - Never use `new Date(isoString).getMonth()/.getDate()` for calendar math on ISO date strings — timezone shifts cause off-by-one errors in Node.js test environments.
 - Parse ISO date strings manually: `dateStr.split('-')` + `parseInt(parts[n], 10)`.
 
+## Feature 4 Precipitation Calendar (added 2026-03-18)
+
+New page at `pages/precipitation.tsx` + `pages/precipitation.module.sass`. Endpoint: `API.useGetPrecipitationQuery({ year })` → tag `'Precipitation'` → URL `precipitation?year=YYYY`. Types at `api/types/precipitation.ts` (namespace `ApiType.Precipitation`).
+
+Components:
+- `widget-precip-calendar/` — full-width calendar grid (12 rows × 31 cols). Uses CSS Grid, `useMemo` Map for O(1) day lookup, inline `backgroundColor` style for cell colours (no CSS vars — see ECharts note). Inline `style` used on `legendSwatch` too for the same reason (dynamic colour values, not ECharts-specific).
+- `widget-streak-card/` — card styled like `WidgetAnomalyCard` at `width: calc(50% - 5px)`, `100%` on mobile.
+
+Page-level helper component pattern: `StatCard` is defined as a `React.FC` above the page component in the same file to stay under JSX depth 4 and DRY up repeated card markup.
+
+Locale labels for month names are generated at runtime with `new Date(2000, idx, 1).toLocaleString(i18n.language, { month: 'short' })` — no translation keys needed.
+
 ## Feature 7 Anomaly Components (added 2026-03-16)
 
 Six components in `client/components/`:

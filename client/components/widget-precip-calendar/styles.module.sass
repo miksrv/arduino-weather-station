@@ -1,0 +1,68 @@
+@use '../../styles/variables'
+
+.widget
+    flex-basis: 100%
+    width: 100%
+    background: var(--container-background-color)
+    color: var(--text-color-primary)
+    border-radius: var(--border-radius)
+    box-shadow: var(--container-shadow)
+    overflow: hidden
+    padding: 14px
+
+.grid
+    width: 100%
+    overflow-x: auto
+
+.headerRow, .monthRow
+    display: grid
+    grid-template-columns: 36px repeat(31, 1fr)
+    gap: 2px
+    margin-bottom: 2px
+
+.dayHeader
+    font-size: 10px
+    color: var(--text-color-secondary)
+    text-align: center
+    line-height: 16px
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        display: none
+
+.monthLabel
+    font-size: 11px
+    color: var(--text-color-secondary)
+    line-height: 16px
+    display: flex
+    align-items: center
+
+.cell, .cellEmpty
+    height: 16px
+    border-radius: 2px
+
+.cell
+    cursor: default
+
+.cellEmpty
+    background: transparent
+
+.legend
+    display: flex
+    flex-wrap: wrap
+    gap: 12px
+    margin-top: 12px
+
+.legendItem
+    display: flex
+    align-items: center
+    gap: 4px
+
+.legendSwatch
+    width: 12px
+    height: 12px
+    border-radius: 2px
+    flex-shrink: 0
+
+.legendLabel
+    font-size: 11px
+    color: var(--text-color-secondary)
