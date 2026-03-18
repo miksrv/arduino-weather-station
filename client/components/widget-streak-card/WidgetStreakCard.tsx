@@ -39,6 +39,7 @@ const WidgetStreakCard: React.FC<WidgetStreakCardProps> = ({ loading, type, days
                 </span>
                 <span className={styles.title}>{title}</span>
             </div>
+
             <div className={styles.value}>{t('days-count', { count: days })}</div>
             <div className={styles.range}>
                 {startFormatted} – {endFormatted}

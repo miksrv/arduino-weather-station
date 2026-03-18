@@ -4,7 +4,6 @@ import { cn, Skeleton } from 'simple-react-ui-kit'
 import { useTranslation } from 'next-i18next'
 
 import { formatDate } from '@/tools/date'
-import { update } from '@/update'
 
 import {
     anomalyIdToI18nKey,
