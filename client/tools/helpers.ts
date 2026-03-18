@@ -45,9 +45,7 @@ export const isValidJSON = (string: string) => {
 
     try {
         JSON.parse(string)
-    } catch (e) {
-        console.error(e)
-
+    } catch {
         return false
     }
 

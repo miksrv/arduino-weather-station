@@ -65,6 +65,14 @@ When testing elements whose text is split across multiple sibling text nodes in 
 
 ---
 
+jsdom normalises hex colour values (`#rrggbb`) to `rgb(r, g, b)` form when they are set as `style.backgroundColor` programmatically by React. This applies to both `element.style.backgroundColor` and `element.getAttribute('style')`. Do not compare the exact hex string returned by a utility (e.g. `getRiskLevelColor`) against the rendered `style.backgroundColor` — jsdom will have already converted it. Instead, assert that all fills share the same non-empty color value (`new Set(colors).size === 1`) or skip the exact-value comparison when the utility internally calls `resolveCssVar` (whose fallback is a hex string).
+
+**Why:** `FloodRiskBars.test.tsx` failed because `#f8a01c` was stored as `rgb(248, 160, 28)` in the DOM after React applied it.
+
+**How to apply:** For any test checking `style.backgroundColor` where the source is a hex literal from a utility function, either use `toEqual` with the rgb form or check structural equality (same value across elements) rather than the raw hex string.
+
+---
+
 When mocking `echarts-for-react` for components that also use `echarts.connect()` (e.g. `WidgetSnowpackChart`), also mock the `echarts` module:
 ```ts
 jest.mock('echarts', () => ({ connect: jest.fn(), ECharts: {} }))
