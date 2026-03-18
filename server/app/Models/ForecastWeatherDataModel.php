@@ -74,7 +74,6 @@ class ForecastWeatherDataModel extends Model
     ];
 
     protected array $casts = [
-        'forecast_time' => 'datetime',
         'temperature'   => '?float',
         'feels_like'    => '?float',
         'pressure'      => '?int',

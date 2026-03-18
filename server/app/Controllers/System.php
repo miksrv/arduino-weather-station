@@ -160,7 +160,7 @@ class System extends ResourceController {
                         $data['id']   = $existingMap[$currentTimeString];
                         $updateData[] = array_merge($data, ['forecast_time' => $currentTimeString]);
                     } else {
-                        $insertData[] = $data;
+                        $insertData[] = array_merge($data, ['forecast_time' => $currentTimeString]);
                     }
                 }
 
