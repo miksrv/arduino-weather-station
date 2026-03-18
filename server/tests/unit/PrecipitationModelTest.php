@@ -9,6 +9,11 @@ use CodeIgniter\Test\CIUnitTestCase;
  * All test cases exercise getStats() — which is purely PHP logic that accepts
  * a pre-built $dailyTotals array — so no database connection is required.
  *
+ * Note: getDailyTotals() sources data from raw_weather_data (not daily_averages),
+ * matching the heatmap's calculation approach for accurate accumulated rainfall.
+ * That method is tested at the database layer; these tests cover only the
+ * pure-PHP statistical logic in getStats().
+ *
  * @internal
  */
 final class PrecipitationModelTest extends CIUnitTestCase
@@ -124,7 +129,34 @@ final class PrecipitationModelTest extends CIUnitTestCase
     }
 
     // -------------------------------------------------------------------------
-    // 4. Monthly totals — sum matches daily sum
+    // 4. Trace amount (0.1 mm) breaks a dry streak
+    // -------------------------------------------------------------------------
+
+    /**
+     * Jan 1–5 dry (0.0 mm), Jan 6 trace (0.1 mm), Jan 7–10 dry (0.0 mm).
+     *
+     * The 0.1 mm on Jan 6 must break the dry streak even though it is not
+     * counted as a "rainy day" in the rainyDays counter (threshold > 0.1).
+     * Expected: longestDryStreak = 5 days (Jan 1–5), NOT 10.
+     */
+    public function testTraceAmountBreaksDryStreak(): void
+    {
+        $days = array_merge(
+            $this->_makeDays('2024-01-01', 5, 0.0),  // dry: Jan 1–5
+            $this->_makeDays('2024-01-06', 1, 0.1),  // trace: Jan 6
+            $this->_makeDays('2024-01-07', 4, 0.0)   // dry: Jan 7–10
+        );
+
+        $stats = $this->model->getStats(2024, $days);
+
+        $dry = $stats['longestDryStreak'];
+        $this->assertSame(5, $dry['days'], 'Trace amount (0.1 mm) must break the dry streak');
+        $this->assertSame('2024-01-01', $dry['start']);
+        $this->assertSame('2024-01-05', $dry['end']);
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. Monthly totals — sum matches daily sum
     // -------------------------------------------------------------------------
 
     /**
@@ -170,7 +202,7 @@ final class PrecipitationModelTest extends CIUnitTestCase
     }
 
     // -------------------------------------------------------------------------
-    // 5. All dry year
+    // 6. All dry year
     // -------------------------------------------------------------------------
 
     /**
@@ -196,7 +228,7 @@ final class PrecipitationModelTest extends CIUnitTestCase
     }
 
     // -------------------------------------------------------------------------
-    // 6. Empty input
+    // 7. Empty input
     // -------------------------------------------------------------------------
 
     /**
@@ -216,7 +248,7 @@ final class PrecipitationModelTest extends CIUnitTestCase
     }
 
     // -------------------------------------------------------------------------
-    // 7. maxDailyTotal picks the highest value day
+    // 8. maxDailyTotal picks the highest value day
     // -------------------------------------------------------------------------
 
     public function testMaxDailyTotalIdentifiesCorrectDay(): void

@@ -269,6 +269,10 @@ class RawWeatherDataModel extends Model
     /**
      * Retrieves the SQL query string for selecting average weather data.
      *
+     * All fields use AVG() with ROUND(). This method is used by multiple callers
+     * that may query tables without a `source` column (e.g. hourly_averages,
+     * daily_averages), so expressions that reference `source` must not appear here.
+     *
      * @param string|null $type The specific type of weather data to retrieve averages for (e.g., 'temperature', 'humidity').
      *                          If null, retrieves averages for all types of weather data.
      * @return string The SQL query string for selecting average weather data.

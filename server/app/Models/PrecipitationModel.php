@@ -3,12 +3,21 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use DateInterval;
+use DatePeriod;
+use DateTime;
 
 /**
  * Class PrecipitationModel
  *
- * Provides precipitation-specific queries against the daily_averages table
- * and pure-PHP statistical computations for the precipitation calendar feature.
+ * Provides precipitation-specific queries and pure-PHP statistical computations
+ * for the precipitation calendar feature.
+ *
+ * Daily totals are sourced from raw_weather_data using a two-level aggregation:
+ * hourly AVG across all sources (inner query) followed by SUM of those hourly
+ * averages per day (outer query). This correctly handles multiple concurrent
+ * sources without inflating totals. Available years are resolved against
+ * daily_averages, which is a cheaper aggregated proxy for the same year coverage.
  *
  * @package App\Models
  *
@@ -27,6 +36,21 @@ class PrecipitationModel extends Model
     /**
      * Returns the daily precipitation totals for the given year.
      *
+     * Queries raw_weather_data directly (same source as the heatmap) using a
+     * two-step aggregation to eliminate source duplication without relying on
+     * COUNT(DISTINCT source):
+     *
+     *   1. Inner query — for each calendar hour, compute the average precipitation
+     *      across all sources that reported during that hour (AVG collapses multiple
+     *      sources recording the same physical rain event into a single figure).
+     *
+     *   2. Outer query — sum those hourly averages per day, giving an accumulated
+     *      daily total that is independent of how many sources were active in each
+     *      hour.
+     *
+     * Rows where precipitation is NULL or zero are excluded before the inner
+     * aggregation for efficiency.
+     *
      * Each element contains:
      *   - 'date'  => 'YYYY-MM-DD'
      *   - 'total' => float  (rounded to 1 decimal place)
@@ -38,10 +62,18 @@ class PrecipitationModel extends Model
     {
         $rows = $this->db
             ->query(
-                'SELECT DATE(date) AS day, SUM(precipitation) AS total
-                 FROM daily_averages
-                 WHERE YEAR(date) = ?
-                 GROUP BY DATE(date)
+                'SELECT day, ROUND(SUM(hour_avg), 1) AS total
+                 FROM (
+                     SELECT DATE(date)                             AS day,
+                            DATE_FORMAT(date, \'%Y-%m-%d %H:00:00\') AS hour_slot,
+                            AVG(precipitation)                    AS hour_avg
+                     FROM raw_weather_data
+                     WHERE YEAR(date) = ?
+                       AND precipitation IS NOT NULL
+                       AND precipitation > 0
+                     GROUP BY day, hour_slot
+                 ) AS hourly
+                 GROUP BY day
                  ORDER BY day',
                 [$year]
             )
@@ -77,6 +109,11 @@ class PrecipitationModel extends Model
      * Computes precipitation statistics for the given year entirely from the
      * already-fetched $dailyTotals array — no additional database queries.
      *
+     * Before computing any statistics, $dailyTotals is expanded into a full
+     * calendar via _buildFullCalendar(). Days absent from $dailyTotals are
+     * inserted with total = 0.0 mm so that dry-day counts and dry-streak
+     * detection are correct. Future days in the current year are not included.
+     *
      * Returns:
      * [
      *   'totalYear'        => float,
@@ -94,6 +131,8 @@ class PrecipitationModel extends Model
      */
     public function getStats(int $year, array $dailyTotals): array
     {
+        $fullCalendar = $this->_buildFullCalendar($year, $dailyTotals);
+
         $totalYear = 0.0;
         $rainyDays = 0;
         $dryDays   = 0;
@@ -101,7 +140,7 @@ class PrecipitationModel extends Model
         $maxDate   = '';
         $monthly   = array_fill(1, 12, 0.0);
 
-        foreach ($dailyTotals as $entry) {
+        foreach ($fullCalendar as $entry) {
             $total = (float) $entry['total'];
             $date  = (string) $entry['date'];
 
@@ -125,7 +164,7 @@ class PrecipitationModel extends Model
             }
         }
 
-        $streaks = $this->_computeStreaks($dailyTotals);
+        $streaks = $this->_computeStreaks($fullCalendar);
 
         $monthlyTotals = [];
 
@@ -151,8 +190,51 @@ class PrecipitationModel extends Model
     }
 
     /**
+     * Builds a complete, chronologically sorted array of daily entries for the
+     * given year, covering every calendar day from {$year}-01-01 through the
+     * earlier of {$year}-12-31 and today.
+     *
+     * Days present in $dailyTotals are taken at face value; days absent are
+     * inserted with total = 0.0, ensuring that dry days are never silently
+     * omitted from downstream statistics.
+     *
+     * @param int   $year
+     * @param array $dailyTotals  Array of ['date' => 'YYYY-MM-DD', 'total' => float]
+     * @return array              Array of ['date' => 'YYYY-MM-DD', 'total' => float]
+     */
+    private function _buildFullCalendar(int $year, array $dailyTotals): array
+    {
+        $lookup = [];
+
+        foreach ($dailyTotals as $entry) {
+            $lookup[(string) $entry['date']] = (float) $entry['total'];
+        }
+
+        $start  = new DateTime("{$year}-01-01");
+        $endOfYear = new DateTime("{$year}-12-31");
+        $today  = new DateTime('today');
+        $end    = $endOfYear < $today ? $endOfYear : $today;
+
+        // DatePeriod end is exclusive, so add one day
+        $end->modify('+1 day');
+
+        $period  = new DatePeriod($start, new DateInterval('P1D'), $end);
+        $calendar = [];
+
+        foreach ($period as $day) {
+            $dateStr    = $day->format('Y-m-d');
+            $calendar[] = [
+                'date'  => $dateStr,
+                'total' => $lookup[$dateStr] ?? 0.0,
+            ];
+        }
+
+        return $calendar;
+    }
+
+    /**
      * Iterates over sorted daily entries and computes the longest consecutive
-     * wet streak (total > 0.1) and the longest consecutive dry streak (total <= 0.1).
+     * wet streak (total > 0) and the longest consecutive dry streak (total = 0).
      *
      * Returns:
      * [
@@ -178,7 +260,7 @@ class PrecipitationModel extends Model
         foreach ($days as $entry) {
             $total = (float) $entry['total'];
             $date  = (string) $entry['date'];
-            $isWet = $total > 0.1;
+            $isWet = $total > 0.0;
 
             // --- wet streak ---
             if ($isWet) {
