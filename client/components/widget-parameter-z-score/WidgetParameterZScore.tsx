@@ -9,7 +9,7 @@ import { getFilledDots, getZScoreColor } from './utils'
 
 import styles from './styles.module.sass'
 
-interface Props {
+interface WidgetParameterZScoreProps {
     loading?: boolean
     parameter: string
     zScore?: number
@@ -36,7 +36,7 @@ const PARAMETER_I18N: Record<string, string> = {
 
 const TOTAL_DOTS = 5
 
-const WidgetParameterZScore: React.FC<Props> = ({ loading, parameter, zScore, sparklineData }) => {
+const WidgetParameterZScore: React.FC<WidgetParameterZScoreProps> = ({ loading, parameter, zScore, sparklineData }) => {
     const { t } = useTranslation()
 
     const color = getZScoreColor(zScore ?? 0)
