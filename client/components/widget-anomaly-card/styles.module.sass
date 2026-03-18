@@ -9,6 +9,14 @@
     padding: 12px 14px
     border-left: 3px solid var(--input-border-color)
 
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        flex-basis: 100%
+        width: 100%
+
+    &.fullWidth
+        width: 100% !important
+        flex-basis: 100%
+
 .cardActive
     border-left-color: var(--color-red)
 

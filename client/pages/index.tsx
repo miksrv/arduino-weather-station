@@ -8,6 +8,7 @@ import { NextSeo } from 'next-seo'
 import { API, ApiModel, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
+import WidgetAnomalyCard from '@/components/widget-anomaly-card'
 import WidgetChart from '@/components/widget-chart'
 import WidgetForecastTable from '@/components/widget-forecast-table'
 import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
@@ -34,6 +35,12 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     const { data: forecastDaily, isLoading: dailyLoading } = API.useGetForecastQuery('daily', {
         pollingInterval: POLING_INTERVAL_FORECAST
     })
+
+    const { data: anomalyData, isLoading: anomalyLoading } = API.useGetAnomalyQuery(undefined, {
+        pollingInterval: POLING_INTERVAL_FORECAST
+    })
+
+    const activeAnomalies = anomalyData?.anomalies.filter((a) => a.active) ?? []
 
     const { data: current, isLoading: currentLoading } = API.useGetCurrentQuery(undefined, {
         pollingInterval: POLING_INTERVAL_CURRENT
@@ -114,6 +121,28 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         }
                     />
                 ))}
+
+                {anomalyLoading ? (
+                    <WidgetAnomalyCard
+                        loading={true}
+                        fullWidth={true}
+                        anomalyId={''}
+                        active={false}
+                    />
+                ) : (
+                    activeAnomalies.map((anomaly) => (
+                        <WidgetAnomalyCard
+                            key={anomaly.id}
+                            fullWidth={true}
+                            anomalyId={anomaly.id}
+                            active={anomaly.active}
+                            triggeredAt={anomaly.triggeredAt}
+                            lastTriggered={anomaly.lastTriggered}
+                            currentZScore={anomaly.currentZScore}
+                            extraMetric={anomaly.extraMetric}
+                        />
+                    ))
+                )}
 
                 <WidgetForecastTable
                     title={t('weather-forecast-by-days')}

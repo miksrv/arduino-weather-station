@@ -1,7 +1,10 @@
 import React from 'react'
-import { Skeleton } from 'simple-react-ui-kit'
+import { cn, Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
+
+import { formatDate } from '@/tools/date'
+import { update } from '@/update'
 
 import {
     anomalyIdToI18nKey,
@@ -16,6 +19,7 @@ import styles from './styles.module.sass'
 
 interface WidgetAnomalyCardProps {
     loading?: boolean
+    fullWidth?: boolean
     anomalyId: string
     active: boolean
     triggeredAt?: string
@@ -26,6 +30,7 @@ interface WidgetAnomalyCardProps {
 
 const WidgetAnomalyCard: React.FC<WidgetAnomalyCardProps> = ({
     loading,
+    fullWidth,
     anomalyId,
     active,
     triggeredAt,
@@ -40,14 +45,14 @@ const WidgetAnomalyCard: React.FC<WidgetAnomalyCardProps> = ({
 
     if (loading) {
         return (
-            <div className={styles.card}>
+            <div className={cn(styles.card, fullWidth && styles.fullWidth)}>
                 <Skeleton style={{ width: '100%', height: 80 }} />
             </div>
         )
     }
 
     return (
-        <div className={active ? styles.cardActive : styles.card}>
+        <div className={cn(active ? styles.cardActive : styles.card, fullWidth && styles.fullWidth)}>
             <div className={styles.header}>
                 <span className={active ? styles.dotActive : styles.dot} />
                 <span className={styles.label}>{label}</span>
@@ -56,7 +61,9 @@ const WidgetAnomalyCard: React.FC<WidgetAnomalyCardProps> = ({
             <p className={styles.desc}>{desc}</p>
 
             {active && triggeredAt && (
-                <div className={styles.meta}>{t('anomaly-active-since', { date: triggeredAt })}</div>
+                <div className={styles.meta}>
+                    {t('anomaly-active-since', { date: formatDate(triggeredAt, t('date-no-time')) })}
+                </div>
             )}
 
             {active && extraMetric != null && (
