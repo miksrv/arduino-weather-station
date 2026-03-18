@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { EChartsOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
-import { Icon, IconTypes } from 'simple-react-ui-kit'
+import { Icon, IconTypes, Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 
@@ -10,8 +10,9 @@ import { getFilledDots, getZScoreColor } from './utils'
 import styles from './styles.module.sass'
 
 interface Props {
+    loading?: boolean
     parameter: string
-    zScore: number
+    zScore?: number
     sparklineData: number[]
 }
 
@@ -35,11 +36,11 @@ const PARAMETER_I18N: Record<string, string> = {
 
 const TOTAL_DOTS = 5
 
-const WidgetParameterZScore: React.FC<Props> = ({ parameter, zScore, sparklineData }) => {
+const WidgetParameterZScore: React.FC<Props> = ({ loading, parameter, zScore, sparklineData }) => {
     const { t } = useTranslation()
 
-    const color = getZScoreColor(zScore)
-    const filledDots = getFilledDots(zScore)
+    const color = getZScoreColor(zScore ?? 0)
+    const filledDots = getFilledDots(zScore ?? 0)
     const icon = PARAMETER_ICONS[parameter] ?? 'Thermometer'
     const i18nKey = PARAMETER_I18N[parameter] ?? parameter
 
@@ -62,6 +63,14 @@ const WidgetParameterZScore: React.FC<Props> = ({ parameter, zScore, sparklineDa
         [sparklineData, color]
     )
 
+    if (loading) {
+        return (
+            <div className={styles.card}>
+                <Skeleton style={{ width: '100%', height: 88 }} />
+            </div>
+        )
+    }
+
     return (
         <div className={styles.card}>
             <div className={styles.header}>
@@ -76,8 +85,8 @@ const WidgetParameterZScore: React.FC<Props> = ({ parameter, zScore, sparklineDa
                 className={styles.zScore}
                 style={{ color }}
             >
-                {zScore > 0 ? '+' : ''}
-                {zScore?.toFixed(2)}
+                {(zScore ?? 0) > 0 ? '+' : ''}
+                {(zScore ?? 0).toFixed(2)}
             </div>
 
             <div className={styles.dots}>

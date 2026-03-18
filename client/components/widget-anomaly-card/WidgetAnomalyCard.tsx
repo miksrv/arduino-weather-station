@@ -1,4 +1,5 @@
 import React from 'react'
+import { Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 
@@ -14,6 +15,7 @@ import { ZScoreBar } from './ZSCoreBar'
 import styles from './styles.module.sass'
 
 interface WidgetAnomalyCardProps {
+    loading?: boolean
     anomalyId: string
     active: boolean
     triggeredAt?: string
@@ -23,6 +25,7 @@ interface WidgetAnomalyCardProps {
 }
 
 const WidgetAnomalyCard: React.FC<WidgetAnomalyCardProps> = ({
+    loading,
     anomalyId,
     active,
     triggeredAt,
@@ -34,6 +37,14 @@ const WidgetAnomalyCard: React.FC<WidgetAnomalyCardProps> = ({
     const i18nKey = anomalyIdToI18nKey(anomalyId)
     const label = t(`anomaly-${i18nKey}`)
     const desc = t(`anomaly-${i18nKey}-desc`)
+
+    if (loading) {
+        return (
+            <div className={styles.card}>
+                <Skeleton style={{ width: '100%', height: 80 }} />
+            </div>
+        )
+    }
 
     return (
         <div className={active ? styles.cardActive : styles.card}>

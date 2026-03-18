@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { ColumnProps, Table } from 'simple-react-ui-kit'
+import { ColumnProps, Skeleton, Table } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 
@@ -11,10 +11,11 @@ import { anomalyTypeToI18nKey, getDuration, isActiveToday } from './utils'
 import styles from './styles.module.sass'
 
 interface WidgetAnomalyHistoryProps {
+    loading?: boolean
     rows: ApiType.Anomaly.AnomalyHistoryEntry[]
 }
 
-const WidgetAnomalyHistory: React.FC<WidgetAnomalyHistoryProps> = ({ rows }) => {
+const WidgetAnomalyHistory: React.FC<WidgetAnomalyHistoryProps> = ({ loading, rows }) => {
     const { t } = useTranslation()
 
     const columns: Array<ColumnProps<ApiType.Anomaly.AnomalyHistoryEntry>> = useMemo(
@@ -57,6 +58,14 @@ const WidgetAnomalyHistory: React.FC<WidgetAnomalyHistoryProps> = ({ rows }) => 
         ],
         [t]
     )
+
+    if (loading) {
+        return (
+            <div className={styles.widgetAnomalyHistory}>
+                <Skeleton style={{ width: '100%', height: 250 }} />
+            </div>
+        )
+    }
 
     return (
         <div className={styles.widgetAnomalyHistory}>

@@ -53,66 +53,80 @@ const AnomalyPage: NextPage<object> = () => {
             />
 
             <div className={'widgets-list'}>
-                {!isLoading && data && (
-                    <>
-                        <div className={styles.floodRiskRow}>
-                            <WidgetFloodRisk
-                                score={data.floodRisk.score}
-                                level={data.floodRisk.level}
-                                components={data.floodRisk.components}
-                                season={data.floodRisk.season}
+                <div className={styles.floodRiskRow}>
+                    <WidgetFloodRisk
+                        loading={isLoading}
+                        score={data?.floodRisk.score}
+                        level={data?.floodRisk.level}
+                        components={data?.floodRisk.components}
+                        season={data?.floodRisk.season}
+                    />
+
+                    <div className={styles.zScoreGrid}>
+                        {PARAMETER_KEYS.map((key) => (
+                            <WidgetParameterZScore
+                                key={key}
+                                loading={isLoading}
+                                parameter={key}
+                                zScore={data?.parameterZScores[key]}
+                                sparklineData={[]}
                             />
+                        ))}
+                    </div>
+                </div>
 
-                            <div className={styles.zScoreGrid}>
-                                {PARAMETER_KEYS.map((key) => (
-                                    <WidgetParameterZScore
-                                        key={key}
-                                        parameter={key}
-                                        zScore={data.parameterZScores[key]}
-                                        sparklineData={[]}
-                                    />
-                                ))}
-                            </div>
-                        </div>
+                <WidgetSnowpackChart
+                    loading={isLoading}
+                    currentSeries={data?.snowpack.series ?? []}
+                    comparisonYears={data?.snowpack.comparisonYears ?? []}
+                    estimatedSWE={data?.snowpack.estimatedSWE ?? 0}
+                    historicalAvgSWE={data?.snowpack.historicalAvgSWE ?? 0}
+                />
 
-                        <WidgetSnowpackChart
-                            currentSeries={data.snowpack.series}
-                            comparisonYears={data.snowpack.comparisonYears}
-                            estimatedSWE={data.snowpack.estimatedSWE}
-                            historicalAvgSWE={data.snowpack.historicalAvgSWE}
-                        />
+                <div className={styles.sectionHeader}>
+                    <h2>{t('active-anomalies')}</h2>
+                </div>
 
-                        <div className={styles.sectionHeader}>
-                            <h2>{t('active-anomalies')}</h2>
-                        </div>
+                <div className={styles.inactiveGrid}>
+                    {isLoading
+                        ? PARAMETER_KEYS.map((key) => (
+                              <WidgetAnomalyCard
+                                  key={key}
+                                  loading={true}
+                                  anomalyId={key}
+                                  active={false}
+                              />
+                          ))
+                        : data?.anomalies.map((anomaly) => (
+                              <WidgetAnomalyCard
+                                  key={anomaly.id}
+                                  anomalyId={anomaly.id}
+                                  active={anomaly.active}
+                                  triggeredAt={anomaly.triggeredAt}
+                                  lastTriggered={anomaly.lastTriggered}
+                                  currentZScore={anomaly.currentZScore}
+                                  extraMetric={anomaly.extraMetric}
+                              />
+                          ))}
+                </div>
 
-                        <div className={styles.inactiveGrid}>
-                            {data?.anomalies.map((anomaly) => (
-                                <WidgetAnomalyCard
-                                    key={anomaly.id}
-                                    anomalyId={anomaly.id}
-                                    active={anomaly.active}
-                                    triggeredAt={anomaly.triggeredAt}
-                                    lastTriggered={anomaly.lastTriggered}
-                                    currentZScore={anomaly.currentZScore}
-                                    extraMetric={anomaly.extraMetric}
-                                />
-                            ))}
-                        </div>
+                <div className={styles.sectionHeader}>
+                    <h2>{t('anomaly-history')}</h2>
+                </div>
 
-                        <div className={styles.sectionHeader}>
-                            <h2>{t('anomaly-history')}</h2>
-                        </div>
+                <div className={styles.fullWidth}>
+                    <WidgetAnomalyCalendar
+                        loading={isLoading}
+                        data={data?.anomalyCalendar ?? []}
+                    />
+                </div>
 
-                        <div className={styles.fullWidth}>
-                            <WidgetAnomalyCalendar data={data.anomalyCalendar} />
-                        </div>
-
-                        <div className={styles.fullWidth}>
-                            <WidgetAnomalyHistory rows={data.anomalyHistory} />
-                        </div>
-                    </>
-                )}
+                <div className={styles.fullWidth}>
+                    <WidgetAnomalyHistory
+                        loading={isLoading}
+                        rows={data?.anomalyHistory ?? []}
+                    />
+                </div>
             </div>
         </AppLayout>
     )

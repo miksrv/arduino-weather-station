@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react'
+import { Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 
@@ -11,6 +12,7 @@ import { formatDateStr, getIntensityClass, isFutureDate } from './utils'
 import styles from './styles.module.sass'
 
 interface WidgetAnomalyCalendarProps {
+    loading?: boolean
     data: ApiType.Anomaly.AnomalyCalendarPoint[]
 }
 
@@ -26,7 +28,7 @@ interface TooltipState {
     types: string[]
 }
 
-const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ data }) => {
+const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ loading, data }) => {
     const { t } = useTranslation()
     const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
@@ -92,6 +94,14 @@ const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ data }) =
 
     const handleMouseLeave = () => {
         setTooltip(null)
+    }
+
+    if (loading) {
+        return (
+            <div className={styles.wrapper}>
+                <Skeleton style={{ width: '100%', height: 120 }} />
+            </div>
+        )
     }
 
     return (

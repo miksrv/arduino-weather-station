@@ -90,6 +90,95 @@ Before considering a task complete, verify:
 
 ---
 
+## Skeleton Loading States
+
+All widget components that receive data from RTK Query must support a `loading?: boolean` prop and render a skeleton placeholder when it is `true`. This ensures smooth loading UX without layout shift.
+
+### Prop name convention
+
+Always use `loading` (not `isLoading`) as the prop name on components. The page extracts `isLoading` from the RTK Query hook and passes it as `loading` to each component.
+
+```tsx
+// In the page:
+const { data, isLoading } = API.useGetSomethingQuery(...)
+
+<WidgetFoo
+    loading={isLoading}
+    value={data?.value}
+/>
+```
+
+### Component pattern
+
+1. Add `loading?: boolean` to the component's props interface.
+2. Make any props that come from API data optional (e.g., `score?: number` instead of `score: number`) so the component can be rendered before data arrives.
+3. Add an early return at the top of the component body that renders a `<Skeleton>` when `loading` is `true`.
+4. Use `??` fallbacks or non-null assertions (`!`) where needed for any remaining TypeScript narrowing after the guard.
+
+```tsx
+import { Skeleton } from 'simple-react-ui-kit'
+
+interface WidgetFooProps {
+    loading?: boolean
+    value?: number
+}
+
+const WidgetFoo: React.FC<WidgetFooProps> = ({ loading, value }) => {
+    if (loading) {
+        return (
+            <div className={styles.widget}>
+                <Skeleton style={{ width: '100%', height: 200 }} />
+            </div>
+        )
+    }
+
+    return (
+        <div className={styles.widget}>
+            {/* actual content */}
+        </div>
+    )
+}
+```
+
+### Skeleton source
+
+`Skeleton` is imported from `simple-react-ui-kit` — **do not introduce any other skeleton library**.
+
+### Skeleton sizing
+
+Match the skeleton height to the approximate rendered height of the real content:
+- Small cards / z-score tiles: `height: 80–90`
+- Medium widgets with a gauge or bars: `height: 170`
+- Full-width chart widgets: `height: 260–460` (match the chart height)
+- Table widgets: use the table's fixed `height` prop value (e.g., `height: 250`)
+- Calendar/heatmap grids: `height: 120`
+
+Always use `width: '100%'` so the skeleton fills the container.
+
+### Page-level pattern for list items (anomaly cards, etc.)
+
+When a widget renders a dynamic list that isn't known until data loads, render a fixed number of skeleton cards during loading using a stable key source:
+
+```tsx
+{isLoading
+    ? SOME_STABLE_KEYS.map((key) => (
+          <WidgetCard key={key} loading={true} requiredProp={key} otherRequired={defaultValue} />
+      ))
+    : data?.items.map((item) => (
+          <WidgetCard key={item.id} {...item} />
+      ))}
+```
+
+### Reference examples
+
+- `client/components/widget-summary/WidgetSummary.tsx` — inline `{loading ? <Skeleton /> : <Content />}` per field
+- `client/components/widget-chart/WidgetChart.tsx` — single full-widget skeleton
+- `client/components/widget-flood-risk/WidgetFloodRisk.tsx` — early-return skeleton pattern
+- `client/components/widget-parameter-z-score/WidgetParameterZScore.tsx` — early-return skeleton on a small card
+- `client/pages/anomaly.tsx` — page-level wiring: passing `loading={isLoading}` to every widget
+
+---
+
 ## Reporting
 
 When your task is complete, report back to the Team Lead with:
