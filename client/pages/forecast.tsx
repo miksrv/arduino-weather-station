@@ -63,6 +63,15 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     defaultSort={{ key: 'date', direction: 'asc' }}
                     fullWidth={true}
                 />
+
+                <WidgetForecastTable
+                    title={t('weather-forecast-hourly')}
+                    columnsPreset={['time', 'weatherIcon', 'temperature', 'clouds', 'pressure', 'wind']}
+                    loading={hourlyLoading}
+                    data={forecastHourly}
+                    defaultSort={{ key: 'date', direction: 'asc' }}
+                    fullWidth={true}
+                />
             </div>
         </AppLayout>
     )
@@ -72,7 +81,7 @@ export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context): Promise<GetServerSidePropsResult<IndexPageProps>> => {
             const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
-            const translations = await serverSideTranslations(locale)
+            const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
 

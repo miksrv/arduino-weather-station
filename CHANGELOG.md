@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 3.7.1
+
+### Patch Changes
+
+- Add `WidgetForecastCards` component to the main page: horizontally scrollable daily and hourly forecast card rows with weather icons, temperature, clouds, wind, and precipitation; highlights today and the current hour
+- Add reusable `Carousel` UI primitive (`ui/carousel/`) using Embla Carousel with optional auto-scroll and previous/next navigation controls
+- Move `WidgetForecastTable` (hourly and daily) from the main page to the `/forecast` page
+- Fix language switching: resolve router/i18n race condition by making `useLocalStorage` write synchronously and navigating via constructed URL instead of calling `i18n.changeLanguage`
+- Fix `appWithTranslation` not receiving the i18n config, causing locale initialization failures in SSR
+- Standardise `serverSideTranslations` calls across all pages to explicitly pass `['common']` namespace
+- Add HTTP request timeouts (30 s) to OpenWeatherMap, WeatherAPI, and VisualCrossing API clients
+- Add response caching to `Anomaly`, `Heatmap`, `History`, and `Precipitation` controllers with short/long TTL constants and cache-key logic
+- Fix `GetForecastWeather` CLI command: use `->format('Y-m-d H:i:s')` for datetime and simplify insert/update arrays
+- Replace manual `className` string concatenation with `cn()` from `simple-react-ui-kit` across `AppBar`, `LanguageSwitcher`, `WidgetAnomalyCalendar`, `WidgetAnomalyCard`, `WidgetFloodRisk`, and `WidgetParameterZScore`
+- Remove unused Sass classes (`.noAnimation`, `.menubar`, `.historyTable`, `.chartLabel`, `.cardTempLow`) and unused translation key `max-daily-rain`
+- Add unit tests for `WidgetForecastCards`, `Carousel`, `CarouselButtons`, `usePrevNextButtons`, `Heatmap` controller caching, and `History` controller caching
+
 ## 3.7.0
 
 ### Minor Changes

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icon, Spinner } from 'simple-react-ui-kit'
+import { cn, Icon, Spinner } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 import { useTheme } from 'next-themes'
@@ -38,7 +38,9 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     </button>
 
                     {!isLoading && (
-                        <div className={minutesAgo(current?.date) <= OFFLINE_TIME ? styles.online : styles.offline} />
+                        <div
+                            className={cn(minutesAgo(current?.date) <= OFFLINE_TIME ? styles.online : styles.offline)}
+                        />
                     )}
 
                     {isLoading ? (

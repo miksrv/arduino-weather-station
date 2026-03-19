@@ -67,4 +67,26 @@ describe('useLocalStorage', () => {
         expect(typeof setState).toBe('function')
         expect(typeof remove).toBe('function')
     })
+
+    it('writes to localStorage synchronously within the same setState call', () => {
+        const { result } = renderHook(() => useLocalStorage<string, string>(storageKey, 'initial'))
+
+        act(() => {
+            result.current[1]('sync-value')
+            // localStorage must already contain the new value before act flushes effects
+            const stored = JSON.parse(localStorage.getItem(DEFAULT_STORAGE_KEY) ?? '{}')
+            expect(stored[storageKey]).toBe('sync-value')
+        })
+    })
+
+    it('accepts a function updater and writes the computed value synchronously', () => {
+        localStorage.setItem(DEFAULT_STORAGE_KEY, JSON.stringify({ [storageKey]: 'old' }))
+        const { result } = renderHook(() => useLocalStorage<string, string>(storageKey, 'old'))
+
+        act(() => {
+            result.current[1]((prev) => `${prev}-updated`)
+            const stored = JSON.parse(localStorage.getItem(DEFAULT_STORAGE_KEY) ?? '{}')
+            expect(stored[storageKey]).toBe('old-updated')
+        })
+    })
 })

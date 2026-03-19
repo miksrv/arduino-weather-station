@@ -23,6 +23,12 @@ use Exception;
  * $heatmap->getHeatmapData();
  */
 class Heatmap extends ResourceController {
+    /** @var int Cache TTL for requests that include today (15 minutes) */
+    public const CACHE_TTL_SHORT = 15 * 60;
+
+    /** @var int Cache TTL for purely historical requests (indefinite) */
+    public const CACHE_TTL_LONG = 0;
+
     protected RawWeatherDataModel $weatherDataModel;
 
     public function __construct()
@@ -37,9 +43,11 @@ class Heatmap extends ResourceController {
      */
     public function getHeatmapData(): ResponseInterface
     {
-        $type      = $this->request->getGet('type');
-        $startDate = $this->request->getGet('start_date');
-        $endDate   = $this->request->getGet('end_date');
+        $type          = $this->request->getGet('type');
+        $startDate     = $this->request->getGet('start_date');
+        $endDate       = $this->request->getGet('end_date');
+        $rawStartDate  = $startDate;
+        $rawEndDate    = $endDate;
 
         // List of valid types
         $validTypes = ['temperature', 'pressure', 'humidity', 'precipitation', 'clouds', 'wind_speed'];
@@ -72,16 +80,26 @@ class Heatmap extends ResourceController {
         $startDate = date('Y-m-d 00:00:00', $startTimestamp);
         $endDate = date('Y-m-d 23:59:59', $endTimestamp);
 
-        // Get the heatmap data grouped by 10 minutes
-        $heatmapData = $this->weatherDataModel->getWeatherHistoryGrouped($startDate, $endDate, '10 MINUTE', $type);
+        $cacheKey = 'heatmap_' . md5(($type ?? '') . '_' . ($rawStartDate ?? '') . '_' . ($rawEndDate ?? ''));
+        $rawData  = cache()->get($cacheKey);
 
-        if (empty($heatmapData)) {
+        if (!is_array($rawData)) {
+            $rawData = $this->weatherDataModel->getWeatherHistoryGrouped($startDate, $endDate, '10 MINUTE', $type);
+
+            if (!empty($rawData)) {
+                $isEndDateToday = date('Y-m-d', strtotime($rawEndDate ?? 'today')) === date('Y-m-d');
+                $ttl = $isEndDateToday ? self::CACHE_TTL_SHORT : self::CACHE_TTL_LONG;
+                cache()->save($cacheKey, $rawData, $ttl);
+            }
+        }
+
+        if (empty($rawData)) {
             return $this->failNotFound('No data found for the given date range and type');
         }
 
         $result = [];
 
-        foreach ($heatmapData as $data) {
+        foreach ($rawData as $data) {
             $result[] = new WeatherData($data);
         }
 

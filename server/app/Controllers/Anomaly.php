@@ -25,6 +25,9 @@ use CodeIgniter\RESTful\ResourceController;
  */
 class Anomaly extends ResourceController
 {
+    /** @var int Cache TTL in seconds (15 minutes) */
+    public const CACHE_TTL = 15 * 60;
+
     protected AnomalyModel    $anomalyModel;
     protected AnomalyLogModel $anomalyLogModel;
     protected AnomalyDetector $detector;
@@ -60,6 +63,13 @@ class Anomaly extends ResourceController
      */
     public function index(): ResponseInterface
     {
+        $cacheKey = 'anomaly_index';
+        $cached   = cache()->get($cacheKey);
+
+        if ($cached !== null) {
+            return $this->respond($cached);
+        }
+
         try {
             $today = new \DateTime('today');
 
@@ -95,6 +105,8 @@ class Anomaly extends ResourceController
                 'anomalyHistory' => $this->_formatHistory($this->anomalyModel->getAnomalyHistory()),
                 'anomalyCalendar' => $this->anomalyModel->getAnomalyCalendar(365, $anomalyStates),
             ];
+
+            cache()->save($cacheKey, $response, self::CACHE_TTL);
 
             return $this->respond($response);
         } catch (\Exception $e) {
@@ -136,6 +148,13 @@ class Anomaly extends ResourceController
             return $this->fail(['messages' => ['error' => 'Season end year must be start year + 1']], 400);
         }
 
+        $cacheKey = 'anomaly_history_' . ($season ?? '');
+        $cached   = cache()->get($cacheKey);
+
+        if ($cached !== null) {
+            return $this->respond($cached);
+        }
+
         try {
             $snowpack  = new SnowpackCalculator();
             $seasonStart = "{$startYear}-10-01";
@@ -154,10 +173,14 @@ class Anomaly extends ResourceController
             );
             $sweSeries = $snowpack->computeSWESeries($rowsArr);
 
-            return $this->respond([
+            $response = [
                 'season' => $season,
                 'series' => $sweSeries,
-            ]);
+            ];
+
+            cache()->save($cacheKey, $response, self::CACHE_TTL);
+
+            return $this->respond($response);
         } catch (\Exception $e) {
             log_message('error', 'Anomaly::history error: ' . $e->getMessage());
             return $this->failServerError('An error occurred while retrieving historical data.');

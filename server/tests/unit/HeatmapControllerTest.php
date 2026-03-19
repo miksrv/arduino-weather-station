@@ -136,6 +136,83 @@ final class HeatmapControllerTest extends CIUnitTestCase
         $this->assertCount(1, $body);
     }
 
+    // -------------------------------------------------------------------------
+    // Caching behaviour
+    // -------------------------------------------------------------------------
+
+    /**
+     * When a cache entry already exists, getHeatmapData() must use it without
+     * calling the model and still return a 200 JSON array.
+     */
+    public function testGetHeatmapDataReturnsCachedDataWithout200(): void
+    {
+        $fakeRow  = ['date' => '2023-01-01 10:10:00', 'temperature' => 5.0];
+        $cacheKey = 'heatmap_' . md5('temperature_2023-01-01_2023-01-31');
+
+        // Pre-seed the cache with the raw row array.
+        cache()->save($cacheKey, [$fakeRow], 0);
+
+        // Model must NOT be called when cache is warm.
+        $mockModel = $this->createMock(RawWeatherDataModel::class);
+        $mockModel->expects($this->never())->method('getWeatherHistoryGrouped');
+
+        $this->controller(Heatmap::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockModel);
+
+        $this->request->setMethod('GET');
+        parse_str('type=temperature&start_date=2023-01-01&end_date=2023-01-31', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHeatmapData');
+        $this->assertSame(200, $result->response()->getStatusCode());
+
+        $body = json_decode((string) $result->response()->getBody(), true);
+        $this->assertIsArray($body);
+        $this->assertCount(1, $body);
+
+        // Clean up.
+        cache()->delete($cacheKey);
+    }
+
+    /**
+     * CACHE_TTL_SHORT and CACHE_TTL_LONG constants are defined with expected values.
+     */
+    public function testCacheTtlConstants(): void
+    {
+        $this->assertSame(15 * 60, Heatmap::CACHE_TTL_SHORT);
+        $this->assertSame(0, Heatmap::CACHE_TTL_LONG);
+    }
+
+    /**
+     * Empty model result (no data) must NOT be cached; a subsequent cold call must
+     * still hit the model.
+     */
+    public function testEmptyDataIsNotCached(): void
+    {
+        $mockModel = $this->createMock(RawWeatherDataModel::class);
+        // Called twice — first warm miss, second warm miss (nothing was cached).
+        $mockModel->expects($this->exactly(2))
+            ->method('getWeatherHistoryGrouped')
+            ->willReturn([]);
+
+        $this->controller(Heatmap::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockModel);
+
+        $this->request->setMethod('GET');
+        parse_str('type=temperature&start_date=2023-06-01&end_date=2023-06-30', $get);
+        $this->request->setGlobal('get', $get);
+
+        // First call.
+        $this->execute('getHeatmapData');
+
+        // Second call — must re-execute the model, not read from cache.
+        $this->controller(Heatmap::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockModel);
+        $this->request->setMethod('GET');
+        $this->request->setGlobal('get', $get);
+        $this->execute('getHeatmapData');
+    }
+
     /**
      * All valid weather types are accepted (do not produce a type-error 400).
      */

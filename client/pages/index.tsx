@@ -10,7 +10,7 @@ import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
 import WidgetAnomalyCard from '@/components/widget-anomaly-card'
 import WidgetChart from '@/components/widget-chart'
-import WidgetForecastTable from '@/components/widget-forecast-table'
+import WidgetForecastCards from '@/components/widget-forecast-cards'
 import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
@@ -28,9 +28,9 @@ type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon'> & {
 const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n, t } = useTranslation()
 
-    const { data: forecastHourly, isLoading: hourlyLoading } = API.useGetForecastQuery('hourly', {
-        pollingInterval: POLING_INTERVAL_FORECAST
-    })
+    // const { data: forecastHourly, isLoading: hourlyLoading } = API.useGetForecastQuery('hourly', {
+    //     pollingInterval: POLING_INTERVAL_FORECAST
+    // })
 
     const { data: forecastDaily, isLoading: dailyLoading } = API.useGetForecastQuery('daily', {
         pollingInterval: POLING_INTERVAL_FORECAST
@@ -144,24 +144,9 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     ))
                 )}
 
-                <WidgetForecastTable
-                    title={t('weather-forecast-by-days')}
-                    link={{ href: '/forecast', title: t('forecast') }}
-                    columnsPreset={['date', 'weather', 'temperature', 'clouds']}
+                <WidgetForecastCards
                     loading={dailyLoading}
-                    data={forecastDaily}
-                    defaultSort={{ key: 'date', direction: 'asc' }}
-                    stickyHeader={true}
-                />
-
-                <WidgetForecastTable
-                    title={t('weather-forecast-hourly')}
-                    link={{ href: '/forecast', title: t('forecast') }}
-                    columnsPreset={['time', 'weatherIcon', 'temperature', 'clouds', 'pressure', 'wind']}
-                    loading={hourlyLoading}
-                    data={forecastHourly}
-                    defaultSort={{ key: 'date', direction: 'asc' }}
-                    stickyHeader={true}
+                    forecast={forecastDaily}
                 />
 
                 <WidgetChart
@@ -184,7 +169,7 @@ export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context): Promise<GetServerSidePropsResult<IndexPageProps>> => {
             const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
-            const translations = await serverSideTranslations(locale)
+            const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
 

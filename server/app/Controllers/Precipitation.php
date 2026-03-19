@@ -21,6 +21,12 @@ use Exception;
  */
 class Precipitation extends ResourceController
 {
+    /** @var int Cache TTL for current-year requests (15 minutes) */
+    public const CACHE_TTL_SHORT = 15 * 60;
+
+    /** @var int Cache TTL for previous-year requests (indefinite) */
+    public const CACHE_TTL_LONG  = 0;
+
     /**
      * GET /precipitation
      *
@@ -58,18 +64,30 @@ class Precipitation extends ResourceController
             );
         }
 
+        $cacheKey = 'precipitation_index_' . $year;
+        $ttl      = ($year === $currentYear) ? self::CACHE_TTL_SHORT : self::CACHE_TTL_LONG;
+        $cached   = cache()->get($cacheKey);
+
+        if ($cached !== null) {
+            return $this->respond($cached);
+        }
+
         try {
             $model       = new PrecipitationModel();
             $dailyTotals = $model->getDailyTotals($year);
             $years       = $model->getAvailableYears();
             $stats       = $model->getStats($year, $dailyTotals);
 
-            return $this->respond([
+            $response = [
                 'year'           => $year,
                 'days'           => $dailyTotals,
                 'stats'          => $stats,
                 'availableYears' => $years,
-            ]);
+            ];
+
+            cache()->save($cacheKey, $response, $ttl);
+
+            return $this->respond($response);
         } catch (Exception $e) {
             log_message('error', 'Precipitation::index error: ' . $e->getMessage());
             return $this->failServerError('An error occurred while retrieving precipitation data.');

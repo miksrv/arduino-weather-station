@@ -1,6 +1,6 @@
 {
     "name": "weather-station",
-    "version": "3.7.0",
+    "version": "3.7.1",
     "engines": {
         "node": ">=20.11.0"
     },
@@ -24,6 +24,9 @@
         "dayjs": "^1.11.19",
         "echarts": "^6.0.0",
         "echarts-for-react": "3.0.6",
+        "embla-carousel": "^8.6.0",
+        "embla-carousel-auto-scroll": "^8.6.0",
+        "embla-carousel-react": "^8.6.0",
         "i18next": "^25.8.14",
         "lodash-es": "^4.17.23",
         "next": "^16.1.6",

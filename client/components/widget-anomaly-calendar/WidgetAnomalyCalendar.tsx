@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { Skeleton } from 'simple-react-ui-kit'
+import { cn, Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 
@@ -122,7 +122,7 @@ const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ loading, 
                 {cells.map(({ dateStr, count, types, isFuture }) => (
                     <div
                         key={dateStr}
-                        className={isFuture || count === 0 ? styles.cell : styles[getIntensityClass(count)]}
+                        className={cn(isFuture || count === 0 ? styles.cell : styles[getIntensityClass(count)])}
                         onMouseEnter={(e) => handleMouseEnter(e, dateStr, count, types, isFuture)}
                         onMouseLeave={handleMouseLeave}
                     />

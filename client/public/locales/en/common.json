@@ -129,7 +129,6 @@
     "total-precipitation": "Total precipitation",
     "longest-wet-streak": "Longest wet streak",
     "longest-dry-streak": "Longest dry streak",
-    "max-daily-rain": "Maximum daily rainfall",
     "days-count_one": "{{count}} day",
     "days-count_other": "{{count}} days",
     "monthly-totals": "Monthly totals",
