@@ -6,8 +6,8 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 
 import { AppProps } from 'next/app'
-import { useRouter } from 'next/dist/client/router'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 // import { useReportWebVitals } from 'next/web-vitals'
 import { appWithTranslation, useTranslation } from 'next-i18next'
 import { ThemeProvider } from 'next-themes'
@@ -49,7 +49,7 @@ const App = ({ Component, pageProps }: AppProps) => {
                 locale: storageLocale
             })
         }
-    }, [storageLocale, i18n.language, router])
+    }, [storageLocale, i18n.language, router.pathname, router.asPath])
 
     useEffect(() => {
         dayjs.locale(i18n.language ?? i18Config.i18n.defaultLocale)
@@ -127,4 +127,4 @@ const App = ({ Component, pageProps }: AppProps) => {
     )
 }
 
-export default appWithTranslation(App)
+export default appWithTranslation(App, i18Config)

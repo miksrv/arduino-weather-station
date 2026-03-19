@@ -15,6 +15,8 @@ import WidgetPrecipStatCard from '@/components/widget-precip-stat-card'
 import WidgetStreakCard from '@/components/widget-streak-card'
 import { LocaleType } from '@/tools/types'
 
+import styles from './precipitation.module.sass'
+
 type PrecipitationPageProps = object
 
 const PrecipitationPage: NextPage<PrecipitationPageProps> = () => {
@@ -52,7 +54,7 @@ const PrecipitationPage: NextPage<PrecipitationPageProps> = () => {
             />
 
             {availableYears.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', margin: '5px 0 10px' }}>
+                <div className={styles.yearSelector}>
                     {availableYears.map((y) => (
                         <Button
                             key={y}
@@ -114,7 +116,7 @@ export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context): Promise<GetServerSidePropsResult<PrecipitationPageProps>> => {
             const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
-            const translations = await serverSideTranslations(locale)
+            const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
 

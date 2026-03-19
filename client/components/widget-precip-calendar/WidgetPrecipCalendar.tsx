@@ -177,7 +177,9 @@ const WidgetPrecipCalendar: React.FC<WidgetPrecipCalendarProps> = ({ loading, ye
                     style={{ left: tooltip.x, top: tooltip.y }}
                 >
                     <div className={styles.tooltipDate}>{formatDate(tooltip.date, t('date-no-time'))}</div>
-                    <div className={styles.tooltipValue}>{tooltip.total.toFixed(1)} mm</div>
+                    <div className={styles.tooltipValue}>
+                        {tooltip.total.toFixed(1)} {t('millimeters')}
+                    </div>
                 </div>
             )}
         </div>

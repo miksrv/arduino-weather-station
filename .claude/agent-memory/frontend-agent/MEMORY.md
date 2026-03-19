@@ -6,3 +6,6 @@
 
 ## Feedback
 - [feedback_testing_conventions.md](feedback_testing_conventions.md) — Mocking patterns, mock completeness (simple-react-ui-kit), pages/_app import trap, ECharts+echarts mocking, hook testing quirks, multi-text-node getByText regex, timezone-safe today date construction
+- [feedback_useLocalStorage_default.md](feedback_useLocalStorage_default.md) — Never pass a default value to useLocalStorage for shared keys (like LOCALE); the hook writes the default to storage on mount, overwriting valid stored values
+- [feedback_useLocalStorage_sync_write.md](feedback_useLocalStorage_sync_write.md) — useLocalStorage setState must write to localStorage synchronously (inside the updater), not in a useEffect, to prevent locale redirect bounce on navigation
+- [feedback_router_dependency_array.md](feedback_router_dependency_array.md) — Never put the whole `router` object in a useEffect dep array; use specific stable properties (pathname, asPath) instead

@@ -33,9 +33,14 @@ RTK Query is the exclusive API layer. All endpoints live in `api/api.ts`. The `L
 
 - All translations in a single `public/locales/{en,ru}/common.json`.
 - `useTranslation()` (no namespace arg) is used everywhere — defaults to `common`.
+- `serverSideTranslations(locale, ['common'])` must be called with the explicit namespace arg on all pages.
+- `appWithTranslation(App)` in `_app.tsx` is called without a config override — `next-i18next` auto-discovers `next-i18next.config.js`.
+- Default locale fallback in all pages' `getServerSideProps` should be `'ru'` (the configured `defaultLocale`), not `'en'`.
+- The language switcher uses `router.push({ pathname, query }, asPath, { locale })` only. Never call `i18n.changeLanguage()` alongside `router.push` — the router navigation handles the i18n update, the direct call causes a race condition / double update.
 - Weather condition codes map to `conditions.*` nested keys (e.g. `conditions.clear_sky`).
 - Date format strings are translated (e.g. `date-full-format`, `date-only-hour`) to allow locale-specific formats.
 - **I18n audit 2026-03-17:** `toggle-sidebar` (aria-label) and `weather-icon` (Meteogram series name) added to both locales. Dead keys removed: `direction`, `anomaly-monitoring`, `anomaly-calendar-title`, `z-score-label`, `swe-flood-year`. Both locale files are now fully symmetric at 137 top-level + 56 `conditions` keys = 193 entries each.
+- **I18n audit 2026-03-19:** All `serverSideTranslations` calls standardised to pass `['common']` explicitly. `[...not-found].tsx` refactored to use `wrapper.getServerSideProps` + `setLocale` dispatch (was the only page without it); default locale fallback corrected to `'ru'`; `useTranslation('common')` simplified to `useTranslation()`. `WidgetPrecipCalendar` hardcoded `'mm'` replaced with `t('millimeters')`. `precipitation.tsx` inline style on year selector extracted to `precipitation.module.sass`.
 
 ## Known Bugs (as of 2026-03-14 audit — see ROADMAP.md)
 
