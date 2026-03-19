@@ -29,7 +29,7 @@
         "embla-carousel-react": "^8.6.0",
         "i18next": "^25.8.14",
         "lodash-es": "^4.17.23",
-        "next": "^16.1.6",
+        "next": "^16.1.7",
         "next-i18next": "^15.4.3",
         "next-redux-wrapper": "^8.1.0",
         "next-seo": "^6.8.0",
