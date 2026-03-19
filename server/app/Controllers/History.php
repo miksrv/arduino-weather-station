@@ -27,6 +27,12 @@ use Exception;
  * $history->getHistoryWeatherCSV();
  */
 class History extends ResourceController {
+    /** @var int Cache TTL for requests that include today (15 minutes) */
+    public const CACHE_TTL_SHORT = 15 * 60;
+
+    /** @var int Cache TTL for purely historical requests (indefinite) */
+    public const CACHE_TTL_LONG = 0;
+
     protected RawWeatherDataModel $weatherDataModel;
     protected HourlyAveragesModel $hourlyAveragesModel;
     protected DailyAveragesModel $dailyAveragesModel;
@@ -45,9 +51,29 @@ class History extends ResourceController {
      */
     public function getHistoryWeather(): ResponseInterface
     {
+        $startDate = $this->request->getGet('start_date');
+        $endDate   = $this->request->getGet('end_date');
+        $cacheKey  = 'history_' . md5(($startDate ?? '') . '_' . ($endDate ?? ''));
+
+        $rawData = cache()->get($cacheKey);
+
+        if (!is_array($rawData)) {
+            $rawData = $this->_getData();
+
+            if (is_array($rawData)) {
+                $isEndDateToday = date('Y-m-d', strtotime($endDate ?? 'today')) === date('Y-m-d');
+                $ttl = $isEndDateToday ? self::CACHE_TTL_SHORT : self::CACHE_TTL_LONG;
+                cache()->save($cacheKey, $rawData, $ttl);
+            }
+        }
+
+        if (!is_array($rawData)) {
+            return $rawData;
+        }
+
         $result = [];
 
-        foreach ($this->_getData() as $data) {
+        foreach ($rawData as $data) {
             $result[] = new WeatherData($data);
         }
 

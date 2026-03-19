@@ -79,7 +79,7 @@ class GetForecastWeather extends BaseCommand
                 // Index existing records by their forecast_time string for O(1) lookup
                 $existingMap = [];
                 foreach ($existingRecords as $record) {
-                    $existingMap[$record->forecast_time->toDateTimeString()] = $record->id;
+                    $existingMap[$record->forecast_time->format('Y-m-d H:i:s')] = $record->id;
                 }
 
                 // Partition incoming data into inserts and updates
@@ -87,13 +87,13 @@ class GetForecastWeather extends BaseCommand
                 $updateData = [];
 
                 foreach ($dataArray as $data) {
-                    $currentTimeString = $data['forecast_time']->toDateTimeString();
+                    $currentTimeString = $data['forecast_time']->format('Y-m-d H:i:s');
 
                     if (isset($existingMap[$currentTimeString])) {
-                        $data['id']   = $existingMap[$currentTimeString];
-                        $updateData[] = array_merge($data, ['forecast_time' => $currentTimeString]);
+                        $data['id'] = $existingMap[$currentTimeString];
+                        $updateData[] = $data;
                     } else {
-                        $insertData[] = array_merge($data, ['forecast_time' => $currentTimeString]);
+                        $insertData[] = $data;
                     }
                 }
 
