@@ -206,6 +206,53 @@ final class HistoryControllerTest extends CIUnitTestCase
     }
 
     // -------------------------------------------------------------------------
+    // getHistoryWeather — caching behaviour
+    // -------------------------------------------------------------------------
+
+    /**
+     * When a cache entry already exists, getHistoryWeather() must use it without
+     * hitting the model and still return a 200 JSON array.
+     */
+    public function testGetHistoryWeatherReturnsCachedDataWithout200(): void
+    {
+        $fakeRow  = ['date' => '2023-01-01 10:00:00', 'temperature' => 7.0];
+        $cacheKey = 'history_' . md5('2023-01-01_2023-01-02');
+
+        // Pre-seed the cache with the raw row array.
+        cache()->save($cacheKey, [$fakeRow], 0);
+
+        // Model must NOT be called when cache is warm.
+        $mockRaw = $this->createMock(RawWeatherDataModel::class);
+        $mockRaw->expects($this->never())->method('getWeatherHistoryGrouped');
+
+        $this->controller(History::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockRaw);
+
+        $this->request->setMethod('GET');
+        parse_str('start_date=2023-01-01&end_date=2023-01-02', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(200, $result->response()->getStatusCode());
+
+        $body = json_decode((string) $result->response()->getBody(), true);
+        $this->assertIsArray($body);
+        $this->assertCount(1, $body);
+
+        // Clean up.
+        cache()->delete($cacheKey);
+    }
+
+    /**
+     * CACHE_TTL_SHORT and CACHE_TTL_LONG constants are defined with expected values.
+     */
+    public function testCacheTtlConstants(): void
+    {
+        $this->assertSame(15 * 60, History::CACHE_TTL_SHORT);
+        $this->assertSame(0, History::CACHE_TTL_LONG);
+    }
+
+    // -------------------------------------------------------------------------
     // getHistoryWeatherCSV — export
     // -------------------------------------------------------------------------
 
