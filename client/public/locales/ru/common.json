@@ -129,7 +129,6 @@
     "total-precipitation": "Сумма осадков",
     "longest-wet-streak": "Наибольшая серия дождливых дней",
     "longest-dry-streak": "Наибольшая серия сухих дней",
-    "max-daily-rain": "Максимальные суточные осадки",
     "days-count_one": "{{count}} день",
     "days-count_few": "{{count}} дня",
     "days-count_many": "{{count}} дней",

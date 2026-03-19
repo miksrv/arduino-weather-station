@@ -38,7 +38,9 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     </button>
 
                     {!isLoading && (
-                        <div className={cn(minutesAgo(current?.date) <= OFFLINE_TIME ? styles.online : styles.offline)} />
+                        <div
+                            className={cn(minutesAgo(current?.date) <= OFFLINE_TIME ? styles.online : styles.offline)}
+                        />
                     )}
 
                     {isLoading ? (
