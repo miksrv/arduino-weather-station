@@ -1,5 +1,5 @@
 import React from 'react'
-import { Skeleton } from 'simple-react-ui-kit'
+import { cn, Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 import { useTheme } from 'next-themes'
@@ -44,7 +44,7 @@ const WidgetFloodRisk: React.FC<WidgetFloodRiskProps> = ({ loading, score, level
         <div className={styles.widget}>
             <div className={styles.header}>
                 <span className={styles.title}>{t('flood-risk')}</span>
-                <span className={`${styles.levelBadge} ${styles[`levelBadge--${level}`]}`}>
+                <span className={cn(styles.levelBadge, styles[`levelBadge--${level}`])}>
                     {t(`flood-risk-${level}`)}
                 </span>
             </div>

@@ -105,6 +105,12 @@ Utility helpers for `widget-anomaly-history` live in `components/widget-anomaly-
 - `getDuration(startDate, endDate)` — returns `'${days}d'` or `''` when endDate is null (component renders `t('in-progress')` for empty string)
 - `anomalyTypeToI18nKey(type)` — re-exported from `@/tools/conditions` (canonical location after 2026-03-17 refactor)
 
+## WidgetForecastCards (added 2026-03-19)
+
+New component at `client/components/widget-forecast-cards/` renders both daily and hourly forecast as horizontally scrollable card rows. Full-width (`flex-basis: 100%`), used on the index page instead of two `WidgetForecastTable` instances. Two sub-components (`DailyCard`, `HourlyCard`) are co-located in the same `.tsx` file. Highlight state for today's daily card and current-hour hourly card uses `getDate(item.date).format('YYYY-MM-DD') === todayStr`.
+
+The two `WidgetForecastTable` instances from `index.tsx` were moved to `forecast.tsx` (appended after the existing daily table, both with `fullWidth={true}`).
+
 ## Canonical String-Conversion Helpers (tools/)
 
 - `anomalyTypeToI18nKey(type)` in `tools/conditions.ts` — converts `snake_case` anomaly IDs to `kebab-case` i18n key segments (e.g. `heat_wave` → `heat-wave`). Used by `widget-anomaly-history/utils.ts` (re-export), `widget-anomaly-calendar/WidgetAnomalyCalendar.tsx` (direct import), and `widget-anomaly-card/utils.ts` (re-exported as `anomalyIdToI18nKey` for backward compatibility).

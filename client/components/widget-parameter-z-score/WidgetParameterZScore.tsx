@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { EChartsOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
-import { Icon, IconTypes, Skeleton } from 'simple-react-ui-kit'
+import { cn, Icon, IconTypes, Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 
@@ -93,7 +93,7 @@ const WidgetParameterZScore: React.FC<WidgetParameterZScoreProps> = ({ loading, 
                 {Array.from({ length: TOTAL_DOTS }, (_, i) => (
                     <span
                         key={i}
-                        className={i < filledDots ? styles.dotFilled : styles.dotEmpty}
+                        className={cn(i < filledDots ? styles.dotFilled : styles.dotEmpty)}
                         style={i < filledDots ? { backgroundColor: color } : undefined}
                     />
                 ))}

@@ -51,9 +51,9 @@ const WidgetAnomalyCard: React.FC<WidgetAnomalyCardProps> = ({
     }
 
     return (
-        <div className={cn(active ? styles.cardActive : styles.card, fullWidth && styles.fullWidth)}>
+        <div className={cn(styles.card, active && styles.cardActive, fullWidth && styles.fullWidth)}>
             <div className={styles.header}>
-                <span className={active ? styles.dotActive : styles.dot} />
+                <span className={cn(styles.dot, active && styles.dotActive)} />
                 <span className={styles.label}>{label}</span>
             </div>
 

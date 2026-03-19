@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { setCookie } from 'cookies-next'
+import { cn } from 'simple-react-ui-kit'
 
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
@@ -45,13 +46,13 @@ const LanguageSwitcher: React.FC = () => {
     return (
         <div className={styles.languageSwitcher}>
             <button
-                className={currentLanguage === 'en' ? styles.active : undefined}
+                className={cn(currentLanguage === 'en' && styles.active)}
                 onClick={() => changeLanguage('en')}
             >
                 {'Eng'}
             </button>
             <button
-                className={currentLanguage === 'ru' ? styles.active : undefined}
+                className={cn(currentLanguage === 'ru' && styles.active)}
                 onClick={() => changeLanguage('ru')}
             >
                 {'Rus'}
