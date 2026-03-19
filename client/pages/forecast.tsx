@@ -63,6 +63,15 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     defaultSort={{ key: 'date', direction: 'asc' }}
                     fullWidth={true}
                 />
+
+                <WidgetForecastTable
+                    title={t('weather-forecast-hourly')}
+                    columnsPreset={['time', 'weatherIcon', 'temperature', 'clouds', 'pressure', 'wind']}
+                    loading={hourlyLoading}
+                    data={forecastHourly}
+                    defaultSort={{ key: 'date', direction: 'asc' }}
+                    fullWidth={true}
+                />
             </div>
         </AppLayout>
     )
