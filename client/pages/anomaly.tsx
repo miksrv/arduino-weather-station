@@ -43,12 +43,15 @@ const AnomalyPage: NextPage<object> = () => {
                 description={t('anomaly-page-description', { location: 'Orenburg' })}
                 canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/anomaly`}
                 openGraph={{
-                    description: t('site-description'),
+                    description: t('anomaly-page-description', { location: 'Orenburg' }),
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                     siteName: t('weather-in-orenburg'),
                     title: t('meteorological-anomaly'),
                     type: 'website',
-                    url: process.env.NEXT_PUBLIC_SITE_LINK
+                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/anomaly`
+                }}
+                twitter={{
+                    cardType: 'summary_large_image'
                 }}
             />
 

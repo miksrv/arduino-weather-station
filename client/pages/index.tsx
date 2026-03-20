@@ -86,7 +86,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     images: [
                         {
                             height: 1642,
-                            url: '/images/main.jpg',
+                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/main.jpg`,
                             width: 2032
                         }
                     ],
@@ -95,6 +95,9 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     title: t('weather-in-orenburg'),
                     type: 'website',
                     url: process.env.NEXT_PUBLIC_SITE_LINK
+                }}
+                twitter={{
+                    cardType: 'summary_large_image'
                 }}
             />
 

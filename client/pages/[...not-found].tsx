@@ -17,9 +17,10 @@ export default function CatchAllPage() {
     return (
         <AppLayout>
             <NextSeo
+                noindex={true}
+                nofollow={false}
                 title={t('page-not-found')}
                 description={t('page-not-found-description')}
-                canonical={process.env.NEXT_PUBLIC_SITE_LINK}
                 openGraph={{
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                     siteName: t('weather-in-orenburg'),
