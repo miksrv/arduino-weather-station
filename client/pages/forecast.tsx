@@ -33,19 +33,22 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 description={t('forecast-page-description')}
                 canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/forecast`}
                 openGraph={{
-                    description: t('site-description'),
+                    description: t('forecast-page-description'),
                     images: [
                         {
                             height: 1368,
-                            url: '/images/forecast.jpg',
+                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/forecast.jpg`,
                             width: 2040
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                     siteName: t('weather-in-orenburg'),
-                    title: t('weather-in-orenburg'),
+                    title: t('forecast-weather-in-orenburg'),
                     type: 'website',
-                    url: process.env.NEXT_PUBLIC_SITE_LINK
+                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/forecast`
+                }}
+                twitter={{
+                    cardType: 'summary_large_image'
                 }}
             />
 

@@ -15,12 +15,12 @@ const Footer: React.FC = () => (
             <a
                 href={'https://miksoft.pro'}
                 className={styles.link}
-                title={''}
+                title={'Mik — author'}
             >
                 <Image
                     className={styles.copyrightImage}
                     src={'https://miksoft.pro/favicon.ico'}
-                    alt={''}
+                    alt={'Mik'}
                     width={12}
                     height={12}
                 />
@@ -33,9 +33,9 @@ const Footer: React.FC = () => (
             <span>{packageInfo.version}</span>
             <a
                 href={'https://github.com/miksrv/arduino-weather-station'}
-                rel={'nofollow noindex'}
+                rel={'nofollow noreferrer'}
                 className={styles.link}
-                title={''}
+                title={'Arduino Weather Station on GitHub'}
             >
                 {'GitHub'}
             </a>

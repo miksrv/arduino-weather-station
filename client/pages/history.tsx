@@ -52,19 +52,22 @@ const HistoryPage: NextPage<object> = () => {
                 description={t('history-page-description')}
                 canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/history`}
                 openGraph={{
-                    description: t('site-description'),
+                    description: t('history-page-description'),
                     images: [
                         {
                             height: 1292,
-                            url: '/images/history.jpg',
+                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/history.jpg`,
                             width: 2028
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                     siteName: t('weather-in-orenburg'),
-                    title: t('weather-in-orenburg'),
+                    title: t('historical-weather-data'),
                     type: 'website',
-                    url: process.env.NEXT_PUBLIC_SITE_LINK
+                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/history`
+                }}
+                twitter={{
+                    cardType: 'summary_large_image'
                 }}
             />
 

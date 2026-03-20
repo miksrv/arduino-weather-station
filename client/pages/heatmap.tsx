@@ -55,19 +55,22 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
                 description={t('heatmap-page-description')}
                 canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/heatmap`}
                 openGraph={{
-                    description: t('site-description'),
+                    description: t('heatmap-page-description'),
                     images: [
                         {
                             height: 1130,
-                            url: '/images/heatmap.jpg',
+                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/heatmap.jpg`,
                             width: 2026
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                     siteName: t('weather-in-orenburg'),
-                    title: t('weather-in-orenburg'),
+                    title: t('heatmap'),
                     type: 'website',
-                    url: process.env.NEXT_PUBLIC_SITE_LINK
+                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/heatmap`
+                }}
+                twitter={{
+                    cardType: 'summary_large_image'
                 }}
             />
 

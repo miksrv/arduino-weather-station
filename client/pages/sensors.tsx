@@ -147,19 +147,22 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 description={t('sensors-page-description')}
                 canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/sensors`}
                 openGraph={{
-                    description: t('site-description'),
+                    description: t('sensors-page-description'),
                     images: [
                         {
                             height: 1480,
-                            url: '/images/sensors.jpg',
+                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/sensors.jpg`,
                             width: 2026
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                     siteName: t('weather-in-orenburg'),
-                    title: t('weather-in-orenburg'),
+                    title: t('weather-sensors'),
                     type: 'website',
-                    url: process.env.NEXT_PUBLIC_SITE_LINK
+                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/sensors`
+                }}
+                twitter={{
+                    cardType: 'summary_large_image'
                 }}
             />
 

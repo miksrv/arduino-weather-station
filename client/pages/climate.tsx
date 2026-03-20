@@ -121,23 +121,26 @@ const ClimatePage: NextPage = () => {
     return (
         <AppLayout>
             <NextSeo
-                title={t('historical-weather-data')}
-                description={t('history-page-description')}
+                title={t('climate-page-title')}
+                description={t('climate-page-description')}
                 canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/climate`}
                 openGraph={{
-                    description: t('site-description'),
+                    description: t('climate-page-description'),
                     images: [
                         {
                             height: 1292,
-                            url: '/images/history.jpg',
+                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/history.jpg`,
                             width: 2028
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                     siteName: t('weather-in-orenburg'),
-                    title: t('weather-in-orenburg'),
+                    title: t('climate-page-title'),
                     type: 'website',
-                    url: process.env.NEXT_PUBLIC_SITE_LINK
+                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/climate`
+                }}
+                twitter={{
+                    cardType: 'summary_large_image'
                 }}
             />
 
