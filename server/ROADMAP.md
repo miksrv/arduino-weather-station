@@ -62,20 +62,6 @@ Set `$forceGlobalSecureRequests = true` in production.
 
 ---
 
-### SEC-15 · Unused `firebase/php-jwt` production dependency [MEDIUM]
-
-**File:** `server/composer.json`, line 9
-
-```json
-"firebase/php-jwt": "^6.10"
-```
-
-The JWT library is listed as a production dependency but is not imported or used anywhere in the codebase. Unused dependencies add attack surface (CVEs in unused libraries still affect the project) and create a misleading impression that JWT authentication is implemented.
-
-Remove the dependency with `composer remove firebase/php-jwt`. If JWT authentication is planned, document it as a future task rather than pre-installing the library.
-
----
-
 ### SEC-18 · Physical station GPS coordinates committed to a public repository [LOW]
 
 **File:** `server/.env.production`
@@ -139,7 +125,6 @@ The `fileExtension` defaults to `.log`. The CodeIgniter documentation notes that
 | ID     | Summary                                                    | File |
 | ------ | ---------------------------------------------------------- | ---- |
 | SEC-13 | HTTPS not enforced at application level                    | `Config/App.php:136` |
-| SEC-15 | Unused `firebase/php-jwt` production dependency            | `composer.json:9` |
 
 ### Low
 
