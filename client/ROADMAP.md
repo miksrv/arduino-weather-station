@@ -331,12 +331,12 @@ Both files parse JSON from browser storage and immediately cast the result to a 
 
 ### High (fix first)
 
-| ID      | Summary                                            |
-| ------- | -------------------------------------------------- |
-| SEC-01  | Missing HTTP security headers (CSP, X-Frame-Options, HSTS) |
+| ID      | Summary                                                     |
+| ------- | ----------------------------------------------------------- |
+| SEC-01  | Missing HTTP security headers (CSP, X-Frame-Options, HSTS)  |
 | SEC-02  | Yandex.Metrika script via `dangerouslySetInnerHTML`, no SRI |
-| QC-01   | `any` types in ECharts tooltip formatters          |
-| FEAT-03 | No error state handling for any RTK Query endpoint |
+| QC-01   | `any` types in ECharts tooltip formatters                   |
+| FEAT-03 | No error state handling for any RTK Query endpoint          |
 
 ### Medium (address in regular sprints)
 
