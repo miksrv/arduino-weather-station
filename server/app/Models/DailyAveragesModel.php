@@ -21,6 +21,9 @@ use CodeIgniter\Model;
  */
 class DailyAveragesModel extends Model
 {
+    /** @var string[] Allowed interval strings for GROUP BY calculations */
+    private const ALLOWED_INTERVALS = ['10 MINUTE', '1 HOUR', '1 DAY'];
+
     protected $table         = 'daily_averages';
     protected $primaryKey    = 'id';
     protected $useTimestamps = false;
@@ -94,6 +97,10 @@ class DailyAveragesModel extends Model
      */
     public function getWeatherHistoryGrouped($startDate, $endDate, $groupInterval): array
     {
+        if (!in_array(strtoupper($groupInterval), self::ALLOWED_INTERVALS, true)) {
+            throw new \InvalidArgumentException('Invalid groupInterval value: ' . $groupInterval);
+        }
+
         return $this
             ->select('DATE_FORMAT(date, "%Y-%m-%d %H:%i:00") as date,' . RawWeatherDataModel::getSelectAverageSQL())
             ->where('date >=', $startDate)
