@@ -97,6 +97,40 @@ final class HistoryControllerTest extends CIUnitTestCase
         $this->execute('getHistoryWeather');
     }
 
+    /**
+     * SEC-07: End-date in the future must also be rejected (TypeError due to
+     * the known return-type mismatch on _getData()).
+     */
+    public function testFutureEndDateThrowsTypeError(): void
+    {
+        $this->expectException(\TypeError::class);
+
+        $this->controller(History::class);
+        $this->request->setMethod('GET');
+        // start_date is in the past, end_date is far in the future
+        parse_str('start_date=2023-01-01&end_date=2099-12-31', $get);
+        $this->request->setGlobal('get', $get);
+
+        $this->execute('getHistoryWeather');
+    }
+
+    /**
+     * SEC-14: Date range exceeding 366 days must be rejected (TypeError due to
+     * the known return-type mismatch on _getData()).
+     */
+    public function testDateRangeExceeding366DaysThrowsTypeError(): void
+    {
+        $this->expectException(\TypeError::class);
+
+        $this->controller(History::class);
+        $this->request->setMethod('GET');
+        // 400-day range
+        parse_str('start_date=2022-01-01&end_date=2023-02-05', $get);
+        $this->request->setGlobal('get', $get);
+
+        $this->execute('getHistoryWeather');
+    }
+
     public function testDateBefore2020ThrowsTypeError(): void
     {
         $this->expectException(\TypeError::class);

@@ -2,6 +2,8 @@
 
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\FeatureTestTrait;
+use CodeIgniter\Throttle\Throttler;
+use CodeIgniter\Config\Services;
 
 /**
  * Feature/unit tests for App\Controllers\Sensors.
@@ -11,6 +13,16 @@ use CodeIgniter\Test\FeatureTestTrait;
 final class SensorsControllerTest extends CIUnitTestCase
 {
     use FeatureTestTrait;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Reset the shared throttler service so each test starts with a fresh
+        // rate-limit bucket. The default mockCache() in CIUnitTestCase replaces
+        // the cache service but the shared throttler still holds a reference to
+        // the old cache. Injecting a new throttler with the current cache fixes this.
+        Services::injectMock('throttler', new Throttler(Services::cache()));
+    }
 
     // -------------------------------------------------------------------------
     // Token validation
@@ -45,7 +57,7 @@ final class SensorsControllerTest extends CIUnitTestCase
 
     /**
      * When the token matches and data is present, auth + validation pass.
-     * Without a DB, the model save will throw → 500. That is the expected
+     * Without a DB, the model save will throw -> 500. That is the expected
      * outcome confirming auth and validation succeeded.
      */
     public function testValidTokenAndDataPassesAuthAndValidation(): void
@@ -67,6 +79,20 @@ final class SensorsControllerTest extends CIUnitTestCase
         $statusCode = $result->response()->getStatusCode();
         $this->assertNotSame(401, $statusCode, 'Should not be 401 when token is correct');
         $this->assertNotSame(400, $statusCode, 'Should not be 400 when data is present');
+    }
+
+    /**
+     * A second POST within the rate window from the same IP must return 429.
+     */
+    public function testThrottleReturns429OnSubsequentRequest(): void
+    {
+        // First request — passes throttle (fresh bucket due to setUp)
+        $first = $this->post('sensors', ['t' => '20.5']);
+        $this->assertNotSame(429, $first->response()->getStatusCode(), 'First request must not be throttled');
+
+        // Second immediate request from the same IP — throttle should fire
+        $second = $this->post('sensors', ['t' => '20.5']);
+        $this->assertSame(429, $second->response()->getStatusCode(), 'Second request within the window must be throttled');
     }
 
     // -------------------------------------------------------------------------

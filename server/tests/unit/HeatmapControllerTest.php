@@ -88,6 +88,19 @@ final class HeatmapControllerTest extends CIUnitTestCase
         $result->assertStatus(400);
     }
 
+    /**
+     * SEC-14: Date range exceeding 366 days must return 400.
+     */
+    public function testDateRangeExceeding366DaysReturns400(): void
+    {
+        $result = $this->get('heatmap', [
+            'type'       => 'temperature',
+            'start_date' => '2022-01-01',
+            'end_date'   => '2023-02-05',  // ~400 days
+        ]);
+        $result->assertStatus(400);
+    }
+
     // -------------------------------------------------------------------------
     // Happy path — ControllerTestTrait with mocked model
     // -------------------------------------------------------------------------
