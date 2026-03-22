@@ -231,12 +231,110 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 
 ---
 
-## 6. Summary by Priority
+## 7. Security
+
+> All items below were identified during a security audit on 2026-03-22. Severity levels: **CRITICAL** · **HIGH** · **MEDIUM** · **LOW**
+
+---
+
+### SEC-01 · Missing HTTP security headers — no CSP, X-Frame-Options, HSTS, or X-Content-Type-Options [HIGH]
+
+**File:** `next.config.js`
+
+The `next.config.js` exports no `headers()` function, so every page is served without any protective HTTP headers:
+
+- **Content-Security-Policy** — no restriction on which scripts, styles, or frames may load. Any successful XSS payload executes without constraint.
+- **X-Frame-Options / CSP `frame-ancestors`** — the application can be embedded in a third-party `<iframe>`, enabling clickjacking attacks on all pages.
+- **X-Content-Type-Options: nosniff** — browsers may sniff response MIME types, enabling MIME-confusion attacks.
+- **Strict-Transport-Security** — no HSTS; downgrade attacks are possible if the user visits over HTTP.
+- **Referrer-Policy** — referrer data (including path and query strings) leaks to third-party domains (Yandex, GitHub links).
+- **Permissions-Policy** — no restrictions on camera, microphone, or geolocation access from the page.
+
+Add a `headers()` export to `next.config.js` setting at minimum `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, and a restrictive `Content-Security-Policy`.
+
+---
+
+### SEC-02 · Third-party Yandex.Metrika script injected via `dangerouslySetInnerHTML` without Subresource Integrity [HIGH]
+
+**File:** `pages/_app.tsx`, lines 131–134
+
+The Yandex.Metrika analytics snippet is injected using `dangerouslySetInnerHTML`, which bypasses React's built-in XSS protection. The snippet dynamically loads `https://mc.yandex.ru/metrika/tag.js` with no `integrity` attribute (SRI). Two attack surfaces are created:
+
+1. **Supply-chain risk:** If Yandex's CDN or DNS is compromised, arbitrary JavaScript executes on every visitor's browser in the full context of the application origin.
+2. **Pattern risk:** `dangerouslySetInnerHTML` with a script block is a foothold — a developer error or a modified string could silently introduce malicious JS into every page load.
+
+Replace with `<Script src="..." strategy="afterInteractive" />` from `next/script`, which supports CSP nonces and deferred loading. Add an `integrity` hash once on a stable version of the script.
+
+---
+
+### SEC-03 · ECharts tooltip formatters render unescaped API data as raw HTML [MEDIUM]
+
+**Files:** `components/widget-chart/Chart.tsx` (lines 62–76), `components/widget-heatmap/Heatmap.tsx` (lines 153–162), `components/widget-meteogram/Meteogram.tsx`, `components/widget-precip-chart/WidgetPrecipChart.tsx`, `components/widget-climate/Chart.tsx`
+
+All chart tooltip formatters build HTML strings by concatenating values received directly from the API, then pass the resulting string to ECharts which renders it as `innerHTML` without escaping. If the backend were to return a malicious string such as `<img src=x onerror=alert(1)>` in a numeric sensor field — due to a backend injection, database compromise, or MITM attack on the HTTP API — it would execute as JavaScript in every user's browser.
+
+Sanitize or numeric-coerce all values before inserting them into formatter strings (e.g., `Number(value).toFixed(1)` for numeric fields), or use a DOM-sanitisation utility such as DOMPurify.
+
+---
+
+### SEC-04 · `client/.env` file committed to the repository [LOW]
+
+**File:** `client/.env`
+
+The `client/.env` file is tracked by Git. The root `.gitignore` does not cover `client/.env` — it only covers `client/env` and `/frontend/.env.local`. Although the file currently contains only the `NEXT_PUBLIC_API_HOST` variable (not a secret), committing any `.env` file normalises the pattern and makes accidental future secret commits likely.
+
+Add `client/.env` to `.gitignore` and remove it from Git history. Provide `client/.env.example` as a documented template instead.
+
+---
+
+### SEC-05 · `NEXT_LOCALE` cookie set without `Secure` or `SameSite` flags [LOW]
+
+**File:** `components/language-switcher/LanguageSwitcher.tsx`, line 31
+
+```ts
+void setCookie('NEXT_LOCALE', locale)
+```
+
+The `setCookie` call passes no options, so the cookie is written without `Secure` (transmissible over HTTP), without `SameSite` (browser default varies — potentially allows cross-site reads), and without `HttpOnly`. While the locale value is not sensitive, this establishes a project-wide pattern of setting cookies without security attributes. Pass `{ secure: true, sameSite: 'lax' }` to all `setCookie` calls.
+
+---
+
+### SEC-06 · Application version number exposed in the footer [LOW]
+
+**File:** `components/footer/Footer.tsx`, lines 32–33
+
+The exact `package.json` version string is rendered on every page. This gives any visitor instant visibility into the precise software version, making version-specific vulnerability targeting trivial.
+
+Remove the version from the rendered HTML, or restrict it to admin/internal views only.
+
+---
+
+### SEC-07 · `ecosystem.config.js` exposes production hostname and internal service port [LOW]
+
+**File:** `client/ecosystem.config.js`
+
+The PM2 deployment config commits the production service name (`meteo.miksoft.pro`) and internal port (`3007`) to the public repository. An attacker performing reconnaissance can fingerprint the server stack and attempt to reach port 3007 directly if firewall rules are misconfigured.
+
+Move deployment-specific config out of the repository or into a secrets-management system. At minimum, add `ecosystem.config.js` to `.gitignore`.
+
+---
+
+### SEC-08 · `sessionStorage` and `localStorage` data deserialised without runtime schema validation [LOW]
+
+**Files:** `pages/climate.tsx` (lines 28–33), `tools/hooks/useLocalStorage.ts` (lines 54–56)
+
+Both files parse JSON from browser storage and immediately cast the result to a typed interface (`as ClimateType[]`) with no runtime field validation. If a browser extension, an XSS payload, or a compromised third-party script (see SEC-02) writes crafted data to storage, the application processes it as trusted data. Add a lightweight runtime validator (e.g., a shape-check function) before casting.
+
+---
+
+## 8. Summary by Priority
 
 ### High (fix first)
 
 | ID      | Summary                                            |
 | ------- | -------------------------------------------------- |
+| SEC-01  | Missing HTTP security headers (CSP, X-Frame-Options, HSTS) |
+| SEC-02  | Yandex.Metrika script via `dangerouslySetInnerHTML`, no SRI |
 | QC-01   | `any` types in ECharts tooltip formatters          |
 | FEAT-03 | No error state handling for any RTK Query endpoint |
 
@@ -244,6 +342,7 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 
 | ID      | Summary                                                   |
 | ------- | --------------------------------------------------------- |
+| SEC-03  | ECharts tooltip renders unescaped API data as HTML        |
 | QC-03   | `showOverlay` redux field is never dispatched             |
 | QC-08   | `weather-icon` i18n key missing from both locales         |
 | QC-13   | `undefined` case after `default` in switch is unreachable |
@@ -259,6 +358,11 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 
 | ID      | Summary                                             |
 | ------- | --------------------------------------------------- |
+| SEC-04  | `client/.env` committed to the repository           |
+| SEC-05  | `NEXT_LOCALE` cookie missing `Secure`/`SameSite`    |
+| SEC-06  | App version number exposed in footer                |
+| SEC-07  | `ecosystem.config.js` exposes production port       |
+| SEC-08  | Storage deserialisation without schema validation   |
 | QC-11   | `for...in` in `encodeQueryData` — use `Object.keys` |
 | QC-12   | `normalizeDateToBaseYear` defined after first use   |
 | QC-14   | Yandex Metrika should use `next/script`             |
