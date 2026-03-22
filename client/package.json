@@ -27,7 +27,7 @@
         "embla-carousel": "^8.6.0",
         "embla-carousel-auto-scroll": "^8.6.0",
         "embla-carousel-react": "^8.6.0",
-        "i18next": "^25.10.3",
+        "i18next": "^25.10.4",
         "lodash-es": "^4.17.23",
         "next": "^16.2.1",
         "next-i18next": "^15.4.3",
@@ -37,10 +37,10 @@
         "nextjs-progressbar": "^0.0.16",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
-        "react-i18next": "^16.6.0",
+        "react-i18next": "^16.6.1",
         "react-redux": "^9.2.0",
         "sharp": "^0.34.5",
-        "simple-react-ui-kit": "^1.7.9"
+        "simple-react-ui-kit": "^1.7.10"
     },
     "devDependencies": {
         "@eslint/compat": "^2.0.3",
