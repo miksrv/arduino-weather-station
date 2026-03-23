@@ -43,4 +43,26 @@ describe('WidgetAnomalyHistory', () => {
         render(<WidgetAnomalyHistory rows={[]} />)
         expect(screen.getByTestId('table')).toBeInTheDocument()
     })
+
+    it('renders Skeleton when loading', () => {
+        render(
+            <WidgetAnomalyHistory
+                loading={true}
+                rows={[]}
+            />
+        )
+        expect(screen.getByTestId('skeleton')).toBeInTheDocument()
+        expect(screen.queryByTestId('table')).not.toBeInTheDocument()
+    })
+
+    it('renders table when loading is false', () => {
+        render(
+            <WidgetAnomalyHistory
+                loading={false}
+                rows={mockRows}
+            />
+        )
+        expect(screen.getByTestId('table')).toBeInTheDocument()
+        expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument()
+    })
 })

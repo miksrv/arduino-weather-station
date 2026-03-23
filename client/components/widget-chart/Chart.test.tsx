@@ -13,8 +13,10 @@ jest.mock('echarts-for-react', () => (props: { option: unknown; style: unknown }
     />
 ))
 
+const mockUseTheme = jest.fn(() => ({ theme: 'dark' }))
+
 jest.mock('next-themes', () => ({
-    useTheme: jest.fn(() => ({ theme: 'dark' }))
+    useTheme: () => mockUseTheme()
 }))
 
 jest.mock('next-i18next', () => ({
@@ -61,6 +63,10 @@ const mockData = [
 ]
 
 describe('Chart (widget-chart)', () => {
+    beforeEach(() => {
+        mockUseTheme.mockReturnValue({ theme: 'dark' })
+    })
+
     it('renders for temperature type', () => {
         const { getByTestId } = render(
             <Chart
@@ -112,6 +118,39 @@ describe('Chart (widget-chart)', () => {
                 type='temperature'
                 data={mockData}
                 dateFormat='DD.MM'
+            />
+        )
+        expect(getByTestId('echarts')).toBeInTheDocument()
+    })
+
+    it('renders in light theme without crashing', () => {
+        mockUseTheme.mockReturnValue({ theme: 'light' })
+        const { getByTestId } = render(
+            <Chart
+                type='temperature'
+                data={mockData}
+            />
+        )
+        expect(getByTestId('echarts')).toBeInTheDocument()
+    })
+
+    it('renders clouds type in light theme', () => {
+        mockUseTheme.mockReturnValue({ theme: 'light' })
+        const { getByTestId } = render(
+            <Chart
+                type='clouds'
+                data={mockData}
+            />
+        )
+        expect(getByTestId('echarts')).toBeInTheDocument()
+    })
+
+    it('renders pressure type in light theme', () => {
+        mockUseTheme.mockReturnValue({ theme: 'light' })
+        const { getByTestId } = render(
+            <Chart
+                type='pressure'
+                data={mockData}
             />
         )
         expect(getByTestId('echarts')).toBeInTheDocument()

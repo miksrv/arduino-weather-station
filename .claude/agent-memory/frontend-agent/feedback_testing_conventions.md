@@ -73,6 +73,23 @@ jsdom normalises hex colour values (`#rrggbb`) to `rgb(r, g, b)` form when they 
 
 ---
 
+**jest.mock factory hoisting:** `jest.mock()` factories are hoisted to the top of the file before any variable declarations. Never reference outer `const` variables inside a `jest.mock()` factory — they will not be initialized yet (temporal dead zone). Use `jest.fn()` directly inside the factory. To control mock return values per-test, capture the mock via `require` inside the test:
+```ts
+// WRONG — throws "Cannot access before initialization":
+const mockFn = jest.fn()
+jest.mock('some-module', () => ({ fn: mockFn }))
+
+// CORRECT — inline jest.fn(), then require in tests:
+jest.mock('some-module', () => ({ fn: jest.fn() }))
+// in test:
+const { fn } = require('some-module') as { fn: jest.Mock }
+fn.mockReturnValue(...)
+```
+
+**How to apply:** Whenever you need a controllable mock across multiple tests, use `jest.fn()` inline in the factory and access via `require()` inside individual tests. The exception is `jest.mock(module, () => ({ useHook: () => mockFn() }))` — here the outer variable is referenced inside a function body (not the factory itself), which runs lazily and works fine.
+
+---
+
 When mocking `echarts-for-react` for components that also use `echarts.connect()` (e.g. `WidgetSnowpackChart`), also mock the `echarts` module:
 ```ts
 jest.mock('echarts', () => ({ connect: jest.fn(), ECharts: {} }))
@@ -80,3 +97,9 @@ jest.mock('echarts', () => ({ connect: jest.fn(), ECharts: {} }))
 **Why:** `WidgetSnowpackChart` calls `echarts.connect('snowpack')` inside `onChartReady` callbacks. Without the mock the import succeeds but the function call may cause issues in jsdom.
 
 **How to apply:** For any chart component that imports directly from `echarts` (not just `echarts-for-react`), add an `echarts` mock alongside the `echarts-for-react` mock.
+
+---
+
+**ECharts coverage ceiling:** ECharts `tooltip.formatter`, `axisLabel.formatter`, `renderItem`, and `onChartReady` callbacks defined inside `useMemo` / component body are never invoked during RTL renders (ECharts itself calls them on user interaction). Expect ~65% statement coverage on chart components — the remaining gap is these callbacks. Do not attempt to drive these via tests; they are an accepted structural gap. The same applies to `Table` column `formatter` functions when `simple-react-ui-kit`'s `Table` mock does not call formatters.
+
+**How to apply:** When coverage on a chart file stalls around 60-70%, check whether the remaining uncovered lines are all formatter/renderItem callbacks. If yes, accept the gap rather than over-engineering to cover them.

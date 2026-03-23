@@ -10,11 +10,17 @@ jest.mock('next-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key })
 }))
 
+const mockUseTheme = jest.fn(() => ({ theme: 'light' }))
+
 jest.mock('next-themes', () => ({
-    useTheme: jest.fn(() => ({ theme: 'light' }))
+    useTheme: () => mockUseTheme()
 }))
 
 jest.mock('echarts-for-react', () => () => <div data-testid='echarts' />)
+
+jest.mock('@/tools', () => ({
+    getEChartBaseConfig: jest.fn(() => ({ legend: {} }))
+}))
 
 const mockNormals = Array.from({ length: 12 }, (_, i) => ({
     avgClouds: 60,
@@ -27,6 +33,10 @@ const mockNormals = Array.from({ length: 12 }, (_, i) => ({
 }))
 
 describe('WidgetMonthlyNormals', () => {
+    beforeEach(() => {
+        mockUseTheme.mockReturnValue({ theme: 'light' })
+    })
+
     it('shows Skeleton when loading', () => {
         render(<WidgetMonthlyNormals loading={true} />)
         expect(screen.getByTestId('skeleton')).toBeInTheDocument()
@@ -59,6 +69,31 @@ describe('WidgetMonthlyNormals', () => {
                 <WidgetMonthlyNormals
                     currentYearMonthly={currentYear}
                     normals={mockNormals}
+                    loading={false}
+                />
+            )
+        ).not.toThrow()
+    })
+
+    it('renders without crashing in dark theme', () => {
+        mockUseTheme.mockReturnValue({ theme: 'dark' })
+        expect(() =>
+            render(
+                <WidgetMonthlyNormals
+                    normals={mockNormals}
+                    loading={false}
+                />
+            )
+        ).not.toThrow()
+        expect(screen.getByTestId('echarts')).toBeInTheDocument()
+    })
+
+    it('renders chart with normals missing some months', () => {
+        const partialNormals = mockNormals.slice(0, 6)
+        expect(() =>
+            render(
+                <WidgetMonthlyNormals
+                    normals={partialNormals}
                     loading={false}
                 />
             )

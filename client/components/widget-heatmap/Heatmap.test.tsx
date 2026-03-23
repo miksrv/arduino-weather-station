@@ -58,6 +58,44 @@ describe('Heatmap', () => {
         expect(getByTestId('echarts')).toBeInTheDocument()
     })
 
+    it('renders for pressure type', () => {
+        const { getByTestId } = render(
+            <Heatmap
+                type='pressure'
+                data={mockData}
+            />
+        )
+        expect(getByTestId('echarts')).toBeInTheDocument()
+    })
+
+    it('renders for clouds type', () => {
+        const mockDataWithClouds = [
+            { date: '2024-01-01T12:00:00Z', clouds: 80 },
+            { date: '2024-01-02T10:00:00Z', clouds: 40 }
+        ]
+        const { getByTestId } = render(
+            <Heatmap
+                type='clouds'
+                data={mockDataWithClouds}
+            />
+        )
+        expect(getByTestId('echarts')).toBeInTheDocument()
+    })
+
+    it('renders for precipitation type', () => {
+        const mockDataWithPrecip = [
+            { date: '2024-01-01T12:00:00Z', precipitation: 5 },
+            { date: '2024-01-02T10:00:00Z', precipitation: 0 }
+        ]
+        const { getByTestId } = render(
+            <Heatmap
+                type='precipitation'
+                data={mockDataWithPrecip}
+            />
+        )
+        expect(getByTestId('echarts')).toBeInTheDocument()
+    })
+
     it('renders without data', () => {
         const { getByTestId } = render(<Heatmap type='temperature' />)
         expect(getByTestId('echarts')).toBeInTheDocument()
@@ -80,6 +118,34 @@ describe('Heatmap', () => {
             <Heatmap
                 type='pressure'
                 height='500px'
+            />
+        )
+        expect(getByTestId('echarts')).toBeInTheDocument()
+    })
+
+    it('renders in client-only mode (isClient=true)', () => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+        const useClientOnly = require('@/tools/hooks/useClientOnly') as jest.Mock
+        useClientOnly.mockReturnValue(true)
+        const { getByTestId } = render(
+            <Heatmap
+                type='temperature'
+                data={mockData}
+            />
+        )
+        expect(getByTestId('echarts')).toBeInTheDocument()
+        useClientOnly.mockReturnValue(false)
+    })
+
+    it('renders with data spanning multiple days', () => {
+        const multiDayData = Array.from({ length: 48 }, (_, i) => ({
+            date: `2024-01-${String(Math.floor(i / 24) + 1).padStart(2, '0')}T${String(i % 24).padStart(2, '0')}:00:00Z`,
+            temperature: 10 + i * 0.5
+        }))
+        const { getByTestId } = render(
+            <Heatmap
+                type='temperature'
+                data={multiDayData}
             />
         )
         expect(getByTestId('echarts')).toBeInTheDocument()

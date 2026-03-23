@@ -15,8 +15,10 @@ jest.mock('echarts-for-react', () =>
     ))
 )
 
+const mockUseTheme = jest.fn(() => ({ theme: 'dark' }))
+
 jest.mock('next-themes', () => ({
-    useTheme: jest.fn(() => ({ theme: 'dark' }))
+    useTheme: () => mockUseTheme()
 }))
 
 jest.mock('next-i18next', () => ({
@@ -65,6 +67,10 @@ const mockData = [
 ]
 
 describe('Meteogram', () => {
+    beforeEach(() => {
+        mockUseTheme.mockReturnValue({ theme: 'dark' })
+    })
+
     it('renders with data', () => {
         const { getByTestId } = render(<Meteogram data={mockData} />)
         expect(getByTestId('echarts')).toBeInTheDocument()
@@ -82,6 +88,12 @@ describe('Meteogram', () => {
                 height='400px'
             />
         )
+        expect(getByTestId('echarts')).toBeInTheDocument()
+    })
+
+    it('renders in light theme without crashing', () => {
+        mockUseTheme.mockReturnValue({ theme: 'light' })
+        const { getByTestId } = render(<Meteogram data={mockData} />)
         expect(getByTestId('echarts')).toBeInTheDocument()
     })
 })

@@ -63,4 +63,17 @@ describe('LanguageSwitcher', () => {
         render(<LanguageSwitcher />)
         expect(setLocale).toHaveBeenCalled()
     })
+
+    it('clicking Rus button sets cookie and calls setStorageLocale', () => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+        const { setCookie } = require('cookies-next')
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+        const useLocalStorage = require('@/tools/hooks/useLocalStorage') as jest.Mock
+        const mockSetter = jest.fn()
+        useLocalStorage.mockReturnValue([null, mockSetter])
+        render(<LanguageSwitcher />)
+        fireEvent.click(screen.getByText('Rus'))
+        expect(setCookie).toHaveBeenCalledWith('NEXT_LOCALE', 'ru')
+        expect(mockSetter).toHaveBeenCalledWith('ru')
+    })
 })

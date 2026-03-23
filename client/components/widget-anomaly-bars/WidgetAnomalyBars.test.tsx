@@ -10,8 +10,10 @@ jest.mock('next-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key })
 }))
 
+const mockUseTheme = jest.fn(() => ({ theme: 'light' }))
+
 jest.mock('next-themes', () => ({
-    useTheme: jest.fn(() => ({ theme: 'light' }))
+    useTheme: () => mockUseTheme()
 }))
 
 jest.mock('echarts-for-react', () => () => <div data-testid='echarts' />)
@@ -52,6 +54,10 @@ const mockData = [
 ]
 
 describe('WidgetAnomalyBars', () => {
+    beforeEach(() => {
+        mockUseTheme.mockReturnValue({ theme: 'light' })
+    })
+
     it('shows Skeleton when loading', () => {
         render(<WidgetAnomalyBars loading={true} />)
         expect(screen.getByTestId('skeleton')).toBeInTheDocument()
@@ -76,5 +82,27 @@ describe('WidgetAnomalyBars', () => {
 
     it('renders without crashing with no data', () => {
         expect(() => render(<WidgetAnomalyBars loading={false} />)).not.toThrow()
+    })
+
+    it('renders in dark theme without crashing', () => {
+        mockUseTheme.mockReturnValue({ theme: 'dark' })
+        render(
+            <WidgetAnomalyBars
+                data={mockData}
+                loading={false}
+            />
+        )
+        expect(screen.getByTestId('echarts')).toBeInTheDocument()
+    })
+
+    it('renders with baselineAvgTemp prop', () => {
+        render(
+            <WidgetAnomalyBars
+                data={mockData}
+                baselineAvgTemp={9.5}
+                loading={false}
+            />
+        )
+        expect(screen.getByTestId('echarts')).toBeInTheDocument()
     })
 })
