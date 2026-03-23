@@ -4706,9 +4706,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^25.10.3":
-  version: 25.10.3
-  resolution: "i18next@npm:25.10.3"
+"i18next@npm:^25.10.4":
+  version: 25.10.4
+  resolution: "i18next@npm:25.10.4"
   dependencies:
     "@babel/runtime": "npm:^7.29.2"
   peerDependencies:
@@ -4716,7 +4716,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/9bea1284974c96a3367dc243ad417811cd410a64715b74551cc70a95e664650fee150d00a255376b327ed59edbb3384fae64ba6732a16efe19bed4ca8f8ad0a6
+  checksum: 10c0/3e28c7a77eece9cb220ba366d0a6be9ee1ee0d83b51e52438bba008af8b52afe646457513d3e981b13ef96f28a1d07e3979f0c2a5618f6c94a9384121d0251b1
   languageName: node
   linkType: hard
 
@@ -6881,9 +6881,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-i18next@npm:^16.6.0":
-  version: 16.6.0
-  resolution: "react-i18next@npm:16.6.0"
+"react-i18next@npm:^16.6.1":
+  version: 16.6.1
+  resolution: "react-i18next@npm:16.6.1"
   dependencies:
     "@babel/runtime": "npm:^7.29.2"
     html-parse-stringify: "npm:^3.0.1"
@@ -6899,7 +6899,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10c0/b603d7f584d31842c0094a225fa31b5f9fa9a096223ac1ce44cab2895bc2ecbd764d812c8b4232171a02bf7182fcf38f300e4602d28775e931d9e12d4cb88f00
+  checksum: 10c0/80b6d3ddd5a8c8ae5c40b3ea696f89e8ee6443c6a9d10040be58f18e65a06d6b866a8eb56f58502470f52644ef0171dbe23dc2fc14a5ec7bb48fb3cf5270271f
   languageName: node
   linkType: hard
 
@@ -7459,15 +7459,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-react-ui-kit@npm:^1.7.9":
-  version: 1.7.9
-  resolution: "simple-react-ui-kit@npm:1.7.9"
+"simple-react-ui-kit@npm:^1.7.10":
+  version: 1.7.10
+  resolution: "simple-react-ui-kit@npm:1.7.10"
   dependencies:
     dayjs: "npm:^1.11.20"
     lodash-es: "npm:^4.17.23"
     react: "npm:^19.2.4"
     react-dom: "npm:^19.2.4"
-  checksum: 10c0/58535e86cd0e6798ee2e3c085365c177fe895e60581bb031e109920ce4e2162d248105c6b91a30d94ffe0dcf97638b2a7ad521b6a509a33ce049529d82d43ee1
+  checksum: 10c0/07811165ae2c92644cd629011c48b4ae086eba028013a8b9620a98a1b40a50d857816edfc8f843e51714a1cdfecd7ae114a0f4de9733e85f2c16382113d2852a
   languageName: node
   linkType: hard
 
@@ -8378,7 +8378,7 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^7.0.1"
     eslint-plugin-simple-import-sort: "npm:^12.1.1"
     globals: "npm:^17.4.0"
-    i18next: "npm:^25.10.3"
+    i18next: "npm:^25.10.4"
     identity-obj-proxy: "npm:^3.0.0"
     jest: "npm:^30.3.0"
     jest-environment-jsdom: "npm:^30.3.0"
@@ -8392,13 +8392,13 @@ __metadata:
     prettier: "npm:^3.8.1"
     react: "npm:^19.2.4"
     react-dom: "npm:^19.2.4"
-    react-i18next: "npm:^16.6.0"
+    react-i18next: "npm:^16.6.1"
     react-redux: "npm:^9.2.0"
     redux-mock-store: "npm:^1.5.5"
     sass: "npm:^1.98.0"
     schema-dts: "npm:^1.1.5"
     sharp: "npm:^0.34.5"
-    simple-react-ui-kit: "npm:^1.7.9"
+    simple-react-ui-kit: "npm:^1.7.10"
     ts-jest: "npm:^29.4.6"
     ts-node: "npm:^10.9.2"
     typescript: "npm:5.9.3"

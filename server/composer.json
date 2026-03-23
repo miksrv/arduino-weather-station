@@ -7,7 +7,6 @@
     "require": {
         "php": "^8.2",
         "codeigniter4/framework": "^4.6",
-        "firebase/php-jwt": "^6.10",
         "guzzlehttp/guzzle": "^7.8",
         "nyholm/psr7": "^1.8",
         "symfony/http-client": "^7.2"

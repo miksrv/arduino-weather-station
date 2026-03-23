@@ -11,12 +11,6 @@ use CodeIgniter\Test\FeatureTestTrait;
 /**
  * Tests for App\Controllers\History.
  *
- * NOTE: History::_getData() has a declared return type of `?array` but internally
- * calls $this->fail() / $this->failValidationErrors() which return a Response object.
- * In PHP 8.3 strict return-type checking this causes a TypeError that CI4's
- * FeatureTestTrait surfaces as a 500 error response.  Tests below document the
- * actual behaviour rather than the theoretical intended behaviour.
- *
  * Uses ControllerTestTrait for happy-path tests with mocked models.
  *
  * @internal
@@ -35,78 +29,94 @@ final class HistoryControllerTest extends CIUnitTestCase
     }
 
     // -------------------------------------------------------------------------
-    // _getData() validation
-    //
-    // History::_getData() has a declared return type of `?array` but calls
-    // $this->fail() / $this->failValidationErrors() which return a Response object.
-    // In PHP 8.3 this causes a TypeError that propagates out of FeatureTestTrait.
-    //
-    // We test the validation logic directly via ControllerTestTrait which uses
-    // ControllerTestTrait::execute() — that trait catches Throwable with code 0
-    // and converts them to an error response.
+    // _getData() validation - returns 400 error responses
     // -------------------------------------------------------------------------
 
     /**
-     * Missing both dates — History::_getData() declares `?array` but returns a Response,
-     * which causes a TypeError in PHP 8.3. This documents the known return-type bug.
+     * Missing both dates returns 400 error.
      */
-    public function testMissingBothDatesThrowsTypeError(): void
+    public function testMissingBothDatesReturns400(): void
     {
-        $this->expectException(\TypeError::class);
-
         $this->controller(History::class);
         $this->request->setMethod('GET');
         $this->request->setGlobal('get', []);
 
-        $this->execute('getHistoryWeather');
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(400, $result->response()->getStatusCode());
     }
 
-    public function testMissingStartDateThrowsTypeError(): void
+    public function testMissingStartDateReturns400(): void
     {
-        $this->expectException(\TypeError::class);
-
         $this->controller(History::class);
         $this->request->setMethod('GET');
         parse_str('end_date=2024-01-31', $get);
         $this->request->setGlobal('get', $get);
 
-        $this->execute('getHistoryWeather');
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(400, $result->response()->getStatusCode());
     }
 
-    public function testMissingEndDateThrowsTypeError(): void
+    public function testMissingEndDateReturns400(): void
     {
-        $this->expectException(\TypeError::class);
-
         $this->controller(History::class);
         $this->request->setMethod('GET');
         parse_str('start_date=2024-01-01', $get);
         $this->request->setGlobal('get', $get);
 
-        $this->execute('getHistoryWeather');
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(400, $result->response()->getStatusCode());
     }
 
-    public function testFutureDateThrowsTypeError(): void
+    public function testFutureDateReturns400(): void
     {
-        $this->expectException(\TypeError::class);
-
         $this->controller(History::class);
         $this->request->setMethod('GET');
         parse_str('start_date=2099-01-01&end_date=2099-01-31', $get);
         $this->request->setGlobal('get', $get);
 
-        $this->execute('getHistoryWeather');
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(400, $result->response()->getStatusCode());
     }
 
-    public function testDateBefore2020ThrowsTypeError(): void
+    /**
+     * SEC-07: End-date in the future must also be rejected with 400.
+     */
+    public function testFutureEndDateReturns400(): void
     {
-        $this->expectException(\TypeError::class);
+        $this->controller(History::class);
+        $this->request->setMethod('GET');
+        // start_date is in the past, end_date is far in the future
+        parse_str('start_date=2023-01-01&end_date=2099-12-31', $get);
+        $this->request->setGlobal('get', $get);
 
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(400, $result->response()->getStatusCode());
+    }
+
+    /**
+     * SEC-14: Date range exceeding 366 days must be rejected with 400.
+     */
+    public function testDateRangeExceeding366DaysReturns400(): void
+    {
+        $this->controller(History::class);
+        $this->request->setMethod('GET');
+        // 400-day range
+        parse_str('start_date=2022-01-01&end_date=2023-02-05', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(400, $result->response()->getStatusCode());
+    }
+
+    public function testDateBefore2020Returns400(): void
+    {
         $this->controller(History::class);
         $this->request->setMethod('GET');
         parse_str('start_date=2019-06-01&end_date=2019-06-30', $get);
         $this->request->setGlobal('get', $get);
 
-        $this->execute('getHistoryWeather');
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(400, $result->response()->getStatusCode());
     }
 
     // -------------------------------------------------------------------------
@@ -256,27 +266,25 @@ final class HistoryControllerTest extends CIUnitTestCase
     // getHistoryWeatherCSV — export
     // -------------------------------------------------------------------------
 
-    public function testExportMissingBothDatesThrowsTypeError(): void
+    public function testExportMissingBothDatesReturns400(): void
     {
-        $this->expectException(\TypeError::class);
-
         $this->controller(History::class);
         $this->request->setMethod('GET');
         $this->request->setGlobal('get', []);
 
-        $this->execute('getHistoryWeatherCSV');
+        $result = $this->execute('getHistoryWeatherCSV');
+        $this->assertSame(400, $result->response()->getStatusCode());
     }
 
-    public function testExportFutureDateThrowsTypeError(): void
+    public function testExportFutureDateReturns400(): void
     {
-        $this->expectException(\TypeError::class);
-
         $this->controller(History::class);
         $this->request->setMethod('GET');
         parse_str('start_date=2099-01-01&end_date=2099-01-31', $get);
         $this->request->setGlobal('get', $get);
 
-        $this->execute('getHistoryWeatherCSV');
+        $result = $this->execute('getHistoryWeatherCSV');
+        $this->assertSame(400, $result->response()->getStatusCode());
     }
 
     /**

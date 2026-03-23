@@ -1,5 +1,26 @@
 # CHANGELOG
 
+## 3.7.2
+
+### Patch Changes
+
+- Add SEO patterns and update per-page `NextSeo` configuration across all pages
+- Bump client dependencies
+- Enable Content Security Policy with restrictive defaults (`default-src 'none'`, no inline scripts or styles) via `ContentSecurityPolicy` config
+- Disable `DBDebug` in production database config to prevent SQL details from leaking in error responses
+- Enable `secureheaders` after-filter to add `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`, and `Referrer-Policy` headers to all API responses
+- Add `ThrottleFilter` to rate-limit `POST /sensors` to one request per 30 seconds per IP; return HTTP 429 on excess requests
+- Add `ALLOWED_INTERVALS` allowlist to `RawWeatherDataModel`, `HourlyAveragesModel`, and `DailyAveragesModel`; `getWeatherHistoryGrouped()` now throws `InvalidArgumentException` for unrecognised interval strings
+- Add numeric range validation rules for sensor fields in `RawWeatherDataModel` (temperature, humidity, pressure, UV index, wind, precipitation, clouds, visibility, and more)
+- Enforce a 366-day maximum date range on `GET /history` and `GET /heatmap`; return HTTP 422 when the range is exceeded
+- Restore future end-date guard in `History` controller; allow dates up to end of tomorrow to account for timezone differences
+- Replace raw exception messages in `Sensors` controller with a generic `Internal server error` response; log full exception details server-side only
+- Register common sensitive key names (`password`, `token`, `api_key`, `key`, `mac`, etc.) in `Exceptions::$sensitiveDataInTrace` to prevent secrets from appearing in debug stack traces
+- Remove unused `firebase/php-jwt` production dependency
+- Update `server/.env.production` to use local database host (`127.0.0.1`) and remove obsolete `server/env` example file from the repository
+- Add security audit roadmaps for server and client directories
+- Add unit tests covering sensor throttling, sensor field range validation, group-interval allowlists, future end-date rejection, and 366-day range limits
+
 ## 3.7.1
 
 ### Patch Changes

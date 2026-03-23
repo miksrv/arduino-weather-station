@@ -127,4 +127,52 @@ final class RawWeatherDataModelTest extends CIUnitTestCase
         $this->assertArrayHasKey('date', $rules);
         $this->assertStringContainsString('required', $rules['date']);
     }
+
+    // -------------------------------------------------------------------------
+    // SEC-06: Physical range validation rules
+    // -------------------------------------------------------------------------
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('rangeRulesProvider')]
+    public function testValidationRulesContainRangeConstraints(string $field, string $min, string $max): void
+    {
+        $rules = $this->getPrivateProperty($this->model, 'validationRules');
+        $this->assertArrayHasKey($field, $rules, "Field '{$field}' must have validation rules");
+        $rule = $rules[$field];
+        $this->assertStringContainsString("greater_than_equal_to[{$min}]", $rule, "'{$field}' must have min {$min}");
+        $this->assertStringContainsString("less_than_equal_to[{$max}]", $rule, "'{$field}' must have max {$max}");
+    }
+
+    /** @return array<string, array{string, string, string}> */
+    public static function rangeRulesProvider(): array
+    {
+        return [
+            'temperature'   => ['temperature',   '-80',  '60'],
+            'feels_like'    => ['feels_like',     '-80',  '60'],
+            'pressure'      => ['pressure',       '800',  '1100'],
+            'humidity'      => ['humidity',       '0',    '100'],
+            'uv_index'      => ['uv_index',       '0',    '20'],
+            'precipitation' => ['precipitation',  '0',    '500'],
+            'clouds'        => ['clouds',         '0',    '100'],
+            'visibility'    => ['visibility',     '0',    '100000'],
+            'wind_speed'    => ['wind_speed',     '0',    '100'],
+            'wind_deg'      => ['wind_deg',       '0',    '360'],
+            'wind_gust'     => ['wind_gust',      '0',    '150'],
+        ];
+    }
+
+    // -------------------------------------------------------------------------
+    // SEC-08: Interval allowlist validation
+    // -------------------------------------------------------------------------
+
+    public function testGetWeatherHistoryGroupedThrowsForInvalidInterval(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->model->getWeatherHistoryGrouped('2023-01-01', '2023-01-31', 'invalid');
+    }
+
+    public function testGetWeatherHistoryGroupedThrowsForArbitraryString(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->model->getWeatherHistoryGrouped('2023-01-01', '2023-01-31', '1 WEEK');
+    }
 }

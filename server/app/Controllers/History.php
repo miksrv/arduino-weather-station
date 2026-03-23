@@ -151,12 +151,12 @@ class History extends ResourceController {
      * - If the range is between 24 hours and 7 days, data is grouped by the hour.
      * - If the range is more than 7 days, data is grouped by day.
      *
-     * @return array|null Returns an array of weather data objects or null in case of errors.
+     * @return array|ResponseInterface Returns an array of weather data objects or Response in case of validation errors.
      *
      * @throws \CodeIgniter\HTTP\Exceptions\HTTPException If any required parameters are missing or invalid.
      * @throws \CodeIgniter\HTTP\Exceptions\HTTPException If the date is in the future or before 2020-01-01.
      */
-    protected function _getData(): ?array {
+    protected function _getData(): array|ResponseInterface {
         $startDate = $this->request->getGet('start_date');
         $endDate   = $this->request->getGet('end_date');
 
@@ -170,19 +170,23 @@ class History extends ResourceController {
         $startTimestamp = strtotime($startDate);
         $endTimestamp   = strtotime($endDate);
         $minTimestamp   = strtotime('2020-01-01');
+        // Allow dates up to end of tomorrow to account for timezone differences
+        $maxAllowedTimestamp = strtotime('tomorrow 23:59:59');
 
         if ($startTimestamp === false || $endTimestamp === false) {
             return $this->failValidationErrors('Invalid date format');
         }
 
-        // Temporary commented: need to fix timeZones on the client side
-        //  || $endTimestamp > $currentTimestamp
-        if ($startTimestamp > $currentTimestamp) {
+        if ($startTimestamp > $maxAllowedTimestamp || $endTimestamp > $maxAllowedTimestamp) {
             return $this->failValidationErrors('Date cannot be in the future');
         }
 
         if ($startTimestamp < $minTimestamp) {
             return $this->failValidationErrors('Date cannot be before 2020-01-01');
+        }
+
+        if ($endTimestamp - $startTimestamp > 366 * 86400) {
+            return $this->failValidationErrors('Date range cannot exceed 366 days.');
         }
 
         // Calculating the range

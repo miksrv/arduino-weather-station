@@ -76,6 +76,10 @@ class Heatmap extends ResourceController {
             return $this->failValidationErrors('Date is out of valid range. It cannot be in the future or before 2020-01-01.');
         }
 
+        if ($endTimestamp - $startTimestamp > 366 * 86400) {
+            return $this->failValidationErrors('Date range cannot exceed 366 days.');
+        }
+
         // Format the dates
         $startDate = date('Y-m-d 00:00:00', $startTimestamp);
         $endDate = date('Y-m-d 23:59:59', $endTimestamp);
