@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 3.7.3
+
+### Patch Changes
+
+- Add `GET /climate` REST endpoint with `Climate` controller and `ClimateModel`; computes annual temperature anomalies, per-year frost/hot-day counts, monthly normals, and baseline average temperature from `daily_averages` (from `START_YEAR = 2022`); response is cached for 24 hours
+- Add `ClimateYearStat`, `ClimateMonthlyNormal`, and climate `Response` TypeScript interfaces; register `Climate` RTK Query tag and `useGetClimateQuery` endpoint in the API slice
+- Refactor `climate` page to consume the new `GET /climate` endpoint for pre-aggregated stats; remove client-side `sessionStorage` caching, handle current-year end-date edge cases, and compute current-year monthly averages via `useMemo`
+- Add `WidgetWarmingStripes` component visualising annual temperature anomalies as colour bands with hover tooltip, min/max/avg legend, and `lerpColor` / `tempToColor` / `getContrastColor` colour utilities
+- Add `WidgetAnomalyBars` component rendering annual temperature anomaly bars with an ECharts trend-line overlay; add `linearRegression` least-squares utility (results rounded to 2 decimal places)
+- Add `WidgetMonthlyNormals` component displaying the historical monthly temperature distribution (min/max/avg range) with a current-year overlay and i18n month labels
+- Add PHPUnit tests for `ClimateModel` verifying frost/hot-day counts, anomaly sign, monthly-normals array length, and total-precipitation preservation
+- Add unit tests for `WidgetWarmingStripes`, `WidgetAnomalyBars`, and `WidgetMonthlyNormals` components and their utility functions
+- Expand frontend unit test suite with 26 new tests across 12 components covering dark/light theme branches, all heatmap sensor types, all `WidgetForecastTable` column presets, and loading skeleton states; fix 2 failing colour-constant assertions in `widget-warming-stripes`; statement coverage increases from 84.15% to 84.9%
+- Update `README.md` with a Climate Dashboard feature section
+
 ## 3.7.2
 
 ### Patch Changes
