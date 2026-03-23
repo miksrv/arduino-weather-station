@@ -62,6 +62,20 @@ const mockComparisonYears = [
 ]
 
 describe('WidgetSnowpackChart', () => {
+    it('renders Skeleton when loading', () => {
+        render(
+            <WidgetSnowpackChart
+                loading={true}
+                currentSeries={[]}
+                comparisonYears={[]}
+                estimatedSWE={0}
+                historicalAvgSWE={0}
+            />
+        )
+        expect(screen.getByTestId('skeleton')).toBeInTheDocument()
+        expect(screen.queryByTestId('echarts')).not.toBeInTheDocument()
+    })
+
     it('renders without crashing', () => {
         render(
             <WidgetSnowpackChart

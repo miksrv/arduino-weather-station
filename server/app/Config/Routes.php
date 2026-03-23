@@ -50,3 +50,7 @@ $routes->get('anomaly',         'Anomaly::index');
 $routes->get('anomaly/history', 'Anomaly::history');
 $routes->options('anomaly',         static function () {});
 $routes->options('anomaly/history', static function () {});
+
+/** Climate Controller **/
+$routes->get('climate',     'Climate::index');
+$routes->options('climate', static function () {});

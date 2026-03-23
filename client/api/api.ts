@@ -67,6 +67,11 @@ export const API = createApi({
             providesTags: ['Precipitation'],
             query: (params) => `precipitation${encodeQueryData<ApiType.Precipitation.Request>(params)}`,
             transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+        }),
+        getClimate: builder.query<ApiType.Climate.Response, void>({
+            providesTags: ['Climate'],
+            query: () => 'climate',
+            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
         })
     }),
     // The `any` return type is intentional: adding an explicit return type annotation causes
@@ -81,5 +86,5 @@ export const API = createApi({
         }
     },
     reducerPath: 'api',
-    tagTypes: ['Current', 'History', 'Heatmap', 'Forecast', 'Anomaly', 'Precipitation']
+    tagTypes: ['Current', 'History', 'Heatmap', 'Forecast', 'Anomaly', 'Precipitation', 'Climate']
 })

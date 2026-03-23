@@ -13,8 +13,10 @@ jest.mock('echarts-for-react', () => (props: { option: unknown; style: unknown }
     />
 ))
 
+const mockUseTheme = jest.fn(() => ({ theme: 'dark' }))
+
 jest.mock('next-themes', () => ({
-    useTheme: jest.fn(() => ({ theme: 'dark' }))
+    useTheme: () => mockUseTheme()
 }))
 
 jest.mock('@/tools', () => ({
@@ -52,6 +54,10 @@ const mockData = [
 ]
 
 describe('Chart (widget-climate)', () => {
+    beforeEach(() => {
+        mockUseTheme.mockReturnValue({ theme: 'dark' })
+    })
+
     it('renders with data', () => {
         const { getByTestId } = render(
             <Chart
@@ -90,6 +96,17 @@ describe('Chart (widget-climate)', () => {
             }
         ]
         const { getByTestId } = render(<Chart data={dataWithoutDate} />)
+        expect(getByTestId('echarts')).toBeInTheDocument()
+    })
+
+    it('renders in light theme without crashing', () => {
+        mockUseTheme.mockReturnValue({ theme: 'light' })
+        const { getByTestId } = render(
+            <Chart
+                data={mockData}
+                height='300px'
+            />
+        )
         expect(getByTestId('echarts')).toBeInTheDocument()
     })
 })
