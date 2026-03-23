@@ -421,6 +421,20 @@ The **Heatmap** section provides a detailed visualization of weather metrics, in
 
 ![History Interface](./client/public/images/heatmap.jpg)
 
+#### 6. **Climate Dashboard**
+
+The **Climate** page is a multi-widget climate science dashboard that surfaces long-term environmental trends from the station's full historical record. Five visualizations make warming and precipitation shifts immediately legible:
+
+| Widget | Description |
+|---|---|
+| **Warming Stripes** | One color-coded stripe per year — deep blue (cold years) through white (baseline) to deep red (warm years). Inspired by Ed Hawkins' iconic "Show Your Stripes" graphic. |
+| **Temperature Anomaly** | Bar chart of annual deviation from the long-term mean. Red bars = warmer than average, blue = cooler. A linear trend line is overlaid automatically. |
+| **Monthly Climate Normals** | Band chart showing the all-time min/max envelope and historical mean per calendar month, with the current year's actual values overlaid. |
+| **Annual Precipitation** | Yearly total rainfall bars (blue = above average, amber = below average) plus a linear trend line and a plain-language trend label. |
+| **Extreme Event Days** | Grouped bars counting frost days (< 0 °C), hot days (≥ 30 °C), and heavy-rain days (≥ 10 mm) per year. |
+
+All five widgets are powered by the new `GET /climate` endpoint, which returns pre-aggregated statistics computed server-side from `daily_averages`. The response is cached indefinitely (TTL = 0) because the underlying data changes at most once per year.
+
 #### Live Demo
 
 Explore the fully functioning weather station web application at:  
