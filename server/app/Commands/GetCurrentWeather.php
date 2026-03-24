@@ -82,7 +82,7 @@ class GetCurrentWeather extends BaseCommand
                 $weatherDataEntity->fill($data);
 
                 if (!$weatherDataModel->save($weatherDataEntity)) {
-                    log_message('error', 'Failed to save weather data from ' . get_class($weatherClient) . ', errors: [' . print_r($weatherDataModel->errors(), true) . ']');
+                    log_message('error', 'Failed to save weather data from ' . get_class($weatherClient) . ', errors: ' . json_encode($weatherDataModel->errors()));
                     CLI::write('[ERROR] ' . $sourceName . ' — save failed', 'red');
                 } else {
                     CLI::write('[OK]    ' . $sourceName . ' — saved for ' . $data['date'], 'green');

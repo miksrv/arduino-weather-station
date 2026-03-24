@@ -101,8 +101,9 @@ class GetForecastWeather extends BaseCommand
                 $sourceUpdated  = 0;
 
                 if (!empty($insertData)) {
-                    if (!$forecastWeatherDataModel->insertBatch($insertData)) {
-                        log_message('error', 'Failed to insert forecast weather data from ' . get_class($weatherClient) . ', errors: [' . print_r($forecastWeatherDataModel->errors(), true) . ']');
+                    $insertResult = $forecastWeatherDataModel->insertBatch($insertData);
+                    if ($insertResult === false) {
+                        log_message('error', 'Failed to insert forecast weather data from ' . get_class($weatherClient) . ', errors: ' . json_encode($forecastWeatherDataModel->errors()));
                         CLI::write('[ERROR] ' . $sourceName . ' — insert failed', 'red');
                     } else {
                         $sourceInserted = count($insertData);
@@ -110,8 +111,9 @@ class GetForecastWeather extends BaseCommand
                 }
 
                 if (!empty($updateData)) {
-                    if (!$forecastWeatherDataModel->updateBatch($updateData, 'id')) {
-                        log_message('error', 'Failed to update forecast weather data from ' . get_class($weatherClient) . ', errors: [' . print_r($forecastWeatherDataModel->errors(), true) . ']');
+                    $updateResult = $forecastWeatherDataModel->updateBatch($updateData, 'id');
+                    if ($updateResult === false) {
+                        log_message('error', 'Failed to update forecast weather data from ' . get_class($weatherClient) . ', errors: ' . json_encode($forecastWeatherDataModel->errors()));
                         CLI::write('[ERROR] ' . $sourceName . ' — update failed', 'red');
                     } else {
                         $sourceUpdated = count($updateData);

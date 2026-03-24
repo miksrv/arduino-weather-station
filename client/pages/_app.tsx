@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -14,7 +14,7 @@ import { DefaultSeo } from 'next-seo'
 import { ThemeProvider } from 'next-themes'
 
 import { wrapper } from '@/api/store'
-import useLocalStorage from '@/tools/hooks/useLocalStorage'
+import { getItem } from '@/tools/localstorage'
 import { StorageKeys } from '@/tools/types'
 
 import i18Config from '../next-i18next.config'
@@ -36,29 +36,57 @@ const App = ({ Component, pageProps }: AppProps) => {
     const router = useRouter()
     const { i18n } = useTranslation()
     const { store } = wrapper.useWrappedStore(pageProps)
-
-    const [storageLocale] = useLocalStorage<StorageKeys, string>(StorageKeys.LOCALE)
-
-    useEffect(() => {
-        if (
-            storageLocale &&
-            i18n.language !== storageLocale &&
-            i18Config.i18n.locales.includes(storageLocale) &&
-            router.pathname !== '/404'
-        ) {
-            void router.push({ pathname: router.pathname, query: router.query }, router.asPath, {
-                locale: storageLocale
-            })
-        }
-    }, [storageLocale, i18n.language, router.pathname, router.asPath])
+    const [isLocaleReady, setIsLocaleReady] = useState(false)
 
     useEffect(() => {
         dayjs.locale(i18n.language ?? i18Config.i18n.defaultLocale)
     }, [i18n.language])
 
+    useEffect(() => {
+        const savedLocale = getItem<string>(StorageKeys.LOCALE)
+
+        // If the saved language differs from the current one and is valid — redirect
+        if (
+            savedLocale &&
+            i18n.language !== savedLocale &&
+            i18Config.i18n.locales.includes(savedLocale) &&
+            router.pathname !== '/404'
+        ) {
+            void router.replace(router.asPath, router.asPath, { locale: savedLocale })
+        } else {
+            // Language matches or no saved locale — can show UI
+            setIsLocaleReady(true)
+        }
+    }, [])
+
+    // Listen for language changes after redirect
+    useEffect(() => {
+        if (!isLocaleReady && router.locale) {
+            const savedLocale = getItem<string>(StorageKeys.LOCALE)
+            if (!savedLocale || router.locale === savedLocale) {
+                setIsLocaleReady(true)
+            }
+        }
+    }, [router.locale, isLocaleReady])
+
     // useReportWebVitals((metric) => {
     //     console.log(metric)
     // })
+
+    // Show minimal loader while determining locale
+    if (!isLocaleReady) {
+        return (
+            <ThemeProvider defaultTheme={'dark'}>
+                <Head>
+                    <meta
+                        name={'viewport'}
+                        content={'width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no'}
+                    />
+                </Head>
+                <div style={{ minHeight: '100vh' }} />
+            </ThemeProvider>
+        )
+    }
 
     return (
         <ThemeProvider defaultTheme={'dark'}>
