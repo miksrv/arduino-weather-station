@@ -36,7 +36,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         { pollingInterval: POLING_INTERVAL_CURRENT }
     )
 
-    const history12HoursData = useMemo(() => filterRecentData(history, 12), [history])
+    // const history12HoursData = useMemo(() => filterRecentData(history, 12), [history])
     const history24HoursData = useMemo(() => filterRecentData(history, 24), [history])
 
     const widgets: WidgetType[] = useMemo(
@@ -173,7 +173,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         key={`widget-${widget.source}`}
                         loading={currentLoading}
                         chartLoading={historyLoading}
-                        minMax={getMinMaxValues(history12HoursData, widget.source)}
+                        minMax={getMinMaxValues(history24HoursData, widget.source)}
                         currentValue={current?.[widget.source]}
                         formatter={widget?.formatter}
                         chart={

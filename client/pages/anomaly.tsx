@@ -117,19 +117,15 @@ const AnomalyPage: NextPage<object> = () => {
                     <h2>{t('anomaly-history')}</h2>
                 </div>
 
-                <div className={styles.fullWidth}>
-                    <WidgetAnomalyCalendar
-                        loading={isLoading}
-                        data={data?.anomalyCalendar ?? []}
-                    />
-                </div>
+                <WidgetAnomalyCalendar
+                    loading={isLoading}
+                    data={data?.anomalyCalendar ?? []}
+                />
 
-                <div className={styles.fullWidth}>
-                    <WidgetAnomalyHistory
-                        loading={isLoading}
-                        rows={data?.anomalyHistory ?? []}
-                    />
-                </div>
+                <WidgetAnomalyHistory
+                    loading={isLoading}
+                    rows={data?.anomalyHistory ?? []}
+                />
             </div>
         </AppLayout>
     )
