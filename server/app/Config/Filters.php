@@ -1,6 +1,7 @@
 <?php namespace Config;
 
 use App\Filters\CorsFilter;
+use App\Filters\ThrottleFilter;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Filters\CSRF;
 use CodeIgniter\Filters\DebugToolbar;
@@ -20,6 +21,7 @@ class Filters extends BaseConfig {
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
         'cors'          => CorsFilter::class,
+        'throttle'      => ThrottleFilter::class,
     ];
 
     /**
@@ -29,6 +31,8 @@ class Filters extends BaseConfig {
     public array $globals = [
         'before' => [
             // 'honeypot',
+            // CSRF filter is intentionally disabled: this is a stateless REST API.
+            // Protection is provided by token-based auth on POST /sensors and CORS allowlist.
             // 'csrf',
             'invalidchars',
             'cors'
@@ -36,7 +40,7 @@ class Filters extends BaseConfig {
         'after' => [
             // 'toolbar',
             // 'honeypot',
-            // 'secureheaders',
+            'secureheaders',
             // 'cors',
         ],
     ];
@@ -50,7 +54,7 @@ class Filters extends BaseConfig {
      *
      * If you use this, you should disable auto-routing because auto-routing
      * permits any HTTP method to access a controller. Accessing the controller
-     * with a method you don’t expect could bypass the filter.
+     * with a method you don't expect could bypass the filter.
      */
     public array $methods = [];
 
@@ -61,5 +65,7 @@ class Filters extends BaseConfig {
      * Example:
      * 'isLoggedIn' => ['before' => ['account/*', 'profiles/*']]
      */
-    public array $filters = [];
+    public array $filters = [
+        'throttle' => ['before' => ['sensors']],
+    ];
 }

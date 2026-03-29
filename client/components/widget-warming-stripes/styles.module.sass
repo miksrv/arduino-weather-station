@@ -1,0 +1,97 @@
+@use '../../styles/variables'
+
+.widget
+    flex-basis: 100%
+    width: 100%
+    background: var(--container-background-color)
+    color: var(--text-color-primary)
+    border-radius: var(--border-radius)
+    box-shadow: var(--container-shadow)
+    overflow: hidden
+    padding: 14px
+
+    .title
+        color: var(--text-color-primary)
+        font-size: 16px
+        font-weight: 200
+
+.header
+    display: flex
+    flex-direction: column
+    gap: 8px
+    margin-bottom: 12px
+
+    @media screen and (min-width: variables.$mobileMaxWidth)
+        flex-direction: row
+        justify-content: space-between
+        align-items: center
+
+.stats
+    display: flex
+    flex-wrap: wrap
+    gap: 12px
+    font-size: 12px
+
+.statItem
+    display: flex
+    gap: 4px
+
+.statLabel
+    color: var(--text-color-secondary)
+
+.statValue
+    font-weight: 500
+
+.stripesContainer
+    position: relative
+    display: flex
+    width: 100%
+    border-radius: 4px
+    overflow: hidden
+
+.stripe
+    flex: 1
+    min-width: 60px
+    height: 100px
+    cursor: crosshair
+    transition: transform 0.15s ease, box-shadow 0.15s ease
+    display: flex
+    flex-direction: column
+    align-items: center
+    justify-content: center
+    gap: 2px
+    padding: 8px 4px
+
+    &:hover,
+    &.stripeActive
+        transform: scaleY(1.05)
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.3)
+        z-index: 2
+
+.stripeYear
+    font-size: 13px
+    font-weight: 600
+    white-space: nowrap
+
+.stripeTemp
+    font-size: 12px
+    font-weight: 500
+    white-space: nowrap
+
+.stripeAnomaly
+    font-size: 11px
+    opacity: 0.85
+    white-space: nowrap
+
+.legend
+    display: flex
+    align-items: center
+    gap: 8px
+    margin-top: 10px
+    font-size: 11px
+    color: var(--text-color-secondary)
+
+.legendGradient
+    flex: 1
+    height: 8px
+    border-radius: 4px

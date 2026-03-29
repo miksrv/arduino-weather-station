@@ -1,0 +1,104 @@
+@use '../../styles/variables'
+
+.widget
+    flex-basis: 100%
+    width: 100%
+    color: var(--text-color-primary)
+    overflow: hidden
+    margin-top: -10px
+
+    .card
+        flex-shrink: 0
+        display: flex
+        flex-direction: column
+        align-items: center
+        gap: 4px
+        border-radius: var(--border-radius)
+        box-shadow: var(--container-shadow)
+        background: var(--container-background-color)
+        padding: 10px 12px
+        width: 100px
+        cursor: default
+        transition: box-shadow 0.2s
+        min-width: 158px
+
+        &.highlighted
+            box-shadow: inset 0 0 0 1.5px var(--color-main)
+
+    .cardDay
+        font-size: var(--font-size-small)
+        color: var(--text-color-primary)
+        font-weight: 400
+        text-transform: uppercase
+        letter-spacing: 0.05em
+        white-space: nowrap
+
+    .cardDate
+        font-size: var(--font-size-small)
+        color: var(--text-color-secondary)
+        white-space: nowrap
+        text-transform: capitalize
+
+    .cardTime
+        font-size: var(--font-size)
+        font-weight: 500
+        color: var(--text-color-primary)
+        white-space: nowrap
+        text-transform: capitalize
+
+    .cardIcon
+        display: flex
+        align-items: center
+        justify-content: center
+
+        svg
+            width: 42px
+            height: 42px
+
+    .cardTempRange
+        display: flex
+        gap: 4px
+        align-items: center
+        white-space: nowrap
+
+    .cardTempHigh
+        font-size: 25px
+        font-weight: 100
+        color: var(--text-color-primary)
+
+
+    .cardTemp
+        font-size: var(--font-size)
+        font-weight: 500
+        color: var(--text-color-primary)
+        white-space: nowrap
+
+    .cardMeta
+        display: flex
+        flex-direction: column
+        align-items: center
+        gap: 2px
+        width: 100%
+
+    .cardMetaRow
+        display: flex
+        align-items: center
+        gap: 4px
+        font-size: var(--font-size-small)
+        color: var(--text-color-secondary)
+        white-space: nowrap
+
+        svg
+            height: 16px
+            width: 16px
+            fill: var(--text-color-secondary)
+            flex-shrink: 0
+
+    .section
+        width: 100%
+
+    .skeletonRow
+        margin-top: 20px
+        display: flex
+        gap: 10px
+        overflow: hidden

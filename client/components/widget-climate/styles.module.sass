@@ -7,6 +7,19 @@
     box-shadow: var(--container-shadow)
     overflow: hidden
 
+.progressBar
+    display: flex
+    align-items: center
+    gap: 8px
+    padding: 8px 12px
+    font-size: 13px
+    color: var(--text-color-secondary)
+
+    svg
+        width: 18px
+        height: 18px
+        flex-shrink: 0
+
 .chartTooltipTitle
     font-family: (--font-family), sans-serif
     font-size: 12px
@@ -39,3 +52,7 @@
         justify-content: space-between
         align-items: center
         color: var(--text-color-secondary)
+
+    .value
+        color: var(--text-color-primary)
+        margin-left: 10px

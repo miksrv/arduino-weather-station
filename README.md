@@ -5,7 +5,7 @@ Arduino Weather Station is a complete DIY weather-monitoring project powered by 
 You can use this repository to build your own fully-featured weather station - and if you like it, please give the project a star :)
 
 <div align="center">
-  <img src="https://miksoft.pro/_next/static/media/meteostation.de6617a7.jpg" alt="Arduino Weather Station" width="150" height="150">
+  <img src="https://miksoft.pro/projects/meteostation.webp" alt="Arduino Weather Station" width="150" height="150">
 
 <h3>Arduino Weather Station</h3>
 
@@ -47,10 +47,6 @@ You can use this repository to build your own fully-featured weather station - a
     - [Measured Parameters](#measured-parameters)
     - [Built With](#built-with)
 - [Build Guide](#build-guide)
-    - [3D Printing the Enclosure](#3d-printing-the-enclosure)
-    - Assembling the Weather Station Hardware 
-    - Server Setup & Configuration (PHP + MySQL + CodeIgniter)
-    - Client Setup & Configuration (Next.js + Redux RTK)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Screenshots and Demos](#screenshots-and-demos)
@@ -58,6 +54,18 @@ You can use this repository to build your own fully-featured weather station - a
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
 - [Contact](#contact)
+
+## Documentation
+
+Detailed documentation lives in the [`/docs`](./docs) directory:
+
+- [Architecture](./docs/architecture.md) — system design, data flow, external services
+- [Backend](./docs/backend.md) — PHP/CodeIgniter API reference and setup
+- [Frontend](./docs/frontend.md) — Next.js app structure and development
+- [Development Guide](./docs/development.md) — local setup, commands, conventions
+- [Testing Guide](./docs/testing.md) — running tests, coverage, CI pipeline
+- [Anomaly Monitor](./docs/anomaly-monitor.md) — meteorological anomaly detection, flood risk scoring, and visualization
+- [Precipitation Calendar](./docs/precipitation-calendar.md) — annual rainfall calendar, daily totals, wet/dry streaks, and monthly breakdown
 
 <!-- ABOUT OF PROJECT -->
 ## About of Project
@@ -138,7 +146,7 @@ Follow these steps to install and run the Arduino Weather Station project on you
 Make sure you have the following installed on your system:
 - **Node.js** (v20 or higher)
 - **NPM** or **Yarn** (for frontend dependencies)
-- **PHP** (v8.0 or higher)
+- **PHP** (v8.2 or higher)
 - **Composer** (for backend dependencies)
 - **MySQL** (or any compatible database)
 - **Arduino IDE** (for programming the Arduino microcontroller)
@@ -155,7 +163,7 @@ cd arduino-weather-station
 1. Navigate to the `server` folder:
 
    ```bash
-   cd backend
+   cd server
    ```
 
 2. Install PHP dependencies using Composer:
@@ -167,7 +175,7 @@ cd arduino-weather-station
 3. Create a `.env` file and configure your environment variables, such as database connection settings:
 
    ```bash
-   cp .env.example .env
+   cp env .env
    ```
 
     Don't forget to set the parameter `app.arduino.token` = '' in the .env file. This token will be used for proper authentication of the Arduino weather station when transmitting data to the server. The same token will need to be set in the Arduino sketch, which will be described in step 4.
@@ -196,7 +204,7 @@ cd arduino-weather-station
 2. Copy file `env` to `.env.local` and set the following environment variables:
 
    ```bash
-   cp .env .env
+   cp env .env.local
    ```
    
     ```bash
@@ -296,7 +304,7 @@ After successfully installing and setting up the Arduino Weather Station project
 
 ### 3. Historical Data
 
-- Navigate to the **History** or **Statistics** page from the main menu.
+- Navigate to the **History** page from the main menu.
 - Choose a date range to view weather trends and archived data, including charts for various metrics like temperature, wind, and humidity.
 
 <div align="center">
@@ -316,7 +324,7 @@ After successfully installing and setting up the Arduino Weather Station project
 
 ### 6. Data Export
 
-- Weather data can be exported from the **Statistics** page in various formats (e.g., CSV) to analyze trends further.
+- Weather data can be exported from the **History** page in various formats (e.g., CSV) to analyze trends further.
 
 ### 7. System Maintenance
 
@@ -329,6 +337,57 @@ After successfully installing and setting up the Arduino Weather Station project
 - **Historical Data**: Review weather history with customizable date ranges.
 - **Graphical Visualizations**: View weather trends and patterns using interactive charts.
 - **Sensor Readings**: Monitor multiple environmental factors, such as UV Index, wind speed, and solar radiation.
+
+## CLI Commands & Cron Jobs
+
+The backend exposes several `php spark` commands for pulling external weather data, computing aggregates, and maintaining the anomaly log. These are intended to be scheduled via cron on the server running the PHP backend.
+
+### Available Commands
+
+| Command | Description |
+|---|---|
+| `php spark system:getCurrentWeather` | Fetches current weather observations from all configured external APIs (VisualCrossing, WeatherAPI, OpenWeatherMap), saves new records to `raw_weather_data`, and recalculates hourly and daily averages. |
+| `php spark system:getForecastWeather` | Fetches forecast data from all configured external APIs and bulk-upserts records into `forecast_weather_data`. |
+| `php spark system:sendNarodmonData` | Retrieves the latest sensor reading from the database and pushes it to the [narodmon.ru](https://narodmon.ru) monitoring service. |
+| `php spark system:detectAnomalies` | Runs all meteorological anomaly checks against today's daily and hourly data and updates the `anomaly_log` table. Must run after daily averages are available. |
+| `php spark system:backfillAnomalyLog` | Iterates all historical daily records and populates `anomaly_log` from scratch. Intended for initial bootstrapping. Accepts `--force` to bypass the non-empty table guard. |
+
+### Recommended Schedule
+
+| Command | Frequency | Rationale |
+|---|---|---|
+| `system:getCurrentWeather` | Every hour | Keeps raw observations and hourly/daily averages up to date. |
+| `system:getForecastWeather` | Every 3–6 hours | Forecast data changes slowly; 4-hour intervals balance freshness against API quota. |
+| `system:sendNarodmonData` | Every 15 minutes | Near-real-time push to the public monitoring network. |
+| `system:detectAnomalies` | Once daily (e.g. 01:30) | Runs after midnight when the previous day's daily averages are fully computed. |
+| `system:backfillAnomalyLog` | One-time / manual | Run once on a fresh deployment to seed historical anomaly records. |
+
+### Example Crontab
+
+Add the entries below to your server's crontab (`crontab -e`). Adjust `/var/www/project/server` to match your actual deployment path.
+
+```cron
+# Fetch current weather from external APIs and recalculate averages — every hour
+0 * * * * cd /var/www/project/server && php spark system:getCurrentWeather >> /var/log/weather.log 2>&1
+
+# Fetch forecast data — every 4 hours
+0 */4 * * * cd /var/www/project/server && php spark system:getForecastWeather >> /var/log/weather.log 2>&1
+
+# Push latest reading to narodmon.ru — every 15 minutes
+*/15 * * * * cd /var/www/project/server && php spark system:sendNarodmonData >> /var/log/weather.log 2>&1
+
+# Run anomaly detection — daily at 01:30 (after daily averages are ready)
+30 1 * * * cd /var/www/project/server && php spark system:detectAnomalies >> /var/log/weather.log 2>&1
+```
+
+> **Note:** `system:backfillAnomalyLog` is a one-time maintenance command and should not be added to cron. Run it manually once after a fresh deployment:
+> ```bash
+> cd /var/www/project/server && php spark system:backfillAnomalyLog
+> ```
+
+<p align="right">
+  (<a href="#top">Back to top</a>)
+</p>
 
 ## Screenshots and Demos
 
@@ -361,6 +420,20 @@ The **Forecast** section offers a comprehensive weather outlook for the next fiv
 The **Heatmap** section provides a detailed visualization of weather metrics, including temperature, pressure, humidity, precipitation, and cloud coverage, displayed as a heatmap. Users can select any time period to view trends and patterns across multiple environmental factors at once. This powerful tool allows for quick comparison and in-depth analysis of weather conditions over time.
 
 ![History Interface](./client/public/images/heatmap.jpg)
+
+#### 6. **Climate Dashboard**
+
+The **Climate** page is a multi-widget climate science dashboard that surfaces long-term environmental trends from the station's full historical record. Five visualizations make warming and precipitation shifts immediately legible:
+
+| Widget | Description |
+|---|---|
+| **Warming Stripes** | One color-coded stripe per year — deep blue (cold years) through white (baseline) to deep red (warm years). Inspired by Ed Hawkins' iconic "Show Your Stripes" graphic. |
+| **Temperature Anomaly** | Bar chart of annual deviation from the long-term mean. Red bars = warmer than average, blue = cooler. A linear trend line is overlaid automatically. |
+| **Monthly Climate Normals** | Band chart showing the all-time min/max envelope and historical mean per calendar month, with the current year's actual values overlaid. |
+| **Annual Precipitation** | Yearly total rainfall bars (blue = above average, amber = below average) plus a linear trend line and a plain-language trend label. |
+| **Extreme Event Days** | Grouped bars counting frost days (< 0 °C), hot days (≥ 30 °C), and heavy-rain days (≥ 10 mm) per year. |
+
+All five widgets are powered by the new `GET /climate` endpoint, which returns pre-aggregated statistics computed server-side from `daily_averages`. The response is cached indefinitely (TTL = 0) because the underlying data changes at most once per year.
 
 #### Live Demo
 

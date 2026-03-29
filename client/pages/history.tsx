@@ -23,10 +23,7 @@ const HistoryPage: NextPage<object> = () => {
     const [period, setPeriod] = useState<[string?, string?]>()
 
     const historyDateParam: Maybe<ApiType.History.Request> = useMemo(
-        () => ({
-            start_date: period?.[0] ?? '',
-            end_date: period?.[1] ?? ''
-        }),
+        () => (period?.[0] && period?.[1] ? { end_date: period[1], start_date: period[0] } : undefined),
         [period]
     )
 
@@ -36,7 +33,7 @@ const HistoryPage: NextPage<object> = () => {
         isFetching: historyFetching
     } = API.useGetHistoryQuery(historyDateParam, {
         pollingInterval: POLING_INTERVAL_CURRENT,
-        skip: !period?.[0] || !period?.[1]
+        skip: !historyDateParam
     })
 
     const dateFormat = useMemo(
@@ -55,19 +52,22 @@ const HistoryPage: NextPage<object> = () => {
                 description={t('history-page-description')}
                 canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/history`}
                 openGraph={{
-                    description: t('site-description'),
+                    description: t('history-page-description'),
                     images: [
                         {
                             height: 1292,
-                            url: '/images/history.jpg',
+                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/history.jpg`,
                             width: 2028
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                     siteName: t('weather-in-orenburg'),
-                    title: t('weather-in-orenburg'),
+                    title: t('historical-weather-data'),
                     type: 'website',
-                    url: process.env.NEXT_PUBLIC_SITE_LINK
+                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/history`
+                }}
+                twitter={{
+                    cardType: 'summary_large_image'
                 }}
             />
 
@@ -131,7 +131,7 @@ export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context): Promise<GetServerSidePropsResult<object>> => {
             const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
-            const translations = await serverSideTranslations(locale)
+            const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
 

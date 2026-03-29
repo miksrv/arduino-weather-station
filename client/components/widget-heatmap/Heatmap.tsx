@@ -196,8 +196,8 @@ const HeatmapChart: React.FC<ChartProps> = ({ type, data, title, subTitle, heigh
             }
         },
         visualMap: {
-            min: Math.min(...(data?.map((item) => item[type] ?? 0) || [0])),
-            max: Math.max(...(data?.map((item) => item[type] ?? 0) || [1])),
+            min: data?.reduce((acc, item) => Math.min(acc, item[type] ?? 0), Infinity) ?? 0,
+            max: data?.reduce((acc, item) => Math.max(acc, item[type] ?? 0), -Infinity) ?? 1,
             calculable: true,
             orient: 'horizontal',
             right: 10,

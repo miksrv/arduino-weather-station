@@ -71,8 +71,8 @@ class Sensors extends ResourceController {
 
             return $this->respondCreated();
         } catch (Exception $e) {
-            log_message('error', 'Error saving weather data: {e}', ['e' => $e->getMessage()]);
-            return $this->failServerError('Failed to save weather data: ' . $e->getMessage());
+            log_message('error', 'Sensors::index - failed to save weather data: ' . $e->getMessage());
+            return $this->failServerError('Internal server error.');
         }
     }
 }

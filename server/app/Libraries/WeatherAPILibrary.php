@@ -127,7 +127,10 @@ class WeatherAPILibrary
         ];
 
         try {
-            $response = $this->httpClient->request('GET', self::API_URL . $endpoint, ['query' => array_merge($params, $additionalParams)]);
+            $response = $this->httpClient->request('GET', self::API_URL . $endpoint, [
+                'query'   => array_merge($params, $additionalParams),
+                'timeout' => 30,
+            ]);
             return json_decode($response->getBody(), true);
         } catch (Exception $e) {
             log_message('error', 'WeatherAPI.com API request error: {e}', ['e' => $e->getMessage()]);

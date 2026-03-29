@@ -33,12 +33,18 @@ export const getMinMaxValues = (data?: ApiModel.Weather[], parameter?: keyof Api
         return {}
     }
 
-    let minValue = data[0][parameter] as number
-    let minDate = data[0].date
-    let maxValue = data[0][parameter] as number
-    let maxDate = data[0].date
+    const validItems = data.filter((item) => item[parameter] !== undefined && item[parameter] != null)
 
-    data.forEach((item) => {
+    if (!validItems.length) {
+        return {}
+    }
+
+    let minValue = validItems[0][parameter] as number
+    let minDate = validItems[0].date
+    let maxValue = validItems[0][parameter] as number
+    let maxDate = validItems[0].date
+
+    validItems.forEach((item) => {
         const value = item[parameter] as number
         const date = item.date
 

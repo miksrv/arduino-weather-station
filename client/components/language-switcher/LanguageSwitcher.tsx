@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { setCookie } from 'cookies-next'
+import { cn } from 'simple-react-ui-kit'
 
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
@@ -17,39 +18,41 @@ const LanguageSwitcher: React.FC = () => {
     const router = useRouter()
     const dispatch = useAppDispatch()
 
-    const [, setStorageLocale] = useLocalStorage<StorageKeys, LocaleType>(StorageKeys.LOCALE, 'en')
+    const [, setStorageLocale] = useLocalStorage<StorageKeys, LocaleType>(StorageKeys.LOCALE)
 
     const { language: currentLanguage } = i18n
-    const { pathname, asPath, query } = router
+    const { pathname, query } = router
 
-    const changeLanguage = async (locale: Locale) => {
+    const changeLanguage = (locale: Locale) => {
         if (locale === currentLanguage) {
             return
         }
 
-        await setCookie('NEXT_LOCALE', locale)
+        void setCookie('NEXT_LOCALE', locale)
         setStorageLocale(locale)
-
         dispatch(setLocale(locale))
 
-        await i18n.changeLanguage(locale)
-        await router.push({ pathname, query }, asPath, { locale })
+        // Формируем новый URL с учётом локали
+        const queryString = new URLSearchParams(query as Record<string, string>).toString()
+        const basePath = locale === 'ru' ? pathname : `/${locale}${pathname}`
+
+        window.location.href = queryString ? `${basePath}?${queryString}` : basePath
     }
 
     useEffect(() => {
         dispatch(setLocale(currentLanguage as Locale))
-    }, [])
+    }, [currentLanguage, dispatch])
 
     return (
         <div className={styles.languageSwitcher}>
             <button
-                className={currentLanguage === 'en' ? styles.active : undefined}
+                className={cn(currentLanguage === 'en' && styles.active)}
                 onClick={() => changeLanguage('en')}
             >
                 {'Eng'}
             </button>
             <button
-                className={currentLanguage === 'ru' ? styles.active : undefined}
+                className={cn(currentLanguage === 'ru' && styles.active)}
                 onClick={() => changeLanguage('ru')}
             >
                 {'Rus'}

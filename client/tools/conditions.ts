@@ -71,6 +71,16 @@ const weatherIdToI18nKeyMap: Record<number, string> = {
 }
 
 /**
+ * Converts an anomaly type identifier (underscore-separated) to the corresponding
+ * i18n key segment (hyphen-separated). Used to build translation keys of the form
+ * `anomaly-<key>` or `anomaly-<key>-desc`.
+ *
+ * @example anomalyTypeToI18nKey('heat_wave')     // 'heat-wave'
+ * @example anomalyTypeToI18nKey('drought_spi30') // 'drought-spi30'
+ */
+export const anomalyTypeToI18nKey = (type: string): string => type.replace(/_/g, '-')
+
+/**
  * Converts weather ID to i18n key.
  * @param weatherId Weather ID.
  * @returns String with i18n key or 'conditions.unknown' if ID not found.

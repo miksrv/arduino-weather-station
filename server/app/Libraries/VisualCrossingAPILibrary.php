@@ -83,7 +83,7 @@ class VisualCrossingAPILibrary
      */
     public function getWeatherData(): array|false
     {
-        $data = $this->request('/today');
+        $data = $this->request('today');
         return $data ? $this->mapWeatherData($data) : false;
     }
 
@@ -97,7 +97,10 @@ class VisualCrossingAPILibrary
         ];
 
         try {
-            $response = $this->httpClient->request('GET', self::API_URL . getenv('app.lat') . ',' . getenv('app.lon') . '/' . $endpoint, ['query' => $params]);
+            $response = $this->httpClient->request('GET', self::API_URL . getenv('app.lat') . ',' . getenv('app.lon') . '/' . $endpoint, [
+                'query'   => $params,
+                'timeout' => 30,
+            ]);
             return json_decode($response->getBody(), true);
         } catch (Exception $e) {
             log_message('error', 'VisualCrossing API request error: {e}', ['e' => $e->getMessage()]);

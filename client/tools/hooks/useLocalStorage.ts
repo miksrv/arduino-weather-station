@@ -1,4 +1,6 @@
-import React, { useDebugValue, useEffect, useState } from 'react'
+import React, { useCallback, useDebugValue, useEffect, useState } from 'react'
+
+import { isValidJSON } from '@/tools/helpers'
 
 export const DEFAULT_STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'mikApp'
 
@@ -70,15 +72,27 @@ export const useLocalStorage = <K extends string, S>(
         }
     }
 
-    const setItem = (key: K, value: S | undefined) => {
-        const data = _getLocalStorage() || {}
-        const updatedData = { ...data, [key]: value }
-        localStorage.setItem(DEFAULT_STORAGE_KEY, JSON.stringify(updatedData))
-    }
+    const setItem = useCallback(
+        (k: K, value: S | undefined) => {
+            if (typeof window === 'undefined') {
+                return
+            }
 
-    const removeItem = (key: K) => {
+            const data = _getLocalStorage() || {}
+            const updatedData = { ...data, [k]: value }
+            localStorage.setItem(DEFAULT_STORAGE_KEY, JSON.stringify(updatedData))
+        },
+
+        [key]
+    )
+
+    const removeItem = (k: K) => {
+        if (typeof window === 'undefined') {
+            return
+        }
+
         const data = _getLocalStorage() || {}
-        delete (data as Record<K, S>)[key]
+        delete (data as Record<K, S>)[k]
         localStorage.setItem(DEFAULT_STORAGE_KEY, JSON.stringify(data))
     }
 
@@ -89,38 +103,24 @@ export const useLocalStorage = <K extends string, S>(
         }
     }, [key])
 
-    useEffect(() => {
-        setItem(key, state)
-    }, [key, state])
+    const setStoredState = useCallback(
+        (value: React.SetStateAction<S | undefined>) => {
+            setState((prev) => {
+                const next =
+                    typeof value === 'function' ? (value as (prev: S | undefined) => S | undefined)(prev) : value
+                setItem(key, next)
+                return next
+            })
+        },
+        [key, setItem]
+    )
 
     const remove = () => {
         removeItem(key)
         setState(typeof initialState === 'function' ? (initialState as () => S)() : initialState)
     }
 
-    return [state, setState, remove]
-}
-
-/**
- * Checks if a given string is a valid JSON.
- *
- * @param string - The string to be checked.
- * @returns `true` if the string is a valid JSON, otherwise `false`.
- */
-const isValidJSON = (string: string) => {
-    if (!string || !string.length) {
-        return true
-    }
-
-    try {
-        JSON.parse(string)
-    } catch (e) {
-        console.error(e)
-
-        return false
-    }
-
-    return true
+    return [state, setStoredState, remove]
 }
 
 export default useLocalStorage
