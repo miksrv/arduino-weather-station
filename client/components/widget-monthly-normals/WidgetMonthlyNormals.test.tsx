@@ -7,7 +7,7 @@ import WidgetMonthlyNormals from './WidgetMonthlyNormals'
 import '@testing-library/jest-dom'
 
 jest.mock('next-i18next', () => ({
-    useTranslation: () => ({ t: (key: string) => key })
+    useTranslation: () => ({ t: (key: string) => key, i18n: { language: 'en' } })
 }))
 
 const mockUseTheme = jest.fn(() => ({ theme: 'light' }))
