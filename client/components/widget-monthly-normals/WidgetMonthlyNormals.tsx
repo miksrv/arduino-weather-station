@@ -19,7 +19,7 @@ interface WidgetMonthlyNormalsProps {
 }
 
 const WidgetMonthlyNormals: React.FC<WidgetMonthlyNormalsProps> = ({ normals, currentYearMonthly, loading }) => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const { theme } = useTheme()
 
     const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff'
@@ -32,8 +32,12 @@ const WidgetMonthlyNormals: React.FC<WidgetMonthlyNormalsProps> = ({ normals, cu
     const currentYearColor = colors['green'][0]
 
     const monthLabels = useMemo(
-        () => Array.from({ length: 12 }, (_, i) => t(`month-short-${i + 1}` as `month-short-${number}`)),
-        [t]
+        () =>
+            Array.from({ length: 12 }, (_, i) => {
+                const date = new Date(2000, i, 1)
+                return date.toLocaleString(i18n.language, { month: 'long' })
+            }),
+        [i18n.language]
     )
 
     const chartOption: EChartsOption = useMemo(() => {
