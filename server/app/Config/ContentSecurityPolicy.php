@@ -43,18 +43,20 @@ class ContentSecurityPolicy extends BaseConfig
     // -------------------------------------------------------------------------
 
     /**
-     * Will default to self if not overridden
+     * Will default to self if not overridden.
+     * Restrictive default: this is a JSON REST API with no inline resources.
      *
      * @var string|string[]|null
      */
-    public $defaultSrc;
+    public $defaultSrc = 'none';
 
     /**
      * Lists allowed scripts' URLs.
+     * Disabled: this API serves no JavaScript.
      *
      * @var string|string[]
      */
-    public $scriptSrc = 'self';
+    public $scriptSrc = 'none';
 
     /**
      * Lists allowed stylesheets' URLs.

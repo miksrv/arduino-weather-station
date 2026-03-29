@@ -3,15 +3,10 @@
         bootstrap="vendor/codeigniter4/framework/system/Test/bootstrap.php"
         backupGlobals="false"
         colors="true"
-        convertErrorsToExceptions="true"
-        convertNoticesToExceptions="true"
-        convertWarningsToExceptions="true"
         stopOnError="false"
         stopOnFailure="false"
-        stopOnIncomplete="false"
-        stopOnSkipped="false"
-        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-    <coverage includeUncoveredFiles="true" processUncoveredFiles="true">
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd">
+    <source>
         <include>
             <directory suffix=".php">./app</directory>
         </include>
@@ -19,10 +14,11 @@
             <directory suffix=".php">./app/Views</directory>
             <file>./app/Config/Routes.php</file>
         </exclude>
+    </source>
+    <coverage>
         <report>
             <clover outputFile="build/logs/clover.xml"/>
             <html outputDirectory="build/logs/html"/>
-            <php outputFile="build/logs/coverage.serialized"/>
             <text outputFile="php://stdout" showUncoveredFiles="false"/>
         </report>
     </coverage>
@@ -32,8 +28,6 @@
         </testsuite>
     </testsuites>
     <logging>
-        <testdoxHtml outputFile="build/logs/testdox.html"/>
-        <testdoxText outputFile="build/logs/testdox.txt"/>
         <junit outputFile="build/logs/logfile.xml"/>
     </logging>
     <php>

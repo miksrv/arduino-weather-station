@@ -50,8 +50,35 @@ export const API = createApi({
             providesTags: ['Forecast'],
             query: (period) => `forecast/${period}`,
             transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+        }),
+        getAnomaly: builder.query<ApiType.Anomaly.AnomalyResponse, void>({
+            providesTags: ['Anomaly'],
+            query: () => 'anomaly',
+            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+        }),
+        getAnomalyHistory: builder.query<ApiType.Anomaly.AnomalyHistoryResponse, ApiType.Anomaly.AnomalyHistoryRequest>(
+            {
+                providesTags: ['Anomaly'],
+                query: (params) => `anomaly/history${encodeQueryData<ApiType.Anomaly.AnomalyHistoryRequest>(params)}`,
+                transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+            }
+        ),
+        getPrecipitation: builder.query<ApiType.Precipitation.Response, ApiType.Precipitation.Request>({
+            providesTags: ['Precipitation'],
+            query: (params) => `precipitation${encodeQueryData<ApiType.Precipitation.Request>(params)}`,
+            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+        }),
+        getClimate: builder.query<ApiType.Climate.Response, void>({
+            providesTags: ['Climate'],
+            query: () => 'climate',
+            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
         })
     }),
+    // The `any` return type is intentional: adding an explicit return type annotation causes
+    // TypeScript to widen the `Definitions` generic and break all endpoint hook inference.
+    // This is a known limitation of the RTK Query + next-redux-wrapper circular dependency
+    // (api.ts → RootState → store.ts → API → api.ts). Resolving it requires extracting the
+    // store type derivation to a separate file so it no longer circularly depends on `api.ts`.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     extractRehydrationInfo(action, { reducerPath }): any {
         if (isHydrateAction(action)) {
@@ -59,5 +86,5 @@ export const API = createApi({
         }
     },
     reducerPath: 'api',
-    tagTypes: ['Current', 'History', 'Heatmap', 'Forecast']
+    tagTypes: ['Current', 'History', 'Heatmap', 'Forecast', 'Anomaly', 'Precipitation', 'Climate']
 })

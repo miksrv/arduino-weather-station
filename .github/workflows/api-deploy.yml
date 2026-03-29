@@ -49,13 +49,25 @@
        - name: Load Secrets
          run: echo "machine ${{ secrets.FTP_HOSTNAME }} login ${{ secrets.FTP_USERNAME }} password ${{ secrets.FTP_PASSWORD }}" > ~/.netrc
 
-       - name: Upload Folder
+       - name: Upload API
          run: |
-           lftp -e "put -O / .htaccess" ${{ secrets.FTP_HOSTNAME }}
-           lftp -e "rm -r app" ${{ secrets.FTP_HOSTNAME }}
-           lftp -e "rm -r vendor" ${{ secrets.FTP_HOSTNAME }}
-           lftp -e "mirror --parallel=100 -R app" ${{ secrets.FTP_HOSTNAME }}
-           lftp -e "mirror --parallel=100 -R vendor" ${{ secrets.FTP_HOSTNAME }}
-           lftp -e "mirror --parallel=100 -R public" ${{ secrets.FTP_HOSTNAME }}
-           lftp -e "mirror --parallel=100 -R writable" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "put -O / .htaccess" ${{ secrets.FTP_HOSTNAME }} || true
+           lftp -e "put -O / .env.production" ${{ secrets.FTP_HOSTNAME }} || true
+           lftp -e "put -O / spark" ${{ secrets.FTP_HOSTNAME }} || true
+           lftp -e "rm -r /app" ${{ secrets.FTP_HOSTNAME }} || true
+           lftp -e "rm -r /vendor" ${{ secrets.FTP_HOSTNAME }} || true
+           lftp -e "mirror --parallel=100 -R app /app" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "mirror --parallel=100 -R vendor /vendor" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "mirror --parallel=100 -R public /public" ${{ secrets.FTP_HOSTNAME }}
+           lftp -e "mirror --parallel=100 -R writable /writable" ${{ secrets.FTP_HOSTNAME }}
          working-directory: server
+
+       - name: Set permissions
+         run: |
+           lftp -e "chmod 755 /spark" ${{ secrets.FTP_HOSTNAME }} || true
+           lftp -e "chmod -R 755 /writable" ${{ secrets.FTP_HOSTNAME }} || true
+           lftp -e "chmod -R 755 /writable/cache" ${{ secrets.FTP_HOSTNAME }} || true
+           lftp -e "chmod -R 755 /writable/logs" ${{ secrets.FTP_HOSTNAME }} || true
+           lftp -e "chmod -R 755 /writable/session" ${{ secrets.FTP_HOSTNAME }} || true
+           lftp -e "chmod -R 755 /writable/uploads" ${{ secrets.FTP_HOSTNAME }} || true
+         continue-on-error: true

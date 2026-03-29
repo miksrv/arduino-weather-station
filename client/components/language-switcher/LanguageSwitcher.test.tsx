@@ -9,8 +9,7 @@ import '@testing-library/jest-dom'
 jest.mock('next-i18next', () => ({
     useTranslation: () => ({
         i18n: {
-            language: 'en',
-            changeLanguage: jest.fn(() => Promise.resolve())
+            language: 'en'
         }
     })
 }))
@@ -50,12 +49,12 @@ describe('LanguageSwitcher', () => {
         expect(screen.getByText('Rus').className).not.toMatch(/active/)
     })
 
-    it('does not call changeLanguage if the selected language is already active', async () => {
+    it('does not call router.push if the selected language is already active', async () => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-        const i18n = require('next-i18next').useTranslation().i18n
+        const router = require('next/router').useRouter()
         render(<LanguageSwitcher />)
         fireEvent.click(screen.getByText('Eng'))
-        expect(i18n.changeLanguage).not.toHaveBeenCalled()
+        expect(router.push).not.toHaveBeenCalled()
     })
 
     it('dispatches setLocale on mount', () => {
@@ -63,5 +62,18 @@ describe('LanguageSwitcher', () => {
         const setLocale = require('@/api').setLocale
         render(<LanguageSwitcher />)
         expect(setLocale).toHaveBeenCalled()
+    })
+
+    it('clicking Rus button sets cookie and calls setStorageLocale', () => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+        const { setCookie } = require('cookies-next')
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+        const useLocalStorage = require('@/tools/hooks/useLocalStorage') as jest.Mock
+        const mockSetter = jest.fn()
+        useLocalStorage.mockReturnValue([null, mockSetter])
+        render(<LanguageSwitcher />)
+        fireEvent.click(screen.getByText('Rus'))
+        expect(setCookie).toHaveBeenCalledWith('NEXT_LOCALE', 'ru')
+        expect(mockSetter).toHaveBeenCalledWith('ru')
     })
 })

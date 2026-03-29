@@ -31,21 +31,24 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             <NextSeo
                 title={t('forecast-weather-in-orenburg')}
                 description={t('forecast-page-description')}
-                canonical={process.env.NEXT_PUBLIC_SITE_LINK}
+                canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/forecast`}
                 openGraph={{
-                    description: t('site-description'),
+                    description: t('forecast-page-description'),
                     images: [
                         {
                             height: 1368,
-                            url: '/images/forecast.jpg',
+                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/forecast.jpg`,
                             width: 2040
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                     siteName: t('weather-in-orenburg'),
-                    title: t('weather-in-orenburg'),
+                    title: t('forecast-weather-in-orenburg'),
                     type: 'website',
-                    url: process.env.NEXT_PUBLIC_SITE_LINK
+                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/forecast`
+                }}
+                twitter={{
+                    cardType: 'summary_large_image'
                 }}
             />
 
@@ -63,6 +66,15 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     defaultSort={{ key: 'date', direction: 'asc' }}
                     fullWidth={true}
                 />
+
+                <WidgetForecastTable
+                    title={t('weather-forecast-hourly')}
+                    columnsPreset={['time', 'weatherIcon', 'temperature', 'clouds', 'pressure', 'wind']}
+                    loading={hourlyLoading}
+                    data={forecastHourly}
+                    defaultSort={{ key: 'date', direction: 'asc' }}
+                    fullWidth={true}
+                />
             </div>
         </AppLayout>
     )
@@ -72,7 +84,7 @@ export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context): Promise<GetServerSidePropsResult<IndexPageProps>> => {
             const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
-            const translations = await serverSideTranslations(locale)
+            const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
 

@@ -1,0 +1,45 @@
+@use '../styles/variables'
+
+.sectionHeader
+    width: 100%
+    margin: 8px 0 4px
+
+    h2
+        margin: 0
+        color: var(--text-color-primary)
+        font-size: 16px
+        font-weight: 200
+
+.floodRiskRow
+    display: flex
+    align-items: flex-start
+    gap: 10px
+    width: 100%
+
+    > :first-child
+        flex-shrink: 0
+
+    .zScoreGrid
+        flex: 1
+        display: grid
+        grid-template-columns: repeat(2, 1fr)
+        gap: 10px
+        width: 100%
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        flex-direction: column
+
+        > :first-child
+            width: 100%
+
+        .zScoreGrid
+            grid-template-columns: repeat(2, 1fr)
+
+.inactiveGrid
+    display: grid
+    grid-template-columns: repeat(3, 1fr)
+    gap: 10px
+    width: 100%
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        grid-template-columns: 1fr

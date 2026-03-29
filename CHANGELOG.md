@@ -1,8 +1,120 @@
 # CHANGELOG
 
-## 3.5.1
+## 3.7.3
+
+### Patch Changes
+
+- Add `GET /climate` REST endpoint with `Climate` controller and `ClimateModel`; computes annual temperature anomalies, per-year frost/hot-day counts, monthly normals, and baseline average temperature from `daily_averages` (from `START_YEAR = 2022`); response is cached for 24 hours
+- Add `ClimateYearStat`, `ClimateMonthlyNormal`, and climate `Response` TypeScript interfaces; register `Climate` RTK Query tag and `useGetClimateQuery` endpoint in the API slice
+- Refactor `climate` page to consume the new `GET /climate` endpoint for pre-aggregated stats; remove client-side `sessionStorage` caching, handle current-year end-date edge cases, and compute current-year monthly averages via `useMemo`
+- Add `WidgetWarmingStripes` component visualising annual temperature anomalies as colour bands with hover tooltip, min/max/avg legend, and `lerpColor` / `tempToColor` / `getContrastColor` colour utilities
+- Add `WidgetAnomalyBars` component rendering annual temperature anomaly bars with an ECharts trend-line overlay; add `linearRegression` least-squares utility (results rounded to 2 decimal places)
+- Add `WidgetMonthlyNormals` component displaying the historical monthly temperature distribution (min/max/avg range) with a current-year overlay and i18n month labels
+- Add PHPUnit tests for `ClimateModel` verifying frost/hot-day counts, anomaly sign, monthly-normals array length, and total-precipitation preservation
+- Add unit tests for `WidgetWarmingStripes`, `WidgetAnomalyBars`, and `WidgetMonthlyNormals` components and their utility functions
+- Expand frontend unit test suite with 26 new tests across 12 components covering dark/light theme branches, all heatmap sensor types, all `WidgetForecastTable` column presets, and loading skeleton states; fix 2 failing colour-constant assertions in `widget-warming-stripes`; statement coverage increases from 84.15% to 84.9%
+- Update `README.md` with a Climate Dashboard feature section
+
+## 3.7.2
+
+### Patch Changes
+
+- Add SEO patterns and update per-page `NextSeo` configuration across all pages
+- Bump client dependencies
+- Enable Content Security Policy with restrictive defaults (`default-src 'none'`, no inline scripts or styles) via `ContentSecurityPolicy` config
+- Disable `DBDebug` in production database config to prevent SQL details from leaking in error responses
+- Enable `secureheaders` after-filter to add `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`, and `Referrer-Policy` headers to all API responses
+- Add `ThrottleFilter` to rate-limit `POST /sensors` to one request per 30 seconds per IP; return HTTP 429 on excess requests
+- Add `ALLOWED_INTERVALS` allowlist to `RawWeatherDataModel`, `HourlyAveragesModel`, and `DailyAveragesModel`; `getWeatherHistoryGrouped()` now throws `InvalidArgumentException` for unrecognised interval strings
+- Add numeric range validation rules for sensor fields in `RawWeatherDataModel` (temperature, humidity, pressure, UV index, wind, precipitation, clouds, visibility, and more)
+- Enforce a 366-day maximum date range on `GET /history` and `GET /heatmap`; return HTTP 422 when the range is exceeded
+- Restore future end-date guard in `History` controller; allow dates up to end of tomorrow to account for timezone differences
+- Replace raw exception messages in `Sensors` controller with a generic `Internal server error` response; log full exception details server-side only
+- Register common sensitive key names (`password`, `token`, `api_key`, `key`, `mac`, etc.) in `Exceptions::$sensitiveDataInTrace` to prevent secrets from appearing in debug stack traces
+- Remove unused `firebase/php-jwt` production dependency
+- Update `server/.env.production` to use local database host (`127.0.0.1`) and remove obsolete `server/env` example file from the repository
+- Add security audit roadmaps for server and client directories
+- Add unit tests covering sensor throttling, sensor field range validation, group-interval allowlists, future end-date rejection, and 366-day range limits
+
+## 3.7.1
+
+### Patch Changes
+
+- Add `WidgetForecastCards` component to the main page: horizontally scrollable daily and hourly forecast card rows with weather icons, temperature, clouds, wind, and precipitation; highlights today and the current hour
+- Add reusable `Carousel` UI primitive (`ui/carousel/`) using Embla Carousel with optional auto-scroll and previous/next navigation controls
+- Move `WidgetForecastTable` (hourly and daily) from the main page to the `/forecast` page
+- Fix language switching: resolve router/i18n race condition by making `useLocalStorage` write synchronously and navigating via constructed URL instead of calling `i18n.changeLanguage`
+- Fix `appWithTranslation` not receiving the i18n config, causing locale initialization failures in SSR
+- Standardise `serverSideTranslations` calls across all pages to explicitly pass `['common']` namespace
+- Add HTTP request timeouts (30 s) to OpenWeatherMap, WeatherAPI, and VisualCrossing API clients
+- Add response caching to `Anomaly`, `Heatmap`, `History`, and `Precipitation` controllers with short/long TTL constants and cache-key logic
+- Fix `GetForecastWeather` CLI command: use `->format('Y-m-d H:i:s')` for datetime and simplify insert/update arrays
+- Replace manual `className` string concatenation with `cn()` from `simple-react-ui-kit` across `AppBar`, `LanguageSwitcher`, `WidgetAnomalyCalendar`, `WidgetAnomalyCard`, `WidgetFloodRisk`, and `WidgetParameterZScore`
+- Remove unused Sass classes (`.noAnimation`, `.menubar`, `.historyTable`, `.chartLabel`, `.cardTempLow`) and unused translation key `max-daily-rain`
+- Add unit tests for `WidgetForecastCards`, `Carousel`, `CarouselButtons`, `usePrevNextButtons`, `Heatmap` controller caching, and `History` controller caching
+
+## 3.7.0
 
 ### Minor Changes
+
+- Add Precipitation Calendar feature: full-stack implementation with PHP controller, two-level aggregation model, RTK Query endpoint, calendar grid, stat cards, streak cards, and monthly bar chart
+- Add CLI weather commands (`system:getCurrentWeather`, `system:getForecastWeather`, `system:sendNarodmonData`); remove `System.php` controller
+- Add skeleton loading states to anomaly page widgets
+- Add active anomaly cards to homepage before forecast table, with full-width layout
+- Localize month labels in `WidgetPrecipCalendar`, `WidgetAnomalyCalendar`, and `WidgetPrecipChart` using `i18n.language`
+- Add precipitation calendar tooltip matching anomaly calendar pattern
+- Fix daily precipitation totals computed from hourly averages to eliminate multi-source inflation
+- Fix dry streak calculation by expanding sparse precipitation data into a full calendar before streak detection
+- Add `forecast_time` column to forecast inserts; remove redundant type cast
+- Rename generic `Props` interfaces to component-specific names across widgets
+- Add widget unit tests for maximum frontend code coverage
+
+## 3.6.0
+
+### Minor Changes
+
+- Implemented Meteorological Anomaly Feature, including API endpoint and UI components.
+- Add PHPUnit test suite and API Checks CI workflow
+- Fix PHPUnit CI failure and integrate PHP coverage into SonarCloud
+- Fix PHPUnit warning: no code coverage driver in api-checks workflow
+- Updated PHP Packages
+- Add UI unit tests for maximum frontend code coverage
+- Fixed UI Prettier issues
+- Add WidgetAnomalyCalendar component and tests
+- Add anomaly API, types and menu badge
+- Add anomaly detection CLI, controller, migration
+- Add anomaly detection, snowpack & logging
+- Add unit tests for anomaly detection and models
+- Add feature requirements and agent-memory docs
+- Add Snowpack chart widget and tests
+- Add WidgetParameterZScore component and tests
+- Add flood-risk widget, utils, styles & tests
+- Add WidgetAnomalyHistory component and tests
+- Add WidgetAnomalyCard, utils, styles, tests
+- Refactor widgets; add FloodRisk and rename files
+- Add Anomaly Monitor docs and update README
+- Extract anomaly i18n helper and memoize chart
+- Add widget unit tests and testing notes
+- I18n sync, AppBar aria i18n and test fixes
+
+## 3.5.2
+
+### Path Changes
+
+- Added a shared `getEChartBaseConfig` function and refactored chart configuration for improved maintainability.
+- Updated UI unit tests and introduced new summary images for 3D models.
+- Created a README for the models section and integrated project documentation with Claude.AI.
+- Fixed multiple bugs, including locale redirects, duplicate year entries, unmounted component updates, React ref dependencies, call-stack overflow in Heatmap, and canonical URL issues.
+- Improved value filtering and min/max calculations in weather utilities, with additional unit tests for edge cases.
+- Enhanced i18n support by adding missing keys and replacing hardcoded strings with translations.
+- Optimized React performance by memoizing arrays and configs, moving `dayjs.extend` calls to module level, and stabilizing dependency arrays.
+- Added and expanded unit test coverage for weather utilities and date formatting functions.
+- Introduced a loading progress indicator and sessionStorage caching for the climate page, improving user experience during sequential data fetches.
+- Cleaned up ROADMAP tracking entries and removed duplicate or obsolete code.
+
+## 3.5.1
+
+### Patch Changes
 
 -   Updated UI Dependencies
 -   Replaced DatePicker UI component from UI Kit

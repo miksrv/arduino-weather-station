@@ -40,6 +40,9 @@ class RawWeatherDataModel extends Model
     const SOURCE_CUSTOMSTATION  = 'CustomStation';
     const SOURCE_OTHERSOURCE    = 'OtherSource';
 
+    /** @var string[] Allowed interval strings for GROUP BY calculations */
+    private const ALLOWED_INTERVALS = ['10 MINUTE', '1 HOUR', '1 DAY'];
+
     protected $table         = 'raw_weather_data';
     protected $primaryKey    = 'id';
     protected $useTimestamps = false;
@@ -67,20 +70,20 @@ class RawWeatherDataModel extends Model
     protected $validationRules = [
         'date'          => 'required|valid_date',
         'source'        => 'required|in_list[OpenWeatherMap,WeatherAPI,VisualCrossing,CustomStation,OtherSource]',
-        'temperature'   => 'permit_empty|decimal',
-        'feels_like'    => 'permit_empty|decimal',
-        'pressure'      => 'permit_empty|integer',
-        'humidity'      => 'permit_empty|decimal',
+        'temperature'   => 'permit_empty|decimal|greater_than_equal_to[-80]|less_than_equal_to[60]',
+        'feels_like'    => 'permit_empty|decimal|greater_than_equal_to[-80]|less_than_equal_to[60]',
+        'pressure'      => 'permit_empty|integer|greater_than_equal_to[800]|less_than_equal_to[1100]',
+        'humidity'      => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[100]',
         'dew_point'     => 'permit_empty|decimal',
-        'uv_index'      => 'permit_empty|decimal',
+        'uv_index'      => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[20]',
         'sol_energy'    => 'permit_empty|decimal',
         'sol_radiation' => 'permit_empty|decimal',
-        'precipitation' => 'permit_empty|decimal',
-        'clouds'        => 'permit_empty|integer',
-        'visibility'    => 'permit_empty|integer',
-        'wind_speed'    => 'permit_empty|decimal',
-        'wind_deg'      => 'permit_empty|integer',
-        'wind_gust'     => 'permit_empty|decimal',
+        'precipitation' => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[500]',
+        'clouds'        => 'permit_empty|integer|greater_than_equal_to[0]|less_than_equal_to[100]',
+        'visibility'    => 'permit_empty|integer|greater_than_equal_to[0]|less_than_equal_to[100000]',
+        'wind_speed'    => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[100]',
+        'wind_deg'      => 'permit_empty|integer|greater_than_equal_to[0]|less_than_equal_to[360]',
+        'wind_gust'     => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[150]',
         'weather_id'    => 'permit_empty|integer',
     ];
 
@@ -256,6 +259,10 @@ class RawWeatherDataModel extends Model
      */
     public function getWeatherHistoryGrouped($startDate, $endDate, $groupInterval, $type = null): array
     {
+        if (!in_array(strtoupper($groupInterval), self::ALLOWED_INTERVALS, true)) {
+            throw new \InvalidArgumentException('Invalid groupInterval value: ' . $groupInterval);
+        }
+
         return $this
             ->select('DATE_FORMAT(date, "%Y-%m-%d %H:%i:00") as date,' . RawWeatherDataModel::getSelectAverageSQL($type))
             ->where('date >=', $startDate)
@@ -268,6 +275,10 @@ class RawWeatherDataModel extends Model
 
     /**
      * Retrieves the SQL query string for selecting average weather data.
+     *
+     * All fields use AVG() with ROUND(). This method is used by multiple callers
+     * that may query tables without a `source` column (e.g. hourly_averages,
+     * daily_averages), so expressions that reference `source` must not appear here.
      *
      * @param string|null $type The specific type of weather data to retrieve averages for (e.g., 'temperature', 'humidity').
      *                          If null, retrieves averages for all types of weather data.

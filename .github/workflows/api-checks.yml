@@ -1,0 +1,46 @@
+name: API Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'server/**/*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api-checks:
+    if: github.event.pull_request.draft == false
+    name: PHPUnit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, mysqli, curl
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        id: cache-composer
+        with:
+          path: server/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('server/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - if: ${{ steps.cache-composer.outputs.cache-hit != 'true' }}
+        name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+        working-directory: server
+
+      - name: PHPUnit Tests
+        run: vendor/bin/phpunit --no-coverage
+        working-directory: server

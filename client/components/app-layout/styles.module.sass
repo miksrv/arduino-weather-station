@@ -15,10 +15,6 @@
     100%
         left: - variables.$sideBarWidth
 
-.noAnimation
-    animation: none !important
-    transition: none !important
-
 .menu
     list-style: none
     padding: 8px
@@ -49,6 +45,27 @@
     .active
         background-color: var(--body-background)
 
+    .iconWrapper
+        position: relative
+        display: inline-flex
+        margin: -10px 10px -10px 0
+
+        svg
+            margin: 0
+            width: 22px
+            height: 22px
+            fill: var(--link-color)
+
+    .badge
+        position: absolute
+        top: 0
+        right: -2px
+        width: 7px
+        height: 7px
+        border-radius: 50%
+        background: var(--color-red)
+        border: 1px solid var(--container-background-color)
+
 .appLayout
     width: 100%
     margin: 0 auto
@@ -66,9 +83,6 @@
             max-width: var(--width-max)
             margin: 0 auto 20px
 
-        @media only screen and (max-width: variables.$mobileMaxWidth)
-            .menubar
-                display: none
 
     &.fullSize
         .mainContainer

@@ -56,7 +56,7 @@ class Database extends Config
         'DBDriver' => 'MySQLi',
         'DBPrefix' => '',
         'pConnect' => false,
-        'DBDebug'  => true,
+        'DBDebug'  => false,
         'charset'  => 'utf8mb4',
         'DBCollat' => 'utf8mb4_general_ci',
         'swapPre'  => '',

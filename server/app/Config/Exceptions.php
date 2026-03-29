@@ -49,7 +49,18 @@ class Exceptions extends BaseConfig
      * In order to specify 2 levels, use "/" to separate.
      * ex. ['server', 'setup/password', 'secret_token']
      */
-    public array $sensitiveDataInTrace = [];
+    public array $sensitiveDataInTrace = [
+        'password',
+        'passwd',
+        'token',
+        'api_key',
+        'apikey',
+        'key',
+        'secret',
+        'mac',
+        'authorization',
+        'auth',
+    ];
 
     /**
      * --------------------------------------------------------------------------

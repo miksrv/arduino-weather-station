@@ -8,8 +8,9 @@ import { NextSeo } from 'next-seo'
 import { API, ApiModel, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
+import WidgetAnomalyCard from '@/components/widget-anomaly-card'
 import WidgetChart from '@/components/widget-chart'
-import WidgetForecastTable from '@/components/widget-forecast-table'
+import WidgetForecastCards from '@/components/widget-forecast-cards'
 import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
@@ -27,13 +28,19 @@ type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon'> & {
 const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n, t } = useTranslation()
 
-    const { data: forecastHourly, isLoading: hourlyLoading } = API.useGetForecastQuery('hourly', {
-        pollingInterval: POLING_INTERVAL_FORECAST
-    })
+    // const { data: forecastHourly, isLoading: hourlyLoading } = API.useGetForecastQuery('hourly', {
+    //     pollingInterval: POLING_INTERVAL_FORECAST
+    // })
 
     const { data: forecastDaily, isLoading: dailyLoading } = API.useGetForecastQuery('daily', {
         pollingInterval: POLING_INTERVAL_FORECAST
     })
+
+    const { data: anomalyData, isLoading: anomalyLoading } = API.useGetAnomalyQuery(undefined, {
+        pollingInterval: POLING_INTERVAL_FORECAST
+    })
+
+    const activeAnomalies = anomalyData?.anomalies.filter((a) => a.active) ?? []
 
     const { data: current, isLoading: currentLoading } = API.useGetCurrentQuery(undefined, {
         pollingInterval: POLING_INTERVAL_CURRENT
@@ -50,20 +57,23 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     const history12HoursData = useMemo(() => filterRecentData(history, 12), [history])
     const history24HoursData = useMemo(() => filterRecentData(history, 24), [history])
 
-    const widgets: WidgetType[] = [
-        {
-            title: t('humidity'),
-            unit: '%',
-            icon: 'Water',
-            source: 'humidity'
-        },
-        {
-            title: t('temperature'),
-            unit: '°C',
-            icon: 'Thermometer',
-            source: 'temperature'
-        }
-    ]
+    const widgets: WidgetType[] = useMemo(
+        () => [
+            {
+                title: t('humidity'),
+                unit: '%',
+                icon: 'Water',
+                source: 'humidity'
+            },
+            {
+                title: t('temperature'),
+                unit: '°C',
+                icon: 'Thermometer',
+                source: 'temperature'
+            }
+        ],
+        [t]
+    )
 
     return (
         <AppLayout>
@@ -76,7 +86,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     images: [
                         {
                             height: 1642,
-                            url: '/images/main.jpg',
+                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/main.jpg`,
                             width: 2032
                         }
                     ],
@@ -85,6 +95,9 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     title: t('weather-in-orenburg'),
                     type: 'website',
                     url: process.env.NEXT_PUBLIC_SITE_LINK
+                }}
+                twitter={{
+                    cardType: 'summary_large_image'
                 }}
             />
 
@@ -112,24 +125,31 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                     />
                 ))}
 
-                <WidgetForecastTable
-                    title={t('weather-forecast-by-days')}
-                    link={{ href: '/forecast', title: t('forecast') }}
-                    columnsPreset={['date', 'weather', 'temperature', 'clouds']}
-                    loading={dailyLoading}
-                    data={forecastDaily}
-                    defaultSort={{ key: 'date', direction: 'asc' }}
-                    stickyHeader={true}
-                />
+                {anomalyLoading ? (
+                    <WidgetAnomalyCard
+                        loading={true}
+                        fullWidth={true}
+                        anomalyId={''}
+                        active={false}
+                    />
+                ) : (
+                    activeAnomalies.map((anomaly) => (
+                        <WidgetAnomalyCard
+                            key={anomaly.id}
+                            fullWidth={true}
+                            anomalyId={anomaly.id}
+                            active={anomaly.active}
+                            triggeredAt={anomaly.triggeredAt}
+                            lastTriggered={anomaly.lastTriggered}
+                            currentZScore={anomaly.currentZScore}
+                            extraMetric={anomaly.extraMetric}
+                        />
+                    ))
+                )}
 
-                <WidgetForecastTable
-                    title={t('weather-forecast-hourly')}
-                    link={{ href: '/forecast', title: t('forecast') }}
-                    columnsPreset={['time', 'weatherIcon', 'temperature', 'clouds', 'pressure', 'wind']}
-                    loading={hourlyLoading}
-                    data={forecastHourly}
-                    defaultSort={{ key: 'date', direction: 'asc' }}
-                    stickyHeader={true}
+                <WidgetForecastCards
+                    loading={dailyLoading}
+                    forecast={forecastDaily}
                 />
 
                 <WidgetChart
@@ -152,7 +172,7 @@ export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context): Promise<GetServerSidePropsResult<IndexPageProps>> => {
             const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
-            const translations = await serverSideTranslations(locale)
+            const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
 

@@ -1,15 +1,30 @@
 import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 
-import { currentDate, formatDate, getDate, getDateTimeFormat, halfYearDate, minutesAgo, yesterdayDate } from './date'
+import {
+    currentDate,
+    formatDate,
+    formatDateFromUTC,
+    getDate,
+    getDateTimeFormat,
+    halfYearDate,
+    minutesAgo,
+    timeAgo,
+    yesterdayDate
+} from './date'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
+dayjs.extend(relativeTime)
 
 describe('date utilities', () => {
     it('should return the current date in the specified timezone', () => {
-        expect(currentDate.format()).toBe(dayjs().tz('Asia/Yekaterinburg').format())
+        // Compare only the date portion to avoid timing issues
+        const expectedDate = dayjs().tz('Asia/Yekaterinburg').format('YYYY-MM-DD')
+        const receivedDate = currentDate.format('YYYY-MM-DD')
+        expect(receivedDate).toBe(expectedDate)
     })
 
     it('should return the date for yesterday', () => {
@@ -45,5 +60,72 @@ describe('date utilities', () => {
 
         const startDateMonth = dayjs().subtract(10, 'day').format()
         expect(getDateTimeFormat(startDateMonth, endDate)).toBe('D MMMM')
+    })
+
+    describe('formatDateFromUTC', () => {
+        it('should return an empty string when called with no argument', () => {
+            expect(formatDateFromUTC()).toBe('')
+        })
+
+        it('should return an empty string when called with undefined', () => {
+            expect(formatDateFromUTC(undefined)).toBe('')
+        })
+
+        it('should return an empty string when called with zero', () => {
+            expect(formatDateFromUTC(0)).toBe('')
+        })
+
+        it('should format a UTC millisecond timestamp using the default format', () => {
+            // 2024-06-15 12:00:00 UTC — in milliseconds
+            const utcMs = 1718452800000
+            const expected = dayjs
+                .unix(utcMs / 1000)
+                .utc(true)
+                .tz('Asia/Yekaterinburg')
+                .format('D MMMM YYYY, HH:mm')
+            expect(formatDateFromUTC(utcMs)).toBe(expected)
+        })
+
+        it('should format a UTC millisecond timestamp using a custom format', () => {
+            const utcMs = 1718452800000
+            const expected = dayjs
+                .unix(utcMs / 1000)
+                .utc(true)
+                .tz('Asia/Yekaterinburg')
+                .format('DD.MM.YYYY')
+            expect(formatDateFromUTC(utcMs, 'DD.MM.YYYY')).toBe(expected)
+        })
+    })
+
+    describe('timeAgo', () => {
+        it('should return an empty string when called with no argument', () => {
+            expect(timeAgo()).toBe('')
+        })
+
+        it('should return an empty string when called with undefined', () => {
+            expect(timeAgo(undefined)).toBe('')
+        })
+
+        it('should return a relative time string for a recent date string', () => {
+            const recentDate = dayjs().subtract(5, 'minute').toISOString()
+            const result = timeAgo(recentDate)
+            expect(typeof result).toBe('string')
+            expect(result.length).toBeGreaterThan(0)
+        })
+
+        it('should return a relative time string for a Date object', () => {
+            const date = dayjs().subtract(2, 'hour').toDate()
+            const result = timeAgo(date)
+            expect(typeof result).toBe('string')
+            expect(result.length).toBeGreaterThan(0)
+        })
+
+        it('should omit the suffix when withoutSuffix is true', () => {
+            const date = dayjs().subtract(5, 'minute').toISOString()
+            const withSuffix = timeAgo(date, false)
+            const withoutSuffix = timeAgo(date, true)
+            // withoutSuffix removes "ago" / "in" — the two strings should differ
+            expect(withSuffix).not.toBe(withoutSuffix)
+        })
     })
 })

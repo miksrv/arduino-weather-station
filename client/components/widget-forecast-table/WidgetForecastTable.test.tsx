@@ -107,6 +107,18 @@ describe('WidgetForecastTable', () => {
         expect(screen.getByText('Forecast')).toHaveAttribute('href', '/details')
     })
 
+    it('renders with title and no link (plain text title)', () => {
+        render(
+            <WidgetForecastTable
+                data={mockData}
+                columns={[]}
+                title='Plain Title'
+            />
+        )
+        const heading = screen.getByText('Plain Title')
+        expect(heading.tagName).toBe('H3')
+    })
+
     it('renders with fullWidth', () => {
         render(
             <WidgetForecastTable
@@ -118,7 +130,39 @@ describe('WidgetForecastTable', () => {
         expect(screen.getByTestId('table')).toBeInTheDocument()
     })
 
-    it('renders with columnsPreset', () => {
+    it('renders with stickyHeader', () => {
+        render(
+            <WidgetForecastTable
+                data={mockData}
+                columns={[]}
+                stickyHeader={true}
+            />
+        )
+        expect(screen.getByTestId('table')).toBeInTheDocument()
+    })
+
+    it('renders with columnsPreset covering all column types', () => {
+        render(
+            <WidgetForecastTable
+                data={mockData}
+                columns={[]}
+                columnsPreset={[
+                    TABLE_COLUMNS.date,
+                    TABLE_COLUMNS.time,
+                    TABLE_COLUMNS.weather,
+                    TABLE_COLUMNS.weatherIcon,
+                    TABLE_COLUMNS.temperature,
+                    TABLE_COLUMNS.clouds,
+                    TABLE_COLUMNS.pressure,
+                    TABLE_COLUMNS.wind,
+                    TABLE_COLUMNS.precipitation
+                ]}
+            />
+        )
+        expect(screen.getByTestId('table')).toBeInTheDocument()
+    })
+
+    it('renders with columnsPreset filtering to a subset', () => {
         render(
             <WidgetForecastTable
                 data={mockData}
@@ -157,5 +201,19 @@ describe('WidgetForecastTable', () => {
             />
         )
         expect(screen.getByTestId('table')).toBeInTheDocument()
+    })
+
+    it('TABLE_COLUMNS contains all expected keys', () => {
+        expect(TABLE_COLUMNS).toMatchObject({
+            date: 'date',
+            time: 'time',
+            weather: 'weather',
+            weatherIcon: 'weatherIcon',
+            temperature: 'temperature',
+            clouds: 'clouds',
+            pressure: 'pressure',
+            wind: 'wind',
+            precipitation: 'precipitation'
+        })
     })
 })

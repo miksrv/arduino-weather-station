@@ -36,106 +36,109 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         { pollingInterval: POLING_INTERVAL_CURRENT }
     )
 
-    const history12HoursData = useMemo(() => filterRecentData(history, 12), [history])
+    // const history12HoursData = useMemo(() => filterRecentData(history, 12), [history])
     const history24HoursData = useMemo(() => filterRecentData(history, 24), [history])
 
-    const widgets: WidgetType[] = [
-        {
-            title: t('temperature'),
-            unit: '°C',
-            icon: 'Thermometer',
-            source: 'temperature',
-            size: 'x2',
-            link: { href: '/history' }
-        },
-        {
-            title: t('feels-like'),
-            unit: '°C',
-            icon: 'Thermometer',
-            source: 'feelsLike',
-            link: { href: '/history' }
-        },
-        {
-            title: t('dew-point'),
-            unit: '°C',
-            icon: 'Thermometer',
-            source: 'dewPoint',
-            link: { href: '/history' }
-        },
-        {
-            title: t('pressure'),
-            unit: t('mm-hg'),
-            icon: 'Pressure',
-            source: 'pressure',
-            formatter: convertHpaToMmHg,
-            size: 'x2',
-            link: { href: '/history' }
-        },
-        {
-            title: t('cloudiness'),
-            unit: '%',
-            icon: 'Cloud',
-            source: 'clouds',
-            link: { href: '/history' }
-        },
-        {
-            title: t('visibility'),
-            unit: t('meters_short'),
-            icon: 'Eye',
-            source: 'visibility'
-        },
-        {
-            title: t('humidity'),
-            unit: '%',
-            icon: 'Water',
-            source: 'humidity',
-            link: { href: '/history' }
-        },
-        {
-            title: t('wind-speed'),
-            unit: t('meters-per-second'),
-            icon: 'Wind',
-            source: 'windSpeed',
-            link: { href: '/history' }
-        },
-        {
-            title: t('wind-gust'),
-            unit: t('meters-per-second'),
-            icon: 'Wind',
-            source: 'windGust'
-        },
-        {
-            title: t('wind-deg'),
-            unit: '°',
-            icon: 'Compass',
-            source: 'windDeg',
-            link: { href: '/history' }
-        },
-        {
-            title: t('precipitation'),
-            unit: t('millimeters'),
-            icon: 'WaterDrop',
-            source: 'precipitation',
-            link: { href: '/history' }
-        },
-        {
-            title: t('uv-index'),
-            icon: 'Sun',
-            source: 'uvIndex'
-        },
-        {
-            title: t('sol-energy'),
-            unit: t('mj-m2'),
-            icon: 'SolarPower',
-            source: 'solEnergy'
-        },
-        {
-            title: t('sol-radiation'),
-            unit: t('w-m2'),
-            icon: 'Lightning',
-            source: 'solRadiation'
-        }
-    ]
+    const widgets: WidgetType[] = useMemo(
+        () => [
+            {
+                title: t('temperature'),
+                unit: '°C',
+                icon: 'Thermometer',
+                source: 'temperature',
+                size: 'x2',
+                link: { href: '/history' }
+            },
+            {
+                title: t('feels-like'),
+                unit: '°C',
+                icon: 'Thermometer',
+                source: 'feelsLike',
+                link: { href: '/history' }
+            },
+            {
+                title: t('dew-point'),
+                unit: '°C',
+                icon: 'Thermometer',
+                source: 'dewPoint',
+                link: { href: '/history' }
+            },
+            {
+                title: t('pressure'),
+                unit: t('mm-hg'),
+                icon: 'Pressure',
+                source: 'pressure',
+                formatter: convertHpaToMmHg,
+                size: 'x2',
+                link: { href: '/history' }
+            },
+            {
+                title: t('cloudiness'),
+                unit: '%',
+                icon: 'Cloud',
+                source: 'clouds',
+                link: { href: '/history' }
+            },
+            {
+                title: t('visibility'),
+                unit: t('meters_short'),
+                icon: 'Eye',
+                source: 'visibility'
+            },
+            {
+                title: t('humidity'),
+                unit: '%',
+                icon: 'Water',
+                source: 'humidity',
+                link: { href: '/history' }
+            },
+            {
+                title: t('wind-speed'),
+                unit: t('meters-per-second'),
+                icon: 'Wind',
+                source: 'windSpeed',
+                link: { href: '/history' }
+            },
+            {
+                title: t('wind-gust'),
+                unit: t('meters-per-second'),
+                icon: 'Wind',
+                source: 'windGust'
+            },
+            {
+                title: t('wind-deg'),
+                unit: '°',
+                icon: 'Compass',
+                source: 'windDeg',
+                link: { href: '/history' }
+            },
+            {
+                title: t('precipitation'),
+                unit: t('millimeters'),
+                icon: 'WaterDrop',
+                source: 'precipitation',
+                link: { href: '/history' }
+            },
+            {
+                title: t('uv-index'),
+                icon: 'Sun',
+                source: 'uvIndex'
+            },
+            {
+                title: t('sol-energy'),
+                unit: t('mj-m2'),
+                icon: 'SolarPower',
+                source: 'solEnergy'
+            },
+            {
+                title: t('sol-radiation'),
+                unit: t('w-m2'),
+                icon: 'Lightning',
+                source: 'solRadiation'
+            }
+        ],
+        [t]
+    )
 
     return (
         <AppLayout>
@@ -144,19 +147,22 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                 description={t('sensors-page-description')}
                 canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/sensors`}
                 openGraph={{
-                    description: t('site-description'),
+                    description: t('sensors-page-description'),
                     images: [
                         {
                             height: 1480,
-                            url: '/images/sensors.jpg',
+                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/sensors.jpg`,
                             width: 2026
                         }
                     ],
                     locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                     siteName: t('weather-in-orenburg'),
-                    title: t('weather-in-orenburg'),
+                    title: t('weather-sensors'),
                     type: 'website',
-                    url: process.env.NEXT_PUBLIC_SITE_LINK
+                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/sensors`
+                }}
+                twitter={{
+                    cardType: 'summary_large_image'
                 }}
             />
 
@@ -167,7 +173,7 @@ const IndexPage: NextPage<IndexPageProps> = () => {
                         key={`widget-${widget.source}`}
                         loading={currentLoading}
                         chartLoading={historyLoading}
-                        minMax={getMinMaxValues(history12HoursData, widget.source)}
+                        minMax={getMinMaxValues(history24HoursData, widget.source)}
                         currentValue={current?.[widget.source]}
                         formatter={widget?.formatter}
                         chart={
@@ -187,7 +193,7 @@ export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context): Promise<GetServerSidePropsResult<IndexPageProps>> => {
             const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
-            const translations = await serverSideTranslations(locale)
+            const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
 
