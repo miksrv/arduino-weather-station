@@ -188,12 +188,14 @@ final class HeatmapControllerTest extends CIUnitTestCase
     }
 
     /**
-     * CACHE_TTL_SHORT and CACHE_TTL_LONG constants are defined with expected values.
+     * Cache TTL constants are defined with expected values.
      */
     public function testCacheTtlConstants(): void
     {
-        $this->assertSame(15 * 60, Heatmap::CACHE_TTL_SHORT);
-        $this->assertSame(0, Heatmap::CACHE_TTL_LONG);
+        $this->assertSame(60 * 60, Heatmap::CACHE_TTL_RECENT);
+        $this->assertSame(0, Heatmap::CACHE_TTL_HISTORICAL);
+        $this->assertSame(48, Heatmap::CACHE_MIN_RANGE_HOURS);
+        $this->assertSame(7, Heatmap::CACHE_RECENT_DAYS_THRESHOLD);
     }
 
     /**

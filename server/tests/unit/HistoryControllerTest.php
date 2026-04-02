@@ -222,11 +222,12 @@ final class HistoryControllerTest extends CIUnitTestCase
     /**
      * When a cache entry already exists, getHistoryWeather() must use it without
      * hitting the model and still return a 200 JSON array.
+     * Uses a range > 48 hours to ensure caching is enabled.
      */
     public function testGetHistoryWeatherReturnsCachedDataWithout200(): void
     {
         $fakeRow  = ['date' => '2023-01-01 10:00:00', 'temperature' => 7.0];
-        $cacheKey = 'history_' . md5('2023-01-01_2023-01-02');
+        $cacheKey = 'history_' . md5('2023-01-01_2023-01-10');
 
         // Pre-seed the cache with the raw row array.
         cache()->save($cacheKey, [$fakeRow], 0);
@@ -239,7 +240,7 @@ final class HistoryControllerTest extends CIUnitTestCase
         $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockRaw);
 
         $this->request->setMethod('GET');
-        parse_str('start_date=2023-01-01&end_date=2023-01-02', $get);
+        parse_str('start_date=2023-01-01&end_date=2023-01-10', $get);
         $this->request->setGlobal('get', $get);
 
         $result = $this->execute('getHistoryWeather');
@@ -250,16 +251,14 @@ final class HistoryControllerTest extends CIUnitTestCase
         $this->assertCount(1, $body);
 
         // Clean up.
-        cache()->delete($cacheKey);
+        cache()->delete('history_' . md5('2023-01-01_2023-01-10'));
     }
-
-    /**
-     * CACHE_TTL_SHORT and CACHE_TTL_LONG constants are defined with expected values.
-     */
     public function testCacheTtlConstants(): void
     {
-        $this->assertSame(15 * 60, History::CACHE_TTL_SHORT);
-        $this->assertSame(0, History::CACHE_TTL_LONG);
+        $this->assertSame(60 * 60, History::CACHE_TTL_RECENT);
+        $this->assertSame(0, History::CACHE_TTL_HISTORICAL);
+        $this->assertSame(48, History::CACHE_MIN_RANGE_HOURS);
+        $this->assertSame(7, History::CACHE_RECENT_DAYS_THRESHOLD);
     }
 
     // -------------------------------------------------------------------------
