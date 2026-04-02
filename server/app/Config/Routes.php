@@ -6,6 +6,15 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
+/** Root - API info endpoint **/
+$routes->get('/', static function () {
+    return response()->setJSON([
+        'name'    => 'Weather Station API',
+        'version' => '1.0.0',
+        'status'  => 'ok'
+    ]);
+});
+
 /** Current Controller **/
 $routes->group('current', static function ($routes) {
     $routes->get('/', 'Current::getCurrentWeather');

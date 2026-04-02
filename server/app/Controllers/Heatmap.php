@@ -23,11 +23,17 @@ use Exception;
  * $heatmap->getHeatmapData();
  */
 class Heatmap extends ResourceController {
-    /** @var int Cache TTL for requests that include today (15 minutes) */
-    public const CACHE_TTL_SHORT = 15 * 60;
+    /** @var int Cache TTL for recent data requests (1 hour) */
+    public const CACHE_TTL_RECENT = 60 * 60;
 
     /** @var int Cache TTL for purely historical requests (indefinite) */
-    public const CACHE_TTL_LONG = 0;
+    public const CACHE_TTL_HISTORICAL = 0;
+
+    /** @var int Minimum range in hours to enable caching */
+    public const CACHE_MIN_RANGE_HOURS = 48;
+
+    /** @var int Number of days to consider data as "recent" (not fully historical) */
+    public const CACHE_RECENT_DAYS_THRESHOLD = 7;
 
     protected RawWeatherDataModel $weatherDataModel;
 
@@ -84,6 +90,25 @@ class Heatmap extends ResourceController {
         $startDate = date('Y-m-d 00:00:00', $startTimestamp);
         $endDate = date('Y-m-d 23:59:59', $endTimestamp);
 
+        // Calculate range in hours for cache decision
+        $rangeHours = ($endTimestamp - $startTimestamp) / 3600;
+
+        // Disable caching for short ranges (≤48 hours) due to timezone differences
+        if ($rangeHours <= self::CACHE_MIN_RANGE_HOURS) {
+            $rawData = $this->weatherDataModel->getWeatherHistoryGrouped($startDate, $endDate, '10 MINUTE', $type);
+
+            if (empty($rawData)) {
+                return $this->failNotFound('No data found for the given date range and type');
+            }
+
+            $result = [];
+            foreach ($rawData as $data) {
+                $result[] = new WeatherData($data);
+            }
+
+            return $this->respond($result);
+        }
+
         $cacheKey = 'heatmap_' . md5(($type ?? '') . '_' . ($rawStartDate ?? '') . '_' . ($rawEndDate ?? ''));
         $rawData  = cache()->get($cacheKey);
 
@@ -91,8 +116,14 @@ class Heatmap extends ResourceController {
             $rawData = $this->weatherDataModel->getWeatherHistoryGrouped($startDate, $endDate, '10 MINUTE', $type);
 
             if (!empty($rawData)) {
-                $isEndDateToday = date('Y-m-d', strtotime($rawEndDate ?? 'today')) === date('Y-m-d');
-                $ttl = $isEndDateToday ? self::CACHE_TTL_SHORT : self::CACHE_TTL_LONG;
+                // Determine cache TTL based on how recent the end date is
+                // If end_date is within the last 7 days, use short TTL (1 hour)
+                // If end_date is older than 7 days ago, cache indefinitely
+                $recentThreshold = strtotime('-' . self::CACHE_RECENT_DAYS_THRESHOLD . ' days');
+                $ttl = $endTimestamp >= $recentThreshold
+                    ? self::CACHE_TTL_RECENT
+                    : self::CACHE_TTL_HISTORICAL;
+
                 cache()->save($cacheKey, $rawData, $ttl);
             }
         }

@@ -21,11 +21,14 @@ use Exception;
  */
 class Precipitation extends ResourceController
 {
-    /** @var int Cache TTL for current-year requests (15 minutes) */
-    public const CACHE_TTL_SHORT = 15 * 60;
+    /** @var int Cache TTL for recent data requests (1 hour) */
+    public const CACHE_TTL_RECENT = 60 * 60;
 
-    /** @var int Cache TTL for previous-year requests (indefinite) */
-    public const CACHE_TTL_LONG  = 0;
+    /** @var int Cache TTL for purely historical requests (indefinite) */
+    public const CACHE_TTL_HISTORICAL = 0;
+
+    /** @var int Number of days to consider data as "recent" (not fully historical) */
+    public const CACHE_RECENT_DAYS_THRESHOLD = 7;
 
     /**
      * GET /precipitation
@@ -64,8 +67,15 @@ class Precipitation extends ResourceController
             );
         }
 
+        // Determine cache TTL based on how recent the year's end date is
+        // For the current year, end date is today; for past years, it's Dec 31
+        $yearEndDate     = ($year === $currentYear) ? time() : strtotime($year . '-12-31');
+        $recentThreshold = strtotime('-' . self::CACHE_RECENT_DAYS_THRESHOLD . ' days');
+        $ttl             = $yearEndDate >= $recentThreshold
+            ? self::CACHE_TTL_RECENT
+            : self::CACHE_TTL_HISTORICAL;
+
         $cacheKey = 'precipitation_index_' . $year;
-        $ttl      = ($year === $currentYear) ? self::CACHE_TTL_SHORT : self::CACHE_TTL_LONG;
         $cached   = cache()->get($cacheKey);
 
         if ($cached !== null) {
