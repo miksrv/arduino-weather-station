@@ -66,4 +66,11 @@ describe('WidgetSummary', () => {
         const { container } = render(<WidgetSummary />)
         expect(container).toBeInTheDocument()
     })
+
+    it('renders no-data fallback when weather values are undefined', () => {
+        render(<WidgetSummary weather={{}} />)
+        // Each badge should contain 'no-data' translation key when value is missing
+        const noDataElements = screen.getAllByText(/no-data/)
+        expect(noDataElements.length).toBeGreaterThanOrEqual(4)
+    })
 })

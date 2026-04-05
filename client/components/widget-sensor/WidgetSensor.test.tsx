@@ -32,9 +32,9 @@ describe('WidgetSensor', () => {
         expect(screen.getByText('22.5')).toBeInTheDocument()
     })
 
-    it('renders fallback "??" when currentValue is undefined', () => {
+    it('renders fallback "no-data" when currentValue is undefined', () => {
         render(<WidgetSensor />)
-        expect(screen.getByText('??')).toBeInTheDocument()
+        expect(screen.getByText('no-data')).toBeInTheDocument()
     })
 
     it('renders unit alongside the value', () => {
@@ -76,6 +76,20 @@ describe('WidgetSensor', () => {
         expect(screen.getByText('max')).toBeInTheDocument()
         expect(screen.getByText('10')).toBeInTheDocument()
         expect(screen.getByText('30')).toBeInTheDocument()
+    })
+
+    it('renders min/max labels with dashes when minMax is an empty object', () => {
+        render(<WidgetSensor minMax={{}} />)
+        expect(screen.getByText('min')).toBeInTheDocument()
+        expect(screen.getByText('max')).toBeInTheDocument()
+        expect(screen.getAllByText('\u2014')).toHaveLength(4)
+    })
+
+    it('renders min/max labels with dashes when minMax is not provided', () => {
+        render(<WidgetSensor />)
+        expect(screen.getByText('min')).toBeInTheDocument()
+        expect(screen.getByText('max')).toBeInTheDocument()
+        expect(screen.getAllByText('\u2014')).toHaveLength(4)
     })
 
     it('renders time labels in min/max stats', () => {

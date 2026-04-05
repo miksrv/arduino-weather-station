@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import dayjs from 'dayjs'
 import { EChartsOption } from 'echarts'
+import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
 import ReactECharts from 'echarts-for-react'
 
 import { useTranslation } from 'next-i18next'
@@ -147,17 +148,16 @@ const HeatmapChart: React.FC<ChartProps> = ({ type, data, title, subTitle, heigh
         tooltip: {
             backgroundColor: backgroundColor,
             borderColor: borderColor,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            formatter: (params: any) => {
+            formatter: (params: TopLevelFormatterParams) => {
+                const item: CallbackDataParams = Array.isArray(params) ? params[0] : params
                 const tooltipContent: string[] = []
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                const colorSquare = `<span class="${styles.icon}" style="background-color: ${params.color};"></span>`
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                const seriesValue = `<span class="${styles.value}">${params.value?.[2]} ${chartUnit}</span>`
+                const colorSquare = `<span class="${styles.icon}" style="background-color: ${String(item.color ?? '')};"></span>`
+                const value = Array.isArray(item.value) ? item.value[2] : item.value
+                const seriesValue = `<span class="${styles.value}">${String(value ?? '---')} ${chartUnit}</span>`
                 const seriesName = `<span class="${styles.label}">${t(type)}${seriesValue}</span>`
 
                 tooltipContent.push(
-                    `<div class="${styles.chartTooltipTitle}">${formatDate(params.name, 'dddd, DD MMM YYYY')}</div>`
+                    `<div class="${styles.chartTooltipTitle}">${formatDate(String(item.name ?? ''), 'dddd, DD MMM YYYY')}</div>`
                 )
                 tooltipContent.push(`<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`)
 

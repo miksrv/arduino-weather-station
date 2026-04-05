@@ -1,7 +1,7 @@
 import React, { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 import { CustomSeriesRenderItemAPI, CustomSeriesRenderItemParams, EChartsOption } from 'echarts'
 import { CustomSeriesRenderItemReturn } from 'echarts/types/dist/echarts'
-import { LabelOption } from 'echarts/types/src/util/types'
+import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
 import ReactECharts from 'echarts-for-react'
 
 import { useTranslation } from 'next-i18next'
@@ -14,6 +14,8 @@ import { formatDate, formatDateFromUTC } from '@/tools/date'
 import { findMaxValue, findMinValue, getSampledData } from '@/tools/weather'
 
 import styles from '@/components/widget-chart/styles.module.sass'
+
+type AxisCallbackDataParams = CallbackDataParams & { axisValueLabel?: string }
 
 const WEATHER_ICON_SIZE = 40
 const WEATHER_ICON_SPACING = 40
@@ -30,8 +32,6 @@ export interface MeteogramProps {
     height?: string | number
 }
 
-// TODO: formatter: (params: any) - set correct type
-// TODO: params.forEach((item: any) - set correct type
 const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
     const { theme } = useTheme()
     const { t } = useTranslation()
@@ -62,7 +62,7 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
     const renderArrow = (
         _: CustomSeriesRenderItemParams,
         api: CustomSeriesRenderItemAPI
-    ): CustomSeriesRenderItemReturn & LabelOption => {
+    ): CustomSeriesRenderItemReturn => {
         const point = api.coord([api.value(DATA_INDEXES.date), api.value(DATA_INDEXES.windSpeed)])
 
         const windSpeed = api.value(DATA_INDEXES.windSpeed) as number
@@ -86,7 +86,8 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
                 height: WIND_ARROW_SIZE
             },
             rotation: Number(api.value(DATA_INDEXES.windDeg)),
-            position: point,
+            x: point[0],
+            y: point[1],
             style: api.style({
                 stroke: color,
                 fill: color,
@@ -117,31 +118,27 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
                 trigger: 'axis',
                 backgroundColor,
                 borderColor,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                formatter: (params: any) => {
+                formatter: (params: TopLevelFormatterParams) => {
+                    const arr: AxisCallbackDataParams[] = Array.isArray(params) ? params : [params]
                     // An array of strings that will be concatenated and returned as the contents of the tooltip
                     const tooltipContent: string[] = []
 
                     //Format the header - let's assume it's a date (xAxis)
-                    if (params.length > 0) {
-                        const header = `<div class="${styles.chartTooltipTitle}">${formatDate(params[0].axisValueLabel, t('date-chart-tooltip'))}</div>`
-                        // const header = `<div class="${styles.chartTooltipTitle}">${params[0].axisValueLabel}</div>`
+                    if (arr.length > 0) {
+                        const header = `<div class="${styles.chartTooltipTitle}">${formatDate(String(arr[0].axisValueLabel ?? ''), t('date-chart-tooltip'))}</div>`
                         tooltipContent.push(header)
                     }
 
-                    // Loop through each element in params to display the values (yAxis)
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    params.forEach((item: any) => {
+                    // Loop through each element in arr to display the values (yAxis)
+                    arr.forEach((item: AxisCallbackDataParams) => {
                         if (item.seriesIndex === 5) {
                             return
                         }
 
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        const seriesValue = `<span class="${styles.value}">${item.value?.[1] ?? '---'}</span>`
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        const seriesName = `<span class="${styles.label}">${item.seriesName}${seriesValue}</span>`
+                        const colorSquare = `<span class="${styles.icon}" style="background-color: ${String(item.color ?? '')};"></span>`
+                        const value = Array.isArray(item.value) ? item.value[1] : item.value
+                        const seriesValue = `<span class="${styles.value}">${String(value ?? '---')}</span>`
+                        const seriesName = `<span class="${styles.label}">${String(item.seriesName ?? '')}${seriesValue}</span>`
 
                         const row = `<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`
                         tooltipContent.push(row)

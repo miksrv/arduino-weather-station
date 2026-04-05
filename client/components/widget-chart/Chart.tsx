@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import { EChartsOption, SeriesOption } from 'echarts'
-import { YAXisOption } from 'echarts/types/dist/shared'
+import { CallbackDataParams, TopLevelFormatterParams, YAXisOption } from 'echarts/types/dist/shared'
 import ReactECharts from 'echarts-for-react'
 
 import { useTranslation } from 'next-i18next'
@@ -16,6 +16,8 @@ import { findMaxValue, findMinValue } from '@/tools/weather'
 
 import styles from './styles.module.sass'
 
+type AxisCallbackDataParams = CallbackDataParams & { axisValueLabel?: string }
+
 interface ChartProps {
     type: ChartTypes
     data?: ApiModel.Weather[]
@@ -23,7 +25,6 @@ interface ChartProps {
     dateFormat?: string
 }
 
-// TODO: formatter: function (params: any) - replace any with correct type
 const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
     const { theme } = useTheme()
     const { t } = useTranslation()
@@ -51,27 +52,23 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                 },
                 backgroundColor,
                 borderColor,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                formatter: (params: any) => {
+                formatter: (params: TopLevelFormatterParams) => {
+                    const arr: AxisCallbackDataParams[] = Array.isArray(params) ? params : [params]
                     // An array of strings that will be concatenated and returned as the contents of the tooltip
                     const tooltipContent: string[] = []
 
                     //Format the header - let's assume it's a date (xAxis)
-                    if (params.length > 0) {
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        const header = `<div class="${styles.chartTooltipTitle}">${params[0].axisValueLabel}</div>`
+                    if (arr.length > 0) {
+                        const header = `<div class="${styles.chartTooltipTitle}">${String(arr[0].axisValueLabel ?? '')}</div>`
                         tooltipContent.push(header)
                     }
 
-                    // Loop through each element in params to display the values (yAxis)
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    params.forEach((item: any) => {
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        const seriesValue = `<span class="${styles.value}">${item.value?.[1] ?? '---'}</span>`
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        const seriesName = `<span class="${styles.label}">${item.seriesName}${seriesValue}</span>`
+                    // Loop through each element in arr to display the values (yAxis)
+                    arr.forEach((item: AxisCallbackDataParams) => {
+                        const colorSquare = `<span class="${styles.icon}" style="background-color: ${String(item.color ?? '')};"></span>`
+                        const value = Array.isArray(item.value) ? item.value[1] : item.value
+                        const seriesValue = `<span class="${styles.value}">${String(value ?? '---')}</span>`
+                        const seriesName = `<span class="${styles.label}">${String(item.seriesName ?? '')}${seriesValue}</span>`
 
                         const row = `<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`
                         tooltipContent.push(row)

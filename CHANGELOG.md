@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## 3.7.4
+
+### Patch Changes
+
+- Fix `WeatherIcon` to return `/icons/unknown.svg` fallback when `weatherId` is `undefined`, `null`, or not present in the icon mapping; add `unknown.svg` placeholder asset
+- Fix `WidgetSensor` min/max block to always render — show em-dash (`—`) for missing values instead of hiding the block; replace hardcoded `'??'` fallback with `t('no-data')` i18n key
+- Fix `WidgetSummary` badges showing `undefined` when weather fields are absent; add `?? t('no-data')` fallback for wind, precipitation, humidity, and pressure
+- Fix `findMinValue` / `findMaxValue` returning `Infinity` / `-Infinity` for empty or all-undefined arrays — now return `undefined` instead
+- Replace `any` types in ECharts tooltip formatters with `TopLevelFormatterParams` and `CallbackDataParams` across 7 components (`widget-chart`, `widget-meteogram`, `widget-climate`, `widget-heatmap`, `widget-precip-chart`, `widget-anomaly-bars`, `widget-monthly-normals`); remove all `eslint-disable` suppression comments
+- Add `isMinMaxEmpty()` helper to `tools/weather.ts` to detect empty `MinMaxResult` objects
+- Add `no-data` translation key (`"—"`) to both `en/common.json` and `ru/common.json`
+- Overhaul caching policy across `Heatmap`, `History`, and `Precipitation` controllers: introduce unified cache constants (`CACHE_TTL_RECENT`, `CACHE_TTL_HISTORICAL`, `CACHE_MIN_RANGE_HOURS`, `CACHE_RECENT_DAYS_THRESHOLD`); disable cache for ranges ≤ 48 h, use 1-hour TTL for recent data (≤ 7 days), and cache historical data indefinitely
+- Add `GET /` root endpoint returning API version and status information
+- Localize month labels in calendar widgets using `i18n.language` instead of hardcoded strings; remove obsolete `month-short` entries from `en` and `ru` locales
+- Replace `dangerouslySetInnerHTML` Yandex.Metrika injection with `next/Script` using `strategy="afterInteractive"` for safer SSR-compatible analytics loading
+- Switch `WidgetSensor` min/max history window from 12 h to 24 h; remove obsolete `fullWidth` layout wrappers from the anomaly page
+- Fix locale initialisation race condition by using synchronous `getItem` and deferring i18n setup
+- Improve DB error handling in CodeIgniter controllers; update CI4 lock file
+- Bump client dependencies: `handlebars` 4.7.8 → 4.7.9, `picomatch` 2.3.1 → 2.3.2, `flatted` 3.3.3 → 3.4.2, `minimatch` 3.1.2 → 3.1.5, `tar` 7.4.3 → 7.5.7, `js-yaml` 3.14.1 → 3.14.2; general client dependency upgrade
+
 ## 3.7.3
 
 ### Patch Changes

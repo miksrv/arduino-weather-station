@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import { EChartsOption } from 'echarts'
+import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
 import ReactECharts from 'echarts-for-react'
 import { Skeleton } from 'simple-react-ui-kit'
 
@@ -154,36 +155,33 @@ const WidgetMonthlyNormals: React.FC<WidgetMonthlyNormalsProps> = ({ normals, cu
                 backgroundColor,
                 borderColor,
                 trigger: 'axis',
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                formatter: (params: any) => {
-                    const arr = Array.isArray(params) ? params : [params]
+                formatter: (params: TopLevelFormatterParams) => {
+                    const arr: CallbackDataParams[] = Array.isArray(params) ? params : [params]
                     const monthIndex = arr[0]?.dataIndex
                     const header = `<div class="${styles.chartTooltipTitle}">${monthLabels[monthIndex] ?? ''}</div>`
 
                     const rows = arr
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        .filter((item: any) => item.value != null && item.seriesName !== t('historical-range'))
+                        .filter(
+                            (item: CallbackDataParams) =>
+                                item.value != null && item.seriesName !== t('historical-range')
+                        )
                         // Sort to show max first, then min, then others
-                        .sort((a: { seriesName: string }, b: { seriesName: string }) => {
+                        .sort((a: CallbackDataParams, b: CallbackDataParams) => {
                             const order = [
                                 t('historical-max'),
                                 t('historical-min'),
                                 t('historical-normal'),
                                 t('current-year')
                             ]
-                            return order.indexOf(a.seriesName) - order.indexOf(b.seriesName)
+                            return order.indexOf(a.seriesName ?? '') - order.indexOf(b.seriesName ?? '')
                         })
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        .map((item: any) => {
-                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                            const dot = `<span class="${styles.icon}" style="background-color:${item.color ?? item.borderColor};"></span>`
+                        .map((item: CallbackDataParams) => {
+                            const dot = `<span class="${styles.icon}" style="background-color:${String(item.color ?? item.borderColor ?? '')};"></span>`
+                            const numVal = item.value as number | null
                             const value =
-                                item.value != null
-                                    ? `${item.value > 0 ? '+' : ''}${Number(item.value).toFixed(1)}°C`
-                                    : '---'
+                                numVal != null ? `${numVal > 0 ? '+' : ''}${Number(numVal).toFixed(1)}°C` : '---'
                             const val = `<span class="${styles.value}">${value}</span>`
-                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                            return `<div class="${styles.chartTooltipItem}">${dot}<span class="${styles.label}">${item.seriesName}${val}</span></div>`
+                            return `<div class="${styles.chartTooltipItem}">${dot}<span class="${styles.label}">${item.seriesName ?? ''}${val}</span></div>`
                         })
                         .join('')
 

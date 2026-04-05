@@ -60,6 +60,7 @@
     "date-no-time": "D MMMM YYYY",
     "min": "Мин",
     "max": "Макс",
+    "no-data": "—",
     "select-date-range": "Выберите диапазон дат",
     "anomaly-monitor": "Монитор аномалий",
     "meteorological-anomaly": "Метеорологический монитор аномалий",

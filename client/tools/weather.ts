@@ -24,6 +24,16 @@ export interface MinMaxResult {
 }
 
 /**
+ * Checks if MinMaxResult is empty (has no valid min/max values).
+ *
+ * @param result The MinMaxResult to check.
+ * @returns true if the result has no min or max values.
+ */
+export const isMinMaxEmpty = (result?: MinMaxResult): boolean => {
+    return !result || (result.min === undefined && result.max === undefined)
+}
+
+/**
  *
  * @param data Array<ApiModel.Weather>
  * @param parameter keyof ApiModel.Weather
@@ -75,12 +85,19 @@ export const getMinMaxValues = (data?: ApiModel.Weather[], parameter?: keyof Api
  * Function to find the minimum value
  * @param weatherData
  * @param key
+ * @returns The minimum value or undefined if no valid values exist
  */
-export const findMinValue = (weatherData?: ApiModel.Weather[], key?: keyof ApiModel.Sensors): number | undefined =>
-    weatherData
-        ?.map((data) => data[key ?? 'temperature']) // Get values by key
-        ?.filter((value) => value !== undefined) // Filter only existing values
-        ?.reduce((min, value) => (value !== undefined && value < min ? value : min), Infinity)
+export const findMinValue = (weatherData?: ApiModel.Weather[], key?: keyof ApiModel.Sensors): number | undefined => {
+    const values = weatherData
+        ?.map((data) => data[key ?? 'temperature'])
+        ?.filter((value): value is number => value !== undefined)
+
+    if (!values || values.length === 0) {
+        return undefined
+    }
+
+    return Math.min(...values)
+}
 
 /**
  * Inverts the values of the specified sensor data key within the weather data array to ensure all values are positive.
@@ -110,12 +127,19 @@ export const invertData = (weatherData: ApiModel.Weather[] = [], key?: keyof Api
  * Function to find the maximum value
  * @param weatherData
  * @param key
+ * @returns The maximum value or undefined if no valid values exist
  */
-export const findMaxValue = (weatherData?: ApiModel.Weather[], key?: keyof ApiModel.Sensors): number | undefined =>
-    weatherData
-        ?.map((data) => data[key ?? 'temperature']) // Get values by key
-        ?.filter((value) => value !== undefined) // Filter only existing values
-        ?.reduce((max, value) => (value !== undefined && value > max ? value : max), -Infinity)
+export const findMaxValue = (weatherData?: ApiModel.Weather[], key?: keyof ApiModel.Sensors): number | undefined => {
+    const values = weatherData
+        ?.map((data) => data[key ?? 'temperature'])
+        ?.filter((value): value is number => value !== undefined)
+
+    if (!values || values.length === 0) {
+        return undefined
+    }
+
+    return Math.max(...values)
+}
 
 /**
  * Converts pressure from hectopascals (hPa) to millimeters of mercury (mmHg).

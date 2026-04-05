@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useTranslation } from 'next-i18next'
 
 import { formatDate } from '@/tools/date'
-import { MinMaxResult } from '@/tools/weather'
+import { isMinMaxEmpty, MinMaxResult } from '@/tools/weather'
 
 import styles from './styles.module.sass'
 
@@ -63,56 +63,64 @@ const WidgetSensor: React.FC<WidgetSensorProps> = ({
                 {loading ? (
                     <Skeleton style={{ width: 100, height: 35, marginTop: 10, marginBottom: 5 }} />
                 ) : formatter ? (
-                    formatter(currentValue ?? '??')
+                    formatter(currentValue ?? t('no-data'))
                 ) : (
-                    (currentValue ?? '??')
+                    (currentValue ?? t('no-data'))
                 )}
                 {unit && !loading && <span>{unit}</span>}
             </div>
-            {minMax && (
-                <div className={styles.statsContainer}>
-                    <div className={styles.block}>
-                        <span className={styles.title}>{t('min')}</span>
-                        <span>
-                            {chartLoading ? (
-                                <Skeleton style={{ width: 40, height: 15, marginTop: 2 }} />
-                            ) : (
-                                <>
-                                    {formatter ? formatter(minMax?.min?.value ?? '??') : (minMax?.min?.value ?? '??')}
-                                    {unit && <span>{unit}</span>}
-                                </>
-                            )}
-                        </span>
-                        <span>
-                            {chartLoading ? (
-                                <Skeleton style={{ width: 40, height: 15, marginTop: 5 }} />
-                            ) : (
-                                formatDate(minMax?.min?.date, 'HH:mm')
-                            )}
-                        </span>
-                    </div>
-                    <div className={styles.block}>
-                        <span className={styles.title}>{t('max')}</span>
-                        <span>
-                            {chartLoading ? (
-                                <Skeleton style={{ width: 40, height: 15, marginTop: 2 }} />
-                            ) : (
-                                <>
-                                    {formatter ? formatter(minMax?.max?.value ?? '??') : (minMax?.max?.value ?? '??')}
-                                    {unit && <span>{unit}</span>}
-                                </>
-                            )}
-                        </span>
-                        <span>
-                            {chartLoading ? (
-                                <Skeleton style={{ width: 40, height: 15, marginTop: 5 }} />
-                            ) : (
-                                formatDate(minMax?.max?.date, 'HH:mm')
-                            )}
-                        </span>
-                    </div>
+
+            <div className={styles.statsContainer}>
+                <div className={styles.block}>
+                    <span className={styles.title}>{t('min')}</span>
+                    <span>
+                        {chartLoading ? (
+                            <Skeleton style={{ width: 40, height: 15, marginTop: 2 }} />
+                        ) : !minMax || isMinMaxEmpty(minMax) || minMax.min?.value === undefined ? (
+                            '\u2014'
+                        ) : (
+                            <>
+                                {formatter ? formatter(minMax.min.value) : minMax.min.value}
+                                {unit && <span>{unit}</span>}
+                            </>
+                        )}
+                    </span>
+                    <span>
+                        {chartLoading ? (
+                            <Skeleton style={{ width: 40, height: 15, marginTop: 5 }} />
+                        ) : !minMax || isMinMaxEmpty(minMax) || !minMax.min?.date ? (
+                            '\u2014'
+                        ) : (
+                            formatDate(minMax.min.date, 'HH:mm')
+                        )}
+                    </span>
                 </div>
-            )}
+                <div className={styles.block}>
+                    <span className={styles.title}>{t('max')}</span>
+                    <span>
+                        {chartLoading ? (
+                            <Skeleton style={{ width: 40, height: 15, marginTop: 2 }} />
+                        ) : !minMax || isMinMaxEmpty(minMax) || minMax.max?.value === undefined ? (
+                            '\u2014'
+                        ) : (
+                            <>
+                                {formatter ? formatter(minMax.max.value) : minMax.max.value}
+                                {unit && <span>{unit}</span>}
+                            </>
+                        )}
+                    </span>
+                    <span>
+                        {chartLoading ? (
+                            <Skeleton style={{ width: 40, height: 15, marginTop: 5 }} />
+                        ) : !minMax || isMinMaxEmpty(minMax) || !minMax.max?.date ? (
+                            '\u2014'
+                        ) : (
+                            formatDate(minMax.max.date, 'HH:mm')
+                        )}
+                    </span>
+                </div>
+            </div>
+
             {chart && (
                 <div className={styles.chart}>
                     {chartLoading ? <Skeleton style={{ width: '100%', height: 54 }} /> : chart}

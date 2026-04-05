@@ -70,7 +70,7 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ columnsPreset, title, link
                 className: styles.cellCondition,
                 formatter: (weatherId) => (
                     <>
-                        <WeatherIcon weatherId={weatherId as number} />
+                        <WeatherIcon weatherId={weatherId as number | undefined} />
                         {t(getWeatherI18nKey(weatherId || ''))}
                     </>
                 )
@@ -82,7 +82,7 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ columnsPreset, title, link
                 className: styles.cellWeather,
                 formatter: (weatherId, data, i) => (
                     <WeatherIcon
-                        weatherId={weatherId as number}
+                        weatherId={weatherId as number | undefined}
                         date={data[i].date}
                     />
                 )
