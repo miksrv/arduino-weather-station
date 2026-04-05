@@ -44,7 +44,7 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
                             />
                         ) : (
                             <WeatherIcon
-                                weatherId={weather?.weatherId as number}
+                                weatherId={weather?.weatherId}
                                 date={weather?.date}
                                 height={80}
                                 width={80}
@@ -75,22 +75,22 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
                     <>
                         <Badge
                             icon={'Wind'}
-                            label={`${weather?.windSpeed} ${t('meters-per-second')}`}
+                            label={`${weather?.windSpeed ?? t('no-data')} ${t('meters-per-second')}`}
                         />
 
                         <Badge
                             icon={'WaterDrop'}
-                            label={`${weather?.precipitation} ${t('millimeters')}`}
+                            label={`${weather?.precipitation ?? t('no-data')} ${t('millimeters')}`}
                         />
 
                         <Badge
                             icon={'Water'}
-                            label={`${weather?.humidity} %`}
+                            label={`${weather?.humidity ?? t('no-data')} %`}
                         />
 
                         <Badge
                             icon={'Pressure'}
-                            label={`${convertHpaToMmHg(weather?.pressure)} ${t('mm-hg')}`}
+                            label={`${convertHpaToMmHg(weather?.pressure) || t('no-data')} ${t('mm-hg')}`}
                         />
                     </>
                 )}
