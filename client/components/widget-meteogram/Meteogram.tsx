@@ -2,7 +2,6 @@ import React, { CSSProperties, useEffect, useMemo, useRef, useState } from 'reac
 import { CustomSeriesRenderItemAPI, CustomSeriesRenderItemParams, EChartsOption } from 'echarts'
 import { CustomSeriesRenderItemReturn } from 'echarts/types/dist/echarts'
 import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
-import { LabelOption } from 'echarts/types/src/util/types'
 import ReactECharts from 'echarts-for-react'
 
 import { useTranslation } from 'next-i18next'
@@ -63,7 +62,7 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
     const renderArrow = (
         _: CustomSeriesRenderItemParams,
         api: CustomSeriesRenderItemAPI
-    ): CustomSeriesRenderItemReturn & LabelOption => {
+    ): CustomSeriesRenderItemReturn => {
         const point = api.coord([api.value(DATA_INDEXES.date), api.value(DATA_INDEXES.windSpeed)])
 
         const windSpeed = api.value(DATA_INDEXES.windSpeed) as number
@@ -87,7 +86,8 @@ const Meteogram: React.FC<MeteogramProps> = ({ data, height }) => {
                 height: WIND_ARROW_SIZE
             },
             rotation: Number(api.value(DATA_INDEXES.windDeg)),
-            position: point,
+            x: point[0],
+            y: point[1],
             style: api.style({
                 stroke: color,
                 fill: color,

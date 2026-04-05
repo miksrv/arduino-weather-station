@@ -1,6 +1,7 @@
 # Frontend Roadmap — Arduino Weather Station Client
 
 Generated: 2026-03-14
+Updated: 2026-04-05
 Scope: `/client` directory (Next.js 16, React 19, TypeScript 5.9, RTK Query, ECharts, i18next)
 
 ---
@@ -15,44 +16,17 @@ Scope: `/client` directory (Next.js 16, React 19, TypeScript 5.9, RTK Query, ECh
 
 ---
 
-## 1. Bugs
-
-## 2. Code Quality
-
-### QC-01 · `any` types in ECharts tooltip formatters — 4 files [High]
-
-**Files:**
-
-- `components/widget-chart/Chart.tsx` lines 54, 67 — `formatter: (params: any)`, `params.forEach((item: any)`
-- `components/widget-meteogram/Meteogram.tsx` lines 121, 134 — same pattern
-- `components/widget-climate/Chart.tsx` lines 45, 58 — same pattern
-- `components/widget-heatmap/Heatmap.tsx` line 151 — same pattern
-
-All four have `// eslint-disable-next-line @typescript-eslint/no-explicit-any` or `// TODO` comments acknowledging the problem. ECharts exports `TopLevelFormatterParams` from `echarts/types/dist/shared` which is the correct type. Replace `any` with the proper ECharts type to eliminate the escape hatches.
-
----
+## 1. Code Quality
 
 ### QC-03 · `showOverlay` state in Redux slice is never dispatched [Medium]
 
-**File:** `api/applicationSlice.ts` — the `showOverlay?: boolean` field exists in `ApplicationStateProps` but there is no `setShowOverlay` action and nothing dispatches it. `AppLayout` reads `application.showOverlay` which is always `undefined` (falsy). Either add the missing action or remove the dead field and the overlay check in `AppLayout`.
-
----
-
-### QC-08 · `'weather-icon'` i18n key used in Meteogram but not defined in either locale [Medium]
-
-**File:** `components/widget-meteogram/Meteogram.tsx` — line 270
-
-```ts
-name: t('weather-icon'),
-```
-
-Neither `en/common.json` nor `ru/common.json` defines a `weather-icon` key. The ECharts series name falls back to the raw key string `"weather-icon"`. Add the key to both locale files (e.g. `"Weather icon"` / `"Иконка погоды"`).
+**File:** `api/applicationSlice.ts` — the `showOverlay?: boolean` field exists in `ApplicationStateProps` but there is no `setShowOverlay` action and nothing dispatches it. Either add the missing action or remove the dead field.
 
 ---
 
 ### QC-11 · `encodeQueryData` uses `for...in` loop which iterates inherited properties [Low]
 
-**File:** `tools/helpers.ts` — lines 14–19
+**File:** `tools/helpers.ts` — lines 15–19
 
 ```ts
 for (const key in data) {
@@ -62,15 +36,9 @@ for (const key in data) {
 
 ---
 
-### QC-12 · `normalizeDateToBaseYear` is defined after it is used in `widget-climate/Chart.tsx` [Low]
-
-**File:** `components/widget-climate/Chart.tsx` — line 141 calls `normalizeDateToBaseYear`, but the function is defined at line 154. While JavaScript hoisting works for function declarations, this is a named `const` arrow function — the linter or TypeScript `noUndeclaredVars` should catch this. Move the helper to the top of the file.
-
----
-
 ### QC-13 · Switch `case` order in `colors.ts` — `undefined` case appears after `default` [Medium]
 
-**File:** `tools/colors.ts` — lines 75–78
+**File:** `tools/colors.ts` — lines 68–72
 
 ```ts
 default:
@@ -80,19 +48,11 @@ case undefined: {
 }
 ```
 
-The `undefined` case is unreachable because `default` matches first. In TypeScript the union `keyof ApiModel.Sensors | undefined` means `undefined` is a valid argument, but the `default` branch returns before reaching the `undefined` case. Either move `case undefined` above `default`, or handle it with a runtime guard before the switch.
+The `undefined` case is unreachable because `default` matches first. Either move `case undefined` above `default`, or handle it with a runtime guard before the switch.
 
 ---
 
-### QC-14 · `dangerouslySetInnerHTML` in `_app.tsx` inlines Yandex Metrika script [Low]
-
-**File:** `pages/_app.tsx` — lines 115–120
-
-The analytics snippet is injected via `dangerouslySetInnerHTML`, which bypasses React's XSS protections. While the content is hardcoded and not user-controlled, the pattern is considered poor practice. A `next/script` component with `strategy="afterInteractive"` is the correct approach for third-party scripts in Next.js.
-
----
-
-## 3. Performance
+## 2. Performance
 
 ### PERF-03 · `currentDate` and `yesterdayDate` are module-level constants evaluated once at import time [Medium]
 
@@ -103,7 +63,7 @@ export const currentDate = dayjs().utc(false).tz(TIME_ZONE)
 export const yesterdayDate = currentDate.subtract(1, 'day').toDate()
 ```
 
-These are computed when the module is first imported and never update. On the SSR pass this is fine, but on long-running sessions or after midnight, the dates become stale. `sensors.tsx` and `index.tsx` pass `currentDate` to RTK Query — the query args do not change, so no re-fetch occurs after midnight.
+These are computed when the module is first imported and never update. On long-running sessions or after midnight, the dates become stale. Query args using these values do not change, so no re-fetch occurs after midnight.
 
 Fix: convert to functions (`getCurrentDate()`, `getYesterdayDate()`) and call them at query-arg computation time, or store a derived value that includes the current date in component state so it refreshes.
 
@@ -113,55 +73,31 @@ Fix: convert to functions (`getCurrentDate()`, `getYesterdayDate()`) and call th
 
 **File:** `api/api.ts`
 
-The default RTK Query `keepUnusedDataFor` is 60 seconds. For a weather station where data changes every 10 minutes, cached data can be served stale for longer. Consider setting `keepUnusedDataFor: 600` (10 minutes) on the `getCurrent` and `getForecast` endpoints to match the polling interval and avoid unnecessary refetches when navigating between pages.
+The default RTK Query `keepUnusedDataFor` is 60 seconds. For a weather station where data changes every 10 minutes, cached data can be served stale for longer. Consider setting `keepUnusedDataFor: 600` (10 minutes) on the endpoints to match the polling interval and avoid unnecessary refetches when navigating between pages.
 
 ---
 
-## 4. Testing
+## 3. Testing
 
-### TEST-03 · `getWeatherIconUrl` in `WeatherIcon.tsx` has no tests [Medium]
+### TEST-05 · `encodeQueryData` edge case: falsy non-null values (`0`, `false`) [Low]
 
-**File:** `components/weather-icon/WeatherIcon.tsx` — exported function `getWeatherIconUrl`
+**File:** `tools/helpers.test.ts`
 
-`getWeatherIconUrl` is used in both `WeatherIcon` and `Meteogram`. It has day/night and special-case logic that warrants unit tests: unknown `weatherId`, daytime vs. nighttime URLs, `withoutDayIcon` condition, missing `date`.
-
----
-
-### TEST-05 · `encodeQueryData` edge case: falsy non-null values (`0`, `false`) [Medium]
-
-**File:** `tools/helpers.ts` — line 17
+The current test suite does not cover numeric `0` or boolean `false` values. Both are valid query parameters and are currently included (correctly) — however there is no regression test to guard against accidentally changing the check to a truthiness test. Add tests like:
 
 ```ts
-if (data[key] !== undefined && data[key] != null) {
+it('includes numeric 0 as valid value', () => {
+    expect(encodeQueryData({ count: 0 })).toBe('?count=0')
+})
+
+it('includes boolean false as valid value', () => {
+    expect(encodeQueryData({ active: false })).toBe('?active=false')
+})
 ```
 
-The current test suite does not cover numeric `0` or boolean `false` values. Both are valid query parameters but are currently included (correctly) — however there is no regression test to guard against accidentally changing the check to a truthiness test.
-
 ---
 
-### TEST-06 · `useLocalStorage` hook has no tests [Medium]
-
-**File:** `tools/hooks/useLocalStorage.ts`
-
-This hook handles localStorage read/write/remove with JSON parsing, initial state functions, and SSR guards (`typeof window === 'undefined'`). It is used in both `_app.tsx` and `LanguageSwitcher`. Add tests using `jest.spyOn(window, 'localStorage', 'get')` or a localStorage mock.
-
----
-
-### TEST-07 · `useClientOnly` hook has no tests [Low]
-
-**File:** `tools/hooks/useClientOnly.ts`
-
-Simple hook but worth a one-case test: returns `false` on first render, `true` after mount. This guards `ThemeSwitcher` visibility and `window.innerWidth` access.
-
----
-
-### TEST-08 · `WidgetSensor`, `WidgetSummary`, `WidgetForecastTable` have no component tests [Medium]
-
-These three components are the most user-visible output on every page. Basic rendering tests covering loading state vs. populated state would guard against regressions in the `formatter`, `minMax`, and table column rendering paths.
-
----
-
-## 5. Features / Enhancements
+## 4. Features / Enhancements
 
 ### FEAT-02 · History page has no chart for humidity, wind, or UV index [Low]
 
@@ -179,26 +115,6 @@ None of the pages or widgets check `isError` from RTK Query. If the API is unrea
 
 ---
 
-### FEAT-04 · `WeatherIcon` renders a broken image when `weatherId` is not in the mapping [Medium]
-
-**File:** `components/weather-icon/WeatherIcon.tsx` — lines 85–88
-
-```ts
-const name = weatherIconsMapping[weatherId]
-```
-
-If `weatherId` has no entry in `weatherIconsMapping`, `name` is `undefined` and the URL becomes `/icons/undefined.svg`, which results in a 404 and a broken image. Add a fallback (e.g. map to `'unknown'` or show nothing).
-
----
-
-### FEAT-05 · `AppBar` always fetches current data, even on pages that also fetch it [Low]
-
-**File:** `components/app-bar/AppBar.tsx` — line 26
-
-`AppBar` calls `API.useGetCurrentQuery` with `pollingInterval`. Every page that also calls `useGetCurrentQuery` (index, sensors) fires the same query. RTK Query deduplicates this at the network level, but the component still subscribes, creating an additional active subscription. This is acceptable but worth being aware of — if `AppBar` is removed or the polling interval changes, the AppBar and page subscriptions must be updated together.
-
----
-
 ### FEAT-06 · `heatmap.tsx` `isMobile` uses synchronous `window.innerWidth` without resize listener [Medium]
 
 **File:** `components/widget-heatmap/Heatmap.tsx` — line 33
@@ -211,29 +127,9 @@ const isMobile = isClient && !!(window?.innerWidth && window?.innerWidth < 500)
 
 ---
 
-### FEAT-07 · No `<noscript>` fallback for chart-heavy pages [Low]
+## 5. Security
 
-**Files:** `pages/history.tsx`, `pages/heatmap.tsx`, `pages/forecast.tsx`
-
-All meaningful content on these pages is rendered by ECharts inside `<canvas>`. Users with JavaScript disabled (or crawlers that do not execute JS) see nothing. Adding `<noscript>` messages or a server-side rendered table summary would improve accessibility and SEO.
-
----
-
-### FEAT-08 · `WidgetSensor` `'??'` fallback is not i18n-aware [Low]
-
-**File:** `components/widget-sensor/WidgetSensor.tsx` — lines 62–64
-
-```tsx
-formatter(currentValue ?? '??')(currentValue ?? '??')
-```
-
-The `'??'` placeholder is a hardcoded non-localised string. It could be replaced with `t('no-data')` or an em-dash if a consistent "no data" pattern is desired across the application.
-
----
-
-## 7. Security
-
-> All items below were identified during a security audit on 2026-03-22. Severity levels: **CRITICAL** · **HIGH** · **MEDIUM** · **LOW**
+> All items below were identified during a security audit. Severity levels: **CRITICAL** · **HIGH** · **MEDIUM** · **LOW**
 
 ---
 
@@ -243,47 +139,24 @@ The `'??'` placeholder is a hardcoded non-localised string. It could be replaced
 
 The `next.config.js` exports no `headers()` function, so every page is served without any protective HTTP headers:
 
-- **Content-Security-Policy** — no restriction on which scripts, styles, or frames may load. Any successful XSS payload executes without constraint.
-- **X-Frame-Options / CSP `frame-ancestors`** — the application can be embedded in a third-party `<iframe>`, enabling clickjacking attacks on all pages.
-- **X-Content-Type-Options: nosniff** — browsers may sniff response MIME types, enabling MIME-confusion attacks.
-- **Strict-Transport-Security** — no HSTS; downgrade attacks are possible if the user visits over HTTP.
-- **Referrer-Policy** — referrer data (including path and query strings) leaks to third-party domains (Yandex, GitHub links).
-- **Permissions-Policy** — no restrictions on camera, microphone, or geolocation access from the page.
+- **Content-Security-Policy** — no restriction on which scripts, styles, or frames may load.
+- **X-Frame-Options / CSP `frame-ancestors`** — the application can be embedded in a third-party `<iframe>`, enabling clickjacking attacks.
+- **X-Content-Type-Options: nosniff** — browsers may sniff response MIME types.
+- **Strict-Transport-Security** — no HSTS; downgrade attacks are possible.
+- **Referrer-Policy** — referrer data leaks to third-party domains.
+- **Permissions-Policy** — no restrictions on camera, microphone, or geolocation access.
 
 Add a `headers()` export to `next.config.js` setting at minimum `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, and a restrictive `Content-Security-Policy`.
 
 ---
 
-### SEC-02 · Third-party Yandex.Metrika script injected via `dangerouslySetInnerHTML` without Subresource Integrity [HIGH]
-
-**File:** `pages/_app.tsx`, lines 131–134
-
-The Yandex.Metrika analytics snippet is injected using `dangerouslySetInnerHTML`, which bypasses React's built-in XSS protection. The snippet dynamically loads `https://mc.yandex.ru/metrika/tag.js` with no `integrity` attribute (SRI). Two attack surfaces are created:
-
-1. **Supply-chain risk:** If Yandex's CDN or DNS is compromised, arbitrary JavaScript executes on every visitor's browser in the full context of the application origin.
-2. **Pattern risk:** `dangerouslySetInnerHTML` with a script block is a foothold — a developer error or a modified string could silently introduce malicious JS into every page load.
-
-Replace with `<Script src="..." strategy="afterInteractive" />` from `next/script`, which supports CSP nonces and deferred loading. Add an `integrity` hash once on a stable version of the script.
-
----
-
 ### SEC-03 · ECharts tooltip formatters render unescaped API data as raw HTML [MEDIUM]
 
-**Files:** `components/widget-chart/Chart.tsx` (lines 62–76), `components/widget-heatmap/Heatmap.tsx` (lines 153–162), `components/widget-meteogram/Meteogram.tsx`, `components/widget-precip-chart/WidgetPrecipChart.tsx`, `components/widget-climate/Chart.tsx`
+**Files:** `components/widget-chart/Chart.tsx`, `components/widget-heatmap/Heatmap.tsx`, `components/widget-meteogram/Meteogram.tsx`, `components/widget-precip-chart/WidgetPrecipChart.tsx`, `components/widget-climate/Chart.tsx`
 
-All chart tooltip formatters build HTML strings by concatenating values received directly from the API, then pass the resulting string to ECharts which renders it as `innerHTML` without escaping. If the backend were to return a malicious string such as `<img src=x onerror=alert(1)>` in a numeric sensor field — due to a backend injection, database compromise, or MITM attack on the HTTP API — it would execute as JavaScript in every user's browser.
+All chart tooltip formatters build HTML strings by concatenating values received directly from the API, then pass the resulting string to ECharts which renders it as `innerHTML` without escaping. If the backend were to return a malicious string, it would execute as JavaScript.
 
-Sanitize or numeric-coerce all values before inserting them into formatter strings (e.g., `Number(value).toFixed(1)` for numeric fields), or use a DOM-sanitisation utility such as DOMPurify.
-
----
-
-### SEC-04 · `client/.env` file committed to the repository [LOW]
-
-**File:** `client/.env`
-
-The `client/.env` file is tracked by Git. The root `.gitignore` does not cover `client/.env` — it only covers `client/env` and `/frontend/.env.local`. Although the file currently contains only the `NEXT_PUBLIC_API_HOST` variable (not a secret), committing any `.env` file normalises the pattern and makes accidental future secret commits likely.
-
-Add `client/.env` to `.gitignore` and remove it from Git history. Provide `client/.env.example` as a documented template instead.
+Sanitize or numeric-coerce all values before inserting them into formatter strings (e.g., `Number(value).toFixed(1)` for numeric fields).
 
 ---
 
@@ -295,17 +168,15 @@ Add `client/.env` to `.gitignore` and remove it from Git history. Provide `clien
 void setCookie('NEXT_LOCALE', locale)
 ```
 
-The `setCookie` call passes no options, so the cookie is written without `Secure` (transmissible over HTTP), without `SameSite` (browser default varies — potentially allows cross-site reads), and without `HttpOnly`. While the locale value is not sensitive, this establishes a project-wide pattern of setting cookies without security attributes. Pass `{ secure: true, sameSite: 'lax' }` to all `setCookie` calls.
+The `setCookie` call passes no options, so the cookie is written without `Secure`, without `SameSite`, and without `HttpOnly`. Pass `{ secure: true, sameSite: 'lax' }` to all `setCookie` calls.
 
 ---
 
 ### SEC-06 · Application version number exposed in the footer [LOW]
 
-**File:** `components/footer/Footer.tsx`, lines 32–33
+**File:** `components/footer/Footer.tsx`, lines 31–32
 
-The exact `package.json` version string is rendered on every page. This gives any visitor instant visibility into the precise software version, making version-specific vulnerability targeting trivial.
-
-Remove the version from the rendered HTML, or restrict it to admin/internal views only.
+The exact `package.json` version string is rendered on every page. This gives any visitor instant visibility into the precise software version. Consider removing the version from the rendered HTML or showing it only in dev mode.
 
 ---
 
@@ -313,30 +184,26 @@ Remove the version from the rendered HTML, or restrict it to admin/internal view
 
 **File:** `client/ecosystem.config.js`
 
-The PM2 deployment config commits the production service name (`meteo.miksoft.pro`) and internal port (`3007`) to the public repository. An attacker performing reconnaissance can fingerprint the server stack and attempt to reach port 3007 directly if firewall rules are misconfigured.
-
-Move deployment-specific config out of the repository or into a secrets-management system. At minimum, add `ecosystem.config.js` to `.gitignore`.
+The PM2 deployment config commits the production service name (`meteo.miksoft.pro`) and internal port (`3007`) to the repository. Move deployment-specific config out of the repository or into a secrets-management system.
 
 ---
 
 ### SEC-08 · `sessionStorage` and `localStorage` data deserialised without runtime schema validation [LOW]
 
-**Files:** `pages/climate.tsx` (lines 28–33), `tools/hooks/useLocalStorage.ts` (lines 54–56)
+**Files:** `pages/climate.tsx`, `tools/hooks/useLocalStorage.ts`
 
-Both files parse JSON from browser storage and immediately cast the result to a typed interface (`as ClimateType[]`) with no runtime field validation. If a browser extension, an XSS payload, or a compromised third-party script (see SEC-02) writes crafted data to storage, the application processes it as trusted data. Add a lightweight runtime validator (e.g., a shape-check function) before casting.
+Both files parse JSON from browser storage and immediately cast the result to a typed interface with no runtime field validation. Add a lightweight runtime validator (e.g., a shape-check function) before casting.
 
 ---
 
-## 8. Summary by Priority
+## 6. Summary by Priority
 
 ### High (fix first)
 
-| ID      | Summary                                                     |
-| ------- | ----------------------------------------------------------- |
-| SEC-01  | Missing HTTP security headers (CSP, X-Frame-Options, HSTS)  |
-| SEC-02  | Yandex.Metrika script via `dangerouslySetInnerHTML`, no SRI |
-| QC-01   | `any` types in ECharts tooltip formatters                   |
-| FEAT-03 | No error state handling for any RTK Query endpoint          |
+| ID      | Summary                                                    |
+| ------- | ---------------------------------------------------------- |
+| SEC-01  | Missing HTTP security headers (CSP, X-Frame-Options, HSTS) |
+| FEAT-03 | No error state handling for any RTK Query endpoint         |
 
 ### Medium (address in regular sprints)
 
@@ -344,31 +211,19 @@ Both files parse JSON from browser storage and immediately cast the result to a 
 | ------- | --------------------------------------------------------- |
 | SEC-03  | ECharts tooltip renders unescaped API data as HTML        |
 | QC-03   | `showOverlay` redux field is never dispatched             |
-| QC-08   | `weather-icon` i18n key missing from both locales         |
 | QC-13   | `undefined` case after `default` in switch is unreachable |
 | PERF-03 | `currentDate` / `yesterdayDate` never refresh             |
-| TEST-03 | `getWeatherIconUrl` has no tests                          |
-| TEST-05 | `encodeQueryData` missing falsy-value edge case           |
-| TEST-06 | `useLocalStorage` hook has no tests                       |
-| TEST-08 | Key widgets have no component tests                       |
-| FEAT-04 | `WeatherIcon` renders broken image for unknown IDs        |
 | FEAT-06 | Heatmap `isMobile` stale after window resize              |
 
 ### Low (backlog)
 
 | ID      | Summary                                             |
 | ------- | --------------------------------------------------- |
-| SEC-04  | `client/.env` committed to the repository           |
 | SEC-05  | `NEXT_LOCALE` cookie missing `Secure`/`SameSite`    |
 | SEC-06  | App version number exposed in footer                |
 | SEC-07  | `ecosystem.config.js` exposes production port       |
 | SEC-08  | Storage deserialisation without schema validation   |
 | QC-11   | `for...in` in `encodeQueryData` — use `Object.keys` |
-| QC-12   | `normalizeDateToBaseYear` defined after first use   |
-| QC-14   | Yandex Metrika should use `next/script`             |
 | PERF-06 | No `keepUnusedDataFor` tuning on RTK Query          |
-| TEST-07 | `useClientOnly` hook has no tests                   |
+| TEST-05 | `encodeQueryData` missing falsy-value edge case     |
 | FEAT-02 | History page missing humidity / wind charts         |
-| FEAT-05 | AppBar duplicate RTK Query subscription awareness   |
-| FEAT-07 | No `<noscript>` fallback for chart pages            |
-| FEAT-08 | `'??'` fallback not i18n-aware in WidgetSensor      |
