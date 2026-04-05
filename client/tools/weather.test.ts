@@ -12,7 +12,8 @@ import {
     getMinMaxValues,
     getSampledData,
     getTemperatureColor,
-    invertData
+    invertData,
+    isMinMaxEmpty
 } from './weather'
 
 dayjs.extend(utc)
@@ -88,6 +89,34 @@ describe('weather', () => {
             const result = getMinMaxValues(data, 'temperature')
             expect(result.min?.value).toBe(7)
             expect(result.max?.value).toBe(7)
+        })
+    })
+
+    describe('isMinMaxEmpty', () => {
+        it('returns true when result is undefined', () => {
+            expect(isMinMaxEmpty(undefined)).toBe(true)
+        })
+
+        it('returns true when result is empty object', () => {
+            expect(isMinMaxEmpty({})).toBe(true)
+        })
+
+        it('returns true when both min and max are undefined', () => {
+            expect(isMinMaxEmpty({ min: undefined, max: undefined })).toBe(true)
+        })
+
+        it('returns false when min is defined', () => {
+            expect(isMinMaxEmpty({ min: { value: 10, date: '2024-01-01' } })).toBe(false)
+        })
+
+        it('returns false when max is defined', () => {
+            expect(isMinMaxEmpty({ max: { value: 20, date: '2024-01-02' } })).toBe(false)
+        })
+
+        it('returns false when both min and max are defined', () => {
+            expect(
+                isMinMaxEmpty({ min: { value: 10, date: '2024-01-01' }, max: { value: 20, date: '2024-01-02' } })
+            ).toBe(false)
         })
     })
 
@@ -388,9 +417,13 @@ describe('weather', () => {
             expect(findMinValue(undefined, 'temperature')).toBeUndefined()
         })
 
-        it('returns Infinity when weatherData is an empty array', () => {
-            // reduce with no items returns the initial value (Infinity) when array is empty after filter
-            expect(findMinValue([], 'temperature')).toBe(Infinity)
+        it('returns undefined when weatherData is an empty array', () => {
+            expect(findMinValue([], 'temperature')).toBeUndefined()
+        })
+
+        it('returns undefined when all values are undefined', () => {
+            const data = [makeItem(undefined, '2024-01-01'), makeItem(undefined, '2024-01-02')]
+            expect(findMinValue(data, 'temperature')).toBeUndefined()
         })
 
         it('returns minimum temperature from a normal dataset', () => {
@@ -430,9 +463,13 @@ describe('weather', () => {
             expect(findMaxValue(undefined, 'temperature')).toBeUndefined()
         })
 
-        it('returns -Infinity when weatherData is an empty array', () => {
-            // reduce with no items returns the initial value (-Infinity) when array is empty after filter
-            expect(findMaxValue([], 'temperature')).toBe(-Infinity)
+        it('returns undefined when weatherData is an empty array', () => {
+            expect(findMaxValue([], 'temperature')).toBeUndefined()
+        })
+
+        it('returns undefined when all values are undefined', () => {
+            const data = [makeItem(undefined, '2024-01-01'), makeItem(undefined, '2024-01-02')]
+            expect(findMaxValue(data, 'temperature')).toBeUndefined()
         })
 
         it('returns maximum temperature from a normal dataset', () => {
