@@ -80,7 +80,13 @@ describe('WeatherIcon', () => {
     it('renders fallback for unknown weatherId', () => {
         render(<WeatherIcon weatherId={999} />)
         const img = screen.getByAltText('')
-        expect(img).toHaveAttribute('src', '/icons/undefined.svg')
+        expect(img).toHaveAttribute('src', '/icons/unknown.svg')
+    })
+
+    it('renders fallback when weatherId is undefined', () => {
+        render(<WeatherIcon weatherId={undefined} />)
+        const img = screen.getByAltText('')
+        expect(img).toHaveAttribute('src', '/icons/unknown.svg')
     })
 })
 
@@ -101,7 +107,15 @@ describe('getWeatherIconUrl', () => {
         expect(getWeatherIconUrl(800)).toBe('/icons/clear.svg')
     })
 
-    it('returns undefined icon for unknown weatherId', () => {
-        expect(getWeatherIconUrl(999)).toBe('/icons/undefined.svg')
+    it('returns fallback icon for unknown weatherId', () => {
+        expect(getWeatherIconUrl(999)).toBe('/icons/unknown.svg')
+    })
+
+    it('returns fallback icon when weatherId is undefined', () => {
+        expect(getWeatherIconUrl(undefined)).toBe('/icons/unknown.svg')
+    })
+
+    it('returns fallback icon when weatherId is null', () => {
+        expect(getWeatherIconUrl(null as unknown as number)).toBe('/icons/unknown.svg')
     })
 })

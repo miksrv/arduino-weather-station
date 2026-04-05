@@ -66,13 +66,25 @@ const weatherIconsMapping: { [key: number]: string } = {
 }
 
 interface WeatherIconProps {
-    weatherId: number
+    weatherId?: number
     date?: string
     width?: number
     height?: number
 }
 
-export const getWeatherIconUrl = (weatherId: number, date?: string): string => {
+const FALLBACK_ICON = '/icons/unknown.svg'
+
+export const getWeatherIconUrl = (weatherId?: number, date?: string): string => {
+    if (weatherId == null) {
+        return FALLBACK_ICON
+    }
+
+    const name = weatherIconsMapping[weatherId]
+
+    if (!name) {
+        return FALLBACK_ICON
+    }
+
     const isDayTime = (date: string): boolean => {
         const hours = getDate(date).hour()
 
@@ -82,7 +94,6 @@ export const getWeatherIconUrl = (weatherId: number, date?: string): string => {
     // Here are weather conditions that are not divided into day and night
     const withoutDayIcon = ['hurricane', 'thunderstorm']
 
-    const name = weatherIconsMapping[weatherId]
     const time = !date || withoutDayIcon.includes(name) ? '' : isDayTime(date) ? '-day' : '-night'
 
     return `/icons/${name}${time}.svg`
