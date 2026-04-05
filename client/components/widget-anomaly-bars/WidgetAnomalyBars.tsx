@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import { EChartsOption } from 'echarts'
+import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
 import ReactECharts from 'echarts-for-react'
 import { Skeleton } from 'simple-react-ui-kit'
 
@@ -64,19 +65,15 @@ const WidgetAnomalyBars: React.FC<WidgetAnomalyBarsProps> = ({ data, baselineAvg
             tooltip: {
                 backgroundColor,
                 borderColor,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                formatter: (params: any) => {
-                    const arr = Array.isArray(params) ? params : [params]
+                formatter: (params: TopLevelFormatterParams) => {
+                    const arr: CallbackDataParams[] = Array.isArray(params) ? params : [params]
                     const header = `<div class="${styles.chartTooltipTitle}">${years[arr[0].dataIndex] ?? ''}</div>`
                     const rows = arr
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        .map((item: any) => {
-                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                            const dot = `<span class="${styles.icon}" style="background-color:${item.color ?? item.borderColor};"></span>`
-                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                            const val = `<span class="${styles.value}">${item.value != null ? `${item.value > 0 ? '+' : ''}${item.value}°C` : '---'}</span>`
-                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                            return `<div class="${styles.chartTooltipItem}">${dot}<span class="${styles.label}">${item.seriesName}${val}</span></div>`
+                        .map((item: CallbackDataParams) => {
+                            const dot = `<span class="${styles.icon}" style="background-color:${String(item.color ?? item.borderColor ?? '')};"></span>`
+                            const numVal = item.value as number | null
+                            const val = `<span class="${styles.value}">${numVal != null ? `${numVal > 0 ? '+' : ''}${numVal}°C` : '---'}</span>`
+                            return `<div class="${styles.chartTooltipItem}">${dot}<span class="${styles.label}">${item.seriesName ?? ''}${val}</span></div>`
                         })
                         .join('')
                     return header + rows
