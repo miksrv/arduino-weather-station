@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import { EChartsOption } from 'echarts'
+import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
 import ReactECharts from 'echarts-for-react'
 import { Skeleton } from 'simple-react-ui-kit'
 
@@ -45,22 +46,19 @@ const WidgetPrecipChart: React.FC<WidgetPrecipChartProps> = ({ loading, monthlyT
                 trigger: 'axis',
                 backgroundColor,
                 borderColor,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                formatter: (params: any) => {
+                formatter: (params: TopLevelFormatterParams) => {
+                    const arr: CallbackDataParams[] = Array.isArray(params) ? params : [params]
                     const tooltipContent: string[] = []
 
-                    if (params.length > 0) {
-                        const monthName = params[0].name as string
+                    if (arr.length > 0) {
+                        const monthName = String(arr[0].name ?? '')
                         const header = `<div class="${styles.chartTooltipTitle}">${monthName}</div>`
                         tooltipContent.push(header)
                     }
 
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    params.forEach((item: any) => {
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        const colorSquare = `<span class="${styles.icon}" style="background-color: ${item.color};"></span>`
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        const seriesValue = `<span class="${styles.value}">${item.value ?? '---'} ${t('millimeters')}</span>`
+                    arr.forEach((item: CallbackDataParams) => {
+                        const colorSquare = `<span class="${styles.icon}" style="background-color: ${String(item.color ?? '')};"></span>`
+                        const seriesValue = `<span class="${styles.value}">${String(item.value ?? '---')} ${t('millimeters')}</span>`
                         const seriesName = `<span class="${styles.label}">${t('precipitation')}${seriesValue}</span>`
 
                         const row = `<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`
