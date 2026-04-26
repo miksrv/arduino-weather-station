@@ -7452,7 +7452,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-react-ui-kit@npm:^1.8.6":
+"simple-react-ui-kit@npm:^1.7.12":
   version: 1.8.6
   resolution: "simple-react-ui-kit@npm:1.8.6"
   dependencies:
@@ -8390,7 +8390,7 @@ __metadata:
     sass: "npm:^1.99.0"
     schema-dts: "npm:^1.1.5"
     sharp: "npm:^0.34.5"
-    simple-react-ui-kit: "npm:^1.8.6"
+    simple-react-ui-kit: "npm:^1.7.12"
     ts-jest: "npm:^29.4.9"
     ts-node: "npm:^10.9.2"
     typescript: "npm:5.9.3"

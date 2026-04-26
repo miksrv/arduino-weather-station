@@ -40,7 +40,7 @@
         "react-i18next": "^16.6.6",
         "react-redux": "^9.2.0",
         "sharp": "^0.34.5",
-        "simple-react-ui-kit": "^1.8.6"
+        "simple-react-ui-kit": "^1.7.12"
     },
     "devDependencies": {
         "@eslint/compat": "^2.0.5",
