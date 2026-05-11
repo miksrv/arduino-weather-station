@@ -2,7 +2,7 @@
 
 ## Project
 - [project_codebase_patterns.md](project_codebase_patterns.md) — Conventions, patterns and architectural decisions found in the client codebase
-- [knowledge_simple_react_ui_kit_table.md](knowledge_simple_react_ui_kit_table.md) — Table component usage: imports, ColumnProps<T>, formatter(value,data,i) signature, widget wrapping pattern, mock details
+- [knowledge_simple_react_ui_kit_table.md](knowledge_simple_react_ui_kit_table.md) — Table component usage: imports, TableColumnProps<T>, formatter(value,data,i) signature, widget wrapping pattern, mock details
 - [project_seo_patterns.md](project_seo_patterns.md) — SEO implementation: next-seo, DefaultSeo in _app, _document, absolute OG image URLs, per-page NextSeo convention, sitemap, robots.txt
 - [project_tooltip_css_pattern.md](project_tooltip_css_pattern.md) — ECharts tooltip HTML uses styles.value/label/icon via string interpolation — these must be explicitly defined in SASS even though they don't appear as JSX class references
 

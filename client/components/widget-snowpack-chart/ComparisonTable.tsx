@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { cn, ColumnProps, Table } from 'simple-react-ui-kit'
+import { cn, Table, TableColumnProps } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next'
 
@@ -17,7 +17,7 @@ interface ComparisonTableProps {
 export const ComparisonTable: React.FC<ComparisonTableProps> = ({ rows }) => {
     const { t } = useTranslation()
 
-    const columns: Array<ColumnProps<ApiType.Anomaly.SeasonComparison>> = useMemo(
+    const columns: Array<TableColumnProps<ApiType.Anomaly.SeasonComparison>> = useMemo(
         () => [
             {
                 accessor: 'year',

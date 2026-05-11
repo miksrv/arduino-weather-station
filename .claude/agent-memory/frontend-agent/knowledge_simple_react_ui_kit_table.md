@@ -7,17 +7,17 @@ type: project
 ## Import Pattern
 
 ```ts
-import { cn, ColumnProps, Table, TableProps } from 'simple-react-ui-kit'
+import { cn, TableColumnProps, Table, TableProps } from 'simple-react-ui-kit'
 ```
 
 `TableProps` is used when a component needs to extend or forward table props.
 
 ## Column Config with useMemo
 
-Define columns with `ColumnProps<T>[]` and wrap in `useMemo` to avoid recreation on each render:
+Define columns with `TableColumnProps<T>[]` and wrap in `useMemo` to avoid recreation on each render:
 
 ```ts
-const columns: ColumnProps<MyType>[] = useMemo(
+const columns: TableColumnProps<MyType>[] = useMemo(
     () => [
         {
             accessor: 'fieldName',
@@ -88,7 +88,7 @@ return (
 
 ## Row-level Conditional Styling
 
-`ColumnProps` has no row-class callback — `className` is a static `string`. To apply conditional per-row styles, use `formatter` to wrap the cell content in a `<span>` with `cn(condition && styles.myClass)`:
+`TableColumnProps` has no row-class callback — `className` is a static `string`. To apply conditional per-row styles, use `formatter` to wrap the cell content in a `<span>` with `cn(condition && styles.myClass)`:
 
 ```tsx
 formatter: (value, data, i) => (
