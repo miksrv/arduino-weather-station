@@ -5,24 +5,30 @@ namespace App\Models;
 use CodeIgniter\Model;
 
 /**
- * Class ClimateModel
+ * Model for climate statistics computed from the daily_averages table.
  *
- * Computes long-term climate statistics from the daily_averages table.
- * All aggregation is performed server-side to avoid shipping thousands of
- * raw rows to the browser.
+ * All aggregation is performed server-side via raw SQL queries to avoid
+ * shipping thousands of raw rows to the browser. Consumed exclusively by
+ * the Climate controller.
  *
  * @package App\Models
- *
- * Public Methods:
- * - getClimateStats(): array — orchestrates sub-queries and returns the full response array
- *
- * Protected Methods:
- * - _getAnnualStats(): array  — runs the per-year SQL aggregate query
- * - _getMonthlyNormals(): array — runs the per-calendar-month SQL query
  */
 class ClimateModel extends Model
 {
-    protected $table = 'daily_averages';
+    protected $table            = 'daily_averages';
+    protected $primaryKey       = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType       = 'array';
+    protected $useSoftDeletes   = false;
+    protected $allowedFields    = [];
+
+    protected $useTimestamps = false;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+
+    protected $validationRules    = [];
+    protected $validationMessages = [];
+    protected $skipValidation     = false;
 
     /**
      * The earliest year to include in climate statistics.

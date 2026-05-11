@@ -5,37 +5,55 @@ namespace App\Models;
 use CodeIgniter\Model;
 
 /**
- * Class AnomalyLogModel
+ * Model for the anomaly_log table.
  *
- * Manages persistent records of detected meteorological anomaly events
- * in the anomaly_log table. Each row represents a single anomaly episode
- * with an optional end date when the condition resolved.
+ * Manages persistent records of detected meteorological anomaly events.
+ * Each row represents a single anomaly episode with an optional end date
+ * when the condition resolved. Consumed by the Anomaly controller, the
+ * AnomalyModel orchestrator, and the DetectAnomalies / BackfillAnomalyLog
+ * CLI commands.
  *
  * @package App\Models
  */
 class AnomalyLogModel extends Model
 {
-    protected $table         = 'anomaly_log';
-    protected $primaryKey    = 'id';
-    protected $allowedFields = [
+    protected $table            = 'anomaly_log';
+    protected $primaryKey       = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType       = 'array';
+    protected $useSoftDeletes   = false;
+    protected $allowedFields    = [
         'type',
         'start_date',
         'end_date',
         'peak_value',
         'description',
-        'created_at',
-        'updated_at',
     ];
+
     protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+
+    protected $validationRules = [
+        'type'        => 'required|max_length[64]',
+        'start_date'  => 'required|valid_date',
+        'end_date'    => 'permit_empty|valid_date',
+        'peak_value'  => 'permit_empty|decimal',
+        'description' => 'permit_empty|max_length[512]',
+    ];
+
+    protected $validationMessages = [];
+
+    protected $skipValidation = false;
 
     /**
      * Opens a new anomaly episode. Inserts a row with no end_date (still active).
      *
-     * @param string      $type        Anomaly type key (e.g. 'heat_wave')
-     * @param string      $date        Start date in 'Y-m-d' format
-     * @param float|null  $peakValue   Optional peak metric value
-     * @param string|null $description Optional human-readable description
-     * @return int Inserted row ID
+     * @param string      $type        Anomaly type key (e.g. 'heat_wave').
+     * @param string      $date        Start date in 'Y-m-d' format.
+     * @param float|null  $peakValue   Optional peak metric value.
+     * @param string|null $description Optional human-readable description.
+     * @return int Inserted row ID.
      */
     public function openAnomaly(
         string $type,
@@ -43,16 +61,12 @@ class AnomalyLogModel extends Model
         ?float $peakValue = null,
         ?string $description = null
     ): int {
-        $now = date('Y-m-d H:i:s');
-
         $this->insert([
             'type'        => $type,
             'start_date'  => $date,
             'end_date'    => null,
             'peak_value'  => $peakValue,
             'description' => $description,
-            'created_at'  => $now,
-            'updated_at'  => null,
         ]);
 
         return (int) $this->getInsertID();
@@ -86,7 +100,6 @@ class AnomalyLogModel extends Model
         if ($storedPeak === null || abs($newValue) > abs($storedPeak)) {
             $this->update($id, [
                 'peak_value' => round($newValue, 4),
-                'updated_at' => date('Y-m-d H:i:s'),
             ]);
         }
     }
@@ -94,15 +107,14 @@ class AnomalyLogModel extends Model
     /**
      * Closes an open anomaly episode by setting its end_date.
      *
-     * @param int    $id      Row ID to close
-     * @param string $endDate End date in 'Y-m-d' format
+     * @param int    $id      Row ID to close.
+     * @param string $endDate End date in 'Y-m-d' format.
      * @return void
      */
     public function closeAnomaly(int $id, string $endDate): void
     {
         $this->update($id, [
-            'end_date'   => $endDate,
-            'updated_at' => date('Y-m-d H:i:s'),
+            'end_date' => $endDate,
         ]);
     }
 
@@ -122,13 +134,9 @@ class AnomalyLogModel extends Model
 
     /**
      * Returns all anomaly_log rows that were active on the given calendar date:
-     *   start_date <= $date AND (end_date IS NULL OR end_date >= $date)
+     *   start_date <= $date AND (end_date IS NULL OR end_date >= $date).
      *
-     * This is the same predicate used by getCalendarData() for each calendar day,
-     * ensuring that anomaly list consumers can apply the identical "active on date"
-     * definition rather than the narrower "still open" (end_date IS NULL) check.
-     *
-     * @param string $date Date in 'Y-m-d' format
+     * @param string $date Date in 'Y-m-d' format.
      * @return array
      */
     public function getAnomaliesActiveOnDate(string $date): array
@@ -147,7 +155,7 @@ class AnomalyLogModel extends Model
      * Returns the most recent $limit rows (open and closed), ordered by
      * start_date descending.
      *
-     * @param int $limit Maximum number of rows to return
+     * @param int $limit Maximum number of rows to return.
      * @return array
      */
     public function getHistory(int $limit = 50): array
@@ -161,8 +169,8 @@ class AnomalyLogModel extends Model
      * Returns the currently open row for the given anomaly type, or null if
      * no open row exists. Used to prevent duplicate open entries.
      *
-     * @param string $type Anomaly type key
-     * @return array|null Row data or null
+     * @param string $type Anomaly type key.
+     * @return array|null Row data or null.
      */
     public function getOpenByType(string $type): ?array
     {
@@ -178,13 +186,14 @@ class AnomalyLogModel extends Model
      * Returns daily active-anomaly counts for the past $days calendar days.
      *
      * For each date, counts how many anomaly_log rows were active on that date:
-     *   start_date <= date AND (end_date IS NULL OR end_date >= date)
+     *   start_date <= date AND (end_date IS NULL OR end_date >= date).
      *
-     * For today's date, merges current anomaly states from detector with anomaly_log
-     * (anomaly is active if detector says so OR there's an open log record).
+     * For today's date, merges current anomaly states from the detector with
+     * anomaly_log (anomaly is active if detector says so OR there is an open
+     * log record).
      *
-     * @param int   $days          Number of past days to cover
-     * @param array $currentStates Current anomaly states from AnomalyDetector (optional)
+     * @param int   $days          Number of past days to cover.
+     * @param array $currentStates Current anomaly states from AnomalyDetector (optional).
      * @return array Array of ['date' => 'Y-m-d', 'activeCount' => int, 'types' => string[]]
      */
     public function getCalendarData(int $days = 365, array $currentStates = []): array
