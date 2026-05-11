@@ -13,24 +13,16 @@ use Exception;
 /**
  * Class History
  *
- * This class handles the retrieval of historical weather data and provides it in different formats.
+ * Handles retrieval of historical weather data in JSON and CSV formats.
  *
  * @package App\Controllers
- *
- * Public Methods:
- * - getHistoryWeather(): Retrieves and returns historical weather data.
- * - getHistoryWeatherCSV(): Retrieves historical weather data and returns it as a CSV file.
- *
- * Usage:
- * $history = new History();
- * $history->getHistoryWeather();
- * $history->getHistoryWeatherCSV();
  */
-class History extends ResourceController {
+class History extends ResourceController
+{
     /** @var int Cache TTL for recent data requests (1 hour) */
     public const CACHE_TTL_RECENT = 60 * 60;
 
-    /** @var int Cache TTL for purely historical requests (indefinite) */
+    /** @var int Cache TTL for purely historical requests (indefinite — use 0 for no expiry) */
     public const CACHE_TTL_HISTORICAL = 0;
 
     /** @var int Minimum range in hours to enable caching */
@@ -39,10 +31,15 @@ class History extends ResourceController {
     /** @var int Number of days to consider data as "recent" (not fully historical) */
     public const CACHE_RECENT_DAYS_THRESHOLD = 7;
 
+    protected $format = 'json';
+
     protected RawWeatherDataModel $weatherDataModel;
     protected HourlyAveragesModel $hourlyAveragesModel;
-    protected DailyAveragesModel $dailyAveragesModel;
+    protected DailyAveragesModel  $dailyAveragesModel;
 
+    /**
+     * Initialises the raw, hourly, and daily weather data models.
+     */
     public function __construct()
     {
         $this->weatherDataModel    = new RawWeatherDataModel();
@@ -51,7 +48,12 @@ class History extends ResourceController {
     }
 
     /**
-     * Get history weather data
+     * Returns historical weather data for a given date range.
+     *
+     * Query parameters:
+     *   - start_date (required): range start (any strtotime-compatible string)
+     *   - end_date (required): range end (any strtotime-compatible string)
+     *
      * @return ResponseInterface
      * @throws Exception
      */
@@ -65,11 +67,11 @@ class History extends ResourceController {
         $endTimestamp   = strtotime($endDate ?? 'today');
         $rangeHours     = ($endTimestamp - $startTimestamp) / 3600;
 
-        // Disable caching for short ranges (≤48 hours) due to timezone differences
+        // Disable caching for short ranges (≤48 h) due to timezone differences
         if ($rangeHours <= self::CACHE_MIN_RANGE_HOURS) {
             $rawData = $this->_getData();
 
-            if (!is_array($rawData)) {
+            if ($rawData instanceof ResponseInterface) {
                 return $rawData;
             }
 
@@ -87,21 +89,17 @@ class History extends ResourceController {
         if (!is_array($rawData)) {
             $rawData = $this->_getData();
 
-            if (is_array($rawData)) {
-                // Determine cache TTL based on how recent the end date is
-                // If end_date is within the last 7 days, use short TTL (1 hour)
-                // If end_date is older than 7 days ago, cache indefinitely
-                $recentThreshold = strtotime('-' . self::CACHE_RECENT_DAYS_THRESHOLD . ' days');
-                $ttl = $endTimestamp >= $recentThreshold
-                    ? self::CACHE_TTL_RECENT
-                    : self::CACHE_TTL_HISTORICAL;
-
-                cache()->save($cacheKey, $rawData, $ttl);
+            if ($rawData instanceof ResponseInterface) {
+                return $rawData;
             }
-        }
 
-        if (!is_array($rawData)) {
-            return $rawData;
+            // Recent end-dates get a short TTL; purely historical data is cached indefinitely
+            $recentThreshold = strtotime('-' . self::CACHE_RECENT_DAYS_THRESHOLD . ' days');
+            $ttl = $endTimestamp >= $recentThreshold
+                ? self::CACHE_TTL_RECENT
+                : self::CACHE_TTL_HISTORICAL;
+
+            cache()->save($cacheKey, $rawData, $ttl);
         }
 
         $result = [];
@@ -114,27 +112,36 @@ class History extends ResourceController {
     }
 
     /**
-     * Get history weather data as CSV file
+     * Returns historical weather data as a downloadable CSV file.
+     *
+     * Query parameters:
+     *   - start_date (required): range start
+     *   - end_date (required): range end
+     *
      * @return ResponseInterface
      * @throws Exception
      */
     public function getHistoryWeatherCSV(): ResponseInterface
     {
-        // CSV file headers
+        $rawData = $this->_getData();
+
+        if ($rawData instanceof ResponseInterface) {
+            return $rawData;
+        }
+
+        // CSV column headers
         $csvHeader = [
             'UTC Date', 'Temperature', 'Feels Like', 'Pressure', 'Humidity', 'Dew Point',
             'Visibility', 'UV Index', 'Solar Energy', 'Solar Radiation', 'Clouds',
-            'Precipitation', 'Wind Speed', 'Wind Gust', 'Wind Degree'
+            'Precipitation', 'Wind Speed', 'Wind Gust', 'Wind Degree',
         ];
 
-        // Open a temporary stream to write CSV data
+        // Write CSV into a temporary in-memory stream
         $tempFile = fopen('php://temp', 'r+');
 
-        // Write headers to CSV
         fputcsv($tempFile, $csvHeader);
 
-        // Get the data and write each line to CSV
-        foreach ($this->_getData() as $data) {
+        foreach ($rawData as $data) {
             $row = [
                 $data['date'],
                 $data['temperature'],
@@ -150,60 +157,49 @@ class History extends ResourceController {
                 $data['visibility'],
                 $data['wind_speed'],
                 $data['wind_gust'],
-                $data['wind_deg']
+                $data['wind_deg'],
             ];
 
-            // Write the line to CSV
             fputcsv($tempFile, $row);
         }
 
-        // Rewind the stream to the beginning
         rewind($tempFile);
-
-        // Get the CSV contents as a string
         $csvContent = stream_get_contents($tempFile);
-
-        // Close the stream
         fclose($tempFile);
 
-        // Return the file as a response
         return $this->response
             ->setHeader('Content-Type', 'text/csv')
             ->setHeader('Content-Disposition', 'attachment; filename="weather_history.csv"')
             ->setBody($csvContent);
     }
 
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
+
     /**
-     * Retrieves historical weather data based on the provided date range.
+     * Validates request parameters and fetches historical weather data from the
+     * appropriate model, choosing the grouping interval based on the date range.
      *
-     * This method accepts 'start_date' and 'end_date' as query parameters and returns weather data
-     * from the corresponding time period. The data is grouped by different intervals depending on
-     * the duration of the date range.
+     * Grouping rules:
+     *   - ≤1 day  → raw data, 10-minute buckets
+     *   - ≤7 days → hourly averages, 1-hour buckets
+     *   - >7 days → daily averages, 1-day buckets
      *
-     * - If the date range is 24 hours or less, data is grouped by 10 minutes.
-     * - If the range is between 24 hours and 7 days, data is grouped by the hour.
-     * - If the range is more than 7 days, data is grouped by day.
-     *
-     * @return array|ResponseInterface Returns an array of weather data objects or Response in case of validation errors.
-     *
-     * @throws \CodeIgniter\HTTP\Exceptions\HTTPException If any required parameters are missing or invalid.
-     * @throws \CodeIgniter\HTTP\Exceptions\HTTPException If the date is in the future or before 2020-01-01.
+     * @return array|ResponseInterface Data rows on success; error response on validation failure.
      */
-    protected function _getData(): array|ResponseInterface {
+    private function _getData(): array|ResponseInterface
+    {
         $startDate = $this->request->getGet('start_date');
         $endDate   = $this->request->getGet('end_date');
 
-        // Check for the presence of parameters
         if (!$startDate || !$endDate) {
-            return $this->fail('Missing required parameters: start_date or end_date', 400);
+            return $this->failValidationErrors('Missing required parameters: start_date or end_date');
         }
 
-        // Check date validity
-        $currentTimestamp = time();
-        $startTimestamp = strtotime($startDate);
-        $endTimestamp   = strtotime($endDate);
-        $minTimestamp   = strtotime('2020-01-01');
-        // Allow dates up to end of tomorrow to account for timezone differences
+        $startTimestamp      = strtotime($startDate);
+        $endTimestamp        = strtotime($endDate);
+        $minTimestamp        = strtotime('2020-01-01');
         $maxAllowedTimestamp = strtotime('tomorrow 23:59:59');
 
         if ($startTimestamp === false || $endTimestamp === false) {
@@ -222,23 +218,18 @@ class History extends ResourceController {
             return $this->failValidationErrors('Date range cannot exceed 366 days.');
         }
 
-        // Calculating the range
-        $dateDiff  = ($endTimestamp - $startTimestamp) / (60 * 60 * 24); // difference in days
-        $startDate = date('Y-m-d 00:00:00', strtotime($startDate));
-        $endDate   = date('Y-m-d 23:59:59', strtotime($endDate));
+        $dateDiff  = ($endTimestamp - $startTimestamp) / (60 * 60 * 24);
+        $startDate = date('Y-m-d 00:00:00', $startTimestamp);
+        $endDate   = date('Y-m-d 23:59:59', $endTimestamp);
 
-        // Selecting a model and grouping
         if ($dateDiff <= 1) {
-            // 24 hour range - RawWeatherDataModel (grouped by 10 minutes)
-            $historyData = $this->weatherDataModel->getWeatherHistoryGrouped($startDate, $endDate, '10 MINUTE');
-        } elseif ($dateDiff <= 7) {
-            // Range from 24 hours to 7 days - Hourly Average Model (grouped by hour)
-            $historyData = $this->hourlyAveragesModel->getWeatherHistoryGrouped($startDate, $endDate, '1 HOUR');
-        } else {
-            // Range from 7 days (grouped by day)
-            $historyData = $this->dailyAveragesModel->getWeatherHistoryGrouped($startDate, $endDate, '1 DAY');
+            return $this->weatherDataModel->getWeatherHistoryGrouped($startDate, $endDate, '10 MINUTE');
         }
 
-        return $historyData;
+        if ($dateDiff <= 7) {
+            return $this->hourlyAveragesModel->getWeatherHistoryGrouped($startDate, $endDate, '1 HOUR');
+        }
+
+        return $this->dailyAveragesModel->getWeatherHistoryGrouped($startDate, $endDate, '1 DAY');
     }
 }
