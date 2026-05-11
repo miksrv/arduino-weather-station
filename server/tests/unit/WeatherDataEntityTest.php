@@ -69,16 +69,24 @@ final class WeatherDataEntityTest extends CIUnitTestCase
     }
 
     /**
-     * Casts are configured for all expected fields.
+     * Casts are configured for all expected non-date fields.
+     *
+     * 'date' is intentionally absent from $casts — it is handled exclusively
+     * by the $dates array, which triggers CI4's mutateDate() on read.
+     * Nullable casts ('?integer', '?float') are used for all nullable columns
+     * so that NULL values from the database are preserved rather than coerced.
      */
     public function testCastsConfigurationIsCorrect(): void
     {
         $entity = new WeatherDataEntity();
         $casts  = $this->getPrivateProperty($entity, 'casts');
 
+        // date is managed by $dates, not $casts — must not appear here
+        $this->assertArrayNotHasKey('date', $casts);
+
+        // Required cast keys
         $this->assertArrayHasKey('id',            $casts);
         $this->assertArrayHasKey('source',        $casts);
-        $this->assertArrayHasKey('date',          $casts);
         $this->assertArrayHasKey('temperature',   $casts);
         $this->assertArrayHasKey('feels_like',    $casts);
         $this->assertArrayHasKey('pressure',      $casts);
@@ -89,15 +97,15 @@ final class WeatherDataEntityTest extends CIUnitTestCase
         $this->assertArrayHasKey('wind_gust',     $casts);
         $this->assertArrayHasKey('weather_id',    $casts);
 
-        $this->assertSame('integer',  $casts['id']);
+        // Nullable variants for numeric columns; plain string for non-nullable
+        $this->assertSame('?integer', $casts['id']);
         $this->assertSame('string',   $casts['source']);
-        $this->assertSame('datetime', $casts['date']);
-        $this->assertSame('float',    $casts['temperature']);
-        $this->assertSame('integer',  $casts['pressure']);
+        $this->assertSame('?float',   $casts['temperature']);
+        $this->assertSame('?integer', $casts['pressure']);
     }
 
     /**
-     * The $dates property declares 'date' for datetime handling.
+     * The $dates property declares 'date' for automatic Time-instance conversion.
      */
     public function testDatesPropertyContainsDate(): void
     {

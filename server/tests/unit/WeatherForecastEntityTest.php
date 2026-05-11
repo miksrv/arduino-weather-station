@@ -39,7 +39,7 @@ final class WeatherForecastEntityTest extends CIUnitTestCase
     }
 
     /**
-     * The $dates property declares 'forecast_time' for datetime handling.
+     * The $dates property declares 'forecast_time' for automatic Time-instance conversion.
      */
     public function testDatesPropertyContainsForecastTime(): void
     {
@@ -50,19 +50,71 @@ final class WeatherForecastEntityTest extends CIUnitTestCase
     }
 
     /**
-     * Casts contain forecast_time as datetime.
+     * forecast_time is managed by $dates, not $casts.
+     *
+     * Fields listed in $dates trigger CI4's mutateDate() automatically on read.
+     * Duplicating them in $casts with a 'datetime' cast is redundant and
+     * can cause double-processing; the cast is intentionally absent.
      */
-    public function testCastsIncludeForecastTime(): void
+    public function testCastsDoNotIncludeForecastTime(): void
     {
         $entity = new WeatherForecastEntity();
         $casts  = $this->getPrivateProperty($entity, 'casts');
 
-        $this->assertArrayHasKey('forecast_time', $casts);
-        $this->assertSame('datetime', $casts['forecast_time']);
+        $this->assertArrayNotHasKey('forecast_time', $casts);
     }
 
     /**
-     * All expected attributes keys are present.
+     * Casts use nullable variants for all numeric columns.
+     *
+     * Nullable casts ('?integer', '?float') preserve NULL values from the
+     * database rather than coercing them to 0, which is correct for optional
+     * sensor / API fields.
+     */
+    public function testCastsUseNullableVariantsForNumericColumns(): void
+    {
+        $entity = new WeatherForecastEntity();
+        $casts  = $this->getPrivateProperty($entity, 'casts');
+
+        $this->assertArrayHasKey('id',          $casts);
+        $this->assertArrayHasKey('temperature', $casts);
+        $this->assertArrayHasKey('pressure',    $casts);
+        $this->assertArrayHasKey('clouds',      $casts);
+        $this->assertArrayHasKey('wind_deg',    $casts);
+        $this->assertArrayHasKey('weather_id',  $casts);
+
+        $this->assertSame('?integer', $casts['id']);
+        $this->assertSame('?float',   $casts['temperature']);
+        $this->assertSame('?integer', $casts['pressure']);
+        $this->assertSame('?integer', $casts['clouds']);
+        $this->assertSame('?integer', $casts['wind_deg']);
+        $this->assertSame('?integer', $casts['weather_id']);
+    }
+
+    /**
+     * The $datamap maps camelCase forecastTime alias and all shared snake_case field aliases.
+     */
+    public function testDatamapContainsForecastTimeAndSharedAliases(): void
+    {
+        $entity  = new WeatherForecastEntity();
+        $datamap = $this->getPrivateProperty($entity, 'datamap');
+
+        $this->assertArrayHasKey('forecastTime',  $datamap);
+        $this->assertSame('forecast_time', $datamap['forecastTime']);
+
+        $this->assertArrayHasKey('feelsLike',    $datamap);
+        $this->assertArrayHasKey('dewPoint',     $datamap);
+        $this->assertArrayHasKey('uvIndex',      $datamap);
+        $this->assertArrayHasKey('solEnergy',    $datamap);
+        $this->assertArrayHasKey('solRadiation', $datamap);
+        $this->assertArrayHasKey('windSpeed',    $datamap);
+        $this->assertArrayHasKey('windDeg',      $datamap);
+        $this->assertArrayHasKey('windGust',     $datamap);
+        $this->assertArrayHasKey('weatherId',    $datamap);
+    }
+
+    /**
+     * All expected attribute keys are present in $attributes.
      */
     public function testAttributesKeysAreComplete(): void
     {
