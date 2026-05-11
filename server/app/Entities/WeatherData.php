@@ -2,9 +2,9 @@
 
 namespace App\Entities;
 
-use Exception;
-
 /**
+ * Weather condition code groups (OpenWeatherMap):
+ *
  * Group 2xx: Thunderstorm
  * 200 => 'Thunderstorm with light rain',
  * 201 => 'Thunderstorm with rain',
@@ -75,76 +75,70 @@ use Exception;
  * 804 => 'Overcast clouds: 85-100%',
  */
 
- /**
-  * Class WeatherData
-  *
-  * This class represents formatted weather data retrieved from the database. It is used solely for displaying weather data, not for setting or modifying it.
-  *
-  * @package App\Entities
-  *
-  * Properties:
-  * - float|null $temperature: The temperature value.
-  * - float|null $feelsLike: The feels-like temperature value.
-  * - int|null $pressure: The atmospheric pressure value.
-  * - int|null $humidity: The humidity percentage.
-  * - float|null $dewPoint: The dew point temperature.
-  * - int|null $visibility: The visibility distance.
-  * - float|null $uvIndex: The UV index value.
-  * - float|null $solEnergy: The solar energy value.
-  * - float|null $solRadiation: The solar radiation value.
-  * - int|null $clouds: The cloudiness percentage.
-  * - float|null $precipitation: The precipitation amount.
-  * - float|null $windSpeed: The wind speed value.
-  * - float|null $windGust: The wind gust speed value.
-  * - int|null $windDeg: The wind direction in degrees.
-  * - int|null $weatherId: The weather condition ID.
-  * - string|null $date: The date of the weather data.
-  *
-  * Usage:
-  * $weatherData = new WeatherData($dataArray);
-  * echo $weatherData->temperature;
-  */
+/**
+ * Read-only DTO that holds a single weather observation for API output.
+ *
+ * This is intentionally a plain PHP class, NOT a CodeIgniter Entity, because it
+ * is populated from raw aggregation arrays (getResultArray / getRowArray) that
+ * are not backed by a single model's returnType. It is used exclusively for
+ * outbound JSON/text serialisation; it never writes to the database.
+ *
+ * @package App\Entities
+ */
 class WeatherData
 {
-    public ?float $temperature;
-    public ?float $feelsLike;
-    public ?int $pressure;
-    public ?int $humidity;
-    public ?float $dewPoint;
-    public ?int $visibility;
-    public ?float $uvIndex;
-    public ?float $solEnergy;
-    public ?float $solRadiation;
-    public ?int $clouds;
-    public ?float $precipitation;
-    public ?float $windSpeed;
-    public ?float $windGust;
-    public ?int $windDeg;
-    public ?int $weatherId;
+    public ?float  $temperature;
+    public ?float  $feelsLike;
+    public ?int    $pressure;
+    public ?int    $humidity;
+    public ?float  $dewPoint;
+    public ?int    $visibility;
+    public ?float  $uvIndex;
+    public ?float  $solEnergy;
+    public ?float  $solRadiation;
+    public ?int    $clouds;
+    public ?float  $precipitation;
+    public ?float  $windSpeed;
+    public ?float  $windGust;
+    public ?int    $windDeg;
+    public ?int    $weatherId;
     public ?string $date;
 
     /**
-     * @throws Exception
+     * Hydrates the DTO from an associative array of snake_case or camelCase keys.
+     *
+     * If the `date` value is a CodeIgniter Time / DateTime instance it is
+     * converted to a Y-m-d H:i:s string automatically.
+     *
+     * @param array $data Associative array of weather field values.
      */
     public function __construct(array $data)
     {
-        // Initialize class properties based on data from an array
         foreach ($data as $key => $value) {
-            $property = $this->camelCase($key); // Convert the array key to camelCase
-            if (property_exists($this, $property)) {
-                if ($value !== null) {
-                    $this->$property = $value;
-                }
+            $property = $this->_toCamelCase($key);
+
+            if (property_exists($this, $property) && $value !== null) {
+                $this->$property = $value;
             }
         }
 
+        // Normalise date: convert Time/DateTime instances to a plain string.
         if (!empty($data['date']) && !is_string($data['date'])) {
-            $this->date = $data['date']?->toDateTimeString();
+            $this->date = $data['date']->toDateTimeString();
         }
     }
 
-    // Method to convert a string with underscores to camelCase
-    private function camelCase(string $string): string
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * Converts a snake_case string to camelCase for property resolution.
+     *
+     * @param string $string Input string, e.g. 'feels_like'.
+     * @return string camelCase equivalent, e.g. 'feelsLike'.
+     */
+    private function _toCamelCase(string $string): string
     {
         return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $string))));
     }
