@@ -5,27 +5,35 @@ namespace App\Controllers;
 use App\Models\ClimateModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
+use Exception;
 
 /**
  * Class Climate
  *
- * REST controller for the long-term climate change visualizations feature.
+ * REST controller for long-term climate change visualisations.
  * Returns pre-aggregated climate statistics computed from daily_averages,
  * covering all available years.
  *
  * @package App\Controllers
- *
- * Public Methods:
- * - index(): GET /climate — full climate statistics (years, monthly normals, baseline)
  */
 class Climate extends ResourceController
 {
-    /** @var int Cache TTL in seconds — 0 = indefinite (data changes at most once per year) */
-    public const CACHE_TTL = 24 * 60 * 60; // 24 hours
+    /** @var int Cache TTL in seconds (24 hours — data changes at most once per day) */
+    public const CACHE_TTL = 24 * 60 * 60;
+
+    protected $format = 'json';
+
+    protected ClimateModel $climateModel;
 
     /**
-     * GET /climate
-     *
+     * Initialises the climate model.
+     */
+    public function __construct()
+    {
+        $this->climateModel = new ClimateModel();
+    }
+
+    /**
      * Returns pre-aggregated climate statistics across all available years and months.
      *
      * Response shape:
@@ -61,13 +69,12 @@ class Climate extends ResourceController
         }
 
         try {
-            $model    = new ClimateModel();
-            $response = $model->getClimateStats();
+            $response = $this->climateModel->getClimateStats();
 
             cache()->save($cacheKey, $response, self::CACHE_TTL);
 
             return $this->respond($response);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             log_message('error', 'Climate::index error: ' . $e->getMessage());
             return $this->failServerError('An error occurred while retrieving climate data.');
         }
