@@ -6,29 +6,25 @@ use App\Entities\WeatherDataEntity;
 use CodeIgniter\Model;
 
 /**
- * Class HourlyAveragesModel
+ * Model for the hourly_averages table.
  *
- * This class represents the model for hourly weather averages, providing methods to interact with the database.
+ * Stores pre-computed hourly weather aggregates derived from raw_weather_data.
+ * Consumed by the History controller (date ranges ≤7 days) and the
+ * GetCurrentWeather / BackfillAnomalyLog / DetectAnomalies commands.
  *
  * @package App\Models
- *
- * Public Methods:
- * - getWeatherHistoryGrouped($startDate, $endDate, $groupInterval): Retrieves and returns weather history data grouped by a specified interval.
- *
- * Usage:
- * $hourlyAveragesModel = new HourlyAveragesModel();
- * $data = $hourlyAveragesModel->getWeatherHistoryGrouped('2023-01-01', '2023-01-31', '1 hour');
  */
 class HourlyAveragesModel extends Model
 {
     /** @var string[] Allowed interval strings for GROUP BY calculations */
     private const ALLOWED_INTERVALS = ['10 MINUTE', '1 HOUR', '1 DAY'];
 
-    protected $table         = 'hourly_averages';
-    protected $primaryKey    = 'id';
-    protected $useTimestamps = false;
-    protected $returnType    = WeatherDataEntity::class;
-    protected $allowedFields = [
+    protected $table            = 'hourly_averages';
+    protected $primaryKey       = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType       = WeatherDataEntity::class;
+    protected $useSoftDeletes   = false;
+    protected $allowedFields    = [
         'date',
         'temperature',
         'feels_like',
@@ -44,8 +40,12 @@ class HourlyAveragesModel extends Model
         'wind_speed',
         'wind_deg',
         'wind_gust',
-        'weather_id'
+        'weather_id',
     ];
+
+    protected $useTimestamps = false;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
 
     protected $validationRules = [
         'date'          => 'required|valid_date',
@@ -63,39 +63,23 @@ class HourlyAveragesModel extends Model
         'wind_speed'    => 'permit_empty|decimal',
         'wind_deg'      => 'permit_empty|decimal',
         'wind_gust'     => 'permit_empty|decimal',
-        'weather_id'    => 'permit_empty|integer'
+        'weather_id'    => 'permit_empty|integer',
     ];
 
-    protected $validationMessages = [
+    protected $validationMessages = [];
 
-    ];
-
-    protected array $casts = [
-        'date'          => 'datetime',
-        'temperature'   => '?float',
-        'feels_like'    => '?float',
-        'pressure'      => '?float',
-        'humidity'      => '?float',
-        'dew_point'     => '?float',
-        'uv_index'      => '?float',
-        'sol_energy'    => '?float',
-        'sol_radiation' => '?float',
-        'precipitation' => '?float',
-        'clouds'        => '?float',
-        'visibility'    => '?float',
-        'wind_speed'    => '?float',
-        'wind_deg'      => '?float',
-        'wind_gust'     => '?float',
-        'weather_id'    => '?int'
-    ];
+    protected $skipValidation = false;
 
     /**
-     * @param $startDate
-     * @param $endDate
-     * @param $groupInterval
-     * @return array
+     * Returns hourly-grouped weather history rows within the given date range.
+     *
+     * @param string $startDate     Start of the date range (Y-m-d H:i:s).
+     * @param string $endDate       End of the date range (Y-m-d H:i:s).
+     * @param string $groupInterval Grouping interval — one of '10 MINUTE', '1 HOUR', '1 DAY'.
+     * @return array Rows of grouped weather data.
+     * @throws \InvalidArgumentException When $groupInterval is not in the allowed list.
      */
-    public function getWeatherHistoryGrouped($startDate, $endDate, $groupInterval): array
+    public function getWeatherHistoryGrouped(string $startDate, string $endDate, string $groupInterval): array
     {
         if (!in_array(strtoupper($groupInterval), self::ALLOWED_INTERVALS, true)) {
             throw new \InvalidArgumentException('Invalid groupInterval value: ' . $groupInterval);

@@ -28,10 +28,20 @@ use DateTime;
  */
 class PrecipitationModel extends Model
 {
-    protected $table         = 'daily_averages';
-    protected $primaryKey    = 'id';
+    protected $table            = 'daily_averages';
+    protected $primaryKey       = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType       = 'array';
+    protected $useSoftDeletes   = false;
+    protected $allowedFields    = [];
+
     protected $useTimestamps = false;
-    protected $returnType    = 'array';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+
+    protected $validationRules    = [];
+    protected $validationMessages = [];
+    protected $skipValidation     = false;
 
     /**
      * Returns the daily precipitation totals for the given year.
