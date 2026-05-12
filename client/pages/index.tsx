@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
-import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { NextSeo } from 'next-seo'
+import Head from 'next/head'
+import { useTranslation } from 'next-i18next/pages'
+import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations'
+import { generateNextSeo } from 'next-seo/pages'
 
 import { API, ApiModel, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
@@ -77,29 +78,31 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
     return (
         <AppLayout>
-            <NextSeo
-                title={t('weather-orenburg-now', { date: formatDate(current?.date ?? new Date()) })}
-                description={t('main-page-description')}
-                canonical={process.env.NEXT_PUBLIC_SITE_LINK}
-                openGraph={{
-                    description: t('site-description'),
-                    images: [
-                        {
-                            height: 1642,
-                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/main.jpg`,
-                            width: 2032
-                        }
-                    ],
-                    locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
-                    siteName: t('weather-in-orenburg'),
-                    title: t('weather-in-orenburg'),
-                    type: 'website',
-                    url: process.env.NEXT_PUBLIC_SITE_LINK
-                }}
-                twitter={{
-                    cardType: 'summary_large_image'
-                }}
-            />
+            <Head>
+                {generateNextSeo({
+                    title: t('weather-orenburg-now', { date: formatDate(current?.date ?? new Date()) }),
+                    description: t('main-page-description'),
+                    canonical: process.env.NEXT_PUBLIC_SITE_LINK,
+                    openGraph: {
+                        description: t('site-description'),
+                        images: [
+                            {
+                                height: 1642,
+                                url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/main.jpg`,
+                                width: 2032
+                            }
+                        ],
+                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
+                        siteName: t('weather-in-orenburg'),
+                        title: t('weather-in-orenburg'),
+                        type: 'website',
+                        url: process.env.NEXT_PUBLIC_SITE_LINK
+                    },
+                    twitter: {
+                        cardType: 'summary_large_image'
+                    }
+                })}
+            </Head>
 
             <div className={'widgets-list'}>
                 <WidgetSummary

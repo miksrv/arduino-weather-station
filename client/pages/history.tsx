@@ -2,9 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Button, DatePicker, Spinner } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
-import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { NextSeo } from 'next-seo'
+import Head from 'next/head'
+import { useTranslation } from 'next-i18next/pages'
+import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations'
+import { generateNextSeo } from 'next-seo/pages'
 
 import { API, ApiType, setLocale } from '@/api'
 import { urlAPI } from '@/api/api'
@@ -47,29 +48,31 @@ const HistoryPage: NextPage<object> = () => {
 
     return (
         <AppLayout>
-            <NextSeo
-                title={t('historical-weather-data')}
-                description={t('history-page-description')}
-                canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/history`}
-                openGraph={{
-                    description: t('history-page-description'),
-                    images: [
-                        {
-                            height: 1292,
-                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/history.jpg`,
-                            width: 2028
-                        }
-                    ],
-                    locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
-                    siteName: t('weather-in-orenburg'),
+            <Head>
+                {generateNextSeo({
                     title: t('historical-weather-data'),
-                    type: 'website',
-                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/history`
-                }}
-                twitter={{
-                    cardType: 'summary_large_image'
-                }}
-            />
+                    description: t('history-page-description'),
+                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/history`,
+                    openGraph: {
+                        description: t('history-page-description'),
+                        images: [
+                            {
+                                height: 1292,
+                                url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/history.jpg`,
+                                width: 2028
+                            }
+                        ],
+                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
+                        siteName: t('weather-in-orenburg'),
+                        title: t('historical-weather-data'),
+                        type: 'website',
+                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/history`
+                    },
+                    twitter: {
+                        cardType: 'summary_large_image'
+                    }
+                })}
+            </Head>
 
             <div className={'toolbar'}>
                 <DatePicker
