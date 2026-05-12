@@ -4,7 +4,7 @@ import { CustomSeriesRenderItemReturn } from 'echarts/types/dist/echarts'
 import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
 import ReactECharts from 'echarts-for-react'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
 import { ApiModel } from '@/api'
