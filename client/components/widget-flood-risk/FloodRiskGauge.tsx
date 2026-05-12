@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { EChartsOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 
 import { ApiType } from '@/api'
 import { getEChartBaseConfig } from '@/tools'

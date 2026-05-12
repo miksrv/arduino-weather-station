@@ -1,7 +1,7 @@
 import React from 'react'
 import { cn, Skeleton } from 'simple-react-ui-kit'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
 import { ApiType } from '@/api'

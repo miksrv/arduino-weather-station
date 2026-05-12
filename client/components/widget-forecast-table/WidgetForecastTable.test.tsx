@@ -8,7 +8,7 @@ import '@testing-library/jest-dom'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock('next/link', () => (props: any) => <a {...props} />)
-jest.mock('next-i18next', () => ({
+jest.mock('next-i18next/pages', () => ({
     useTranslation: () => ({
         t: (key: string) => key
     })
