@@ -3,7 +3,7 @@ import { setCookie } from 'cookies-next'
 import { cn } from 'simple-react-ui-kit'
 
 import { useRouter } from 'next/router'
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 
 import { setLocale } from '@/api'
 import { useAppDispatch } from '@/api/store'

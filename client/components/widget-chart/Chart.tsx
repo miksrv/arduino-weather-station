@@ -3,7 +3,7 @@ import { EChartsOption, SeriesOption } from 'echarts'
 import { CallbackDataParams, TopLevelFormatterParams, YAXisOption } from 'echarts/types/dist/shared'
 import ReactECharts from 'echarts-for-react'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
 import { ApiModel } from '@/api'
