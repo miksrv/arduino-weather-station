@@ -20,7 +20,7 @@ jest.mock('@/tools/hooks/useClientOnly', () => jest.fn())
 jest.mock('next-themes', () => ({
     useTheme: jest.fn()
 }))
-jest.mock('next-i18next', () => ({
+jest.mock('next-i18next/pages', () => ({
     useTranslation: () => ({ t: (key: string) => key })
 }))
 jest.mock('@/ui/theme-switcher', () => () => <div data-testid='theme-switcher' />)
