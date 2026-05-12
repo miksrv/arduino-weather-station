@@ -2,7 +2,7 @@ import React from 'react'
 import { cn, Icon, IconTypes, Skeleton } from 'simple-react-ui-kit'
 
 import Link from 'next/link'
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 
 import { formatDate } from '@/tools/date'
 import { isMinMaxEmpty, MinMaxResult } from '@/tools/weather'

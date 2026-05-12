@@ -10,8 +10,8 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import Script from 'next/script'
 // import { useReportWebVitals } from 'next/web-vitals'
-import { appWithTranslation, useTranslation } from 'next-i18next'
-import { DefaultSeo } from 'next-seo'
+import { appWithTranslation, useTranslation } from 'next-i18next/pages'
+import { generateDefaultSeo } from 'next-seo/pages'
 import { ThemeProvider } from 'next-themes'
 
 import { wrapper } from '@/api/store'
@@ -91,16 +91,16 @@ const App = ({ Component, pageProps }: AppProps) => {
 
     return (
         <ThemeProvider defaultTheme={'dark'}>
-            <DefaultSeo
-                openGraph={{
-                    siteName: 'Meteo Orenburg',
-                    type: 'website'
-                }}
-                twitter={{
-                    cardType: 'summary_large_image'
-                }}
-            />
             <Head>
+                {generateDefaultSeo({
+                    openGraph: {
+                        siteName: 'Meteo Orenburg',
+                        type: 'website'
+                    },
+                    twitter: {
+                        cardType: 'summary_large_image'
+                    }
+                })}
                 <meta
                     name={'mobile-web-app-capable'}
                     content={'yes'}

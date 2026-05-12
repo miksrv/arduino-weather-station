@@ -1,14 +1,21 @@
 ---
 name: SEO patterns and conventions
-description: How SEO is implemented across the Next.js client — next-seo, _document, OG images, sitemap, robots
+description: How SEO is implemented across the Next.js client — next-seo v7, _document, OG images, sitemap, robots
 type: project
 ---
 
 ## SEO implementation
 
-- `next-seo` v6 is installed. Each page uses `<NextSeo>` from `next-seo`.
-- Global fallback is `<DefaultSeo>` in `_app.tsx` — sets `openGraph.siteName`, `twitter.cardType`.
-- `_document.tsx` exists (created during SEO audit). Plain `<Html>` with no `lang` prop — the Next.js i18n router automatically sets `lang` from the active locale (`ru`/`en`).
+- `next-seo` v7 is installed. **Breaking change from v6**: `NextSeo` and `DefaultSeo` components are gone.
+- Each page uses `generateNextSeo({...})` from `next-seo/pages` inside `<Head>`:
+  ```tsx
+  import Head from 'next/head'
+  import { generateNextSeo } from 'next-seo/pages'
+  // ...
+  <Head>{generateNextSeo({ title: ..., description: ..., canonical: ..., openGraph: {...}, twitter: {...} })}</Head>
+  ```
+- Global fallback is `generateDefaultSeo({...})` from `next-seo/pages` inside `<Head>` in `_app.tsx` — sets `openGraph.siteName`, `twitter.cardType`.
+- `_document.tsx` exists. Plain `<Html>` with no `lang` prop — the Next.js i18n router automatically sets `lang`.
 - Default locale is `ru`; English is also supported.
 
 ## OG images
@@ -18,7 +25,7 @@ type: project
 - Available OG images in `public/images/`: `main.jpg`, `sensors.jpg`, `history.jpg`, `heatmap.jpg`, `forecast.jpg`.
 - Pages without an image (`anomaly`, `precipitation`) skip the `openGraph.images` array.
 
-## Per-page NextSeo convention
+## Per-page generateNextSeo convention
 
 - `title`: page-specific translated key
 - `description`: page-specific translated key (not the generic `site-description`)
@@ -30,7 +37,7 @@ type: project
 
 ## 404 page
 
-`[...not-found].tsx` uses `noindex={true}` on `<NextSeo>` to prevent indexing.
+`[...not-found].tsx` uses `noindex: true` in `generateNextSeo({...})` to prevent indexing.
 No `canonical` is set on the 404 page.
 
 ## Sitemap

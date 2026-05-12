@@ -14,7 +14,7 @@ module.exports = {
     Table: (props) =>
         React.createElement('table', { 'data-testid': 'table', ...props }),
     TableProps: {},
-    ColumnProps: {},
+    TableColumnProps: {},
     Skeleton: ({ style }) =>
         React.createElement('div', { 'data-testid': 'skeleton', style }),
     Spinner: () =>

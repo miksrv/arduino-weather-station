@@ -6,7 +6,7 @@ import WidgetSensor from './WidgetSensor'
 
 import '@testing-library/jest-dom'
 
-jest.mock('next-i18next', () => ({
+jest.mock('next-i18next/pages', () => ({
     useTranslation: () => ({ t: (key: string) => key })
 }))
 jest.mock('next/link', () => ({ children, href, ...rest }: React.PropsWithChildren<{ href: string }>) => (

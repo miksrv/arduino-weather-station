@@ -1,9 +1,10 @@
 import React from 'react'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
-import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { NextSeo } from 'next-seo'
+import Head from 'next/head'
+import { useTranslation } from 'next-i18next/pages'
+import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations'
+import { generateNextSeo } from 'next-seo/pages'
 
 import { API, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
@@ -28,29 +29,31 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
     return (
         <AppLayout>
-            <NextSeo
-                title={t('forecast-weather-in-orenburg')}
-                description={t('forecast-page-description')}
-                canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/forecast`}
-                openGraph={{
-                    description: t('forecast-page-description'),
-                    images: [
-                        {
-                            height: 1368,
-                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/forecast.jpg`,
-                            width: 2040
-                        }
-                    ],
-                    locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
-                    siteName: t('weather-in-orenburg'),
+            <Head>
+                {generateNextSeo({
                     title: t('forecast-weather-in-orenburg'),
-                    type: 'website',
-                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/forecast`
-                }}
-                twitter={{
-                    cardType: 'summary_large_image'
-                }}
-            />
+                    description: t('forecast-page-description'),
+                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/forecast`,
+                    openGraph: {
+                        description: t('forecast-page-description'),
+                        images: [
+                            {
+                                height: 1368,
+                                url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/forecast.jpg`,
+                                width: 2040
+                            }
+                        ],
+                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
+                        siteName: t('weather-in-orenburg'),
+                        title: t('forecast-weather-in-orenburg'),
+                        type: 'website',
+                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/forecast`
+                    },
+                    twitter: {
+                        cardType: 'summary_large_image'
+                    }
+                })}
+            </Head>
 
             <div className={'widgets-list'}>
                 <WidgetMeteogram

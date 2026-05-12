@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { cn, Skeleton } from 'simple-react-ui-kit'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 
 import { ApiType } from '@/api'
 import { anomalyTypeToI18nKey } from '@/tools/conditions'

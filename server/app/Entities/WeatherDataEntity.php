@@ -5,38 +5,40 @@ namespace App\Entities;
 use CodeIgniter\Entity\Entity;
 
 /**
- * Class WeatherDataEntity
+ * CI4 Entity for weather observation records persisted to the database.
  *
- * This class is used for setting weather data before saving the current weather values from any source into the database.
+ * Used by RawWeatherDataModel, HourlyAveragesModel, and DailyAveragesModel
+ * (all share the same column set). Handles both reads and writes; callers
+ * use fill() to populate before save().
  *
  * @package App\Entities
  *
- * Properties:
- * - int|null $id: The unique identifier of the weather data record.
- * - string|null $source: The source of the weather data.
- * - \DateTime|null $date: The date and time of the weather data.
- * - float|null $temperature: The temperature value.
- * - float|null $feelsLike: The feels-like temperature value.
- * - int|null $pressure: The atmospheric pressure value.
- * - int|null $humidity: The humidity percentage.
- * - float|null $dewPoint: The dew point temperature.
- * - float|null $uvIndex: The UV index value.
- * - float|null $solEnergy: The solar energy value.
- * - float|null $solRadiation: The solar radiation value.
- * - int|null $clouds: The cloudiness percentage.
- * - float|null $precipitation: The precipitation amount.
- * - int|null $visibility: The visibility distance.
- * - float|null $windSpeed: The wind speed value.
- * - int|null $windDeg: The wind direction in degrees.
- * - float|null $windGust: The wind gust speed value.
- * - int|null $weatherId: The weather condition ID.
- *
- * Usage:
- * $weatherDataEntity = new WeatherDataEntity();
- * $weatherDataEntity->fill($dataArray);
+ * @property int|null    $id
+ * @property string|null $source
+ * @property mixed       $date       Stored as DATETIME; cast to CodeIgniter\I18n\Time on read.
+ * @property float|null  $temperature
+ * @property float|null  $feelsLike  Maps to DB column feels_like.
+ * @property int|null    $pressure
+ * @property int|null    $humidity
+ * @property float|null  $dewPoint   Maps to DB column dew_point.
+ * @property float|null  $uvIndex    Maps to DB column uv_index.
+ * @property float|null  $solEnergy  Maps to DB column sol_energy.
+ * @property float|null  $solRadiation Maps to DB column sol_radiation.
+ * @property int|null    $clouds
+ * @property float|null  $precipitation
+ * @property int|null    $visibility
+ * @property float|null  $windSpeed  Maps to DB column wind_speed.
+ * @property int|null    $windDeg    Maps to DB column wind_deg.
+ * @property float|null  $windGust   Maps to DB column wind_gust.
+ * @property int|null    $weatherId  Maps to DB column weather_id.
  */
 class WeatherDataEntity extends Entity
 {
+    /**
+     * Default values for all mapped database columns.
+     * Keys must match the actual column names in raw_weather_data,
+     * hourly_averages, and daily_averages.
+     */
     protected $attributes = [
         'id'            => null,
         'source'        => null,
@@ -55,31 +57,45 @@ class WeatherDataEntity extends Entity
         'wind_speed'    => null,
         'wind_deg'      => null,
         'wind_gust'     => null,
-        'weather_id'    => null
+        'weather_id'    => null,
     ];
 
-    protected $dates = ['date'];
+    /**
+     * Type casts applied on get/set for each column.
+     * Numeric columns use nullable variants ('?integer', '?float') so that
+     * NULL values in the database are preserved rather than coerced to 0.
+     */
     protected $casts = [
-        'id'            => 'integer',
+        'id'            => '?integer',
         'source'        => 'string',
-        'date'          => 'datetime',
-        'temperature'   => 'float',
-        'feels_like'    => 'float',
-        'pressure'      => 'integer',
-        'humidity'      => 'integer',
-        'dew_point'     => 'float',
-        'uv_index'      => 'float',
-        'sol_energy'    => 'float',
-        'sol_radiation' => 'float',
-        'clouds'        => 'integer',
-        'precipitation' => 'float',
-        'visibility'    => 'integer',
-        'wind_speed'    => 'float',
-        'wind_deg'      => 'integer',
-        'wind_gust'     => 'float',
-        'weather_id'    => 'integer'
+        'temperature'   => '?float',
+        'feels_like'    => '?float',
+        'pressure'      => '?integer',
+        'humidity'      => '?integer',
+        'dew_point'     => '?float',
+        'uv_index'      => '?float',
+        'sol_energy'    => '?float',
+        'sol_radiation' => '?float',
+        'clouds'        => '?integer',
+        'precipitation' => '?float',
+        'visibility'    => '?integer',
+        'wind_speed'    => '?float',
+        'wind_deg'      => '?integer',
+        'wind_gust'     => '?float',
+        'weather_id'    => '?integer',
     ];
 
+    /**
+     * Date/datetime columns that CI4 automatically mutates to Time instances.
+     * These columns must NOT also appear in $casts with a datetime cast to
+     * avoid double-processing; the $dates array takes precedence.
+     */
+    protected $dates = ['date'];
+
+    /**
+     * Maps camelCase property access to snake_case database column names.
+     * Required for columns whose names differ from their PHP property names.
+     */
     protected $datamap = [
         'feelsLike'    => 'feels_like',
         'dewPoint'     => 'dew_point',
@@ -89,6 +105,6 @@ class WeatherDataEntity extends Entity
         'windSpeed'    => 'wind_speed',
         'windDeg'      => 'wind_deg',
         'windGust'     => 'wind_gust',
-        'weatherId'    => 'weather_id'
+        'weatherId'    => 'weather_id',
     ];
 }

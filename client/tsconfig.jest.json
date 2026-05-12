@@ -1,7 +1,9 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-        "jsx": "react-jsx"
+        "jsx": "react-jsx",
+        "rootDir": ".",
+        "ignoreDeprecations": "6.0"
     },
     "include": ["**/*.ts", "**/*.tsx", "global.d.ts"],
     "exclude": ["node_modules"]

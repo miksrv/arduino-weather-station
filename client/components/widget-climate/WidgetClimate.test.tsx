@@ -6,7 +6,7 @@ import WidgetClimate from './WidgetClimate'
 
 import '@testing-library/jest-dom'
 
-jest.mock('next-i18next', () => ({
+jest.mock('next-i18next/pages', () => ({
     useTranslation: () => ({
         t: (key: string, opts?: Record<string, unknown>) => (opts ? `${key}:${JSON.stringify(opts)}` : key)
     })

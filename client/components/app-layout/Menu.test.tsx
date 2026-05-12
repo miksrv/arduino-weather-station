@@ -12,7 +12,7 @@ jest.mock('@/api', () => ({
     }
 }))
 
-jest.mock('next-i18next', () => ({
+jest.mock('next-i18next/pages', () => ({
     useTranslation: () => ({
         t: (key: string) => `t:${key}`
     })

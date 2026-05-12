@@ -11,29 +11,27 @@ use Exception;
 /**
  * Class Forecast
  *
- * This class handles the retrieval of forecast weather data, both daily and hourly.
+ * Handles retrieval of hourly and daily forecast weather data.
  *
  * @package App\Controllers
- *
- * Public Methods:
- * - getForecastDaily(): Retrieves and returns daily forecast weather data.
- * - getForecastHourly(): Retrieves and returns hourly forecast weather data.
- *
- * Usage:
- * $forecast = new Forecast();
- * $forecast->getForecastDaily();
- * $forecast->getForecastHourly();
  */
-class Forecast extends ResourceController {
+class Forecast extends ResourceController
+{
+    protected $format = 'json';
+
     protected ForecastWeatherDataModel $weatherForecastModel;
 
+    /**
+     * Initialises the forecast weather data model.
+     */
     public function __construct()
     {
         $this->weatherForecastModel = new ForecastWeatherDataModel();
     }
 
     /**
-     * Get forecast weather data daily
+     * Returns daily forecast weather data.
+     *
      * @return ResponseInterface
      * @throws Exception
      */
@@ -53,14 +51,15 @@ class Forecast extends ResourceController {
             }
 
             return $this->respond($result);
-        } catch (\Exception $e) {
-            log_message('error', 'Failed to get forecast weather data daily , errors: ' . $e);
+        } catch (Exception $e) {
+            log_message('error', 'Forecast::getForecastDaily - failed to get daily forecast data: ' . $e->getMessage());
             return $this->failServerError('An error occurred while retrieving daily forecast data.');
         }
     }
 
     /**
-     * Get forecast weather data hourly
+     * Returns hourly forecast weather data.
+     *
      * @return ResponseInterface
      * @throws Exception
      */
@@ -80,8 +79,8 @@ class Forecast extends ResourceController {
             }
 
             return $this->respond($result);
-        } catch (\Exception $e) {
-            log_message('error', 'Failed to get forecast weather data hourly , errors: ' . $e);
+        } catch (Exception $e) {
+            log_message('error', 'Forecast::getForecastHourly - failed to get hourly forecast data: ' . $e->getMessage());
             return $this->failServerError('An error occurred while retrieving hourly forecast data.');
         }
     }

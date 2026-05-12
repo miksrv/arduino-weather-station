@@ -6,28 +6,22 @@ use App\Entities\WeatherForecastEntity;
 use CodeIgniter\Model;
 
 /**
- * Class ForecastWeatherDataModel
+ * Model for the forecast_weather_data table.
  *
- * This class represents the model for forecast weather data, providing methods to interact with the database and retrieve weather forecasts.
+ * Stores forecast records fetched from external weather APIs. Provides
+ * hourly and daily aggregation methods consumed by the Forecast controller
+ * and the Current controller (next-hour precipitation look-ahead).
  *
  * @package App\Models
- *
- * Public Methods:
- * - getHourlyAverages(): Retrieves and returns hourly average forecast weather data.
- * - getDailyAverages(): Retrieves and returns daily average forecast weather data.
- *
- * Usage:
- * $forecastWeatherDataModel = new ForecastWeatherDataModel();
- * $hourlyAverages = $forecastWeatherDataModel->getHourlyAverages();
- * $dailyAverages = $forecastWeatherDataModel->getDailyAverages();
  */
 class ForecastWeatherDataModel extends Model
 {
-    protected $table         = 'forecast_weather_data';
-    protected $primaryKey    = 'id';
-    protected $useTimestamps = false;
-    protected $returnType    = WeatherForecastEntity::class;
-    protected $allowedFields = [
+    protected $table            = 'forecast_weather_data';
+    protected $primaryKey       = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType       = WeatherForecastEntity::class;
+    protected $useSoftDeletes   = false;
+    protected $allowedFields    = [
         'forecast_time',
         'source',
         'temperature',
@@ -44,8 +38,12 @@ class ForecastWeatherDataModel extends Model
         'wind_speed',
         'wind_deg',
         'wind_gust',
-        'weather_id'
+        'weather_id',
     ];
+
+    protected $useTimestamps = false;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
 
     protected $validationRules = [
         'forecast_time' => 'required|valid_date',
@@ -64,7 +62,7 @@ class ForecastWeatherDataModel extends Model
         'wind_speed'    => 'permit_empty|decimal',
         'wind_deg'      => 'permit_empty|integer',
         'wind_gust'     => 'permit_empty|decimal',
-        'weather_id'    => 'permit_empty|integer'
+        'weather_id'    => 'permit_empty|integer',
     ];
 
     protected $validationMessages = [
@@ -73,26 +71,13 @@ class ForecastWeatherDataModel extends Model
         ],
     ];
 
-    protected array $casts = [
-        'forecast_time' => 'datetime',
-        'temperature'   => '?float',
-        'feels_like'    => '?float',
-        'pressure'      => '?int',
-        'humidity'      => '?float',
-        'dew_point'     => '?float',
-        'uv_index'      => '?float',
-        'sol_energy'    => '?float',
-        'sol_radiation' => '?float',
-        'clouds'        => '?int',
-        'visibility'    => '?int',
-        'wind_speed'    => '?float',
-        'wind_deg'      => '?int',
-        'wind_gust'     => '?float',
-        'weather_id'    => '?int'
-    ];
+    protected $skipValidation = false;
 
     /**
-     * @return array
+     * Returns hourly-averaged forecast data starting from the current UTC hour
+     * through the end of the next calendar day.
+     *
+     * @return array Rows of hourly aggregated forecast data.
      */
     public function getHourlyAverages(): array
     {
@@ -106,7 +91,9 @@ class ForecastWeatherDataModel extends Model
     }
 
     /**
-     * @return array
+     * Returns daily-averaged forecast data starting from today (UTC).
+     *
+     * @return array Rows of daily aggregated forecast data.
      */
     public function getDailyAverages(): array
     {
@@ -118,6 +105,12 @@ class ForecastWeatherDataModel extends Model
             ->getResultArray();
     }
 
+    /**
+     * Builds the SELECT expression for hourly or daily aggregate grouping.
+     *
+     * @param string $groupBy Grouping level: 'hour' or 'day'.
+     * @return string SQL SELECT fragment including all aggregated weather fields.
+     */
     private function _getAverageSelect(string $groupBy): string
     {
         $formatHours = $groupBy === 'hour' ? '%H:00:00' : '00:00:00';

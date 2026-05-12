@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
-import { ColumnProps, Skeleton, Table } from 'simple-react-ui-kit'
+import { Skeleton, Table, TableColumnProps } from 'simple-react-ui-kit'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 
 import { ApiType } from '@/api'
 import { formatDate } from '@/tools/date'
@@ -18,7 +18,7 @@ interface WidgetAnomalyHistoryProps {
 const WidgetAnomalyHistory: React.FC<WidgetAnomalyHistoryProps> = ({ loading, rows }) => {
     const { t } = useTranslation()
 
-    const columns: Array<ColumnProps<ApiType.Anomaly.AnomalyHistoryEntry>> = useMemo(
+    const columns: Array<TableColumnProps<ApiType.Anomaly.AnomalyHistoryEntry>> = useMemo(
         () => [
             {
                 accessor: 'type',

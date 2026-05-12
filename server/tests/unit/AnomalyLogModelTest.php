@@ -334,4 +334,205 @@ final class AnomalyLogModelTest extends CIUnitTestCase
 
         $this->assertSame([], $result);
     }
+
+    // -------------------------------------------------------------------------
+    // closeAnomaly()
+    // -------------------------------------------------------------------------
+
+    /**
+     * closeAnomaly() must call update() with the end_date supplied.
+     */
+    public function testCloseAnomalyCallsUpdateWithEndDate(): void
+    {
+        $stub = $this->getMockBuilder(AnomalyLogModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['update'])
+            ->getMock();
+
+        $captured = null;
+
+        $stub->expects($this->once())
+            ->method('update')
+            ->willReturnCallback(function (int $id, array $data) use (&$captured): bool {
+                $captured = ['id' => $id, 'data' => $data];
+                return true;
+            });
+
+        $stub->closeAnomaly(7, '2026-03-20');
+
+        $this->assertNotNull($captured);
+        $this->assertSame(7, $captured['id']);
+        $this->assertSame('2026-03-20', $captured['data']['end_date']);
+    }
+
+    // -------------------------------------------------------------------------
+    // getOpenByType()
+    // -------------------------------------------------------------------------
+
+    /**
+     * When first() returns a row, getOpenByType() must return it as an array.
+     */
+    public function testGetOpenByTypeReturnsArrayWhenRowFound(): void
+    {
+        $stub = $this->getMockBuilder(AnomalyLogModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['first'])
+            ->getMock();
+
+        $stub->method('first')->willReturn(['id' => 5, 'type' => 'heat_wave', 'end_date' => null]);
+
+        $result = $stub->getOpenByType('heat_wave');
+
+        $this->assertIsArray($result);
+        $this->assertSame('heat_wave', $result['type']);
+    }
+
+    /**
+     * When first() returns null, getOpenByType() must return null.
+     */
+    public function testGetOpenByTypeReturnsNullWhenNoRow(): void
+    {
+        $stub = $this->getMockBuilder(AnomalyLogModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['first'])
+            ->getMock();
+
+        $stub->method('first')->willReturn(null);
+
+        $result = $stub->getOpenByType('heat_wave');
+
+        $this->assertNull($result);
+    }
+
+    // -------------------------------------------------------------------------
+    // getHistory()
+    // -------------------------------------------------------------------------
+
+    /**
+     * getHistory() must call findAll() with the supplied limit and return its result.
+     */
+    public function testGetHistoryCallsFindAllWithLimit(): void
+    {
+        $expected = [
+            ['id' => 1, 'type' => 'heat_wave', 'start_date' => '2026-03-01', 'end_date' => null],
+        ];
+
+        $capturedLimit = null;
+
+        $stub = $this->getMockBuilder(AnomalyLogModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['findAll'])
+            ->getMock();
+
+        $stub->method('findAll')
+            ->willReturnCallback(function (int $limit = 0) use (&$capturedLimit, $expected) {
+                $capturedLimit = $limit;
+                return $expected;
+            });
+
+        $result = $stub->getHistory(25);
+
+        $this->assertSame(25, $capturedLimit);
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * getHistory() default limit must be 50.
+     */
+    public function testGetHistoryDefaultLimitIs50(): void
+    {
+        $capturedLimit = null;
+
+        $stub = $this->getMockBuilder(AnomalyLogModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['findAll'])
+            ->getMock();
+
+        $stub->method('findAll')
+            ->willReturnCallback(function (int $limit = 0) use (&$capturedLimit) {
+                $capturedLimit = $limit;
+                return [];
+            });
+
+        $stub->getHistory();
+
+        $this->assertSame(50, $capturedLimit);
+    }
+
+    // -------------------------------------------------------------------------
+    // getCalendarData() — pure PHP logic
+    // -------------------------------------------------------------------------
+
+    /**
+     * getCalendarData(7) with no rows must return exactly 7 calendar entries.
+     */
+    public function testGetCalendarDataReturnsCorrectNumberOfDays(): void
+    {
+        $stub = $this->getMockBuilder(AnomalyLogModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['findAll'])
+            ->getMock();
+
+        $stub->method('findAll')->willReturn([]);
+
+        $result = $stub->getCalendarData(7);
+
+        $this->assertCount(7, $result);
+    }
+
+    /**
+     * A still-open row (end_date=null, very old start) must count as active
+     * on every day in the calendar window.
+     */
+    public function testGetCalendarDataActiveRowIsCountedForDate(): void
+    {
+        $rows = [
+            ['type' => 'heat_wave', 'start_date' => '2020-01-01', 'end_date' => null, 'id' => 1],
+        ];
+
+        $stub = $this->getMockBuilder(AnomalyLogModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['findAll'])
+            ->getMock();
+
+        $stub->method('findAll')->willReturn($rows);
+
+        $result = $stub->getCalendarData(3);
+
+        $activeEntry = null;
+
+        foreach ($result as $entry) {
+            if ($entry['activeCount'] >= 1) {
+                $activeEntry = $entry;
+                break;
+            }
+        }
+
+        $this->assertNotNull($activeEntry, 'At least one calendar entry must have activeCount >= 1');
+        $this->assertContains('heat_wave', $activeEntry['types']);
+    }
+
+    /**
+     * A row closed long ago (end_date well before the calendar window) must not
+     * be counted as active on any day in the window.
+     */
+    public function testGetCalendarDataClosedRowNotCountedAfterEndDate(): void
+    {
+        $rows = [
+            ['type' => 'heat_wave', 'start_date' => '2020-01-01', 'end_date' => '2020-06-01', 'id' => 1],
+        ];
+
+        $stub = $this->getMockBuilder(AnomalyLogModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['findAll'])
+            ->getMock();
+
+        $stub->method('findAll')->willReturn($rows);
+
+        $result = $stub->getCalendarData(3);
+
+        foreach ($result as $entry) {
+            $this->assertSame(0, $entry['activeCount'], 'Closed-long-ago row must not be active today');
+        }
+    }
 }

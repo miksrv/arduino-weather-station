@@ -1,7 +1,7 @@
 import React from 'react'
 import { Badge, Icon, Skeleton } from 'simple-react-ui-kit'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 
 import { ApiModel } from '@/api'
 import WeatherIcon from '@/components/weather-icon'

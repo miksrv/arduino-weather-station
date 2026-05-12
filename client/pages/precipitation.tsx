@@ -2,9 +2,10 @@ import React, { useMemo, useState } from 'react'
 import { Button } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
-import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { NextSeo } from 'next-seo'
+import Head from 'next/head'
+import { useTranslation } from 'next-i18next/pages'
+import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations'
+import { generateNextSeo } from 'next-seo/pages'
 
 import { API, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
@@ -39,22 +40,24 @@ const PrecipitationPage: NextPage<PrecipitationPageProps> = () => {
 
     return (
         <AppLayout>
-            <NextSeo
-                title={t('precipitation-calendar')}
-                description={t('precipitation-page-description', { location: 'Orenburg' })}
-                canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/precipitation`}
-                openGraph={{
-                    description: t('precipitation-page-description', { location: 'Orenburg' }),
-                    locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
-                    siteName: t('weather-in-orenburg'),
+            <Head>
+                {generateNextSeo({
                     title: t('precipitation-calendar'),
-                    type: 'website',
-                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/precipitation`
-                }}
-                twitter={{
-                    cardType: 'summary_large_image'
-                }}
-            />
+                    description: t('precipitation-page-description', { location: 'Orenburg' }),
+                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/precipitation`,
+                    openGraph: {
+                        description: t('precipitation-page-description', { location: 'Orenburg' }),
+                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
+                        siteName: t('weather-in-orenburg'),
+                        title: t('precipitation-calendar'),
+                        type: 'website',
+                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/precipitation`
+                    },
+                    twitter: {
+                        cardType: 'summary_large_image'
+                    }
+                })}
+            </Head>
 
             {availableYears.length > 0 && (
                 <div className={styles.yearSelector}>

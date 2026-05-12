@@ -16,7 +16,17 @@ Components that import from `@/pages/_app` (e.g. `AppBar.tsx` imports `POLING_IN
 ```ts
 jest.mock('@/pages/_app', () => ({ POLING_INTERVAL_CURRENT: 600000 }))
 ```
-**Why:** `pages/_app.tsx` imports `appWithTranslation` from `next-i18next` and creates a Redux store, causing test suite failure if not mocked.
+**Why:** `pages/_app.tsx` imports `appWithTranslation` from `next-i18next/pages` and creates a Redux store, causing test suite failure if not mocked.
+
+---
+
+Components import `useTranslation` from `next-i18next/pages` (not `next-i18next`). Tests must mock the new path:
+```ts
+jest.mock('next-i18next/pages', () => ({
+    useTranslation: () => ({ t: (key: string) => `t:${key}`, i18n: { language: 'ru' } })
+}))
+```
+**Why:** After upgrading to `next-i18next` v16, the `useTranslation` hook was moved to the `next-i18next/pages` subpath (Pages Router API). Tests that mocked `next-i18next` directly stopped working.
 
 Preferred alternative: avoid importing constants from `@/pages/_app` in components entirely. Define polling interval constants inline or in a dedicated constants file. Only `AppBar.tsx` has this pattern — do not replicate it in new components.
 

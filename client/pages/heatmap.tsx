@@ -3,9 +3,10 @@ import dayjs from 'dayjs'
 import { DatePicker, findPresetByDate, Select, Spinner } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
-import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { NextSeo } from 'next-seo'
+import Head from 'next/head'
+import { useTranslation } from 'next-i18next/pages'
+import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations'
+import { generateNextSeo } from 'next-seo/pages'
 
 import { API, ApiType, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
@@ -50,29 +51,31 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
 
     return (
         <AppLayout>
-            <NextSeo
-                title={t('heatmap')}
-                description={t('heatmap-page-description')}
-                canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/heatmap`}
-                openGraph={{
-                    description: t('heatmap-page-description'),
-                    images: [
-                        {
-                            height: 1130,
-                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/heatmap.jpg`,
-                            width: 2026
-                        }
-                    ],
-                    locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
-                    siteName: t('weather-in-orenburg'),
+            <Head>
+                {generateNextSeo({
                     title: t('heatmap'),
-                    type: 'website',
-                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/heatmap`
-                }}
-                twitter={{
-                    cardType: 'summary_large_image'
-                }}
-            />
+                    description: t('heatmap-page-description'),
+                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/heatmap`,
+                    openGraph: {
+                        description: t('heatmap-page-description'),
+                        images: [
+                            {
+                                height: 1130,
+                                url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/heatmap.jpg`,
+                                width: 2026
+                            }
+                        ],
+                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
+                        siteName: t('weather-in-orenburg'),
+                        title: t('heatmap'),
+                        type: 'website',
+                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/heatmap`
+                    },
+                    twitter: {
+                        cardType: 'summary_large_image'
+                    }
+                })}
+            </Head>
 
             <div className={'toolbar'}>
                 <DatePicker

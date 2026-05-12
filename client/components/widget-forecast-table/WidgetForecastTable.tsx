@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { cn, ColumnProps, Table, TableProps } from 'simple-react-ui-kit'
+import { cn, Table, TableColumnProps, TableProps } from 'simple-react-ui-kit'
 
 import Link from 'next/link'
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 
 import { ApiModel } from '@/api'
 import WeatherIcon from '@/components/weather-icon'
@@ -27,7 +27,7 @@ export const TABLE_COLUMNS = {
     precipitation: 'precipitation'
 } as const
 
-type ExtendedColumnProps<T> = ColumnProps<T> & {
+type ExtendedColumnProps<T> = TableColumnProps<T> & {
     column: keyof typeof TABLE_COLUMNS
 }
 

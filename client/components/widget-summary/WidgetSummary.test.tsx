@@ -6,7 +6,7 @@ import WidgetSummary from './WidgetSummary'
 
 import '@testing-library/jest-dom'
 
-jest.mock('next-i18next', () => ({
+jest.mock('next-i18next/pages', () => ({
     useTranslation: () => ({ t: (key: string) => key })
 }))
 jest.mock('@/components/weather-icon', () => () => <span data-testid='weather-icon' />)

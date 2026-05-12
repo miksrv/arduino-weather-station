@@ -15,23 +15,32 @@ use Exception;
  * for a requested calendar year.
  *
  * @package App\Controllers
- *
- * Public Methods:
- * - index(): GET /precipitation — yearly precipitation data and statistics
  */
 class Precipitation extends ResourceController
 {
     /** @var int Cache TTL for recent data requests (1 hour) */
     public const CACHE_TTL_RECENT = 60 * 60;
 
-    /** @var int Cache TTL for purely historical requests (indefinite) */
+    /** @var int Cache TTL for purely historical requests (indefinite — use 0 for no expiry) */
     public const CACHE_TTL_HISTORICAL = 0;
 
     /** @var int Number of days to consider data as "recent" (not fully historical) */
     public const CACHE_RECENT_DAYS_THRESHOLD = 7;
 
+    protected $format = 'json';
+
+    protected PrecipitationModel $precipitationModel;
+
     /**
-     * GET /precipitation
+     * Initialises the precipitation model.
+     */
+    public function __construct()
+    {
+        $this->precipitationModel = new PrecipitationModel();
+    }
+
+    /**
+     * Returns per-day precipitation totals, yearly statistics, and available years.
      *
      * Query parameters:
      *   - year (optional, int): calendar year to retrieve; defaults to the current year.
@@ -67,8 +76,7 @@ class Precipitation extends ResourceController
             );
         }
 
-        // Determine cache TTL based on how recent the year's end date is
-        // For the current year, end date is today; for past years, it's Dec 31
+        // Current year uses today as the effective end date; past years use Dec 31
         $yearEndDate     = ($year === $currentYear) ? time() : strtotime($year . '-12-31');
         $recentThreshold = strtotime('-' . self::CACHE_RECENT_DAYS_THRESHOLD . ' days');
         $ttl             = $yearEndDate >= $recentThreshold
@@ -83,10 +91,9 @@ class Precipitation extends ResourceController
         }
 
         try {
-            $model       = new PrecipitationModel();
-            $dailyTotals = $model->getDailyTotals($year);
-            $years       = $model->getAvailableYears();
-            $stats       = $model->getStats($year, $dailyTotals);
+            $dailyTotals = $this->precipitationModel->getDailyTotals($year);
+            $years       = $this->precipitationModel->getAvailableYears();
+            $stats       = $this->precipitationModel->getStats($year, $dailyTotals);
 
             $response = [
                 'year'           => $year,

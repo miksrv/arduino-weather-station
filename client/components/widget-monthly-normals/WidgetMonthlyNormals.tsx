@@ -4,7 +4,7 @@ import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/
 import ReactECharts from 'echarts-for-react'
 import { Skeleton } from 'simple-react-ui-kit'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
 import { ApiType } from '@/api'

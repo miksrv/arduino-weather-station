@@ -3,7 +3,7 @@ import { EChartsOption } from 'echarts'
 import ReactECharts from 'echarts-for-react'
 import { cn, Icon, IconTypes, Skeleton } from 'simple-react-ui-kit'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 
 import { getFilledDots, getZScoreColor } from './utils'
 

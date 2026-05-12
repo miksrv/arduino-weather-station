@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
-import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { NextSeo } from 'next-seo'
+import Head from 'next/head'
+import { useTranslation } from 'next-i18next/pages'
+import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations'
+import { generateNextSeo } from 'next-seo/pages'
 
 import { API, ApiModel, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
@@ -142,29 +143,31 @@ const IndexPage: NextPage<IndexPageProps> = () => {
 
     return (
         <AppLayout>
-            <NextSeo
-                title={t('weather-sensors')}
-                description={t('sensors-page-description')}
-                canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/sensors`}
-                openGraph={{
-                    description: t('sensors-page-description'),
-                    images: [
-                        {
-                            height: 1480,
-                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/sensors.jpg`,
-                            width: 2026
-                        }
-                    ],
-                    locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
-                    siteName: t('weather-in-orenburg'),
+            <Head>
+                {generateNextSeo({
                     title: t('weather-sensors'),
-                    type: 'website',
-                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/sensors`
-                }}
-                twitter={{
-                    cardType: 'summary_large_image'
-                }}
-            />
+                    description: t('sensors-page-description'),
+                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/sensors`,
+                    openGraph: {
+                        description: t('sensors-page-description'),
+                        images: [
+                            {
+                                height: 1480,
+                                url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/sensors.jpg`,
+                                width: 2026
+                            }
+                        ],
+                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
+                        siteName: t('weather-in-orenburg'),
+                        title: t('weather-sensors'),
+                        type: 'website',
+                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/sensors`
+                    },
+                    twitter: {
+                        cardType: 'summary_large_image'
+                    }
+                })}
+            </Head>
 
             <div className={'widgets-list'}>
                 {widgets?.map((widget) => (
