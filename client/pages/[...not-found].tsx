@@ -1,9 +1,10 @@
 import React from 'react'
 
 import type { GetServerSidePropsResult } from 'next'
-import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { NextSeo } from 'next-seo'
+import Head from 'next/head'
+import { useTranslation } from 'next-i18next/pages'
+import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations'
+import { generateNextSeo } from 'next-seo/pages'
 
 import { setLocale } from '@/api'
 import { wrapper } from '@/api/store'
@@ -16,18 +17,20 @@ export default function CatchAllPage() {
 
     return (
         <AppLayout>
-            <NextSeo
-                noindex={true}
-                nofollow={false}
-                title={t('page-not-found')}
-                description={t('page-not-found-description')}
-                openGraph={{
-                    locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
-                    siteName: t('weather-in-orenburg'),
+            <Head>
+                {generateNextSeo({
+                    noindex: true,
+                    nofollow: false,
                     title: t('page-not-found'),
-                    type: 'website'
-                }}
-            />
+                    description: t('page-not-found-description'),
+                    openGraph: {
+                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
+                        siteName: t('weather-in-orenburg'),
+                        title: t('page-not-found'),
+                        type: 'website'
+                    }
+                })}
+            </Head>
             <div className={'not-found'}>
                 <h1>{t('page-not-found')}</h1>
                 <div>{t('page-not-found-description')}</div>
