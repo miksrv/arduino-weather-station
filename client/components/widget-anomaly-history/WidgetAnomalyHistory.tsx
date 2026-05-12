@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Skeleton, Table, TableColumnProps } from 'simple-react-ui-kit'
 
-import { useTranslation } from 'next-i18next'
+import { useTranslation } from 'next-i18next/pages'
 
 import { ApiType } from '@/api'
 import { formatDate } from '@/tools/date'
