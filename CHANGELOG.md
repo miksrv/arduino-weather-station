@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 3.7.5
+
+### Patch Changes
+
+- Migrate all component `useTranslation` imports from `next-i18next` to `next-i18next/pages` following the next-i18next v16 breaking change; update all Jest mocks to the new module path across all affected components and tests
+- Migrate SEO integration from `NextSeo`/`DefaultSeo` components to `generateNextSeo`/`generateDefaultSeo` functions from `next-seo/pages` wrapped in `<Head>` (next-seo v7 API) across all pages; preserve existing title, description, canonical, openGraph, and twitter metadata
+- Replace `ColumnProps` with `TableColumnProps` after simple-react-ui-kit API rename in `WidgetAnomalyHistory`, `WidgetForecastTable`, and `ComparisonTable` components
+- Set `rootDir` and `ignoreDeprecations: "6.0"` in Jest TypeScript config to fix source resolution and suppress TypeScript 6 deprecation diagnostics during test runs
+- Refactor all backend controllers (Anomaly, Climate, Current, Forecast, Heatmap, History, Precipitation, Sensors) to use constructor dependency injection, explicit `$format = 'json'`, unified error handling and logging, consistent caching keys and TTL logic, and stricter input validation
+- Standardize model definitions across all models (AnomalyLogModel, ClimateModel, DailyAveragesModel, ForecastWeatherDataModel, HourlyAveragesModel, PrecipitationModel, RawWeatherDataModel): add explicit model properties, timestamps config, validation rules/messages, stricter type hints, and remove legacy `$casts` arrays
+- Refactor `WeatherData` into a read-only DTO with snake_case/camelCase key normalization; add nullable casts, `$dates` arrays, and `datamap` entries to `WeatherDataEntity` and `WeatherForecastEntity` for correct NULL handling and DB column mapping
+- Add PHPUnit tests for `AnomalyController`, `ClimateController`, and `PrecipitationController` covering parameter validation, happy/exception paths, cache-hit behavior, and private helper coverage via reflection; expand `AnomalyLogModel` tests with additional edge cases for `closeAnomaly`, `getOpenByType`, `getHistory`, and `getCalendarData`
+- Increase CI/CD API deploy job timeout to 25 minutes to prevent premature termination of long-running deployments
+- Bump client dependencies: `next` 16.2.2 → 16.2.3, `react`/`react-dom` 19.2.4 → 19.2.5, `prettier` 3.8.1 → 3.8.2, `@typescript-eslint/*` 8.58.0 → 8.58.1, `eslint-plugin-jest` 29.15.1 → 29.15.2, `next-i18next` → v16, `next-seo` → v7; revert `simple-react-ui-kit` to previous version
+
 ## 3.7.4
 
 ### Patch Changes
