@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
-import { useTranslation } from 'next-i18next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { NextSeo } from 'next-seo'
+import Head from 'next/head'
+import { useTranslation } from 'next-i18next/pages'
+import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations'
+import { generateNextSeo } from 'next-seo/pages'
 
 import { API, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
@@ -105,29 +106,31 @@ const ClimatePage: NextPage = () => {
 
     return (
         <AppLayout>
-            <NextSeo
-                title={t('climate-page-title')}
-                description={t('climate-page-description')}
-                canonical={`${process.env.NEXT_PUBLIC_SITE_LINK}/climate`}
-                openGraph={{
-                    description: t('climate-page-description'),
-                    images: [
-                        {
-                            height: 1292,
-                            url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/history.jpg`,
-                            width: 2028
-                        }
-                    ],
-                    locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
-                    siteName: t('weather-in-orenburg'),
+            <Head>
+                {generateNextSeo({
                     title: t('climate-page-title'),
-                    type: 'website',
-                    url: `${process.env.NEXT_PUBLIC_SITE_LINK}/climate`
-                }}
-                twitter={{
-                    cardType: 'summary_large_image'
-                }}
-            />
+                    description: t('climate-page-description'),
+                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/climate`,
+                    openGraph: {
+                        description: t('climate-page-description'),
+                        images: [
+                            {
+                                height: 1292,
+                                url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/history.jpg`,
+                                width: 2028
+                            }
+                        ],
+                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
+                        siteName: t('weather-in-orenburg'),
+                        title: t('climate-page-title'),
+                        type: 'website',
+                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/climate`
+                    },
+                    twitter: {
+                        cardType: 'summary_large_image'
+                    }
+                })}
+            </Head>
 
             <div className={'widgets-list'}>
                 <WidgetClimate
