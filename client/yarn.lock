@@ -3521,7 +3521,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"echarts@npm:^6.1.0":
+"echarts@npm:^6.0.0":
   version: 6.1.0
   resolution: "echarts@npm:6.1.0"
   dependencies:
@@ -8408,7 +8408,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^8.60.1"
     cookies-next: "npm:^6.1.1"
     dayjs: "npm:^1.11.21"
-    echarts: "npm:^6.1.0"
+    echarts: "npm:^6.0.0"
     echarts-for-react: "npm:^3.0.6"
     embla-carousel: "npm:^8.6.0"
     embla-carousel-auto-scroll: "npm:^8.6.0"
