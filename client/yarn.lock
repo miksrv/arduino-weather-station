@@ -3335,6 +3335,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dayjs@npm:^1.11.21":
+  version: 1.11.21
+  resolution: "dayjs@npm:1.11.21"
+  checksum: 10c0/bd97dfdc4bfea3c66268635690313828b386faa040fbc1f829ff42a2bd748b72c9d9b3c8f9616ce9e61fcb78923f1461a462c969c54b1084458ae1b715898fb0
+  languageName: node
+  linkType: hard
+
 "debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4":
   version: 4.4.1
   resolution: "debug@npm:4.4.1"
@@ -8400,7 +8407,7 @@ __metadata:
     "@types/redux-mock-store": "npm:^1.5.0"
     "@typescript-eslint/eslint-plugin": "npm:^8.60.1"
     cookies-next: "npm:^6.1.1"
-    dayjs: "npm:^1.11.20"
+    dayjs: "npm:^1.11.21"
     echarts: "npm:^6.0.0"
     echarts-for-react: "npm:^3.0.6"
     embla-carousel: "npm:^8.6.0"
