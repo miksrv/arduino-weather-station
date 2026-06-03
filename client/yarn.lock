@@ -4721,15 +4721,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^26.1.0":
-  version: 26.1.0
-  resolution: "i18next@npm:26.1.0"
+"i18next@npm:^26.3.0":
+  version: 26.3.0
+  resolution: "i18next@npm:26.3.0"
   peerDependencies:
     typescript: ^5 || ^6
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/f6b2e0f70b3e0455dd47a831225b0b81e364004be6f7598ba552d46bef0d0d5ec3bf50824500a0af2e19ad862afa73e1b8e4d204fd77e97bd5d23cdb26666683
+  checksum: 10c0/e5dc29171d9a05746b31ad68e179ce2f36459c0a20d2d6733837961fe9492d1b48706804fa12059aa91dbb004655cb54ade817eb9e72371649f26d6dba1ca211
   languageName: node
   linkType: hard
 
@@ -8416,7 +8416,7 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^7.1.1"
     eslint-plugin-simple-import-sort: "npm:^13.0.0"
     globals: "npm:^17.6.0"
-    i18next: "npm:^26.1.0"
+    i18next: "npm:^26.3.0"
     identity-obj-proxy: "npm:^3.0.0"
     jest: "npm:^30.4.2"
     jest-environment-jsdom: "npm:^30.4.1"
