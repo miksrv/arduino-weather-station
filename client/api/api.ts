@@ -1,5 +1,6 @@
 import { HYDRATE } from 'next-redux-wrapper'
 import type { Action, PayloadAction } from '@reduxjs/toolkit'
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 import { ApiType } from '@/api'
@@ -10,6 +11,9 @@ import { encodeQueryData } from '@/tools/helpers'
 const isHydrateAction = (action: Action): action is PayloadAction<RootState> => action.type === HYDRATE
 
 export const urlAPI = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:8080/'
+
+const extractErrorMessage = (response: FetchBaseQueryError): string | undefined =>
+    (response.data as APIErrorType | undefined)?.messages?.error
 
 // export const isApiValidationErrors = <T>(response: unknown): response is ApiTypes.ApiResponseError<T> =>
 //     typeof response === 'object' &&
@@ -34,44 +38,44 @@ export const API = createApi({
         getCurrent: builder.query<ApiType.Current.Response, void>({
             providesTags: ['Current'],
             query: () => 'current',
-            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+            transformErrorResponse: extractErrorMessage
         }),
         getHistory: builder.query<ApiType.History.Response, Maybe<ApiType.History.Request>>({
             providesTags: ['History'],
             query: (params) => `history${encodeQueryData<ApiType.History.Request>(params)}`,
-            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+            transformErrorResponse: extractErrorMessage
         }),
         getHeatmap: builder.query<ApiType.Heatmap.Response, Maybe<ApiType.Heatmap.Request>>({
             providesTags: ['Heatmap'],
             query: (params) => `heatmap${encodeQueryData<ApiType.Heatmap.Request>(params)}`,
-            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+            transformErrorResponse: extractErrorMessage
         }),
         getForecast: builder.query<ApiType.Forecast.Response, 'hourly' | 'daily'>({
             providesTags: ['Forecast'],
             query: (period) => `forecast/${period}`,
-            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+            transformErrorResponse: extractErrorMessage
         }),
         getAnomaly: builder.query<ApiType.Anomaly.AnomalyResponse, void>({
             providesTags: ['Anomaly'],
             query: () => 'anomaly',
-            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+            transformErrorResponse: extractErrorMessage
         }),
         getAnomalyHistory: builder.query<ApiType.Anomaly.AnomalyHistoryResponse, ApiType.Anomaly.AnomalyHistoryRequest>(
             {
                 providesTags: ['Anomaly'],
                 query: (params) => `anomaly/history${encodeQueryData<ApiType.Anomaly.AnomalyHistoryRequest>(params)}`,
-                transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+                transformErrorResponse: extractErrorMessage
             }
         ),
         getPrecipitation: builder.query<ApiType.Precipitation.Response, ApiType.Precipitation.Request>({
             providesTags: ['Precipitation'],
             query: (params) => `precipitation${encodeQueryData<ApiType.Precipitation.Request>(params)}`,
-            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+            transformErrorResponse: extractErrorMessage
         }),
         getClimate: builder.query<ApiType.Climate.Response, void>({
             providesTags: ['Climate'],
             query: () => 'climate',
-            transformErrorResponse: (response) => (response.data as APIErrorType).messages.error
+            transformErrorResponse: extractErrorMessage
         })
     }),
     // The `any` return type is intentional: adding an explicit return type annotation causes

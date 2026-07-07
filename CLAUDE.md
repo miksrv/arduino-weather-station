@@ -16,29 +16,29 @@ Full-stack DIY weather monitoring system that collects real environmental data f
 |---|---|
 | Firmware | C++ (Arduino / ESP32), Arduino IDE |
 | Backend | PHP 8.2+, CodeIgniter 4.6, MySQL |
-| Frontend | Next.js 16, React 19, TypeScript 5.9 |
-| State management | Redux Toolkit + RTK Query, next-redux-wrapper |
+| Frontend | Next.js 16.2, React 19.2, TypeScript 6.0 |
+| State management | Redux Toolkit 2.12 + RTK Query, next-redux-wrapper |
 | Styling | SASS/SCSS, CSS Modules, next-themes |
 | Charts | ECharts 6 (echarts-for-react) |
-| i18n | i18next, next-i18next (locales: `ru`, `en`) |
+| i18n | i18next 26 (next-i18next 16, locales: `ru`, `en`) |
 | HTTP client | Guzzle 7 (PHP), RTK Query (TS) |
-| Package manager | Yarn 4 (client), Composer (server) |
-| Testing | PHPUnit 11.5 (server), Jest 30 + Testing Library (client) |
-| Quality | SonarCloud, ESLint, Prettier |
+| Package manager | Yarn 4.9 (client), Composer (server) |
+| Testing | PHPUnit 11.5 (server), Jest 30 + ts-jest + Testing Library (client) |
+| Quality | SonarCloud, ESLint 9, Prettier |
 | CI/CD | GitHub Actions → FTP deploy |
 
 ---
 
 ## Team Agents
 
-| Agent | Code Location                                 | Instructions               |
-|-------|-----------------------------------------------|----------------------------|
-| **Backend Agent** | `/server`                                 | `/.claude/agents/backend.md` |
-| **Frontend Agent** | `/client`                                | `/.claude/agents/frontend.md` |
-| **QA Agent** | `/server/tests`, `/client/**/*.tests.(ts/tsx)` | `/.claude/agents/qa.md`       |
-| **Doc Agent** | `/docs`, `README.md`                          | `/.claude/agents/docs.md`  |
+| Agent | Code Location | Instructions |
+|-------|----------------|--------------|
+| **Backend Agent** | `/server` | `.claude/agents/backend-agent.md` |
+| **Frontend Agent** | `/client` | `.claude/agents/frontend-agent.md` |
 
 Agents must read their instruction file before starting. Each agent reports completion to Team Lead.
+
+> Note: only backend-agent and frontend-agent currently exist under `.claude/agents/`. There is no separate QA or Doc agent — testing and docs work is handled by whichever of the two agents owns the affected code.
 
 ---
 
@@ -61,9 +61,10 @@ Next.js Frontend (SSR)
 
 ### Data Flow
 1. Arduino POSTs sensor readings to `POST /sensors`
-2. CLI commands (`spark system:getCurrentWeather` etc.) periodically fetch from external APIs and compute hourly/daily averages
-3. Next.js pages fetch data via RTK Query endpoints; locale is sent as a custom `Locale` HTTP header
-4. The `System` controller also pushes data to narodmon.ru
+2. `spark system:getCurrentWeather` periodically fetches from external APIs, ingests raw data, and recalculates hourly/daily averages (no separate averaging commands)
+3. `spark system:detectAnomalies` scans recent data for statistically unusual conditions (z-score + composite flood-risk scoring) and writes to `anomaly_log`
+4. Next.js pages fetch data via RTK Query endpoints; locale is sent as a custom `Locale` HTTP header
+5. `spark system:sendNarodmonData` pushes data to narodmon.ru
 
 ---
 
@@ -78,24 +79,25 @@ arduino-weather-station/
 ├── client/                # Next.js frontend
 │   ├── api/               # RTK Query store, slices, endpoint definitions, types
 │   ├── components/        # Reusable React components (widgets, layout, icons)
-│   ├── pages/             # Next.js pages (index, climate, sensors, history, heatmap, forecast)
+│   ├── pages/             # Next.js pages (index, climate, sensors, history, heatmap, forecast, precipitation, anomaly)
 │   ├── public/locales/    # i18n translation files (en/, ru/)
 │   ├── styles/            # Global SASS + light/dark theme CSS
 │   ├── tools/             # Utility functions, custom hooks, unit tests
-│   └── ui/                # Small UI primitives (theme-switcher, comparison-icon)
+│   └── ui/                # Small UI primitives (theme-switcher, comparison-icon, carousel)
 ├── server/                # CodeIgniter 4 backend
 │   ├── app/
-│   │   ├── Controllers/   # REST controllers (Current, Forecast, Heatmap, History, Sensors, System)
+│   │   ├── Commands/      # spark CLI commands (system:* — see Development Commands)
+│   │   ├── Controllers/   # REST controllers (Current, Forecast, Heatmap, History, Sensors, Precipitation, Anomaly, Climate)
 │   │   ├── Database/      # Migrations + Seeds
 │   │   ├── Entities/      # Data entities (WeatherData, WeatherDataEntity, WeatherForecastEntity)
-│   │   ├── Libraries/     # External API clients (OpenWeather, WeatherAPI, VisualCrossing, NarodMon)
-│   │   ├── Models/        # DB models (RawWeatherDataModel, Hourly/DailyAveragesModel, ForecastWeatherDataModel)
+│   │   ├── Libraries/     # External API clients (OpenWeather, WeatherAPI, VisualCrossing, NarodMon) + AnomalyDetector, SnowpackCalculator
+│   │   ├── Models/        # DB models (RawWeatherDataModel, Hourly/DailyAveragesModel, ForecastWeatherDataModel, ClimateModel, PrecipitationModel, AnomalyModel, AnomalyLogModel)
 │   │   └── Config/        # Routes.php, app configuration
 │   └── tests/             # PHPUnit test suites (unit/, database/, session/)
 ├── models/                # 3D-printable STL/CAD files for enclosure
 ├── docs/                  # Documentation assets and screenshots
-├── config/                # Shared configuration files
-└── .github/workflows/     # GitHub Actions (sonarcloud, ui-checks, ui-deploy, api-deploy, arduino-code-check)
+├── config/                # Shared configuration files (docker-compose.yml, nginx.conf)
+└── .github/workflows/     # GitHub Actions (sonarcloud, ui-checks, ui-deploy, api-checks, api-deploy, arduino-code-check)
 ```
 
 ---
@@ -128,11 +130,11 @@ vendor/bin/phpunit                  # Run PHPUnit tests
 vendor/bin/phpunit --coverage-html  # With HTML coverage report
 
 # CLI commands (cron jobs)
-php spark system:sendNarodmonData
-php spark system:getCurrentWeather
-php spark system:getForecastWeather
-php spark system:calculateHourlyAverages
-php spark system:calculateDailyAverages
+php spark system:getCurrentWeather      # Fetches current weather from external APIs, recalculates hourly/daily averages
+php spark system:getForecastWeather     # Fetches forecast weather from external APIs, upserts forecast_weather_data
+php spark system:detectAnomalies        # Checks meteorological anomaly conditions, updates anomaly_log
+php spark system:backfillAnomalyLog     # One-off backfill of anomaly_log from historical daily records
+php spark system:sendNarodmonData       # Sends current sensor reading to narodmon.ru
 ```
 
 ### Arduino — use Arduino IDE
@@ -188,10 +190,12 @@ Load `arduino/main/main.ino` in Arduino IDE and upload to the board.
 | Variable | Default | Description |
 |---|---|---|
 | `NEXT_PUBLIC_API_HOST` | `http://localhost:8080/` | Backend API base URL |
+| `NEXT_PUBLIC_SITE_LINK` | `http://localhost:3000/` | Public site URL (used for SEO/canonical links) |
+| `NEXT_PUBLIC_STORAGE_KEY` | `meteo` | localStorage key prefix |
 
-### Server (`server/env`)
+### Server (`server/.env`)
 
-Configure database, external API keys (OpenWeatherMap, WeatherAPI, VisualCrossing, NarodMon), and CodeIgniter base settings.
+CodeIgniter dotted-key env vars — database (`database.production.*`), app coordinates (`app.lat`, `app.lon`), external API keys (`app.openweather.key`, `app.weatherapi.key`, `app.visualcrossing.key`), and NarodMon settings (`app.narodmon.mac`, `.lat`, `.lon`, `.alt`).
 
 ---
 
@@ -203,6 +207,7 @@ Configure database, external API keys (OpenWeatherMap, WeatherAPI, VisualCrossin
 | `hourly_averages` | Hourly-aggregated weather data |
 | `daily_averages` | Daily-aggregated weather data |
 | `forecast_weather_data` | Forecast data from external APIs |
+| `anomaly_log` | Detected meteorological anomalies (z-score / flood-risk scoring) |
 
 ---
 
@@ -210,14 +215,19 @@ Configure database, external API keys (OpenWeatherMap, WeatherAPI, VisualCrossin
 
 | Method | Path | Controller::Method |
 |---|---|---|
-| GET | `/current` | Current::index |
-| GET | `/current/text` | Current::text |
-| GET | `/forecast/hourly` | Forecast::hourly |
-| GET | `/forecast/daily` | Forecast::daily |
-| GET | `/history` | History::index |
-| GET | `/history/export` | History::export |
-| GET | `/heatmap` | Heatmap::index |
-| POST | `/sensors` | Sensors::index |
+| GET | `/` | API info (name/version/status) |
+| GET | `/current` | Current::getCurrentWeather |
+| GET | `/current/text` | Current::getCurrentTextWeather |
+| GET | `/forecast/daily` | Forecast::getForecastDaily |
+| GET | `/forecast/hourly` | Forecast::getForecastHourly |
+| GET | `/history` | History::getHistoryWeather |
+| GET | `/history/export` | History::getHistoryWeatherCSV |
+| GET | `/heatmap` | Heatmap::getHeatmapData |
+| POST | `/sensors` | Sensors::setWeather |
+| GET | `/precipitation` | Precipitation::index |
+| GET | `/anomaly` | Anomaly::index |
+| GET | `/anomaly/history` | Anomaly::history |
+| GET | `/climate` | Climate::index |
 
 ---
 
@@ -239,11 +249,12 @@ Configure database, external API keys (OpenWeatherMap, WeatherAPI, VisualCrossin
 
 | Workflow | Trigger | Action |
 |---|---|---|
-| `sonarcloud.yml` | Push to main / PRs | Run tests, upload LCOV to SonarCloud |
+| `sonarcloud.yml` | Push to main (incl. tags) / PRs | Run tests, upload LCOV to SonarCloud |
 | `ui-checks.yml` | PRs to main (`client/**`) | ESLint, Prettier, Jest, Next.js build |
-| `ui-deploy.yml` | Push to main (`client/**`) | Build and deploy frontend via FTP |
-| `api-deploy.yml` | Push to main (`server/**`) | Composer install, deploy server via FTP |
-| `arduino-code-check.yml` | Arduino file changes | Arduino lint check |
+| `ui-deploy.yml` | Push to main (`client/**`) | Build and deploy frontend via FTP (lftp) |
+| `api-checks.yml` | PRs to main (`server/**`) | PHPUnit tests |
+| `api-deploy.yml` | Push to main (`server/**`) | Composer install, deploy server via FTP (lftp) |
+| `arduino-code-check.yml` | Push to main / PRs touching `arduino/**` | Arduino lint check |
 
 ---
 
