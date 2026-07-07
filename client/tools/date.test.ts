@@ -10,6 +10,7 @@ import {
     getDate,
     getDateTimeFormat,
     halfYearDate,
+    isValidDateString,
     minutesAgo,
     timeAgo,
     yesterdayDate
@@ -94,6 +95,28 @@ describe('date utilities', () => {
                 .tz('Asia/Yekaterinburg')
                 .format('DD.MM.YYYY')
             expect(formatDateFromUTC(utcMs, 'DD.MM.YYYY')).toBe(expected)
+        })
+    })
+
+    describe('isValidDateString', () => {
+        it('should return true for a valid YYYY-MM-DD string', () => {
+            expect(isValidDateString('2024-06-15')).toBe(true)
+        })
+
+        it('should return false for an undefined value', () => {
+            expect(isValidDateString(undefined)).toBe(false)
+        })
+
+        it('should return false for a string array', () => {
+            expect(isValidDateString(['2024-06-15'])).toBe(false)
+        })
+
+        it('should return false for a differently formatted date string', () => {
+            expect(isValidDateString('06/15/2024')).toBe(false)
+        })
+
+        it('should return false for a non-date string', () => {
+            expect(isValidDateString('not-a-date')).toBe(false)
         })
     })
 

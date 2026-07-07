@@ -1,6 +1,10 @@
 import React, { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
-import { CustomSeriesRenderItemAPI, CustomSeriesRenderItemParams, EChartsOption } from 'echarts'
-import { CustomSeriesRenderItemReturn } from 'echarts/types/dist/echarts'
+import {
+    CustomSeriesRenderItemAPI,
+    CustomSeriesRenderItemParams,
+    CustomSeriesRenderItemReturn,
+    EChartsOption
+} from 'echarts'
 import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
 import ReactECharts from 'echarts-for-react'
 

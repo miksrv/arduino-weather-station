@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 3.7.6
+
+### Patch Changes
+
+- Handle history date params and locale redirect UX
+- Update deps and harden API error handling
+
 ## 3.7.5
 
 ### Patch Changes
