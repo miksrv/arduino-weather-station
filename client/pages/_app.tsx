@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -37,16 +37,18 @@ const App = ({ Component, pageProps }: AppProps) => {
     const router = useRouter()
     const { i18n } = useTranslation()
     const { store } = wrapper.useWrappedStore(pageProps)
-    const [isLocaleReady, setIsLocaleReady] = useState(false)
 
     useEffect(() => {
         dayjs.locale(i18n.language ?? i18Config.i18n.defaultLocale)
     }, [i18n.language])
 
+    // Redirect to the user's previously saved locale preference if it differs from the
+    // current URL locale. Runs after the current locale's content has already rendered
+    // (SSR and first paint are never gated on this), so it may briefly flash the URL's
+    // locale before redirecting — that's the accepted tradeoff for keeping pages crawlable.
     useEffect(() => {
         const savedLocale = getItem<string>(StorageKeys.LOCALE)
 
-        // If the saved language differs from the current one and is valid — redirect
         if (
             savedLocale &&
             i18n.language !== savedLocale &&
@@ -54,40 +56,12 @@ const App = ({ Component, pageProps }: AppProps) => {
             router.pathname !== '/404'
         ) {
             void router.replace(router.asPath, router.asPath, { locale: savedLocale })
-        } else {
-            // Language matches or no saved locale — can show UI
-            setIsLocaleReady(true)
         }
     }, [])
-
-    // Listen for language changes after redirect
-    useEffect(() => {
-        if (!isLocaleReady && router.locale) {
-            const savedLocale = getItem<string>(StorageKeys.LOCALE)
-            if (!savedLocale || router.locale === savedLocale) {
-                setIsLocaleReady(true)
-            }
-        }
-    }, [router.locale, isLocaleReady])
 
     // useReportWebVitals((metric) => {
     //     console.log(metric)
     // })
-
-    // Show minimal loader while determining locale
-    if (!isLocaleReady) {
-        return (
-            <ThemeProvider defaultTheme={'dark'}>
-                <Head>
-                    <meta
-                        name={'viewport'}
-                        content={'width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no'}
-                    />
-                </Head>
-                <div style={{ minHeight: '100vh' }} />
-            </ThemeProvider>
-        )
-    }
 
     return (
         <ThemeProvider defaultTheme={'dark'}>

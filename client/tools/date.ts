@@ -1,9 +1,11 @@
 import dayjs, { Dayjs } from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
+dayjs.extend(customParseFormat)
 
 export const TIME_ZONE = 'Asia/Yekaterinburg'
 
@@ -12,6 +14,9 @@ export const yesterdayDate = currentDate.subtract(1, 'day').toDate()
 export const halfYearDate = currentDate.subtract(6, 'month').toDate()
 
 export const getDate = (date: string | Date): Dayjs => dayjs.utc(date).tz(TIME_ZONE)
+
+export const isValidDateString = (value?: string | string[]): value is string =>
+    typeof value === 'string' && dayjs(value, 'YYYY-MM-DD', true).isValid()
 
 export const formatDateFromUTC = (utc?: number, format: string = 'D MMMM YYYY, HH:mm'): string =>
     utc

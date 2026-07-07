@@ -3,6 +3,7 @@ import { Button, DatePicker, Spinner } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next/pages'
 import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations'
 import { generateNextSeo } from 'next-seo/pages'
@@ -14,14 +15,21 @@ import { Maybe } from '@/api/types'
 import AppLayout from '@/components/app-layout'
 import WidgetChart from '@/components/widget-chart'
 import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
-import { currentDate, formatDate, getDateTimeFormat, yesterdayDate } from '@/tools/date'
+import { currentDate, formatDate, getDateTimeFormat, isValidDateString, yesterdayDate } from '@/tools/date'
 import { encodeQueryData } from '@/tools/helpers'
 import { LocaleType } from '@/tools/types'
 
-const HistoryPage: NextPage<object> = () => {
+interface HistoryPageProps {
+    initialStartDate?: string
+    initialEndDate?: string
+    hasDateParams: boolean
+}
+
+const HistoryPage: NextPage<HistoryPageProps> = ({ initialStartDate, initialEndDate, hasDateParams }) => {
+    const router = useRouter()
     const { i18n, t } = useTranslation()
 
-    const [period, setPeriod] = useState<[string?, string?]>()
+    const [period, setPeriod] = useState<[string?, string?]>(() => [initialStartDate, initialEndDate])
 
     const historyDateParam: Maybe<ApiType.History.Request> = useMemo(
         () => (period?.[0] && period?.[1] ? { end_date: period[1], start_date: period[0] } : undefined),
@@ -43,8 +51,22 @@ const HistoryPage: NextPage<object> = () => {
     )
 
     useEffect(() => {
-        setPeriod([formatDate(yesterdayDate, 'YYYY-MM-DD'), formatDate(currentDate.toDate(), 'YYYY-MM-DD')])
+        if (!initialStartDate || !initialEndDate) {
+            setPeriod([formatDate(yesterdayDate, 'YYYY-MM-DD'), formatDate(currentDate.toDate(), 'YYYY-MM-DD')])
+        }
     }, [])
+
+    const handlePeriodSelect = (startDate?: string, endDate?: string) => {
+        setPeriod([startDate, endDate])
+
+        if (startDate && endDate) {
+            void router.replace(
+                { pathname: router.pathname, query: { end_date: endDate, start_date: startDate } },
+                undefined,
+                { shallow: true }
+            )
+        }
+    }
 
     return (
         <AppLayout>
@@ -53,6 +75,8 @@ const HistoryPage: NextPage<object> = () => {
                     title: t('historical-weather-data'),
                     description: t('history-page-description'),
                     canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/history`,
+                    noindex: hasDateParams,
+                    nofollow: false,
                     openGraph: {
                         description: t('history-page-description'),
                         images: [
@@ -83,7 +107,7 @@ const HistoryPage: NextPage<object> = () => {
                     minDate={'2021-01-01'}
                     maxDate={formatDate(currentDate.toDate(), 'YYYY-MM-DD')}
                     placeholder={t('select-date-range')}
-                    onPeriodSelect={(startDate, endDate) => setPeriod([startDate, endDate])}
+                    onPeriodSelect={handlePeriodSelect}
                 />
 
                 <Button
@@ -132,13 +156,22 @@ const HistoryPage: NextPage<object> = () => {
 
 export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
-        async (context): Promise<GetServerSidePropsResult<object>> => {
+        async (context): Promise<GetServerSidePropsResult<HistoryPageProps>> => {
             const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
             const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
 
-            return { props: { ...translations } }
+            const { end_date, start_date } = context.query
+            const hasValidPeriod = isValidDateString(start_date) && isValidDateString(end_date)
+
+            return {
+                props: {
+                    ...translations,
+                    hasDateParams: Boolean(start_date || end_date),
+                    ...(hasValidPeriod ? { initialEndDate: end_date, initialStartDate: start_date } : {})
+                }
+            }
         }
 )
 
