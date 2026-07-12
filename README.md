@@ -148,7 +148,7 @@ Make sure you have the following installed on your system:
 - **NPM** or **Yarn** (for frontend dependencies)
 - **PHP** (v8.2 or higher)
 - **Composer** (for backend dependencies)
-- **MySQL** (or any compatible database)
+- **MySQL** (or any compatible database) — or **Docker** to run the bundled local database (see step 2 below)
 - **Arduino IDE** (for programming the Arduino microcontroller)
 
 ### 1. Clone the repository
@@ -172,22 +172,28 @@ cd arduino-weather-station
    composer install
    ```
 
-3. Create a `.env` file and configure your environment variables, such as database connection settings:
+3. Start the local MySQL database using Docker (skip this if you already have a MySQL-compatible database running):
+
+   ```bash
+   docker-compose -f ../config/docker-compose.yml up -d
+   ```
+
+4. Create a `.env` file and configure your environment variables, such as database connection settings:
 
    ```bash
    cp env .env
    ```
 
-    Don't forget to set the parameter `app.arduino.token` = '' in the .env file. This token will be used for proper authentication of the Arduino weather station when transmitting data to the server. The same token will need to be set in the Arduino sketch, which will be described in step 4.
+    The default `database.development.*` values already match the docker-compose database from step 3, so no changes are needed if you used Docker. Don't forget to set the parameter `app.arduino.token` = '' in the .env file. This token will be used for proper authentication of the Arduino weather station when transmitting data to the server. The same token will need to be set in the Arduino sketch, which will be described in step 4.
 
 
-4. Migrate the database:
+5. Migrate the database:
 
    ```bash
    php spark migrate
    ```
 
-5. Start the backend server (built-in PHP server or any web server of your choice):
+6. Start the backend server (built-in PHP server or any web server of your choice):
 
    ```bash
    php spark serve
