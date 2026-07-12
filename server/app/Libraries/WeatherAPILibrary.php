@@ -4,19 +4,12 @@ namespace App\Libraries;
 
 // https://www.weatherapi.com/my/#
 use App\Models\RawWeatherDataModel;
-use CodeIgniter\HTTP\CURLRequest;
 use CodeIgniter\I18n\Time;
-use Config\Services;
 use Exception;
 
-class WeatherAPILibrary
+class WeatherAPILibrary extends AbstractWeatherAPILibrary
 {
     const API_URL = 'https://api.weatherapi.com/v1';
-
-    /**
-     * @var \CodeIgniter\HTTP\CURLRequest The HTTP client used for making requests.
-     */
-    protected CURLRequest $httpClient;
 
     /**
      * @lnk https://www.weatherapi.com/docs/weather_conditions.json
@@ -76,9 +69,9 @@ class WeatherAPILibrary
 
     public function __construct()
     {
-        helper('weather');
+        parent::__construct();
 
-        $this->httpClient = Services::curlrequest();
+        helper('weather');
     }
 
     /**
@@ -126,16 +119,7 @@ class WeatherAPILibrary
             'q'   => getenv('app.lat') . ',' . getenv('app.lon')
         ];
 
-        try {
-            $response = $this->httpClient->request('GET', self::API_URL . $endpoint, [
-                'query'   => array_merge($params, $additionalParams),
-                'timeout' => 30,
-            ]);
-            return json_decode($response->getBody(), true);
-        } catch (Exception $e) {
-            log_message('error', 'WeatherAPI.com API request error: {e}', ['e' => $e->getMessage()]);
-            return false;
-        }
+        return $this->httpGet(self::API_URL . $endpoint, array_merge($params, $additionalParams));
     }
 
     /**
@@ -146,23 +130,9 @@ class WeatherAPILibrary
      */
     protected function mapWeatherData(array $data): array
     {
-        return [
-            'temperature'   => (float) $data['current']['temp_c'] ?? null,
-            'dew_point'     => (float) $data['current']['dewpoint_c'] ?? null,
-            'feels_like'    => (float) $data['current']['feelslike_c'] ?? null,
-            'pressure'      => (int) $data['current']['pressure_mb'] ?? null,
-            'humidity'      => (float) $data['current']['humidity'] ?? null,
-            'visibility'    => !empty($data['current']['vis_km']) ? (int) $data['current']['vis_km'] * 1000 : null,
-            'wind_speed'    => !empty($data['current']['wind_kph']) ? kmh_to_ms($data['current']['wind_kph']) : null,
-            'wind_gust'     => !empty($data['current']['gust_mph']) ? kmh_to_ms($data['current']['gust_mph']) : null,
-            'wind_deg'      => (int) $data['current']['wind_degree'] ?? null,
-            'clouds'        => $data['current']['cloud'] ?? null,
-            'uv_index'      => $data['current']['uv'] ?? null,
-            'precipitation' => $data['current']['precip_mm'] ?? null,
-            'weather_id'    => !empty($data['current']['condition']['code']) ? self::convertWeatherCondition((int) $data['current']['condition']['code']) : null,
-            'date'          => !empty($data['current']['last_updated_epoch']) ? Time::createFromTimestamp($data['current']['last_updated_epoch']) : null,
-            'source'        => RawWeatherDataModel::SOURCE_WEATHERAPI
-        ];
+        return array_merge($this->_mapCommonFields($data['current']), [
+            'date' => !empty($data['current']['last_updated_epoch']) ? Time::createFromTimestamp($data['current']['last_updated_epoch']) : null,
+        ]);
     }
 
     /**
@@ -172,6 +142,20 @@ class WeatherAPILibrary
      * @throws Exception
      */
     protected function mapForecastData(array $data): array
+    {
+        return array_merge($this->_mapCommonFields($data), [
+            'forecast_time' => !empty($data['time_epoch']) ? Time::createFromTimestamp($data['time_epoch']) : null,
+        ]);
+    }
+
+    /**
+     * Maps the fields shared between the current-weather ("current" object)
+     * and forecast ("hour" object) payload shapes — both use the same key
+     * names, only the date/time key and the enclosing structure differ.
+     * @param array $data
+     * @return array
+     */
+    private function _mapCommonFields(array $data): array
     {
         return [
             'temperature'   => (float) $data['temp_c'] ?? null,
@@ -187,7 +171,6 @@ class WeatherAPILibrary
             'uv_index'      => $data['uv'] ?? null,
             'precipitation' => $data['precip_mm'] ?? null,
             'weather_id'    => !empty($data['condition']['code']) ? self::convertWeatherCondition((int) $data['condition']['code']) : null,
-            'forecast_time' => !empty($data['time_epoch']) ? Time::createFromTimestamp($data['time_epoch']) : null,
             'source'        => RawWeatherDataModel::SOURCE_WEATHERAPI
         ];
     }

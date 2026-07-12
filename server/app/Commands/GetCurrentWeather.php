@@ -3,9 +3,7 @@
 namespace App\Commands;
 
 use App\Entities\WeatherDataEntity;
-use App\Libraries\OpenWeatherAPILibrary;
-use App\Libraries\VisualCrossingAPILibrary;
-use App\Libraries\WeatherAPILibrary;
+use App\Libraries\WeatherProviderInterface;
 use App\Models\DailyAveragesModel;
 use App\Models\HourlyAveragesModel;
 use App\Models\RawWeatherDataModel;
@@ -52,14 +50,14 @@ class GetCurrentWeather extends BaseCommand
             $hourlyAveragesModel = new HourlyAveragesModel();
             $dailyAveragesModel  = new DailyAveragesModel();
 
-            $clients = [
-                new VisualCrossingAPILibrary(),
-                new WeatherAPILibrary(),
-                new OpenWeatherAPILibrary(),
-            ];
+            /** @var WeatherProviderInterface[] $clients */
+            $clients = array_map(
+                static fn (string $class): WeatherProviderInterface => new $class(),
+                config('WeatherProviders')->providers
+            );
 
             foreach ($clients as $weatherClient) {
-                $sourceName = $this->_shortName($weatherClient);
+                $sourceName = $weatherClient->getSourceName();
                 $data       = $weatherClient->getWeatherData();
 
                 if ($data === false) {
@@ -108,18 +106,6 @@ class GetCurrentWeather extends BaseCommand
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
-
-    /**
-     * Returns the short, human-readable API source name for CLI output.
-     * Strips the 'APILibrary' suffix from the class short name.
-     *
-     * @param object $client An instantiated API library object
-     * @return string
-     */
-    private function _shortName(object $client): string
-    {
-        return str_replace('APILibrary', '', (new \ReflectionClass($client))->getShortName());
-    }
 
     /**
      * Fetches hourly averages from raw_weather_data and upserts each row into

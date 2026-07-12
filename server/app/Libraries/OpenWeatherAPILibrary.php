@@ -3,28 +3,16 @@
 namespace App\Libraries;
 
 use App\Models\RawWeatherDataModel;
-use CodeIgniter\HTTP\CURLRequest;
 use CodeIgniter\I18n\Time;
-use Config\Services;
 use Exception;
 
 /**
  * CODES: https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
  */
-class OpenWeatherAPILibrary
+class OpenWeatherAPILibrary extends AbstractWeatherAPILibrary
 {
     const API_VERSION = 2.5;
     const API_URL     = 'https://api.openweathermap.org/data/' . self::API_VERSION . '/';
-
-    /**
-     * @var \CodeIgniter\HTTP\CURLRequest The HTTP client used for making requests.
-     */
-    protected CURLRequest $httpClient;
-
-    public function __construct()
-    {
-        $this->httpClient = Services::curlrequest();
-    }
 
     /**
      * Receive current weather data
@@ -74,16 +62,7 @@ class OpenWeatherAPILibrary
             'lang'  => 'ru'
         ];
 
-        try {
-            $response = $this->httpClient->request('GET', self::API_URL . $endpoint, [
-                'query'   => array_merge($params, $additionalParams),
-                'timeout' => 30,
-            ]);
-            return json_decode($response->getBody(), true);
-        } catch (Exception $e) {
-            log_message('error', 'OpenWeather API request error: {e}', ['e' => $e->getMessage()]);
-            return false;
-        }
+        return $this->httpGet(self::API_URL . $endpoint, array_merge($params, $additionalParams));
     }
 
     /**
@@ -94,21 +73,9 @@ class OpenWeatherAPILibrary
      */
     protected function mapWeatherData(array $data): array
     {
-        return [
-            'temperature'   => $data['main']['temp'] ?? null,
-            'feels_like'    => $data['main']['feels_like'] ?? null,
-            'pressure'      => $data['main']['pressure'] ?? null,
-            'humidity'      => $data['main']['humidity'] ?? null,
-            'visibility'    => $data['visibility'] ?? null,
-            'wind_speed'    => $data['wind']['speed'] ?? null,
-            'wind_gust'     => $data['wind']['gust'] ?? null,
-            'wind_deg'      => $data['wind']['deg'] ?? null,
-            'clouds'        => $data['clouds']['all'] ?? null,
-            'precipitation' => $data['rain']['1h'] ?? ($data['snow']['1h'] ?? null),
-            'weather_id'    => !empty($data['weather'][0]['id']) ? self::convertWeatherCondition($data['weather'][0]['id']) : null,
-            'date'          => !empty($data['dt']) ? Time::createFromTimestamp($data['dt']) : null,
-            'source'        => RawWeatherDataModel::SOURCE_OPENWEATHERMAP
-        ];
+        return array_merge($this->_mapCommonFields($data), [
+            'date' => !empty($data['dt']) ? Time::createFromTimestamp($data['dt']) : null,
+        ]);
     }
 
     /**
@@ -118,6 +85,20 @@ class OpenWeatherAPILibrary
      * @throws Exception
      */
     protected function mapForecastData(array $data): array
+    {
+        return array_merge($this->_mapCommonFields($data), [
+            'forecast_time' => !empty($data['dt']) ? Time::createFromTimestamp($data['dt']) : null,
+        ]);
+    }
+
+    /**
+     * Maps the fields shared between the current-weather and forecast
+     * payload shapes (they are structurally identical apart from the
+     * date/time key).
+     * @param array $data
+     * @return array
+     */
+    private function _mapCommonFields(array $data): array
     {
         return [
             'temperature'   => $data['main']['temp'] ?? null,
@@ -131,7 +112,6 @@ class OpenWeatherAPILibrary
             'clouds'        => $data['clouds']['all'] ?? null,
             'precipitation' => $data['rain']['1h'] ?? ($data['snow']['1h'] ?? null),
             'weather_id'    => !empty($data['weather'][0]['id']) ? self::convertWeatherCondition($data['weather'][0]['id']) : null,
-            'forecast_time' => !empty($data['dt']) ? Time::createFromTimestamp($data['dt']) : null,
             'source'        => RawWeatherDataModel::SOURCE_OPENWEATHERMAP
         ];
     }
