@@ -47,7 +47,7 @@ class ForecastWeatherDataModel extends Model
 
     protected $validationRules = [
         'forecast_time' => 'required|valid_date',
-        'source'        => 'required|in_list[OpenWeatherMap,WeatherAPI,VisualCrossing,CustomStation,OtherSource]',
+        'source'        => 'required|in_list[OpenWeatherMap,WeatherAPI,VisualCrossing,OpenMeteo,CustomStation,OtherSource]',
         'temperature'   => 'permit_empty|decimal',
         'feels_like'    => 'permit_empty|decimal',
         'pressure'      => 'permit_empty|integer',
@@ -67,7 +67,7 @@ class ForecastWeatherDataModel extends Model
 
     protected $validationMessages = [
         'source' => [
-            'in_list' => 'The source must be one of: OpenWeatherMap, WeatherAPI, VisualCrossing, CustomStation, OtherSource.',
+            'in_list' => 'The source must be one of: OpenWeatherMap, WeatherAPI, VisualCrossing, OpenMeteo, CustomStation, OtherSource.',
         ],
     ];
 
