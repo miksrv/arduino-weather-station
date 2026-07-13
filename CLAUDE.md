@@ -251,7 +251,7 @@ CodeIgniter dotted-key env vars — database (`database.production.*`), app coor
 |---|---|---|
 | `sonarcloud.yml` | Push to main (incl. tags) / PRs | Run tests, upload LCOV to SonarCloud |
 | `ui-checks.yml` | PRs to main (`client/**`) | ESLint, Prettier, Jest, Next.js build |
-| `ui-deploy.yml` | Push to main (`client/**`) | Build and deploy frontend via FTP (lftp) |
+| `ui-deploy.yml` | Push to main (`client/**`) | Build standalone Next.js output and deploy via SSH (`rsync` + PM2 restart) |
 | `api-checks.yml` | PRs to main (`server/**`) | PHPUnit tests |
 | `api-deploy.yml` | Push to main (`server/**`) | Composer install, deploy server via FTP (lftp) |
 | `arduino-code-check.yml` | Push to main / PRs touching `arduino/**` | Arduino lint check |

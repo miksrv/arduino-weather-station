@@ -30,7 +30,7 @@ You can use this repository to build your own fully-featured weather station - a
 [![MIT License][license-badge]][license-url]
 
 [![UI Checks](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-checks.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-checks.yml)
-[![FTP Deploy](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-deploy.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-deploy.yml)
+[![UI Deploy](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-deploy.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-deploy.yml)
 [![Arduino Code Check](https://github.com/miksrv/arduino-weather-station/actions/workflows/arduino-code-check.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/arduino-code-check.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=miksrv_arduino-weather-station&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=miksrv_arduino-weather-station)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=miksrv_arduino-weather-station&metric=coverage)](https://sonarcloud.io/summary/new_code?id=miksrv_arduino-weather-station)
@@ -352,7 +352,7 @@ The backend exposes several `php spark` commands for pulling external weather da
 
 | Command | Description |
 |---|---|
-| `php spark system:getCurrentWeather` | Fetches current weather observations from all configured external APIs (VisualCrossing, WeatherAPI, OpenWeatherMap), saves new records to `raw_weather_data`, and recalculates hourly and daily averages. |
+| `php spark system:getCurrentWeather` | Fetches current weather observations from all configured external APIs (VisualCrossing, WeatherAPI, OpenWeatherMap, Open-Meteo), saves new records to `raw_weather_data`, and recalculates hourly and daily averages. |
 | `php spark system:getForecastWeather` | Fetches forecast data from all configured external APIs and bulk-upserts records into `forecast_weather_data`. |
 | `php spark system:sendNarodmonData` | Retrieves the latest sensor reading from the database and pushes it to the [narodmon.ru](https://narodmon.ru) monitoring service. |
 | `php spark system:detectAnomalies` | Runs all meteorological anomaly checks against today's daily and hourly data and updates the `anomaly_log` table. Must run after daily averages are available. |
