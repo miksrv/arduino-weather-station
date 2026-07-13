@@ -19,5 +19,6 @@ class WeatherProviders extends BaseConfig
         \App\Libraries\VisualCrossingAPILibrary::class,
         \App\Libraries\WeatherAPILibrary::class,
         \App\Libraries\OpenWeatherAPILibrary::class,
+        \App\Libraries\OpenMeteoAPILibrary::class,
     ];
 }
