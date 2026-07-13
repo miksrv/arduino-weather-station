@@ -6,19 +6,12 @@ namespace App\Libraries;
 // CODES: https://www.weatherapi.com/docs/weather_conditions.json
 // 1000 records/day
 use App\Models\RawWeatherDataModel;
-use CodeIgniter\HTTP\CURLRequest;
 use CodeIgniter\I18n\Time;
-use Config\Services;
 use Exception;
 
-class VisualCrossingAPILibrary
+class VisualCrossingAPILibrary extends AbstractWeatherAPILibrary
 {
     const API_URL = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/';
-
-    /**
-     * @var \CodeIgniter\HTTP\CURLRequest The HTTP client used for making requests.
-     */
-    protected CURLRequest $httpClient;
 
     /**
      * @lnk https://docs.google.com/spreadsheets/d/1cc-jQIap7ZToVaEgiXEk_Aa6YVYjSObLV9PMe4oHrFg/edit?gid=2045823731#gid=2045823731
@@ -71,11 +64,6 @@ class VisualCrossingAPILibrary
         'Freezing Drizzle/Freezing Rain'       => 511, // Freezing drizzle
     ];
 
-    public function __construct()
-    {
-        $this->httpClient = Services::curlrequest();
-    }
-
     /**
      * Receive current weather data
      * @return array|false
@@ -87,6 +75,11 @@ class VisualCrossingAPILibrary
         return $data ? $this->mapWeatherData($data) : false;
     }
 
+    /**
+     * Makes a request to the VisualCrossing API
+     * @param string $endpoint
+     * @return false|array
+     */
     protected function request(string $endpoint): false|array
     {
         $params = [
@@ -96,16 +89,7 @@ class VisualCrossingAPILibrary
             'contentType' => 'json',
         ];
 
-        try {
-            $response = $this->httpClient->request('GET', self::API_URL . getenv('app.lat') . ',' . getenv('app.lon') . '/' . $endpoint, [
-                'query'   => $params,
-                'timeout' => 30,
-            ]);
-            return json_decode($response->getBody(), true);
-        } catch (Exception $e) {
-            log_message('error', 'VisualCrossing API request error: {e}', ['e' => $e->getMessage()]);
-            return false;
-        }
+        return $this->httpGet(self::API_URL . getenv('app.lat') . ',' . getenv('app.lon') . '/' . $endpoint, $params);
     }
 
     /**

@@ -20,6 +20,7 @@ class RawWeatherDataModel extends Model
     public const SOURCE_OPENWEATHERMAP = 'OpenWeatherMap';
     public const SOURCE_WEATHERAPI     = 'WeatherAPI';
     public const SOURCE_VISUALCROSSING = 'VisualCrossing';
+    public const SOURCE_OPENMETEO      = 'OpenMeteo';
     public const SOURCE_CUSTOMSTATION  = 'CustomStation';
     public const SOURCE_OTHERSOURCE    = 'OtherSource';
 
@@ -49,6 +50,12 @@ class RawWeatherDataModel extends Model
         'wind_deg',
         'wind_gust',
         'weather_id',
+        'pm2_5',
+        'pm10',
+        'co',
+        'no2',
+        'so2',
+        'o3',
     ];
 
     protected $useTimestamps = false;
@@ -57,7 +64,7 @@ class RawWeatherDataModel extends Model
 
     protected $validationRules = [
         'date'          => 'required|valid_date',
-        'source'        => 'required|in_list[OpenWeatherMap,WeatherAPI,VisualCrossing,CustomStation,OtherSource]',
+        'source'        => 'required|in_list[OpenWeatherMap,WeatherAPI,VisualCrossing,OpenMeteo,CustomStation,OtherSource]',
         'temperature'   => 'permit_empty|decimal|greater_than_equal_to[-80]|less_than_equal_to[60]',
         'feels_like'    => 'permit_empty|decimal|greater_than_equal_to[-80]|less_than_equal_to[60]',
         'pressure'      => 'permit_empty|integer|greater_than_equal_to[800]|less_than_equal_to[1100]',
@@ -73,11 +80,17 @@ class RawWeatherDataModel extends Model
         'wind_deg'      => 'permit_empty|integer|greater_than_equal_to[0]|less_than_equal_to[360]',
         'wind_gust'     => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[150]',
         'weather_id'    => 'permit_empty|integer',
+        'pm2_5'         => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[2000]',
+        'pm10'          => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[2000]',
+        'co'            => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[100000]',
+        'no2'           => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[2000]',
+        'so2'           => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[2000]',
+        'o3'            => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[2000]',
     ];
 
     protected $validationMessages = [
         'source' => [
-            'in_list' => 'The source must be one of: OpenWeatherMap, WeatherAPI, VisualCrossing, CustomStation, OtherSource.',
+            'in_list' => 'The source must be one of: OpenWeatherMap, WeatherAPI, VisualCrossing, OpenMeteo, CustomStation, OtherSource.',
         ],
     ];
 
@@ -272,6 +285,12 @@ class RawWeatherDataModel extends Model
             'wind_deg'      => 'ROUND(AVG(wind_deg), 2) as wind_deg',
             'wind_gust'     => 'ROUND(AVG(wind_gust), 2) as wind_gust',
             'weather_id'    => 'MAX(weather_id) as weather_id',
+            'pm2_5'         => 'ROUND(AVG(pm2_5), 2) as pm2_5',
+            'pm10'          => 'ROUND(AVG(pm10), 2) as pm10',
+            'co'            => 'ROUND(AVG(co), 2) as co',
+            'no2'           => 'ROUND(AVG(no2), 2) as no2',
+            'so2'           => 'ROUND(AVG(so2), 2) as so2',
+            'o3'            => 'ROUND(AVG(o3), 2) as o3',
         ];
 
         // If a type is specified, return only it

@@ -30,7 +30,7 @@ You can use this repository to build your own fully-featured weather station - a
 [![MIT License][license-badge]][license-url]
 
 [![UI Checks](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-checks.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-checks.yml)
-[![FTP Deploy](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-deploy.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-deploy.yml)
+[![UI Deploy](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-deploy.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/ui-deploy.yml)
 [![Arduino Code Check](https://github.com/miksrv/arduino-weather-station/actions/workflows/arduino-code-check.yml/badge.svg)](https://github.com/miksrv/arduino-weather-station/actions/workflows/arduino-code-check.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=miksrv_arduino-weather-station&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=miksrv_arduino-weather-station)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=miksrv_arduino-weather-station&metric=coverage)](https://sonarcloud.io/summary/new_code?id=miksrv_arduino-weather-station)
@@ -148,7 +148,7 @@ Make sure you have the following installed on your system:
 - **NPM** or **Yarn** (for frontend dependencies)
 - **PHP** (v8.2 or higher)
 - **Composer** (for backend dependencies)
-- **MySQL** (or any compatible database)
+- **MySQL** (or any compatible database) — or **Docker** to run the bundled local database (see step 2 below)
 - **Arduino IDE** (for programming the Arduino microcontroller)
 
 ### 1. Clone the repository
@@ -172,22 +172,28 @@ cd arduino-weather-station
    composer install
    ```
 
-3. Create a `.env` file and configure your environment variables, such as database connection settings:
+3. Start the local MySQL database using Docker (skip this if you already have a MySQL-compatible database running):
+
+   ```bash
+   docker-compose -f ../config/docker-compose.yml up -d
+   ```
+
+4. Create a `.env` file and configure your environment variables, such as database connection settings:
 
    ```bash
    cp env .env
    ```
 
-    Don't forget to set the parameter `app.arduino.token` = '' in the .env file. This token will be used for proper authentication of the Arduino weather station when transmitting data to the server. The same token will need to be set in the Arduino sketch, which will be described in step 4.
+    The default `database.development.*` values already match the docker-compose database from step 3, so no changes are needed if you used Docker. Don't forget to set the parameter `app.arduino.token` = '' in the .env file. This token will be used for proper authentication of the Arduino weather station when transmitting data to the server. The same token will need to be set in the Arduino sketch, which will be described in step 4.
 
 
-4. Migrate the database:
+5. Migrate the database:
 
    ```bash
    php spark migrate
    ```
 
-5. Start the backend server (built-in PHP server or any web server of your choice):
+6. Start the backend server (built-in PHP server or any web server of your choice):
 
    ```bash
    php spark serve
@@ -346,7 +352,7 @@ The backend exposes several `php spark` commands for pulling external weather da
 
 | Command | Description |
 |---|---|
-| `php spark system:getCurrentWeather` | Fetches current weather observations from all configured external APIs (VisualCrossing, WeatherAPI, OpenWeatherMap), saves new records to `raw_weather_data`, and recalculates hourly and daily averages. |
+| `php spark system:getCurrentWeather` | Fetches current weather observations from all configured external APIs (VisualCrossing, WeatherAPI, OpenWeatherMap, Open-Meteo), saves new records to `raw_weather_data`, and recalculates hourly and daily averages. |
 | `php spark system:getForecastWeather` | Fetches forecast data from all configured external APIs and bulk-upserts records into `forecast_weather_data`. |
 | `php spark system:sendNarodmonData` | Retrieves the latest sensor reading from the database and pushes it to the [narodmon.ru](https://narodmon.ru) monitoring service. |
 | `php spark system:detectAnomalies` | Runs all meteorological anomaly checks against today's daily and hourly data and updates the `anomaly_log` table. Must run after daily averages are available. |

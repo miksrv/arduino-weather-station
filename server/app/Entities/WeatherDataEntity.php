@@ -31,6 +31,12 @@ use CodeIgniter\Entity\Entity;
  * @property int|null    $windDeg    Maps to DB column wind_deg.
  * @property float|null  $windGust   Maps to DB column wind_gust.
  * @property int|null    $weatherId  Maps to DB column weather_id.
+ * @property float|null  $pm25       Maps to DB column pm2_5 (PM2.5 particulate matter, µg/m³).
+ * @property float|null  $pm10       PM10 particulate matter, µg/m³.
+ * @property float|null  $co         Carbon monoxide, µg/m³.
+ * @property float|null  $no2        Nitrogen dioxide, µg/m³.
+ * @property float|null  $so2        Sulphur dioxide, µg/m³.
+ * @property float|null  $o3         Ozone, µg/m³.
  */
 class WeatherDataEntity extends Entity
 {
@@ -58,6 +64,12 @@ class WeatherDataEntity extends Entity
         'wind_deg'      => null,
         'wind_gust'     => null,
         'weather_id'    => null,
+        'pm2_5'         => null,
+        'pm10'          => null,
+        'co'            => null,
+        'no2'           => null,
+        'so2'           => null,
+        'o3'            => null,
     ];
 
     /**
@@ -83,6 +95,12 @@ class WeatherDataEntity extends Entity
         'wind_deg'      => '?integer',
         'wind_gust'     => '?float',
         'weather_id'    => '?integer',
+        'pm2_5'         => '?float',
+        'pm10'          => '?float',
+        'co'            => '?float',
+        'no2'           => '?float',
+        'so2'           => '?float',
+        'o3'            => '?float',
     ];
 
     /**
@@ -106,5 +124,6 @@ class WeatherDataEntity extends Entity
         'windDeg'      => 'wind_deg',
         'windGust'     => 'wind_gust',
         'weatherId'    => 'weather_id',
+        'pm25'         => 'pm2_5',
     ];
 }

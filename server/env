@@ -1,21 +1,21 @@
 #--------------------------------------------------------------------
 # Example Environment Configuration file
 #
-# This file can be used as a starting point for your own
-# custom .env files, and contains most of the possible settings
-# available in a default install.
+# Copy this file to `.env` (cp env .env) and adjust the values below
+# for your local setup. By default, all settings are commented out
+# except the minimum needed to run the project locally against the
+# docker-compose database (see config/docker-compose.yml).
 #
-# By default, all of the settings are commented out. If you want
-# to override the setting, you must un-comment it by removing the '#'
-# at the beginning of the line.
+# To override a setting, un-comment it by removing the '#' at the
+# beginning of the line.
 #--------------------------------------------------------------------
 
 #--------------------------------------------------------------------
 # ENVIRONMENT
 #--------------------------------------------------------------------
 
-CI_ENVIRONMENT = production
-; CI_ENVIRONMENT = development
+CI_ENVIRONMENT = development
+; CI_ENVIRONMENT = production
 
 #--------------------------------------------------------------------
 # APP
@@ -23,11 +23,11 @@ CI_ENVIRONMENT = production
 
 app.baseURL = 'http://localhost:8080/'
 
-# app.arduino.token = ''
+app.arduino.token = ''
 
-# app.weatherapi.key  = ''
-# app.openweather.key = ''
-# app.visualcrossing.key = ''
+app.weatherapi.key     = ''
+app.openweather.key    = ''
+app.visualcrossing.key = ''
 
 app.lat = 00.0000
 app.lon = 00.0000
@@ -44,21 +44,27 @@ app.narodmon.alt = 0
 # DATABASE
 #--------------------------------------------------------------------
 
-database.production.hostname = 127.0.0.1
-database.production.port     = 3306
-database.production.database = db
-# database.production.username = ''
-# database.production.password = ''
-database.production.DBDriver = MySQLi
-
+# Start the local database first: docker-compose -f config/docker-compose.yml up -d
 database.development.hostname = 127.0.0.1
-database.development.port     = 3306
+database.development.port     = 3309
 database.development.database = db
-# database.development.username = ''
-# database.development.password = ''
+database.development.username = user
+database.development.password = password
 database.development.DBDriver = MySQLi
 
-# database.tests.hostname = localhost
+# database.production.hostname = 127.0.0.1
+# database.production.port     = 3306
+# database.production.database = ''
+# database.production.username = ''
+# database.production.password = ''
+# database.production.DBDriver = MySQLi
+
+# Leave `tests` on Config\Database's built-in SQLite in-memory default —
+# do NOT point it at the same database as `development`. DatabaseTestTrait
+# defaults to $refresh = true, which drops/re-migrates the schema on every
+# PHPUnit run, so reusing the dev database wipes real local data every time
+# the test suite runs.
+# database.tests.hostname = 127.0.0.1
 # database.tests.database = ci4_test
 # database.tests.username = ''
 # database.tests.password = ''
@@ -171,4 +177,3 @@ database.development.DBDriver = MySQLi
 #--------------------------------------------------------------------
 
 # curlrequest.shareOptions = true
-

@@ -2,9 +2,7 @@
 
 namespace App\Commands;
 
-use App\Libraries\OpenWeatherAPILibrary;
-use App\Libraries\VisualCrossingAPILibrary;
-use App\Libraries\WeatherAPILibrary;
+use App\Libraries\WeatherProviderInterface;
 use App\Models\ForecastWeatherDataModel;
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
@@ -46,17 +44,17 @@ class GetForecastWeather extends BaseCommand
         try {
             $forecastWeatherDataModel = new ForecastWeatherDataModel();
 
-            $clients = [
-                new OpenWeatherAPILibrary(),
-                new WeatherAPILibrary(),
-                new VisualCrossingAPILibrary(),
-            ];
+            /** @var WeatherProviderInterface[] $clients */
+            $clients = array_map(
+                static fn (string $class): WeatherProviderInterface => new $class(),
+                config('WeatherProviders')->providers
+            );
 
             $totalInserted = 0;
             $totalUpdated  = 0;
 
             foreach ($clients as $weatherClient) {
-                $sourceName = $this->_shortName($weatherClient);
+                $sourceName = $weatherClient->getSourceName();
                 $dataArray  = $weatherClient->getForecastWeatherData();
 
                 if ($dataArray === false) {
@@ -136,21 +134,5 @@ class GetForecastWeather extends BaseCommand
             log_message('error', $msg);
             CLI::write('[ERROR] ' . $msg, 'red');
         }
-    }
-
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
-
-    /**
-     * Returns the short, human-readable API source name for CLI output.
-     * Strips the 'APILibrary' suffix from the class short name.
-     *
-     * @param object $client An instantiated API library object
-     * @return string
-     */
-    private function _shortName(object $client): string
-    {
-        return str_replace('APILibrary', '', (new \ReflectionClass($client))->getShortName());
     }
 }

@@ -41,6 +41,12 @@ class DailyAveragesModel extends Model
         'wind_deg',
         'wind_gust',
         'weather_id',
+        'pm2_5',
+        'pm10',
+        'co',
+        'no2',
+        'so2',
+        'o3',
     ];
 
     protected $useTimestamps = false;
@@ -64,6 +70,12 @@ class DailyAveragesModel extends Model
         'wind_deg'      => 'permit_empty|decimal',
         'wind_gust'     => 'permit_empty|decimal',
         'weather_id'    => 'permit_empty|integer',
+        'pm2_5'         => 'permit_empty|decimal',
+        'pm10'          => 'permit_empty|decimal',
+        'co'            => 'permit_empty|decimal',
+        'no2'           => 'permit_empty|decimal',
+        'so2'           => 'permit_empty|decimal',
+        'o3'            => 'permit_empty|decimal',
     ];
 
     protected $validationMessages = [];

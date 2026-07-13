@@ -69,6 +69,47 @@ final class WeatherDataEntityTest extends CIUnitTestCase
     }
 
     /**
+     * Air quality fields (pm2_5, pm10, co, no2, so2, o3) are populated via
+     * fill() and readable via their snake_case attribute names. pm2_5 also
+     * has a camelCase datamap alias ($pm25) since a literal camelCase
+     * conversion of "pm2_5" is not representable without it.
+     */
+    public function testAirQualityFieldsSetAndReadable(): void
+    {
+        $entity = new WeatherDataEntity();
+        $entity->fill([
+            'pm2_5' => 9.4,
+            'pm10'  => 20.9,
+            'co'    => 119.0,
+            'no2'   => 2.1,
+            'so2'   => 1.2,
+            'o3'    => 81.0,
+        ]);
+
+        $this->assertSame(9.4,   $entity->pm2_5);
+        $this->assertSame(20.9,  $entity->pm10);
+        $this->assertSame(119.0, $entity->co);
+        $this->assertSame(2.1,   $entity->no2);
+        $this->assertSame(1.2,   $entity->so2);
+        $this->assertSame(81.0,  $entity->o3);
+
+        // camelCase datamap alias for pm2_5
+        $this->assertSame(9.4, $entity->pm25);
+    }
+
+    /**
+     * The camelCase alias $pm25 can also be used to set the value via fill(),
+     * mapping back to the pm2_5 database column.
+     */
+    public function testPm25CamelCaseAliasSetsPm2_5(): void
+    {
+        $entity = new WeatherDataEntity();
+        $entity->fill(['pm25' => 12.3]);
+
+        $this->assertSame(12.3, $entity->pm2_5);
+    }
+
+    /**
      * Casts are configured for all expected non-date fields.
      *
      * 'date' is intentionally absent from $casts — it is handled exclusively
@@ -96,6 +137,12 @@ final class WeatherDataEntityTest extends CIUnitTestCase
         $this->assertArrayHasKey('wind_deg',      $casts);
         $this->assertArrayHasKey('wind_gust',     $casts);
         $this->assertArrayHasKey('weather_id',    $casts);
+        $this->assertArrayHasKey('pm2_5',         $casts);
+        $this->assertArrayHasKey('pm10',          $casts);
+        $this->assertArrayHasKey('co',             $casts);
+        $this->assertArrayHasKey('no2',            $casts);
+        $this->assertArrayHasKey('so2',            $casts);
+        $this->assertArrayHasKey('o3',              $casts);
 
         // Nullable variants for numeric columns; plain string for non-nullable
         $this->assertSame('?integer', $casts['id']);
