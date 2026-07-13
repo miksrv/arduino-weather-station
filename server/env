@@ -59,17 +59,18 @@ database.development.DBDriver = MySQLi
 # database.production.password = ''
 # database.production.DBDriver = MySQLi
 
-# Used automatically by PHPUnit database tests (ENVIRONMENT === 'testing').
-# Points at the same docker-compose database as `development` by default.
-database.tests.hostname = 127.0.0.1
-database.tests.port     = 3309
-database.tests.database = db
-database.tests.username = user
-database.tests.password = password
-database.tests.DBDriver = MySQLi
-database.tests.DBPrefix =
-database.tests.charset  = utf8mb4
-database.tests.DBCollat = utf8mb4_general_ci
+# Leave `tests` on Config\Database's built-in SQLite in-memory default —
+# do NOT point it at the same database as `development`. DatabaseTestTrait
+# defaults to $refresh = true, which drops/re-migrates the schema on every
+# PHPUnit run, so reusing the dev database wipes real local data every time
+# the test suite runs.
+# database.tests.hostname = 127.0.0.1
+# database.tests.database = ci4_test
+# database.tests.username = ''
+# database.tests.password = ''
+# database.tests.DBDriver = MySQLi
+# database.tests.DBPrefix =
+# database.tests.port = 3306
 
 #--------------------------------------------------------------------
 # SMTP
