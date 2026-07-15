@@ -1,6 +1,7 @@
 export * as Anomaly from './anomaly'
 export * as Climate from './climate'
 export * as Current from './current'
+export * as Events from './events'
 export * as Forecast from './forecast'
 export * as Heatmap from './heatmap'
 export * as History from './history'
