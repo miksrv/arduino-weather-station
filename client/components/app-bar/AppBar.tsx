@@ -5,9 +5,9 @@ import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
 import { API } from '@/api'
+import useClientOnly from '@/hooks/useClientOnly'
 import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
 import { formatDate, minutesAgo, timeAgo } from '@/tools/date'
-import useClientOnly from '@/tools/hooks/useClientOnly'
 import ThemeSwitcher from '@/ui/theme-switcher'
 
 import styles from './styles.module.sass'

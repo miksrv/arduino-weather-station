@@ -16,7 +16,7 @@ jest.mock('@/api', () => ({
     }
 }))
 
-jest.mock('@/tools/hooks/useClientOnly', () => jest.fn())
+jest.mock('@/hooks/useClientOnly', () => jest.fn())
 jest.mock('next-themes', () => ({
     useTheme: jest.fn()
 }))
@@ -33,7 +33,7 @@ jest.mock('@/tools/date', () => ({
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const useGetCurrentQuery = require('@/api').API.useGetCurrentQuery
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const useClientOnly = require('@/tools/hooks/useClientOnly')
+const useClientOnly = require('@/hooks/useClientOnly')
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { useTheme } = require('next-themes')
 
