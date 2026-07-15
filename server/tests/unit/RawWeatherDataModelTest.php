@@ -175,4 +175,51 @@ final class RawWeatherDataModelTest extends CIUnitTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->model->getWeatherHistoryGrouped('2023-01-01', '2023-01-31', '1 WEEK');
     }
+
+    // -------------------------------------------------------------------------
+    // getRowsSince() — used by the Events feed
+    // -------------------------------------------------------------------------
+
+    /**
+     * getRowsSince() must delegate to the CI4 fluent query builder and return
+     * whatever findAll() produces, without altering it. Only __call (where/
+     * orderBy) and findAll are mocked via onlyMethods() so that getRowsSince()
+     * itself keeps its real implementation.
+     */
+    public function testGetRowsSinceReturnsFindAllResult(): void
+    {
+        $expected = [
+            ['id' => 1, 'date' => '2026-07-13 15:00:00', 'temperature' => 20.0],
+        ];
+
+        $stub = $this->getMockBuilder(RawWeatherDataModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['__call', 'findAll'])
+            ->getMock();
+
+        $stub->method('__call')->willReturnCallback(static fn() => $stub);
+        $stub->expects($this->once())->method('findAll')->willReturn($expected);
+
+        $result = $stub->getRowsSince(new \DateTime('2026-07-13 00:00:00'));
+
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * getRowsSince() must return an empty array when findAll() returns none.
+     */
+    public function testGetRowsSinceReturnsEmptyArrayWhenNoRows(): void
+    {
+        $stub = $this->getMockBuilder(RawWeatherDataModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['__call', 'findAll'])
+            ->getMock();
+
+        $stub->method('__call')->willReturnCallback(static fn() => $stub);
+        $stub->method('findAll')->willReturn([]);
+
+        $result = $stub->getRowsSince(new \DateTime('2026-07-13 00:00:00'));
+
+        $this->assertSame([], $result);
+    }
 }

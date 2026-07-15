@@ -113,12 +113,12 @@ final class PrecipitationModelTest extends CIUnitTestCase
     }
 
     // -------------------------------------------------------------------------
-    // 3. Rainy day threshold — exactly 0.1 mm
+    // 3. Rainy day threshold — exactly RAIN_THRESHOLD_MM
     // -------------------------------------------------------------------------
 
     /**
-     * A day with total = 0.1 is NOT rainy (threshold is strictly > 0.1).
-     * A day with total = 0.11 IS rainy.
+     * A day with total = RAIN_THRESHOLD_MM (0.1) is NOT rainy (threshold is
+     * strictly > RAIN_THRESHOLD_MM). A day with total = 0.11 IS rainy.
      *
      * _buildFullCalendar() fills all 366 days of 2024 (leap year). The 3 explicit
      * days are included; the remaining 363 days are filled with 0.0 and counted as
@@ -127,7 +127,7 @@ final class PrecipitationModelTest extends CIUnitTestCase
     public function testRainyDayThreshold(): void
     {
         $days = [
-            ['date' => '2024-06-01', 'total' => 0.1],   // NOT rainy
+            ['date' => '2024-06-01', 'total' => PrecipitationModel::RAIN_THRESHOLD_MM], // NOT rainy
             ['date' => '2024-06-02', 'total' => 0.11],  // rainy
             ['date' => '2024-06-03', 'total' => 0.0],   // NOT rainy
         ];
@@ -139,15 +139,25 @@ final class PrecipitationModelTest extends CIUnitTestCase
         $this->assertSame(365, $stats['dryDays']);
     }
 
+    /**
+     * RAIN_THRESHOLD_MM must equal 0.1 mm — the noise floor shared with
+     * App\Libraries\EventFeedBuilder's precipitation event detection.
+     */
+    public function testRainThresholdConstant(): void
+    {
+        $this->assertSame(0.1, PrecipitationModel::RAIN_THRESHOLD_MM);
+    }
+
     // -------------------------------------------------------------------------
     // 4. Trace amount (0.1 mm) breaks a dry streak
     // -------------------------------------------------------------------------
 
     /**
-     * Jan 1–5 dry (0.0 mm), Jan 6 trace (0.1 mm), Jan 7–10 dry (0.0 mm).
+     * Jan 1–5 dry (0.0 mm), Jan 6 trace (RAIN_THRESHOLD_MM), Jan 7–10 dry (0.0 mm).
      *
-     * The 0.1 mm on Jan 6 must break the dry streak even though it is not
-     * counted as a "rainy day" in the rainyDays counter (threshold > 0.1).
+     * The trace amount on Jan 6 must break the dry streak even though it is not
+     * counted as a "rainy day" in the rainyDays counter (threshold is strictly
+     * greater than RAIN_THRESHOLD_MM).
      *
      * _buildFullCalendar() fills all 366 days of 2024 (leap year). Days Jan 11–Dec 31
      * (356 days) are filled with 0.0, extending the post-trace dry run from 4 (Jan 7–10)
@@ -158,7 +168,7 @@ final class PrecipitationModelTest extends CIUnitTestCase
     {
         $days = array_merge(
             $this->_makeDays('2024-01-01', 5, 0.0),  // dry: Jan 1–5
-            $this->_makeDays('2024-01-06', 1, 0.1),  // trace: Jan 6
+            $this->_makeDays('2024-01-06', 1, PrecipitationModel::RAIN_THRESHOLD_MM),  // trace: Jan 6
             $this->_makeDays('2024-01-07', 4, 0.0)   // dry: Jan 7–10
         );
 
@@ -167,7 +177,7 @@ final class PrecipitationModelTest extends CIUnitTestCase
         // The trace on Jan 6 breaks the Jan 1–5 dry streak (correct behaviour).
         // After calendar fill, the post-trace dry run (Jan 7 – Dec 31) is the longest.
         $dry = $stats['longestDryStreak'];
-        $this->assertSame(360, $dry['days'], 'Trace amount (0.1 mm) must break the dry streak');
+        $this->assertSame(360, $dry['days'], 'Trace amount (RAIN_THRESHOLD_MM) must break the dry streak');
         $this->assertSame('2024-01-07', $dry['start']);
         $this->assertSame('2024-12-31', $dry['end']);
     }
