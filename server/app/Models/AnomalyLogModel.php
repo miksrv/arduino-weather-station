@@ -152,6 +152,31 @@ class AnomalyLogModel extends Model
     }
 
     /**
+     * Returns anomaly_log rows whose start_date or end_date falls within the
+     * given inclusive date window. Used by the Events feed to surface
+     * anomaly_started / anomaly_ended entries — reuses the existing
+     * anomaly_log table rather than persisting anything new.
+     *
+     * @param string $startDate Window start, 'Y-m-d' format.
+     * @param string $endDate   Window end, 'Y-m-d' format.
+     * @return array
+     */
+    public function getAnomaliesTouchingWindow(string $startDate, string $endDate): array
+    {
+        return $this
+            ->groupStart()
+                ->where('start_date >=', $startDate)
+                ->where('start_date <=', $endDate)
+            ->groupEnd()
+            ->orGroupStart()
+                ->where('end_date >=', $startDate)
+                ->where('end_date <=', $endDate)
+            ->groupEnd()
+            ->orderBy('start_date', 'DESC')
+            ->findAll();
+    }
+
+    /**
      * Returns the most recent $limit rows (open and closed), ordered by
      * start_date descending.
      *

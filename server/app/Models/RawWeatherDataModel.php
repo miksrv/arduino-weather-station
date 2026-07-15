@@ -231,6 +231,23 @@ class RawWeatherDataModel extends Model
     }
 
     /**
+     * Retrieves all raw weather observations recorded on or after the given
+     * date, ordered chronologically (oldest first). Used by the Events feed
+     * to dynamically derive value-change, wind-gust, and precipitation
+     * entries without persisting any additional data.
+     *
+     * @param DateTime $since Earliest date/time (inclusive) to include.
+     * @return array Rows as WeatherDataEntity instances, ordered by date ASC.
+     */
+    public function getRowsSince(DateTime $since): array
+    {
+        return $this
+            ->where('date >=', $since->format('Y-m-d H:i:s'))
+            ->orderBy('date', 'ASC')
+            ->findAll();
+    }
+
+    /**
      * Retrieves weather history data grouped by a specified interval.
      *
      * @param string      $startDate     Start of the date range (Y-m-d H:i:s).
