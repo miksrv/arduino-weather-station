@@ -13,6 +13,10 @@
 - [feedback_phpunit_mock_return_types.md](feedback_phpunit_mock_return_types.md) — willReturnCallback closures must declare and return the correct type when the mocked method has a PHP 8 return type declaration
 - [feedback_ci4_shared_test_db_wipes_schema.md](feedback_ci4_shared_test_db_wipes_schema.md) — vendor/bin/phpunit wipes the App-namespace schema in the shared dev DB; run migrate AFTER phpunit, before final manual DB verification
 - [feedback_ci4_entity_camelcase_digit_columns.md](feedback_ci4_entity_camelcase_digit_columns.md) — Entity camelCase access needs explicit $datamap entries; no auto-conversion, especially for columns with embedded digits (pm2_5 → pm25)
+- [feedback_getrowarray_null_typeerror.md](feedback_getrowarray_null_typeerror.md) — getRowArray() returns null (not []) on no match → array_merge() TypeError, which is NOT an Exception; controllers must catch Throwable
+
+## Project
+- [project_freshness_constant_reuse.md](project_freshness_constant_reuse.md) — Canonical staleness threshold is EventFeedBuilder::SYSTEM_FRESHNESS_MINUTES (15 min, public); reuse it, don't duplicate. Time extends DateTimeImmutable not DateTime — use instanceof DateTimeInterface
 
 ## Reference
 - [reference_openmeteo_api_quirks.md](reference_openmeteo_api_quirks.md) — Open-Meteo API verified response shape: dual-host, ISO8601 time (not epoch), columnar hourly arrays, visibility is valid, shorter air-quality forecast horizon
