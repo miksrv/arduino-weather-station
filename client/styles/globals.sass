@@ -26,8 +26,17 @@ body
 .widgets-list
     display: flex
     flex-wrap: wrap
-    justify-content: space-between
     margin-top: 5px
+    gap: 10px
+
+// Groups widgets that should always sit on their own row together, at equal height
+// (flex's default align-items: stretch matches them to the tallest one), regardless
+// of how the preceding widgets in .widgets-list happen to wrap.
+.widget-row
+    display: flex
+    flex-wrap: wrap
+    flex-basis: 100%
+    width: 100%
     gap: 10px
 
 .toolbar
