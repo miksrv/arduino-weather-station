@@ -28,6 +28,14 @@ use DateTime;
  */
 class PrecipitationModel extends Model
 {
+    /**
+     * @var float Noise floor (mm) used to decide whether a day actually
+     * "rained" versus a spurious sensor reading. This is the single source
+     * of truth for that threshold — App\Libraries\EventFeedBuilder references
+     * this same constant for its precipitation events.
+     */
+    public const RAIN_THRESHOLD_MM = 0.1;
+
     protected $table            = 'daily_averages';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
@@ -156,7 +164,7 @@ class PrecipitationModel extends Model
 
             $totalYear += $total;
 
-            if ($total > 0.1) {
+            if ($total > self::RAIN_THRESHOLD_MM) {
                 $rainyDays++;
             } else {
                 $dryDays++;

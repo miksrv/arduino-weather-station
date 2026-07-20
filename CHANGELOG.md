@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 3.7.7
+
+### Patch Changes
+
+- Add a system events feed (`GET /events`, `EventFeedBuilder`) that surfaces significant sensor changes, wind gusts, precipitation runs, anomaly start/end entries, and a `system_status` freshness flag derived from the latest `raw_weather_data` row; expose it on `/sensors` via a new `widget-event-log` widget, with full PHPUnit and Jest coverage
+- Fix `Current::getCurrentWeather` throwing an unhandled 500 when the latest sensor reading is older than 30 minutes (`array_merge()` receiving `null` from `RawWeatherDataModel::getRecentAverages()`); add `lastUpdated`/`isStale` fields to the `/current` response so the frontend can flag stale sensor data instead of silently rendering it as current
+- Revamp the `/sensors` dashboard layout with new dedicated widgets — `widget-sensor-stat`, `widget-sensor-uv` (with UV scale), `widget-sensor-wind` (with compass), `widget-wind-rose`, `widget-precip`, and `widget-charts-panel` — built on new reusable building blocks (`WidgetCard`, `WidgetTile`, `StatBlock`, `SparklineChart`) and ECharts theme color utilities
+- Add an Open-Meteo weather provider alongside OpenWeatherMap/WeatherAPI/VisualCrossing, including air quality fields (new migration plus entity/model support) and a shared `WeatherProviderInterface`/`AbstractWeatherAPILibrary` base now used uniformly by the `GetCurrentWeather`/`GetForecastWeather` commands
+- Fix broken hook import paths after moving shared hooks (`useClientOnly`, `useLocalStorage`) from `client/tools` to `client/hooks`, affecting `AppBar` and `LanguageSwitcher`
+- Fix null-safety issues in `widget-flood-risk`, `widget-heatmap`, and `WidgetSummary` utilities
+- Bump frontend i18n/lint dependencies; rename server env template (`.env.production` → `env`) and update setup docs
+
 ## 3.7.6
 
 ### Patch Changes

@@ -20,6 +20,28 @@
 
 import { ApiModel } from '@/api'
 
+/**
+ * Reads a CSS custom property value from :root at runtime.
+ * Returns a fallback if called on the server (SSR) or if the variable is not set.
+ * Needed because canvas-rendered charts (ECharts) can't resolve `var(--x)` themselves —
+ * they need an actual resolved hex/rgb value.
+ */
+export const resolveCssVar = (variable: string, fallback: string): string => {
+    if (typeof window === 'undefined') {
+        return fallback
+    }
+    return getComputedStyle(document.documentElement).getPropertyValue(variable).trim() || fallback
+}
+
+/** Converts a '#rrggbb' hex color to an 'rgba(...)' string with the given alpha, for ECharts gradient stops. */
+export const hexToRgba = (hex: string, alpha: number): string => {
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
 export const colors = {
     brown: ['#795548', '#8d6e63'], // Brown
     navy: ['#283593', '#3f51b5'], // Navy
@@ -84,3 +106,6 @@ export const getSensorColor = (sensor?: keyof ApiModel.Sensors): string[] => {
 
     return colors[sensorColor]
 }
+
+/** Shared trend chart color for the summary stat widgets (e.g. widget-sensor-stat) — always blue per design, regardless of sensor kind. */
+export const statChartColor: string[] = colors.blue

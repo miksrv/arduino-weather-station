@@ -1,0 +1,57 @@
+@use '../../styles/variables'
+
+.header
+    display: flex
+    align-items: center
+    justify-content: space-between
+    flex-wrap: wrap
+    gap: 10px
+    margin-bottom: 8px
+
+    h3
+        margin: 0
+        font-size: 18px
+        font-weight: 300
+        color: var(--text-color-primary)
+
+.toggle
+    display: flex
+    gap: 2px
+    background: var(--input-background-color)
+    border-radius: var(--border-radius)
+    padding: 3px
+
+.toggleButton
+    border: none
+    background: transparent
+    color: var(--text-color-secondary)
+    font-size: 12px
+    padding: 6px 12px
+    border-radius: calc(var(--border-radius) - 2px)
+    cursor: pointer
+    transition: background-color 0.2s, color 0.2s
+    white-space: nowrap
+
+    &:hover
+        color: var(--text-color-primary)
+
+.toggleButtonActive
+    background: var(--color-main)
+    color: #fff
+
+    &:hover
+        color: #fff
+
+.chartsRow
+    display: flex
+    gap: 8px
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        flex-direction: column
+
+.chartColumn
+    flex: 1
+    min-width: 0
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        width: 100%

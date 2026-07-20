@@ -175,4 +175,170 @@ final class RawWeatherDataModelTest extends CIUnitTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->model->getWeatherHistoryGrouped('2023-01-01', '2023-01-31', '1 WEEK');
     }
+
+    // -------------------------------------------------------------------------
+    // getRowsSince() — used by the Events feed
+    // -------------------------------------------------------------------------
+
+    /**
+     * getRowsSince() must delegate to the CI4 fluent query builder and return
+     * whatever findAll() produces, without altering it. Only __call (where/
+     * orderBy) and findAll are mocked via onlyMethods() so that getRowsSince()
+     * itself keeps its real implementation.
+     */
+    public function testGetRowsSinceReturnsFindAllResult(): void
+    {
+        $expected = [
+            ['id' => 1, 'date' => '2026-07-13 15:00:00', 'temperature' => 20.0],
+        ];
+
+        $stub = $this->getMockBuilder(RawWeatherDataModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['__call', 'findAll'])
+            ->getMock();
+
+        $stub->method('__call')->willReturnCallback(static fn() => $stub);
+        $stub->expects($this->once())->method('findAll')->willReturn($expected);
+
+        $result = $stub->getRowsSince(new \DateTime('2026-07-13 00:00:00'));
+
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * getRowsSince() must return an empty array when findAll() returns none.
+     */
+    public function testGetRowsSinceReturnsEmptyArrayWhenNoRows(): void
+    {
+        $stub = $this->getMockBuilder(RawWeatherDataModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['__call', 'findAll'])
+            ->getMock();
+
+        $stub->method('__call')->willReturnCallback(static fn() => $stub);
+        $stub->method('findAll')->willReturn([]);
+
+        $result = $stub->getRowsSince(new \DateTime('2026-07-13 00:00:00'));
+
+        $this->assertSame([], $result);
+    }
+
+    // -------------------------------------------------------------------------
+    // getRecentAverages() — null-safety around getRowArray()
+    //
+    // getRowArray() returns null (not []) when the query matches no rows. Prior
+    // to the fix, getCurrentActualWeatherData() fed this null straight into
+    // array_merge(), which throws a TypeError (not an Exception) whenever the
+    // Arduino sensor has not reported for ~30 minutes. getRecentAverages() must
+    // now coalesce that null to an empty array itself.
+    // -------------------------------------------------------------------------
+
+    /**
+     * When the underlying query returns no rows, getRowArray() yields null;
+     * getRecentAverages() must coalesce this to an empty array rather than
+     * propagating null to its caller.
+     */
+    public function testGetRecentAveragesReturnsEmptyArrayWhenNoRows(): void
+    {
+        $resultStub = new class {
+            public function getRowArray(): ?array
+            {
+                return null;
+            }
+        };
+
+        $stub = $this->getMockBuilder(RawWeatherDataModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['__call'])
+            ->getMock();
+
+        $stub->method('__call')->willReturnCallback(
+            static fn(string $name) => $name === 'get' ? $resultStub : $stub
+        );
+
+        $result = $stub->getRecentAverages(new \DateTime('2026-07-13 00:00:00'), new \DateTime('2026-07-13 01:00:00'));
+
+        $this->assertSame([], $result);
+    }
+
+    /**
+     * When rows are found, getRecentAverages() must pass the row array through unchanged.
+     */
+    public function testGetRecentAveragesReturnsRowArrayWhenPresent(): void
+    {
+        $expected   = ['temperature' => 21.5, 'humidity' => 60];
+        $resultStub = new class($expected) {
+            public function __construct(private readonly array $row)
+            {
+            }
+
+            public function getRowArray(): ?array
+            {
+                return $this->row;
+            }
+        };
+
+        $stub = $this->getMockBuilder(RawWeatherDataModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['__call'])
+            ->getMock();
+
+        $stub->method('__call')->willReturnCallback(
+            static fn(string $name) => $name === 'get' ? $resultStub : $stub
+        );
+
+        $result = $stub->getRecentAverages(new \DateTime('2026-07-13 00:00:00'), new \DateTime('2026-07-13 01:00:00'));
+
+        $this->assertSame($expected, $result);
+    }
+
+    // -------------------------------------------------------------------------
+    // getCurrentActualWeatherData() — must not throw when there is no recent data
+    // -------------------------------------------------------------------------
+
+    /**
+     * With a completely empty table (no recent averages, no latest data, no
+     * last update time at all), getCurrentActualWeatherData() must return a
+     * plain ['date' => null] array instead of throwing a TypeError from
+     * array_merge() receiving null arguments.
+     */
+    public function testGetCurrentActualWeatherDataDoesNotThrowWhenNoData(): void
+    {
+        $stub = $this->getMockBuilder(RawWeatherDataModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getRecentAverages', 'getLatestWeatherData', 'getLastUpdateTime'])
+            ->getMock();
+
+        $stub->method('getRecentAverages')->willReturn([]);
+        $stub->method('getLatestWeatherData')->willReturn([]);
+        $stub->method('getLastUpdateTime')->willReturn(null);
+
+        $result = $stub->getCurrentActualWeatherData();
+
+        $this->assertSame(['date' => null], $result);
+    }
+
+    /**
+     * With data present, getCurrentActualWeatherData() merges the last update
+     * date, recent averages, and latest infrequent-field data into one array.
+     */
+    public function testGetCurrentActualWeatherDataMergesAllSources(): void
+    {
+        $stub = $this->getMockBuilder(RawWeatherDataModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getRecentAverages', 'getLatestWeatherData', 'getLastUpdateTime'])
+            ->getMock();
+
+        $stub->method('getRecentAverages')->willReturn(['temperature' => 20.5]);
+        $stub->method('getLatestWeatherData')->willReturn(['precipitation' => 0.0]);
+        $stub->method('getLastUpdateTime')->willReturn('2026-07-20 10:00:00');
+
+        $result = $stub->getCurrentActualWeatherData();
+
+        $this->assertSame([
+            'date'          => '2026-07-20 10:00:00',
+            'temperature'   => 20.5,
+            'precipitation' => 0.0,
+        ], $result);
+    }
 }

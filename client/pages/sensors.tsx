@@ -6,21 +6,33 @@ import { useTranslation } from 'next-i18next/pages'
 import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations'
 import { generateNextSeo } from 'next-seo/pages'
 
-import { API, ApiModel, setLocale } from '@/api'
+import { API, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
-import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
-import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
+import { getWeatherI18nKey } from '@/tools/conditions'
 import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
+import { round } from '@/tools/helpers'
 import { LocaleType } from '@/tools/types'
-import { convertHpaToMmHg, filterRecentData, getMinMaxValues } from '@/tools/weather'
+import {
+    convertHpaToMmHg,
+    filterRecentData,
+    filterToday,
+    getAbsoluteHumidity,
+    getAirDensity,
+    getPressureAltitude,
+    sumPrecipitation
+} from '@/tools/weather'
+import WidgetChartsPanel from '@/widgets/widget-charts-panel'
+import WidgetEventLog from '@/widgets/widget-event-log'
+import WidgetPrecip from '@/widgets/widget-precip'
+import WidgetSensorStat from '@/widgets/widget-sensor-stat'
+import WidgetSensorUv from '@/widgets/widget-sensor-uv'
+import WidgetSensorWind from '@/widgets/widget-sensor-wind'
+import WidgetTile from '@/widgets/widget-tile'
+import WidgetWindRose from '@/widgets/widget-wind-rose'
 
 type IndexPageProps = object
-
-type WidgetType = Pick<WidgetSensorProps, 'title' | 'unit' | 'icon' | 'formatter' | 'size' | 'link'> & {
-    source: keyof ApiModel.Sensors
-}
 
 const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n, t } = useTranslation()
@@ -37,108 +49,74 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         { pollingInterval: POLING_INTERVAL_CURRENT }
     )
 
+    const { data: weeklyHistory, isLoading: weeklyHistoryLoading } = API.useGetHistoryQuery(
+        {
+            start_date: formatDate(currentDate.subtract(6, 'days').toDate(), 'YYYY-MM-DD'),
+            end_date: formatDate(currentDate.toDate(), 'YYYY-MM-DD')
+        },
+        { pollingInterval: POLING_INTERVAL_CURRENT }
+    )
+
     // const history12HoursData = useMemo(() => filterRecentData(history, 12), [history])
     const history24HoursData = useMemo(() => filterRecentData(history, 24), [history])
 
-    const widgets: WidgetType[] = useMemo(
+    const pressureHistory24HoursMmHg = useMemo(
+        () => history24HoursData?.map((item) => ({ ...item, pressure: convertHpaToMmHg(item.pressure) })),
+        [history24HoursData]
+    )
+
+    const precipTodayTotal = useMemo(() => sumPrecipitation(filterToday(history)), [history])
+    const precip24hTotal = useMemo(() => sumPrecipitation(history24HoursData), [history24HoursData])
+    const precip7dTotal = useMemo(() => sumPrecipitation(weeklyHistory), [weeklyHistory])
+
+    const tiles = useMemo(
         () => [
+            { title: t('dew-point'), icon: 'Thermometer' as const, value: current?.dewPoint, unit: '°C' },
+            { title: t('feels-like'), icon: 'Thermometer' as const, value: current?.feelsLike, unit: '°C' },
             {
-                title: t('temperature'),
-                unit: '°C',
-                icon: 'Thermometer',
-                source: 'temperature',
-                size: 'x2',
-                link: { href: '/history' }
+                title: t('absolute-humidity'),
+                icon: 'Water' as const,
+                value: getAbsoluteHumidity(current?.temperature, current?.humidity),
+                unit: t('g-m3')
             },
             {
-                title: t('feels-like'),
-                unit: '°C',
-                icon: 'Thermometer',
-                source: 'feelsLike',
-                link: { href: '/history' }
+                title: t('air-density'),
+                icon: 'Layers' as const,
+                value: getAirDensity(current?.temperature, current?.pressure, current?.humidity),
+                unit: t('kg-m3')
             },
             {
-                title: t('dew-point'),
-                unit: '°C',
-                icon: 'Thermometer',
-                source: 'dewPoint',
-                link: { href: '/history' }
-            },
-            {
-                title: t('pressure'),
-                unit: t('mm-hg'),
-                icon: 'Pressure',
-                source: 'pressure',
-                formatter: convertHpaToMmHg,
-                size: 'x2',
-                link: { href: '/history' }
-            },
-            {
-                title: t('cloudiness'),
-                unit: '%',
-                icon: 'Cloud',
-                source: 'clouds',
-                link: { href: '/history' }
-            },
-            {
-                title: t('visibility'),
-                unit: t('meters_short'),
-                icon: 'Eye',
-                source: 'visibility'
-            },
-            {
-                title: t('humidity'),
-                unit: '%',
-                icon: 'Water',
-                source: 'humidity',
-                link: { href: '/history' }
-            },
-            {
-                title: t('wind-speed'),
-                unit: t('meters-per-second'),
-                icon: 'Wind',
-                source: 'windSpeed',
-                link: { href: '/history' }
-            },
-            {
-                title: t('wind-gust'),
-                unit: t('meters-per-second'),
-                icon: 'Wind',
-                source: 'windGust'
-            },
-            {
-                title: t('wind-deg'),
-                unit: '°',
-                icon: 'Compass',
-                source: 'windDeg',
-                link: { href: '/history' }
-            },
-            {
-                title: t('precipitation'),
-                unit: t('millimeters'),
-                icon: 'WaterDrop',
-                source: 'precipitation',
-                link: { href: '/history' }
-            },
-            {
-                title: t('uv-index'),
-                icon: 'Sun',
-                source: 'uvIndex'
-            },
-            {
-                title: t('sol-energy'),
-                unit: t('mj-m2'),
-                icon: 'SolarPower',
-                source: 'solEnergy'
+                title: t('pressure-altitude'),
+                icon: 'Ruler' as const,
+                value: getPressureAltitude(current?.pressure),
+                unit: t('meters')
             },
             {
                 title: t('sol-radiation'),
-                unit: t('w-m2'),
-                icon: 'Lightning',
-                source: 'solRadiation'
-            }
+                icon: 'Lightning' as const,
+                value: current?.solRadiation,
+                unit: t('w-m2')
+            },
+            {
+                title: t('sol-energy'),
+                icon: 'SolarPower' as const,
+                value: current?.solEnergy,
+                unit: t('mj-m2')
+            },
+            {
+                title: t('visibility'),
+                icon: 'Eye' as const,
+                value: current?.visibility !== undefined ? round(current.visibility / 1000, 1) : undefined,
+                unit: t('km')
+            },
+            {
+                title: t('sky-condition'),
+                icon: 'Cloud' as const,
+                value: t(getWeatherI18nKey(current?.weatherId))
+            },
+            { title: t('cloudiness'), icon: 'Cloud' as const, value: current?.clouds, unit: '%' }
         ],
-        [t]
+        [t, current]
     )
 
     return (
@@ -170,23 +148,105 @@ const IndexPage: NextPage<IndexPageProps> = () => {
             </Head>
 
             <div className={'widgets-list'}>
-                {widgets?.map((widget) => (
-                    <WidgetSensor
-                        {...widget}
-                        key={`widget-${widget.source}`}
+                <WidgetSensorStat
+                    title={t('air-temperature')}
+                    unit={'°C'}
+                    icon={'Thermometer'}
+                    source={'temperature'}
+                    size={'x2'}
+                    link={{ href: '/history' }}
+                    loading={currentLoading}
+                    chartLoading={historyLoading}
+                    currentValue={current?.temperature}
+                    history={history24HoursData}
+                />
+
+                <WidgetSensorStat
+                    title={t('air-humidity')}
+                    unit={'%'}
+                    icon={'Water'}
+                    source={'humidity'}
+                    size={'x2'}
+                    link={{ href: '/history' }}
+                    loading={currentLoading}
+                    chartLoading={historyLoading}
+                    currentValue={current?.humidity}
+                    history={history24HoursData}
+                />
+
+                <WidgetSensorStat
+                    title={t('atmospheric-pressure')}
+                    unit={t('mm-hg-full')}
+                    icon={'Pressure'}
+                    source={'pressure'}
+                    size={'x2'}
+                    link={{ href: '/history' }}
+                    loading={currentLoading}
+                    chartLoading={historyLoading}
+                    currentValue={convertHpaToMmHg(current?.pressure)}
+                    history={pressureHistory24HoursMmHg}
+                />
+
+                <WidgetPrecip
+                    title={t('precipitation')}
+                    icon={'WaterDrop'}
+                    size={'x2'}
+                    link={{ href: '/history' }}
+                    loading={historyLoading}
+                    chartLoading={historyLoading || weeklyHistoryLoading}
+                    todayTotal={precipTodayTotal}
+                    last24hTotal={precip24hTotal}
+                    last7dTotal={precip7dTotal}
+                    history={history24HoursData}
+                />
+
+                <WidgetSensorWind
+                    title={t('wind')}
+                    icon={'Wind'}
+                    size={'x2'}
+                    link={{ href: '/history' }}
+                    loading={currentLoading}
+                    chartLoading={historyLoading}
+                    windSpeed={current?.windSpeed}
+                    windDeg={current?.windDeg}
+                    windGust={current?.windGust}
+                    history={history24HoursData}
+                />
+
+                <WidgetSensorUv
+                    title={t('uv-index')}
+                    icon={'Sun'}
+                    size={'x2'}
+                    loading={currentLoading}
+                    chartLoading={historyLoading}
+                    value={current?.uvIndex}
+                    history={history24HoursData}
+                />
+
+                {tiles.map((tile) => (
+                    <WidgetTile
+                        {...tile}
+                        key={tile.title}
                         loading={currentLoading}
-                        chartLoading={historyLoading}
-                        minMax={getMinMaxValues(history24HoursData, widget.source)}
-                        currentValue={current?.[widget.source]}
-                        formatter={widget?.formatter}
-                        chart={
-                            <WeatherChart
-                                source={widget.source}
-                                data={history24HoursData}
-                            />
-                        }
                     />
                 ))}
+
+                <div className={'widget-row'}>
+                    <WidgetWindRose
+                        title={t('wind-rose')}
+                        icon={'Compass'}
+                        size={'x2'}
+                        loading={historyLoading}
+                        history={history24HoursData}
+                    />
+
+                    <WidgetEventLog size={'x2'} />
+                </div>
+
+                <WidgetChartsPanel
+                    history24h={history24HoursData}
+                    history7d={weeklyHistory}
+                />
             </div>
         </AppLayout>
     )

@@ -13,6 +13,7 @@ jest.mock('@/api/store', () => ({
 jest.mock('@/components/app-bar', () => jest.fn(() => <div data-testid='app-bar' />))
 jest.mock('@/components/footer', () => jest.fn(() => <div data-testid='footer' />))
 jest.mock('@/components/language-switcher', () => jest.fn(() => <div data-testid='language-switcher' />))
+jest.mock('@/components/stale-data-banner', () => jest.fn(() => <div data-testid='stale-data-banner' />))
 jest.mock('./Menu', () =>
     jest.fn(({ onClick }) => (
         <button
@@ -46,6 +47,7 @@ describe('AppLayout', () => {
         expect(screen.getByTestId('language-switcher')).toBeInTheDocument()
         expect(screen.getByTestId('menu')).toBeInTheDocument()
         expect(screen.getByTestId('progressbar')).toBeInTheDocument()
+        expect(screen.getByTestId('stale-data-banner')).toBeInTheDocument()
         expect(screen.getByText('ChildContent')).toBeInTheDocument()
     })
 

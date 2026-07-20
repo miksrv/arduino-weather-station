@@ -111,6 +111,16 @@ New component at `client/components/widget-forecast-cards/` renders both daily a
 
 The two `WidgetForecastTable` instances from `index.tsx` were moved to `forecast.tsx` (appended after the existing daily table, both with `fullWidth={true}`).
 
+## StaleDataBanner (added 2026-07-20)
+
+New shared component at `client/components/stale-data-banner/` (`StaleDataBanner.tsx` + `styles.module.sass` + `index.ts` barrel + test). Wired into `components/app-layout/AppLayout.tsx` as the first child inside `<main className={styles.main}>`, right before `{children}` — this makes it render on every page since every page wraps its content in `AppLayout`. It is self-contained: calls `API.useGetCurrentQuery(undefined, { pollingInterval: POLING_INTERVAL_CURRENT })` itself (RTK Query dedupes this against `AppBar`'s identical subscription — same query key/arg, no extra network request) and returns `null` unless `current?.isStale` is `true`. Styled with `--color-orange-background` / `--color-orange` (light+dark vars already exist in `styles/light.css` / `dark.css`) — same warning-color convention as `widget-flood-risk`'s `.disclaimer`.
+
+`ApiType.Current.Response` (`api/types/current.ts`) was extended with backend-driven `lastUpdated: string` (ISO8601) and `isStale: boolean` fields — added as an intersection on `Response`, NOT on the shared `ApiModel.Weather` model, because `ApiModel.Weather` is reused as `Weather[]` by `history`, `forecast`, and `heatmap` response types (`api/types/history.ts`, `forecast.ts`, `heatmap.ts`) — adding stale/lastUpdated fields there would have leaked into unrelated endpoints. The staleness threshold itself is computed server-side; the frontend must only branch on the `isStale` boolean, never recompute a threshold.
+
+Relative-time formatting for `lastUpdated` reuses the existing `timeAgo()` in `tools/date.ts` (dayjs `.fromNow()`, locale-aware via `dayjs.locale()` set in `_app.tsx`) — no new tools/ utility was needed. Note this is a *second*, independent staleness indicator: `AppBar.tsx` already has a client-computed online/offline dot using `minutesAgo(current?.date) <= OFFLINE_TIME` (30 min hardcoded threshold) — that one was intentionally left untouched (small dot in the header, different concern) while the new banner is the prominent, backend-driven, whole-app warning.
+
+i18n keys added next to the pre-existing `event-system-stale` key (which belongs to `widget-event-log`, a different feature — do not reuse it for other "stale" UI): `stale-data-banner-title`, `stale-data-banner-message` (interpolates `{{time}}`).
+
 ## Canonical String-Conversion Helpers (tools/)
 
 - `anomalyTypeToI18nKey(type)` in `tools/conditions.ts` — converts `snake_case` anomaly IDs to `kebab-case` i18n key segments (e.g. `heat_wave` → `heat-wave`). Used by `widget-anomaly-history/utils.ts` (re-export), `widget-anomaly-calendar/WidgetAnomalyCalendar.tsx` (direct import), and `widget-anomaly-card/utils.ts` (re-exported as `anomalyIdToI18nKey` for backward compatibility).

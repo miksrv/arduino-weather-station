@@ -90,7 +90,7 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
 
                         <Badge
                             icon={'Pressure'}
-                            label={`${convertHpaToMmHg(weather?.pressure) || t('no-data')} ${t('mm-hg')}`}
+                            label={`${convertHpaToMmHg(weather?.pressure) ?? t('no-data')} ${t('mm-hg')}`}
                         />
                     </>
                 )}

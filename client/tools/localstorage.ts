@@ -1,4 +1,4 @@
-import { DEFAULT_STORAGE_KEY } from '@/tools/hooks/useLocalStorage'
+import { DEFAULT_STORAGE_KEY } from '@/hooks/useLocalStorage'
 
 import { isValidJSON } from './helpers'
 

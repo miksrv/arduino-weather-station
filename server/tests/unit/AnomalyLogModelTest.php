@@ -336,6 +336,54 @@ final class AnomalyLogModelTest extends CIUnitTestCase
     }
 
     // -------------------------------------------------------------------------
+    // getAnomaliesTouchingWindow — used by the Events feed
+    // -------------------------------------------------------------------------
+
+    /**
+     * getAnomaliesTouchingWindow() must delegate to findAll() and return its
+     * result unchanged. As with getAnomaliesActiveOnDate(), the fluent
+     * groupStart/where/orGroupStart chain is exercised for real (it only
+     * builds the query, it does not execute it), so only findAll() needs to
+     * be mocked.
+     */
+    public function testGetAnomaliesTouchingWindowCallsFindAll(): void
+    {
+        $expected = [
+            ['id' => 1, 'type' => 'heat_wave', 'start_date' => '2026-07-13', 'end_date' => null],
+        ];
+
+        $stub = $this->getMockBuilder(AnomalyLogModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['findAll'])
+            ->getMock();
+
+        $stub->expects($this->once())
+            ->method('findAll')
+            ->willReturn($expected);
+
+        $result = $stub->getAnomaliesTouchingWindow('2026-07-13', '2026-07-14');
+
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * getAnomaliesTouchingWindow() must return an empty array when findAll() returns [].
+     */
+    public function testGetAnomaliesTouchingWindowReturnsEmptyArrayWhenNoRows(): void
+    {
+        $stub = $this->getMockBuilder(AnomalyLogModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['findAll'])
+            ->getMock();
+
+        $stub->method('findAll')->willReturn([]);
+
+        $result = $stub->getAnomaliesTouchingWindow('2026-07-13', '2026-07-14');
+
+        $this->assertSame([], $result);
+    }
+
+    // -------------------------------------------------------------------------
     // closeAnomaly()
     // -------------------------------------------------------------------------
 

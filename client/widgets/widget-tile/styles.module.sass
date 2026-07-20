@@ -1,0 +1,53 @@
+@use '../../styles/variables'
+
+.tile
+    display: flex
+    align-items: center
+    gap: 10px
+    background: var(--container-background-color)
+    border-radius: var(--border-radius)
+    box-shadow: var(--container-shadow)
+    padding: 12px 14px
+    flex-basis: calc(20% - 8px)
+    width: calc(20% - 8px)
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        flex-basis: calc(33.33% - 8px) !important
+        width: calc(33.33% - 8px) !important
+
+    @media only screen and (max-width: 480px)
+        flex-basis: calc(50% - 5px) !important
+        width: calc(50% - 5px) !important
+
+.icon
+    flex: 0 0 auto
+    width: 22px
+    height: 22px
+    fill: var(--text-color-secondary)
+
+.content
+    display: flex
+    flex-direction: column
+    gap: 2px
+    min-width: 0
+
+.title
+    font-size: 12px
+    color: var(--text-color-secondary)
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+
+.value
+    font-size: 15px
+    font-weight: 600
+    color: var(--text-color-primary)
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+
+.unit
+    font-size: 12px
+    font-weight: 400
+    color: var(--text-color-secondary)
+    margin-left: 3px
