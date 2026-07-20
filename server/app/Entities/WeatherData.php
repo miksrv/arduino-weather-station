@@ -103,6 +103,8 @@ class WeatherData
     public ?int    $windDeg;
     public ?int    $weatherId;
     public ?string $date;
+    public ?string $lastUpdated;
+    public bool    $isStale;
 
     /**
      * Hydrates the DTO from an associative array of snake_case or camelCase keys.

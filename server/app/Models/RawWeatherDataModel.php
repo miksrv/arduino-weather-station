@@ -172,7 +172,7 @@ class RawWeatherDataModel extends Model
      *
      * @param DateTime $startDateTime The start of the time range for sampling data.
      * @param DateTime $currentDateTime The end of the time range for sampling data.
-     * @return array The recent averages of weather data.
+     * @return array The recent averages of weather data, or an empty array when no rows match.
      */
     public function getRecentAverages(DateTime $startDateTime, DateTime $currentDateTime): array
     {
@@ -182,7 +182,7 @@ class RawWeatherDataModel extends Model
             ->where('date <=', $currentDateTime->format('Y-m-d H:i:s'))
             ->limit(3)
             ->get()
-            ->getRowArray();
+            ->getRowArray() ?? [];
     }
 
     /**

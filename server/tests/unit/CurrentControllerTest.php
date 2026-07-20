@@ -76,6 +76,103 @@ final class CurrentControllerTest extends CIUnitTestCase
     }
 
     // -------------------------------------------------------------------------
+    // Data-freshness fields (lastUpdated / isStale)
+    // -------------------------------------------------------------------------
+
+    /**
+     * A reading older than EventFeedBuilder::SYSTEM_FRESHNESS_MINUTES must be
+     * flagged as stale, and lastUpdated must be a populated ISO 8601 string.
+     */
+    public function testGetCurrentWeatherFlagsStaleDataAsTrue(): void
+    {
+        $oldDate  = (new \DateTime('-1 hour'))->format('Y-m-d H:i:s');
+        $fakeData = [
+            'date'        => $oldDate,
+            'temperature' => 12.3,
+        ];
+
+        $mockModel = $this->createMock(RawWeatherDataModel::class);
+        $mockModel->method('getCurrentActualWeatherData')->willReturn($fakeData);
+
+        $this->controller(Current::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockModel);
+
+        $result = $this->execute('getCurrentWeather');
+
+        $this->assertSame(200, $result->response()->getStatusCode());
+        $body = json_decode((string) $result->response()->getBody(), true);
+        $this->assertTrue($body['isStale']);
+        $this->assertIsString($body['lastUpdated']);
+    }
+
+    /**
+     * A reading within the freshness window must be flagged as not stale.
+     */
+    public function testGetCurrentWeatherFlagsFreshDataAsNotStale(): void
+    {
+        $freshDate = (new \DateTime('-1 minute'))->format('Y-m-d H:i:s');
+        $fakeData  = [
+            'date'        => $freshDate,
+            'temperature' => 12.3,
+        ];
+
+        $mockModel = $this->createMock(RawWeatherDataModel::class);
+        $mockModel->method('getCurrentActualWeatherData')->willReturn($fakeData);
+
+        $this->controller(Current::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockModel);
+
+        $result = $this->execute('getCurrentWeather');
+
+        $body = json_decode((string) $result->response()->getBody(), true);
+        $this->assertFalse($body['isStale']);
+    }
+
+    /**
+     * When there is no data at all (empty array from the model), the response
+     * must still be a valid 200 JSON body with isStale = true and no lastUpdated key.
+     */
+    public function testGetCurrentWeatherFlagsMissingDataAsStale(): void
+    {
+        $mockModel = $this->createMock(RawWeatherDataModel::class);
+        $mockModel->method('getCurrentActualWeatherData')->willReturn([]);
+
+        $this->controller(Current::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockModel);
+
+        $result = $this->execute('getCurrentWeather');
+
+        $this->assertSame(200, $result->response()->getStatusCode());
+        $body = json_decode((string) $result->response()->getBody(), true);
+        $this->assertIsArray($body);
+        $this->assertTrue($body['isStale']);
+        $this->assertArrayNotHasKey('lastUpdated', $body);
+    }
+
+    /**
+     * A Throwable that is not an Exception (e.g. TypeError, as previously thrown
+     * by array_merge() receiving a null argument when the sensor had not
+     * reported for ~30 minutes) must be caught and turned into a valid JSON
+     * error response instead of an unhandled 500.
+     */
+    public function testGetCurrentWeatherHandlesTypeErrorFromModelGracefully(): void
+    {
+        $mockModel = $this->createMock(RawWeatherDataModel::class);
+        $mockModel->method('getCurrentActualWeatherData')->willThrowException(
+            new \TypeError('array_merge(): Argument #2 must be of type array, null given')
+        );
+
+        $this->controller(Current::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockModel);
+
+        $result = $this->execute('getCurrentWeather');
+
+        $this->assertSame(500, $result->response()->getStatusCode());
+        $body = json_decode((string) $result->response()->getBody(), true);
+        $this->assertIsArray($body);
+    }
+
+    // -------------------------------------------------------------------------
     // _formatWeatherDataToText (via ReflectionMethod)
     // -------------------------------------------------------------------------
 

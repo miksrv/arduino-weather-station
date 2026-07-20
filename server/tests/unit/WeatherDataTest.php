@@ -163,4 +163,36 @@ final class WeatherDataTest extends CIUnitTestCase
         }
         $this->assertTrue($isUninitialized, 'Null value should have left property uninitialized');
     }
+
+    // -------------------------------------------------------------------------
+    // lastUpdated / isStale (data-freshness fields added for the /current endpoint)
+    // -------------------------------------------------------------------------
+
+    /**
+     * lastUpdated and isStale are populated like any other declared property.
+     */
+    public function testLastUpdatedAndIsStaleArePopulatedWhenProvided(): void
+    {
+        $data = [
+            'temperature' => 10.0,
+            'lastUpdated' => '2026-07-20T10:00:00+00:00',
+            'isStale'     => true,
+        ];
+
+        $entity = new WeatherData($data);
+
+        $this->assertSame('2026-07-20T10:00:00+00:00', $entity->lastUpdated);
+        $this->assertTrue($entity->isStale);
+    }
+
+    /**
+     * isStale = false must still be written, since the constructor only skips
+     * strictly null values (false !== null).
+     */
+    public function testIsStaleAcceptsFalseValue(): void
+    {
+        $entity = new WeatherData(['isStale' => false]);
+
+        $this->assertFalse($entity->isStale);
+    }
 }
