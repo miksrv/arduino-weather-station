@@ -113,7 +113,7 @@ const WidgetForecastTable: React.FC<WidgetProps> = ({ columnsPreset, title, link
                 isSortable: true,
                 formatter: (pressure, data, i) => (
                     <>
-                        <span>{convertHpaToMmHg(pressure)}</span>
+                        <span>{convertHpaToMmHg(pressure) ?? ''}</span>
                         <ComparisonIcon
                             currentValue={pressure}
                             previousValue={data[i - 1]?.pressure}

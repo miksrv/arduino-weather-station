@@ -1,17 +1,9 @@
 import { ApiType } from '@/api'
+import { resolveCssVar } from '@/tools/colors'
 
 type RiskLevel = ApiType.Anomaly.RiskLevel
 
-/**
- * Reads a CSS custom property value from :root at runtime.
- * Returns a fallback if called on the server (SSR) or if the variable is not set.
- */
-export const resolveCssVar = (variable: string, fallback: string): string => {
-    if (typeof window === 'undefined') {
-        return fallback
-    }
-    return getComputedStyle(document.documentElement).getPropertyValue(variable).trim() || fallback
-}
+export { resolveCssVar }
 
 /**
  * Returns the resolved colour value for a given flood-risk level.

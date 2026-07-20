@@ -26,7 +26,7 @@ jest.mock('next-i18next/pages', () => ({
     useTranslation: () => ({ t: (key: string) => key })
 }))
 
-jest.mock('@/tools/hooks/useClientOnly', () => jest.fn(() => false))
+jest.mock('@/hooks/useClientOnly', () => jest.fn(() => false))
 
 jest.mock('@/tools/date', () => ({
     formatDate: jest.fn(() => '01.01.2024')
@@ -125,7 +125,7 @@ describe('Heatmap', () => {
 
     it('renders in client-only mode (isClient=true)', () => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-        const useClientOnly = require('@/tools/hooks/useClientOnly') as jest.Mock
+        const useClientOnly = require('@/hooks/useClientOnly') as jest.Mock
         useClientOnly.mockReturnValue(true)
         const { getByTestId } = render(
             <Heatmap

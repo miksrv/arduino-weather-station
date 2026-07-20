@@ -8,8 +8,8 @@ import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
 import { ApiModel, ApiType } from '@/api'
+import useClientOnly from '@/hooks/useClientOnly'
 import { formatDate } from '@/tools/date'
-import useClientOnly from '@/tools/hooks/useClientOnly'
 
 import styles from './styles.module.sass'
 
