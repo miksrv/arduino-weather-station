@@ -30,7 +30,7 @@ jest.mock('@/api/store', () => ({
 jest.mock('cookies-next', () => ({
     setCookie: jest.fn()
 }))
-jest.mock('@/tools/hooks/useLocalStorage', () => jest.fn(() => [null, jest.fn()]))
+jest.mock('@/hooks/useLocalStorage', () => jest.fn(() => [null, jest.fn()]))
 
 describe('LanguageSwitcher', () => {
     beforeEach(() => {
@@ -68,7 +68,7 @@ describe('LanguageSwitcher', () => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
         const { setCookie } = require('cookies-next')
         // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-        const useLocalStorage = require('@/tools/hooks/useLocalStorage') as jest.Mock
+        const useLocalStorage = require('@/hooks/useLocalStorage') as jest.Mock
         const mockSetter = jest.fn()
         useLocalStorage.mockReturnValue([null, mockSetter])
         render(<LanguageSwitcher />)

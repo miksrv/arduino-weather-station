@@ -8,7 +8,7 @@ import { useTranslation } from 'next-i18next/pages'
 import { setLocale } from '@/api'
 import { useAppDispatch } from '@/api/store'
 import { Locale } from '@/api/types'
-import useLocalStorage from '@/tools/hooks/useLocalStorage'
+import useLocalStorage from '@/hooks/useLocalStorage'
 import { LocaleType, StorageKeys } from '@/tools/types'
 
 import styles from './styles.module.sass'
