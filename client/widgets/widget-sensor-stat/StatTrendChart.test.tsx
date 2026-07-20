@@ -134,6 +134,6 @@ describe('StatTrendChart', () => {
         const shownIndexes = Array.from({ length: 12 }, (_, i) => i).filter((i) => xAxis.axisLabel.interval(i))
 
         expect(shownIndexes).toEqual([0, 3, 6, 8, 11])
-        expect(shownIndexes.length).toBe(5)
+        expect(shownIndexes).toHaveLength(5)
     })
 })
