@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 
 import { ApiModel } from '@/api'
+import { currentDate, getDate } from '@/tools/date'
 import { round } from '@/tools/helpers'
 
 /**
@@ -82,6 +83,250 @@ export const getMinMaxValues = (data?: ApiModel.Weather[], parameter?: keyof Api
 }
 
 /**
+ * Represents the change of a sensor value over a recent time window.
+ */
+export interface RecentDeltaResult {
+    /**
+     * Difference between the latest value and the reference value (latest - reference).
+     */
+    value: number
+    /**
+     * Direction of the change.
+     */
+    direction: 'up' | 'down' | 'flat'
+}
+
+/**
+ * Compares the latest reading of a sensor against its reading closest to *hours* ago,
+ * e.g. "+0.6°C over the last hour".
+ *
+ * @param data Chronologically ordered weather data (oldest first).
+ * @param parameter The sensor key to compare.
+ * @param hours How many hours back the reference reading should be taken from.
+ */
+export const getRecentDelta = (
+    data?: ApiModel.Weather[],
+    parameter?: keyof ApiModel.Sensors,
+    hours: number = 1
+): RecentDeltaResult | undefined => {
+    if (!data?.length || !parameter) {
+        return undefined
+    }
+
+    const validItems = data.filter((item) => item[parameter] !== undefined && item[parameter] != null && item.date)
+
+    if (validItems.length < 2) {
+        return undefined
+    }
+
+    const latest = validItems[validItems.length - 1]
+    const referenceTime = dayjs.utc(latest.date).subtract(hours, 'hours')
+
+    const reference = validItems.reduce((closest, item) => {
+        const diff = Math.abs(dayjs.utc(item.date).diff(referenceTime))
+        const closestDiff = Math.abs(dayjs.utc(closest.date).diff(referenceTime))
+
+        return diff < closestDiff ? item : closest
+    })
+
+    if (reference === latest) {
+        return undefined
+    }
+
+    const latestValue = latest[parameter] as number
+    const referenceValue = reference[parameter] as number
+    const delta = round(latestValue - referenceValue, 1) ?? 0
+
+    return {
+        value: delta,
+        direction: delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat'
+    }
+}
+
+/**
+ * Averages a numeric sensor value over the most recent time window, e.g. average wind speed over the last 10 minutes.
+ *
+ * @param data Chronologically ordered weather data (oldest first).
+ * @param parameter The sensor key to average.
+ * @param minutes How many minutes back from the latest reading to include.
+ */
+export const getRecentAverage = (
+    data?: ApiModel.Weather[],
+    parameter?: keyof ApiModel.Sensors,
+    minutes: number = 10
+): number | undefined => {
+    if (!data?.length || !parameter) {
+        return undefined
+    }
+
+    const latest = data[data.length - 1]
+
+    if (!latest?.date) {
+        return undefined
+    }
+
+    const cutoff = dayjs.utc(latest.date).subtract(minutes, 'minutes')
+
+    const values = data
+        .filter((item) => item.date && dayjs.utc(item.date).isAfter(cutoff))
+        .map((item) => item[parameter])
+        .filter((value): value is number => value !== undefined && value != null)
+
+    if (!values.length) {
+        return undefined
+    }
+
+    return round(values.reduce((sum, value) => sum + value, 0) / values.length, 1)
+}
+
+/**
+ * Computes the circular mean of wind direction readings over the most recent time window.
+ * A plain arithmetic mean is wrong for angles (e.g. averaging 350° and 10° should give 0°, not 180°),
+ * so this averages the unit vectors instead.
+ *
+ * @param data Chronologically ordered weather data (oldest first).
+ * @param minutes How many minutes back from the latest reading to include.
+ */
+export const getAverageWindDirection = (data?: ApiModel.Weather[], minutes: number = 10): number | undefined => {
+    if (!data?.length) {
+        return undefined
+    }
+
+    const latest = data[data.length - 1]
+
+    if (!latest?.date) {
+        return undefined
+    }
+
+    const cutoff = dayjs.utc(latest.date).subtract(minutes, 'minutes')
+
+    const degrees = data
+        .filter((item) => item.date && dayjs.utc(item.date).isAfter(cutoff))
+        .map((item) => item.windDeg)
+        .filter((value): value is number => value !== undefined && value != null)
+
+    if (!degrees.length) {
+        return undefined
+    }
+
+    const sinSum = degrees.reduce((sum, deg) => sum + Math.sin((deg * Math.PI) / 180), 0)
+    const cosSum = degrees.reduce((sum, deg) => sum + Math.cos((deg * Math.PI) / 180), 0)
+    const meanDegrees = (Math.atan2(sinSum, cosSum) * 180) / Math.PI
+
+    return Math.round((meanDegrees + 360) % 360)
+}
+
+/**
+ * Converts a wind direction in degrees to its 16-point compass abbreviation, e.g. 315 -> 'NW'.
+ *
+ * @param degrees Wind direction in degrees (0-360, where 0/360 is north).
+ */
+export const getWindDirectionLabel = (degrees?: number): string => {
+    if (degrees === undefined || degrees == null) {
+        return ''
+    }
+
+    const directions = [
+        'N',
+        'NNE',
+        'NE',
+        'ENE',
+        'E',
+        'ESE',
+        'SE',
+        'SSE',
+        'S',
+        'SSW',
+        'SW',
+        'WSW',
+        'W',
+        'WNW',
+        'NW',
+        'NNW'
+    ]
+
+    const index = Math.round((degrees % 360) / 22.5) % 16
+
+    return directions[index]
+}
+
+/**
+ * Converts a wind direction in degrees to the i18n key for its 16-point compass abbreviation,
+ * e.g. 315 -> 'wind-direction-nw'. Used to translate the direction label without touching the
+ * compass/wind-rose graphics, which keep the untranslated latin abbreviations.
+ *
+ * @param degrees Wind direction in degrees (0-360, where 0/360 is north).
+ * @example getWindDirectionI18nKey(315) // 'wind-direction-nw'
+ */
+export const getWindDirectionI18nKey = (degrees?: number): string => {
+    if (degrees === undefined || degrees == null) {
+        return ''
+    }
+
+    return `wind-direction-${getWindDirectionLabel(degrees).toLowerCase()}`
+}
+
+type TranslateFn = (key: string) => string
+
+/**
+ * Formats a wind direction in degrees as a translated compass label with degrees,
+ * e.g. 315 -> "NW (315°)" (or the localized equivalent). Shared by the wind sensor card and
+ * the wind rose widget so the two never drift apart.
+ *
+ * @param t The translation function from useTranslation().
+ * @param degrees Wind direction in degrees (0-360, where 0/360 is north).
+ */
+export const formatWindDirection = (t: TranslateFn, degrees?: number): string => {
+    if (degrees === undefined || degrees == null) {
+        return '—'
+    }
+
+    return `${t(getWindDirectionI18nKey(degrees))} (${Math.round(degrees)}°)`
+}
+
+export type UvCategory = 'low' | 'moderate' | 'high' | 'very-high' | 'extreme'
+
+/**
+ * Upper bound of each UV index category, in ascending order (Low, Moderate, High, Very High).
+ * Anything above the last breakpoint is Extreme. Shared between {@link getUvCategory} and the
+ * UV scale widget so the category thresholds and the gradient bar breakpoints never drift apart.
+ */
+export const UV_INDEX_BREAKPOINTS = [2, 5, 7, 10] as const
+
+/** Nominal upper end of the UV scale bar, used to position the current-value marker. */
+export const UV_INDEX_SCALE_MAX = 12
+
+const UV_CATEGORIES: UvCategory[] = ['low', 'moderate', 'high', 'very-high', 'extreme']
+
+/**
+ * Classifies a UV index reading into its risk category (EPA UV Index scale).
+ *
+ * @param value The UV index reading.
+ */
+export const getUvCategory = (value?: number): UvCategory => {
+    if (value === undefined || value == null) {
+        return 'low'
+    }
+
+    const index = UV_INDEX_BREAKPOINTS.findIndex((breakpoint) => value <= breakpoint)
+
+    return index === -1 ? 'extreme' : UV_CATEGORIES[index]
+}
+
+/**
+ * Converts a UV index reading to a 0-100 position along the UV scale bar.
+ *
+ * @param value The UV index reading.
+ */
+export const getUvScalePercent = (value?: number): number => {
+    if (value === undefined || value == null) {
+        return 0
+    }
+
+    return Math.max(0, Math.min(100, (value / UV_INDEX_SCALE_MAX) * 100))
+}
+
+/**
  * Function to find the minimum value
  * @param weatherData
  * @param key
@@ -144,15 +389,109 @@ export const findMaxValue = (weatherData?: ApiModel.Weather[], key?: keyof ApiMo
 /**
  * Converts pressure from hectopascals (hPa) to millimeters of mercury (mmHg).
  * @param hPa Pressure in hectopascals (hPa).
- * @returns Pressure in millimeters of mercury (mmHg).
+ * @returns Pressure in millimeters of mercury (mmHg), or undefined when hPa is missing (undefined, null,
+ * or an empty string). Note this does not treat `0` as missing — 0 hPa is not a physically valid reading,
+ * but it is still a defined value and is converted normally rather than being coerced to "missing".
  */
-export const convertHpaToMmHg = (hPa?: number | string): number => {
-    if (!hPa) {
-        return 0
+export const convertHpaToMmHg = (hPa?: number | string): number | undefined => {
+    if (hPa === undefined || hPa == null || hPa === '') {
+        return undefined
     }
 
     const mmHg = Number(hPa) * (760 / 1013.25)
     return round(parseFloat(mmHg.toFixed(2)), 1) ?? mmHg
+}
+
+/**
+ * Saturation vapor pressure at a given air temperature, via the Magnus formula.
+ *
+ * @param temperature Air temperature in °C.
+ * @returns Saturation vapor pressure in hPa.
+ */
+const getSaturationVaporPressure = (temperature: number): number =>
+    6.112 * Math.exp((17.62 * temperature) / (243.12 + temperature))
+
+/**
+ * Computes absolute humidity — the mass of water vapor per volume of air — from air
+ * temperature and relative humidity.
+ *
+ * @param temperature Air temperature in °C.
+ * @param relativeHumidity Relative humidity in % (0-100).
+ * @returns Absolute humidity in g/m³, or undefined if either input is missing.
+ */
+export const getAbsoluteHumidity = (temperature?: number, relativeHumidity?: number): number | undefined => {
+    if (
+        temperature === undefined ||
+        temperature == null ||
+        relativeHumidity === undefined ||
+        relativeHumidity == null
+    ) {
+        return undefined
+    }
+
+    const actualVaporPressure = getSaturationVaporPressure(temperature) * (relativeHumidity / 100)
+
+    return round((216.7 * actualVaporPressure) / (273.15 + temperature), 1)
+}
+
+/** Specific gas constant for dry air, in J/(kg·K). */
+const DRY_AIR_GAS_CONSTANT = 287.05
+
+/** Specific gas constant for water vapor, in J/(kg·K). */
+const WATER_VAPOR_GAS_CONSTANT = 461.495
+
+/**
+ * Computes air density from temperature, pressure, and relative humidity, accounting for the
+ * fact that water vapor is less dense than dry air.
+ *
+ * @param temperature Air temperature in °C.
+ * @param pressure Station pressure in hPa.
+ * @param relativeHumidity Relative humidity in % (0-100).
+ * @returns Air density in kg/m³, or undefined if any input is missing.
+ */
+export const getAirDensity = (
+    temperature?: number,
+    pressure?: number,
+    relativeHumidity?: number
+): number | undefined => {
+    if (
+        temperature === undefined ||
+        temperature == null ||
+        pressure === undefined ||
+        pressure == null ||
+        relativeHumidity === undefined ||
+        relativeHumidity == null
+    ) {
+        return undefined
+    }
+
+    const temperatureKelvin = temperature + 273.15
+    const vaporPressurePa = getSaturationVaporPressure(temperature) * (relativeHumidity / 100) * 100
+    const dryAirPressurePa = pressure * 100 - vaporPressurePa
+
+    const density =
+        dryAirPressurePa / (DRY_AIR_GAS_CONSTANT * temperatureKelvin) +
+        vaporPressurePa / (WATER_VAPOR_GAS_CONSTANT * temperatureKelvin)
+
+    return round(density, 3)
+}
+
+/** Standard sea-level pressure (ISA), in hPa. */
+const STANDARD_SEA_LEVEL_PRESSURE = 1013.25
+
+/**
+ * Converts station pressure to pressure altitude — the altitude at which the given pressure
+ * would occur in the International Standard Atmosphere, independent of actual temperature.
+ *
+ * @param pressure Station pressure in hPa.
+ * @returns Pressure altitude in meters, or undefined if pressure is missing.
+ */
+export const getPressureAltitude = (pressure?: number): number | undefined => {
+    if (pressure === undefined || pressure == null) {
+        return undefined
+    }
+
+    return round(44330 * (1 - Math.pow(pressure / STANDARD_SEA_LEVEL_PRESSURE, 1 / 5.255)), 0)
 }
 
 /**
@@ -254,6 +593,26 @@ export const filterRecentData = (data?: ApiModel.Weather[], hours: number = 24):
 
     return data?.filter((item) => dayjs.utc(item.date).isAfter(hoursAgo)) || []
 }
+
+/**
+ * Filters weather data down to readings from the current local calendar day (since local midnight).
+ *
+ * @param data Weather data to filter.
+ */
+export const filterToday = (data?: ApiModel.Weather[]): ApiModel.Weather[] =>
+    (data ?? []).filter((item) => item.date && getDate(item.date).isSame(currentDate, 'day'))
+
+/**
+ * Sums precipitation readings over the given data — each reading is a per-interval amount
+ * (not a running total), so summing gives the total precipitation across the window.
+ *
+ * @param data Weather data to sum.
+ */
+export const sumPrecipitation = (data?: ApiModel.Weather[]): number =>
+    round(
+        (data ?? []).reduce((sum, item) => sum + (item.precipitation ?? 0), 0),
+        1
+    ) ?? 0
 
 /**
  * Returns a sampled subset of the input data array.
