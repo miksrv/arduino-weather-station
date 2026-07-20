@@ -63,3 +63,7 @@ $routes->options('anomaly/history', static function () {});
 /** Climate Controller **/
 $routes->get('climate',     'Climate::index');
 $routes->options('climate', static function () {});
+
+/** Events Controller **/
+$routes->get('events',     'Events::index');
+$routes->options('events', static function () {});
