@@ -7,6 +7,7 @@ import { useAppSelector } from '@/api/store'
 import AppBar from '@/components/app-bar'
 import Footer from '@/components/footer'
 import LanguageSwitcher from '@/components/language-switcher'
+import StaleDataBanner from '@/components/stale-data-banner'
 
 import Menu from './Menu'
 
@@ -98,7 +99,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ className, fullSize, children }) 
             </aside>
 
             <section className={styles.mainContainer}>
-                <main className={styles.main}>{children}</main>
+                <main className={styles.main}>
+                    <StaleDataBanner />
+                    {children}
+                </main>
             </section>
         </div>
     )

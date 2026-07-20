@@ -1,0 +1,34 @@
+@use '../../styles/variables'
+
+.banner
+    display: flex
+    align-items: center
+    gap: 10px
+    max-width: var(--width-max)
+    margin: 0 auto 10px
+    padding: 10px 14px
+    border-radius: var(--border-radius)
+    background: var(--color-orange-background)
+    color: var(--text-color-primary)
+    box-shadow: var(--container-shadow)
+
+    svg
+        flex-shrink: 0
+        width: 22px
+        height: 22px
+        fill: var(--color-orange)
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        margin: 0 0 10px
+
+.text
+    display: flex
+    flex-direction: column
+
+.title
+    font-size: var(--font-size)
+    font-weight: 700
+
+.message
+    font-size: var(--font-size-small)
+    color: var(--text-color-secondary)

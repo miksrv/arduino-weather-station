@@ -115,6 +115,8 @@
     "event-precipitation": "Precipitation: {{value}} mm",
     "event-system-ok": "Data successfully updated from all sensors",
     "event-system-stale": "Data hasn't updated recently — check the sensors",
+    "stale-data-banner-title": "Data may be outdated",
+    "stale-data-banner-message": "Last updated {{time}}",
     "event-anomaly-started": "Anomaly detected: {{name}}",
     "event-anomaly-ended": "Anomaly ended: {{name}}",
     "date-full-format": "D MMMM YYYY, h:mm a",

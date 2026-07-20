@@ -115,6 +115,8 @@
     "event-precipitation": "Осадки: {{value}} мм",
     "event-system-ok": "Данные успешно обновлены со всех датчиков",
     "event-system-stale": "Данные не обновлялись — проверьте датчики",
+    "stale-data-banner-title": "Данные могут быть устаревшими",
+    "stale-data-banner-message": "Обновлено {{time}}",
     "event-anomaly-started": "Обнаружена аномалия: {{name}}",
     "event-anomaly-ended": "Аномалия завершена: {{name}}",
     "date-full-format": "D MMMM YYYY, HH:mm",
