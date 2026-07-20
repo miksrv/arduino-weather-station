@@ -190,7 +190,7 @@ The PM2 deployment config commits the production service name (`meteo.miksoft.pr
 
 ### SEC-08 · `sessionStorage` and `localStorage` data deserialised without runtime schema validation [LOW]
 
-**Files:** `pages/climate.tsx`, `tools/hooks/useLocalStorage.ts`
+**Files:** `pages/climate.tsx`, `hooks/useLocalStorage.ts`
 
 Both files parse JSON from browser storage and immediately cast the result to a typed interface with no runtime field validation. Add a lightweight runtime validator (e.g., a shape-check function) before casting.
 

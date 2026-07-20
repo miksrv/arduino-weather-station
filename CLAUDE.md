@@ -40,6 +40,8 @@ Agents must read their instruction file before starting. Each agent reports comp
 
 > Note: only backend-agent and frontend-agent currently exist under `.claude/agents/`. There is no separate QA or Doc agent — testing and docs work is handled by whichever of the two agents owns the affected code.
 
+> Note: `docs/*.md` (architecture, backend, frontend, testing) is a snapshot that has drifted from the code — it references old command names (`system:current`/`system:forecast`/`system:narodmon` instead of the actual `system:getCurrentWeather`/`getForecastWeather`/`sendNarodmonData`) and is missing the Anomaly/Precipitation/Climate controllers. Treat this file and the current code as authoritative over `docs/`.
+
 ---
 
 ## High-Level Architecture
@@ -78,11 +80,13 @@ arduino-weather-station/
 │   └── test_*/            # Individual sensor test sketches
 ├── client/                # Next.js frontend
 │   ├── api/               # RTK Query store, slices, endpoint definitions, types
-│   ├── components/        # Reusable React components (widgets, layout, icons)
+│   ├── components/        # Reusable React components (layout, icons, legacy widgets, shared building blocks like widget-card, sparkline-chart)
+│   ├── widgets/           # Finished sensor/dashboard card widgets, one directory per widget (new widgets go here — see widget-sensor-stat); shared pieces reused by more than one widget belong in components/ instead
+│   ├── hooks/             # Shared custom React hooks (useLocalStorage, useClientOnly)
 │   ├── pages/             # Next.js pages (index, climate, sensors, history, heatmap, forecast, precipitation, anomaly)
 │   ├── public/locales/    # i18n translation files (en/, ru/)
 │   ├── styles/            # Global SASS + light/dark theme CSS
-│   ├── tools/             # Utility functions, custom hooks, unit tests
+│   ├── tools/             # Utility functions, unit tests
 │   └── ui/                # Small UI primitives (theme-switcher, comparison-icon, carousel)
 ├── server/                # CodeIgniter 4 backend
 │   ├── app/
@@ -95,7 +99,8 @@ arduino-weather-station/
 │   │   └── Config/        # Routes.php, app configuration
 │   └── tests/             # PHPUnit test suites (unit/, database/, session/)
 ├── models/                # 3D-printable STL/CAD files for enclosure
-├── docs/                  # Documentation assets and screenshots
+├── docs/                  # Markdown docs (architecture, backend, frontend, testing, etc.) + screenshots
+├── requirements/          # Feature proposal specs (not yet implemented — e.g. records, wind rose, solar dashboard)
 ├── config/                # Shared configuration files (docker-compose.yml, nginx.conf)
 └── .github/workflows/     # GitHub Actions (sonarcloud, ui-checks, ui-deploy, api-checks, api-deploy, arduino-code-check)
 ```
@@ -240,7 +245,7 @@ CodeIgniter dotted-key env vars — database (`database.production.*`), app coor
 
 ### Client
 - Jest 30 + ts-jest + jsdom, config in `client/jest.config.ts`
-- Tests co-located in `client/tools/*.test.ts` and component directories
+- Tests co-located in `client/tools/*.test.ts`, `client/hooks/*.test.ts`, and component directories
 - Coverage from all `.ts`/`.tsx` except test files, index files, and pages
 
 ---
@@ -265,7 +270,7 @@ CodeIgniter dotted-key env vars — database (`database.production.*`), app coor
 3. **Server changes:** Use CodeIgniter 4 conventions. Do not write raw SQL in controllers. Use Models, Entities, and validation rules.
 4. **Client changes:** No semicolons. No `any`. Keep imports sorted. Keep JSX depth ≤ 4. Use RTK Query for all API calls — do not use `fetch` or `axios` directly.
 5. **No over-engineering.** Do not add abstractions, helpers, or patterns beyond what the task requires.
-6. **Tests:** When adding logic to `tools/`, add or update the corresponding `.test.ts` file. For new PHP methods in controllers or libraries, add a PHPUnit test.
+6. **Tests:** When adding logic to `tools/` or `hooks/`, add or update the corresponding `.test.ts` file. For new PHP methods in controllers or libraries, add a PHPUnit test.
 7. **i18n:** All user-facing strings in the frontend must use `useTranslation()` and have entries in both `public/locales/en/` and `public/locales/ru/`.
 8. **Environment:** Never hard-code API keys, URLs, or credentials. Use environment variables.
 9. **Database:** Schema changes require a new CodeIgniter migration file — never modify existing migrations.
