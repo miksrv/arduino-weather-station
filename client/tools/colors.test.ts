@@ -1,4 +1,4 @@
-import { colors, getSensorColor, getSensorColorType } from './colors'
+import { colors, getSensorColor, getSensorColorType, resolveCssVar } from './colors'
 
 describe('colors', () => {
     describe('getSensorColorType', () => {
@@ -38,6 +38,21 @@ describe('colors', () => {
             expect(getSensorColor('windGust')).toStrictEqual(colors.teal)
             expect(getSensorColor('windDeg')).toStrictEqual(colors.olive)
             expect(() => getSensorColor(undefined)).toThrow('Not implemented yet: undefined case')
+        })
+    })
+
+    describe('resolveCssVar', () => {
+        it('returns fallback on the server (no window)', () => {
+            const originalWindow = global.window
+            // @ts-expect-error intentionally removing window to simulate SSR
+            delete global.window
+            expect(resolveCssVar('--color-green', '#4bb34b')).toBe('#4bb34b')
+            global.window = originalWindow
+        })
+
+        it('returns fallback when CSS variable is not set', () => {
+            // jsdom does not resolve CSS custom properties — getPropertyValue returns ''
+            expect(resolveCssVar('--nonexistent-var', '#fallback')).toBe('#fallback')
         })
     })
 })
