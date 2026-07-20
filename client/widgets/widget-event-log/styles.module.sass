@@ -1,0 +1,60 @@
+.list
+    display: flex
+    flex-direction: column
+    max-height: 180px
+    overflow-y: auto
+
+.item
+    display: flex
+    align-items: center
+    gap: 5px
+    padding: 5px 0
+    border-bottom: 1px solid var(--input-border-color)
+
+    &:last-child
+        border-bottom: none
+
+.time
+    flex: 0 0 auto
+    width: 40px
+    font-size: 12px
+    color: var(--text-color-secondary)
+
+.icon
+    flex: 0 0 auto
+    width: 18px
+    height: 18px
+
+.icon--temperature-up
+    fill: var(--color-red)
+
+.icon--temperature-down
+    fill: var(--color-main)
+
+.icon--pressure
+    fill: #6cbb4f
+
+.icon--wind
+    fill: #4a90e2
+
+.icon--precipitation
+    fill: #4a90e2
+
+.icon--system-ok
+    fill: #4caf50
+
+.icon--system-stale
+    fill: #e0a03e
+
+.icon--anomaly
+    fill: #e5544a
+
+.message
+    font-size: 13px
+    color: var(--text-color-primary)
+
+.empty
+    padding: 16px 0
+    text-align: center
+    font-size: 13px
+    color: var(--text-color-secondary)
