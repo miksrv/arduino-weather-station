@@ -5,7 +5,7 @@ Arduino Weather Station is a complete DIY weather-monitoring project powered by 
 You can use this repository to build your own fully-featured weather station - and if you like it, please give the project a star :)
 
 <div align="center">
-  <img src="https://miksoft.pro/projects/meteostation.webp" alt="Arduino Weather Station" width="150" height="150">
+  <img src="./docs/cover.jpg" alt="Arduino Weather Station" width="800">
 
 <h3>Arduino Weather Station</h3>
 
@@ -272,6 +272,13 @@ cd arduino-weather-station
 All models for 3D printing can be found in the `models` directory.
 
 ![Arduino Weather Station](./docs/models.jpg)
+
+**Which filament / print settings should I use?** Don't overthink it - any
+filament with default slicer settings works fine, and none of the parts need
+supports. My own enclosure has been printed in plain **ABS** with default
+settings, and it's been mounted outdoors since 2021, through everything from
++44°C summer sun to -37°C winter frost - nothing has cracked, warped, or
+fallen apart.
 
 ### 5. Accessing the Application
 
