@@ -245,7 +245,7 @@ cd arduino-weather-station
 
 ### 4. Arduino Setup
 
-1. Open [Arduino Readme](./arduino/README.md).
+1. Open the [Arduino Readme](./arduino/README.md) — it includes the full wiring diagram (which pin/wire connects to which component).
 2. Open the Arduino sketch from the `arduino/main` folder in the Arduino IDE.
 3. Configure the following parameters in the `main.ino` file for Arduino:
    - `API_SERVER` - the server address for sending data from the weather station.
@@ -266,6 +266,8 @@ cd arduino-weather-station
 - **GUML8511**: UV sensor
 - **Anemometer**: Measures wind speed
 - **Wind Vane**: Measures wind direction
+
+![Weather Station Wiring Diagram](./docs/wiring-diagram.jpg)
 
 All models for 3D printing can be found in the `models` directory.
 
