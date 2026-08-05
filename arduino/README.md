@@ -48,16 +48,48 @@ This ensures that all dependencies are correctly set up for the successful compi
 
 ## Wiring Diagram
 
+![Weather Station Wiring Diagram](../docs/wiring-diagram.jpg)
+
+Wire colors used throughout this section:
+
+- **Red** — VCC (+5V, or +3.3V where noted)
+- **White** — GND
+- **Green** — Data / I2C SCL
+- **Blue** — Data / I2C SDA
+
 Sensors are connected to the Arduino as follows:
 
-| Sensor         | Arduino       |
-|----------------|---------------|
-| BMP085         | I2C (SCL, SDA)|
-| BH1750         | I2C (SCL, SDA)|
-| Wind Vane      | I2C (SCL, SDA)|
-| Anemometer     | Digital PIN 3 |
-| DHT22          | Digital PIN 4 |
-| UV Sensor      | Analog PIN A0 (UV OUT), Analog PIN A1 (UV REF) |
+| Sensor         | Power           | Data / Signal |
+|----------------|-----------------|---------------|
+| BMP085         | VCC -> 5V, GND -> GND | I2C (SCL, SDA) |
+| BH1750         | VCC -> 5V, GND -> GND | I2C (SCL, SDA) |
+| PCF8574 (Wind Vane expander) | VCC -> 5V, GND -> GND | I2C (SCL, SDA) |
+| Anemometer     | — (2-wire reed switch) | Digital PIN 3 (interrupt), other lead -> GND |
+| DHT22          | VCC -> 5V, GND -> GND | Digital PIN 4 |
+| UV Sensor (GY-ML8511) | VCC -> 3.3V, GND -> GND | Analog PIN A0 (UV OUT), Analog PIN A1 (UV REF) |
+
+BMP085, BH1750, and the PCF8574 all share the same I2C bus (SDA/SCL), wired in
+parallel (daisy-chained), with pull-up resistors on SDA and SCL if your
+breakout boards don't already provide them.
+
+### Wind Vane (via PCF8574)
+
+The wind vane itself is not read directly by the Arduino — it goes through the
+**PCF8574**, an 8-bit I2C I/O expander (address `0x20` in `main.ino`, set via
+its `A0`/`A1`/`A2` address pins tied to GND). This is **not** a shift register;
+it's a general-purpose I2C port expander used here to multiplex 8 digital
+inputs onto the shared I2C bus.
+
+- PCF8574 `VCC` -> 5V, `GND` -> GND, `SCL`/`SDA` -> shared I2C bus
+- PCF8574 address pins `A0`, `A1`, `A2` -> GND (address `0x20`)
+- The vane has **8 reed/hall-effect switches**, one per compass direction (N,
+  NE, E, SE, S, SW, W, NW). Each switch is wired between one PCF8574 port
+  (`P0`...`P7`) and a common GND
+- Every port `P0`-`P7` is configured in firmware as `INPUT_PULLUP`, so a port
+  reads `HIGH` when idle and is pulled `LOW` only when its switch closes
+- As the vane rotates, its magnet passes over one sensor at a time, pulling
+  the matching port `LOW`; `get_sensor_wind_direction()` scans all 8 ports and
+  reports the index of the active one as the current wind direction
 
 ## Files
 
