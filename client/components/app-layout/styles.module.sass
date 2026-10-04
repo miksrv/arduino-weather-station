@@ -31,19 +31,24 @@
         color: var(--text-color-primary)
         text-decoration: none
         font-weight: 400
-        transition: background-color .15s ease-out,opacity .15s ease-out
+        transition: background-color var(--duration-fast) var(--ease), color var(--duration-fast) var(--ease)
 
         &:hover
-            background-color: var(--modal-background)
+            background-color: var(--surface-2)
+
+        &:focus-visible
+            outline: var(--focus-outline)
+            outline-offset: -2px
 
         svg
-            fill: var(--link-color)
+            fill: var(--color-main)
             margin: -10px 10px -10px 0
             width: 22px
             height: 22px
 
-    .active
-        background-color: var(--body-background)
+    .active, .active:hover
+        background-color: var(--color-main-background)
+        font-weight: var(--font-weight-medium)
 
     .iconWrapper
         position: relative
@@ -54,7 +59,7 @@
             margin: 0
             width: 22px
             height: 22px
-            fill: var(--link-color)
+            fill: var(--color-main)
 
     .badge
         position: absolute
