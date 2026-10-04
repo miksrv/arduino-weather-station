@@ -29,7 +29,9 @@ describe('helpers', () => {
         })
 
         it('ignores keys with undefined or null values', () => {
-            expect(encodeQueryData({ key1: 'value1', key2: undefined, key3: null })).toBe('?key1=value1')
+            expect(
+                encodeQueryData({ key1: 'value1', key2: undefined, key3: null } as unknown as Record<string, string>)
+            ).toBe('?key1=value1')
         })
     })
 

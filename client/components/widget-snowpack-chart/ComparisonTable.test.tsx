@@ -2,6 +2,8 @@ import React from 'react'
 
 import { render, screen } from '@testing-library/react'
 
+import { ApiType } from '@/api'
+
 import { ComparisonTable } from './ComparisonTable'
 
 import '@testing-library/jest-dom'
@@ -43,10 +45,12 @@ jest.mock('simple-react-ui-kit', () => ({
     )
 }))
 
-const rows = [
-    { year: '2023-2024', maxSWE: 180, floodOccurred: true },
-    { year: '2022-2023', maxSWE: 95, floodOccurred: false },
-    { year: '2024-2025', maxSWE: 60, floodOccurred: undefined }
+const season = { series: [], peakDate: null, temperatureSeries: [] }
+
+const rows: ApiType.Anomaly.SeasonComparison[] = [
+    { ...season, year: '2023-2024', maxSWE: 180, floodOccurred: true },
+    { ...season, year: '2022-2023', maxSWE: 95, floodOccurred: false },
+    { ...season, year: '2024-2025', maxSWE: 60, floodOccurred: null }
 ]
 
 describe('ComparisonTable', () => {
@@ -69,7 +73,7 @@ describe('ComparisonTable', () => {
         expect(screen.getByText('no-flood')).toBeInTheDocument()
     })
 
-    it('shows season-in-progress text for row with floodOccurred=undefined', () => {
+    it('shows season-in-progress text for row with floodOccurred=null', () => {
         render(<ComparisonTable rows={rows} />)
         expect(screen.getByText('season-in-progress')).toBeInTheDocument()
     })
