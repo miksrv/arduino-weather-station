@@ -22,8 +22,8 @@ import i18Config from '../next-i18next.config'
 
 import 'dayjs/locale/ru'
 
-import '@/styles/dark.css'
-import '@/styles/light.css'
+import 'simple-react-ui-kit/theme.css'
+import '@/styles/theme.css'
 import '@/styles/globals.sass'
 
 dayjs.extend(utc)

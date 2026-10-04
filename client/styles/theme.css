@@ -1,0 +1,22 @@
+/*
+ * Project overrides on top of `simple-react-ui-kit/theme.css` (imported first in `pages/_app.tsx`).
+ * Only values that differ from the kit defaults, plus project-only tokens, belong here.
+ */
+
+/* One flat radius for every element instead of the kit's tiered scale (2 / 4 / 6 / 8 / 12px).
+   `--radius-full` (pills, progress bars) is left as is. */
+:root {
+    --radius: 4px;
+    --radius-xs: var(--radius);
+    --radius-sm: var(--radius);
+    --radius-md: var(--radius);
+    --radius-lg: var(--radius);
+    --radius-xl: var(--radius);
+}
+
+/* Project-only tokens */
+:root {
+    --letter-spacing: 0.00938em;
+    --width-max: 1000px;
+    --width-menu: 280px;
+}
