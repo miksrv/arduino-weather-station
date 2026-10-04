@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 3.8.0
+
+### Minor Changes
+
+- Upgrade `simple-react-ui-kit` to 2.0 and switch to its `theme.css` design tokens; replace `light.css`/`dark.css` with a small project override file
+- Use one flat 4px radius for all elements and kit radius tokens in widget styles
+- Fix clipped borders on forecast cards and their loading skeletons
+- Improve sidebar menu hover, active and focus states
+- Update client and server dependencies
+
 ## 3.7.7
 
 ### Patch Changes
