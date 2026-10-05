@@ -4,7 +4,6 @@
     flex-basis: 100%
     width: 100%
     color: var(--text-color-primary)
-    overflow: hidden
     margin-top: -10px
 
     .card
@@ -13,7 +12,7 @@
         flex-direction: column
         align-items: center
         gap: 4px
-        border-radius: var(--border-radius)
+        border-radius: var(--container-radius)
         box-shadow: var(--container-shadow)
         background: var(--container-background-color)
         padding: 10px 12px
@@ -23,7 +22,7 @@
         min-width: 158px
 
         &.highlighted
-            box-shadow: inset 0 0 0 1.5px var(--color-main)
+            box-shadow: 0 0 0 1px var(--color-main)
 
     .cardDay
         font-size: var(--font-size-small)
@@ -98,7 +97,9 @@
         width: 100%
 
     .skeletonRow
-        margin-top: 20px
+        // 1px of padding (offset by the negative margin) keeps the cards' outer ring from being clipped
+        margin: 19px -1px -1px
+        padding: 1px
         display: flex
         gap: 10px
         overflow: hidden

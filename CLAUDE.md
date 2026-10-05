@@ -275,3 +275,4 @@ CodeIgniter dotted-key env vars — database (`database.production.*`), app coor
 8. **Environment:** Never hard-code API keys, URLs, or credentials. Use environment variables.
 9. **Database:** Schema changes require a new CodeIgniter migration file — never modify existing migrations.
 10. **Do not commit** `vendor/`, `node_modules/`, `.next/`, `writable/`, or `env` files.
+11. **Before opening a PR:** bump `version` in `client/package.json` (usually the patch number, occasionally minor, almost never major) and add a matching new version section at the top of the root `CHANGELOG.md` (`## x.y.z` → `### Patch Changes` / `### Minor Changes` / `### Major Changes`) with a very short bullet list of the changes.
