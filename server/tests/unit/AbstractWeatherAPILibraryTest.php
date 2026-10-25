@@ -105,4 +105,11 @@ final class AbstractWeatherAPILibraryTest extends CIUnitTestCase
 
         $this->assertSame([], $library->callHttpGet('https://example.test', []));
     }
+
+    public function testHttpGetReturnsFalseOnNonJsonBody(): void
+    {
+        $library = $this->_buildLibraryWithMockClient('<html>Bad gateway</html>');
+
+        $this->assertFalse($library->callHttpGet('https://example.test', []));
+    }
 }

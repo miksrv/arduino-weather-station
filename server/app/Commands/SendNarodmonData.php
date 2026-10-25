@@ -51,7 +51,12 @@ class SendNarodmonData extends BaseCommand
                 return;
             }
 
-            $NarodMonLibrary->send($weatherData);
+            if ($NarodMonLibrary->send($weatherData) !== true) {
+                $msg = 'system:sendNarodmonData failed — narodmon.ru did not accept the data.';
+                log_message('error', $msg);
+                CLI::write('[ERROR] ' . $msg, 'red');
+                return;
+            }
 
             CLI::write('[OK]    Data sent to narodmon.ru', 'green');
 
