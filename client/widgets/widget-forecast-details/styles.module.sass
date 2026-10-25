@@ -1,0 +1,42 @@
+@use '../../styles/variables'
+@use '../../styles/typography' as type
+
+.grid
+    display: grid
+    grid-template-columns: repeat(3, minmax(0, 1fr))
+    gap: var(--space-2)
+    margin: 0
+
+    @media only screen and (max-width: variables.$smallMaxWidth)
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+
+// A figure: icon and label over the value, on the grey of a nested surface
+.item
+    display: grid
+    grid-template-columns: 18px minmax(0, 1fr)
+    column-gap: var(--space-2)
+    row-gap: 2px
+    align-items: center
+    padding: var(--space-3)
+    border-radius: var(--radius-md)
+    background: var(--surface-2)
+
+    dt
+        +type.caption
+        overflow: hidden
+        text-overflow: ellipsis
+        white-space: nowrap
+
+    dd
+        grid-column: 1 / -1
+        margin: 0
+        +type.valueSmall
+
+.icon
+    width: 18px
+    height: 18px
+    fill: var(--text-color-secondary)
+
+.note
+    display: block
+    +type.caption

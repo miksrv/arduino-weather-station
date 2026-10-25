@@ -1,0 +1,77 @@
+@use '../../styles/mixins'
+@use '../../styles/typography' as type
+
+.header
+    display: flex
+    align-items: center
+    justify-content: space-between
+    flex-wrap: wrap
+    gap: var(--space-2)
+    margin-bottom: var(--space-2)
+
+    h2
+        margin: 0
+        +type.titleCard
+
+.toggle
+    +mixins.segmented
+
+.toggleButton
+    +mixins.segment
+
+.toggleButtonActive
+    +mixins.segmentActive
+
+// Every hour in a row, scrolled sideways, edge to edge of the card under a hairline
+.strip
+    --scroll-rail-inset: var(--space-3)
+    margin: var(--space-3) calc(-1 * var(--card-padding)) calc(-1 * var(--card-padding))
+    border-top: 1px solid var(--border)
+
+.hour
+    flex: 0 0 64px
+    display: flex
+    flex-direction: column
+    align-items: center
+    gap: 4px
+    padding: var(--space-1) 0
+    border-radius: var(--radius-md)
+
+    &[data-new-day]
+        box-shadow: inset 1px 0 0 var(--border-strong)
+        border-radius: 0
+
+    &:first-child
+        background: var(--color-main-background)
+
+.hourDay
+    +type.overline
+    color: var(--color-main)
+
+.hourTime
+    +type.numbers
+    +type.caption
+    color: var(--text-color-primary)
+
+.hourTemp
+    +type.valueSmall
+
+.hourPrecip
+    +type.numbers
+    font-size: var(--font-size-micro)
+    color: var(--data-precipitation)
+    white-space: nowrap
+
+.hourWind
+    display: inline-flex
+    align-items: center
+    gap: 3px
+    +type.numbers
+    +type.caption
+
+    svg
+        width: 11px
+        height: 11px
+        fill: var(--text-color-secondary)
+
++mixins.chartTooltip

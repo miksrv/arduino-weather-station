@@ -1,0 +1,74 @@
+@use '../../styles/variables'
+@use '../../styles/typography' as type
+
+.card
+    justify-content: space-between
+    gap: var(--space-3)
+
+.main
+    display: flex
+    align-items: center
+    justify-content: space-between
+    gap: var(--space-4)
+    flex-wrap: wrap
+
+.now
+    display: flex
+    align-items: center
+    gap: var(--space-3)
+
+.nowText
+    display: flex
+    flex-direction: column
+    gap: 2px
+
+.caption
+    +type.caption
+
+.temperature
+    display: flex
+    align-items: flex-start
+    +type.valueDisplay
+    font-size: 48px
+
+.unit
+    margin-left: 2px
+    +type.unit
+    font-size: 20px
+    line-height: 1.4
+
+// High and low of the day, side by side, the high warm and the low cool
+.extremes
+    display: flex
+    gap: var(--space-5)
+    margin: 0
+
+    div
+        display: flex
+        flex-direction: column
+        align-items: center
+        gap: 2px
+
+    dt
+        +type.overline
+
+    dd
+        margin: 0
+        +type.value
+
+.high
+    color: var(--color-max) !important
+
+.low
+    color: var(--color-min) !important
+
+.summary
+    margin: 0
+    padding: var(--space-3)
+    border-radius: var(--radius-md)
+    background: var(--surface-2)
+    +type.secondary
+    color: var(--text-color-primary)
+
+    strong
+        font-weight: var(--font-weight-medium)
