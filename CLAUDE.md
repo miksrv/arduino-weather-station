@@ -15,13 +15,13 @@ Full-stack DIY weather monitoring system that collects real environmental data f
 | Layer | Technology |
 |---|---|
 | Firmware | C++ (Arduino / ESP32), Arduino IDE |
-| Backend | PHP 8.2+, CodeIgniter 4.6, MySQL |
-| Frontend | Next.js 16.2, React 19.2, TypeScript 6.0 |
-| State management | Redux Toolkit 2.12 + RTK Query, next-redux-wrapper |
+| Backend | PHP 8.2+, CodeIgniter 4.7, MySQL |
+| Frontend | Next.js 16.4, React 19.3, TypeScript 6.0 |
+| State management | Redux Toolkit 2.13 + RTK Query, next-redux-wrapper |
 | Styling | SASS/SCSS, CSS Modules, next-themes |
-| Charts | ECharts 6 (echarts-for-react) |
+| Charts | ECharts 6 (tree-shaken `echarts/core`, lazy `components/echart` wrapper) |
 | i18n | i18next 26 (next-i18next 16, locales: `ru`, `en`) |
-| HTTP client | Guzzle 7 (PHP), RTK Query (TS) |
+| HTTP client | CodeIgniter `CURLRequest` (PHP), RTK Query (TS) |
 | Package manager | Yarn 4.9 (client), Composer (server) |
 | Testing | PHPUnit 11.5 (server), Jest 30 + ts-jest + Testing Library (client) |
 | Quality | SonarCloud, ESLint 9, Prettier |
@@ -87,7 +87,7 @@ arduino-weather-station/
 │   ├── public/locales/    # i18n translation files (en/, ru/)
 │   ├── styles/            # Global SASS + light/dark theme CSS
 │   ├── tools/             # Utility functions, unit tests
-│   └── ui/                # Small UI primitives (theme-switcher, comparison-icon, carousel)
+│   └── ui/                # Small UI primitives (theme-switcher, comparison-icon, scroll-rail — the one horizontal scroller)
 ├── server/                # CodeIgniter 4 backend
 │   ├── app/
 │   │   ├── Commands/      # spark CLI commands (system:* — see Development Commands)
@@ -130,7 +130,7 @@ yarn prettier:fix         # Prettier auto-fix
 composer install                    # Install PHP dependencies
 php spark migrate                   # Run database migrations
 php spark db:seed                   # Run database seeds
-php spark serve                     # Start local dev server (port 8080)
+php spark serve                     # Start local dev server (port 8080); outside production first runs DevWeatherSeeder (--no-seed to skip)
 vendor/bin/phpunit                  # Run PHPUnit tests
 vendor/bin/phpunit --coverage-html  # With HTML coverage report
 
@@ -141,6 +141,14 @@ php spark system:detectAnomalies        # Checks meteorological anomaly conditio
 php spark system:backfillAnomalyLog     # One-off backfill of anomaly_log from historical daily records
 php spark system:sendNarodmonData       # Sends current sensor reading to narodmon.ru
 ```
+
+#### Local development data
+
+```bash
+php spark db:seed DevWeatherSeeder      # Dev only (refuses in production); fills the gap from the newest raw_weather_data row up to now
+```
+
+Generates synthetic Orenburg weather (CustomStation every 5 min plus OpenWeatherMap/WeatherAPI/VisualCrossing/OpenMeteo at cron cadence), rebuilds hourly/daily averages, regenerates a 7-day hourly forecast, runs anomaly detection over the new days and clears the cache. Idempotent: re-run any time to fill the new gap. `php spark serve` runs it automatically outside production (`app/Commands/Serve.php` overrides the framework command; `--no-seed` skips it). Generator lives in `server/app/Libraries/DevWeatherGenerator.php`.
 
 ### Arduino — use Arduino IDE
 
@@ -163,6 +171,7 @@ Load `arduino/main/main.ino` in Arduino IDE and upload to the board.
 - **Validation:** Use CodeIgniter validation rules (defined in `Validation/` or inline in controllers)
 - **Controllers** extend `ResourceController`
 - **Database access** through Model classes only — no raw queries in controllers
+- **HTTP caching:** GET responses get `Cache-Control` + ETag from `Filters/CacheControlFilter.php` (per-route max-age in `Config/Filters.php`); keep response bodies deterministic so ETags stay stable
 
 ### TypeScript / React
 
@@ -178,6 +187,8 @@ Load `arduino/main/main.ino` in Arduino IDE and upload to the board.
 - **No `console.log`** — only `console.warn` / `console.error` permitted
 - **JSX max depth:** 4 levels
 - **CSS:** CSS Modules (`.module.sass` / `.module.scss`), no inline styles
+- **Design system:** read `client/DESIGN.md` before adding or changing any UI. Surfaces, type and layout come from the tokens in `styles/theme.css` and the mixins in `styles/mixins.sass` / `styles/typography.sass` — no raw hex colours or bare font sizes in components; charts go through `components/echart` with `getChartTokens()`
+- **SEO:** every page sets its tags with `getPageSeo()` (`tools/seo.ts`: canonical per locale, hreflang) and starts with `PageHeader` (the one `h1`); data above the fold is prefetched in `getServerSideProps` with `prefetchQueries()` (`api/ssr.ts`) using the same query arguments as the client hooks
 
 ### Arduino / C++
 
@@ -275,4 +286,21 @@ CodeIgniter dotted-key env vars — database (`database.production.*`), app coor
 8. **Environment:** Never hard-code API keys, URLs, or credentials. Use environment variables.
 9. **Database:** Schema changes require a new CodeIgniter migration file — never modify existing migrations.
 10. **Do not commit** `vendor/`, `node_modules/`, `.next/`, `writable/`, or `env` files.
-11. **Before opening a PR:** bump `version` in `client/package.json` (usually the patch number, occasionally minor, almost never major) and add a matching new version section at the top of the root `CHANGELOG.md` (`## x.y.z` → `### Patch Changes` / `### Minor Changes` / `### Major Changes`) with a very short bullet list of the changes.
+
+---
+
+## Pull Request Checklist
+
+Branches are named after the release they ship in: `release/X.Y.Z` (e.g. `release/3.8.1`). Work for an upcoming release goes into its branch; another PR meant for that release is merged into it, not into `main`.
+
+Before opening a PR:
+
+1. Bump `"version"` in `client/package.json`: almost always **patch**; **minor** only for noticeable new features or UX changes; **major** practically never.
+2. Add a section for that version to the top of the root `CHANGELOG.md` in the existing format: `## X.Y.Z`, then `### Patch Changes` / `### Minor Changes` / `### Major Changes`, then short one-line bullets. English only.
+
+---
+
+## Release
+
+Only after the version-bump PR is merged into `main` and the user asks for a release: tag the merge commit `v<version>` and create the GitHub release (title = tag, body = that version's `CHANGELOG.md` section without the `## X.Y.Z` heading, marked latest) in one command:
+`gh release create v3.8.1 --target main --title v3.8.1 --notes-file <section.md> --latest`.
