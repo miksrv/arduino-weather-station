@@ -31,6 +31,11 @@ class Heatmap extends ResourceController
 
     protected $format = 'json';
 
+    /**
+     * One value per hour: the heatmap is an hour × day grid, so finer readings would only overlap in a cell.
+     */
+    private const GROUP_INTERVAL = '1 HOUR';
+
     protected RawWeatherDataModel $weatherDataModel;
 
     /**
@@ -71,6 +76,10 @@ class Heatmap extends ResourceController
             return $this->failValidationErrors('Missing required parameters: start_date or end_date');
         }
 
+        if (!is_string($rawStartDate) || !is_string($rawEndDate)) {
+            return $this->failValidationErrors('Invalid date format');
+        }
+
         $startTimestamp = strtotime($rawStartDate);
         $endTimestamp   = strtotime($rawEndDate);
 
@@ -85,6 +94,10 @@ class Heatmap extends ResourceController
             return $this->failValidationErrors('Date is out of valid range. It cannot be in the future or before 2020-01-01.');
         }
 
+        if ($endTimestamp < $startTimestamp) {
+            return $this->failValidationErrors('end_date cannot be earlier than start_date');
+        }
+
         if ($endTimestamp - $startTimestamp > 366 * 86400) {
             return $this->failValidationErrors('Date range cannot exceed 366 days.');
         }
@@ -96,7 +109,7 @@ class Heatmap extends ResourceController
 
         // Disable caching for short ranges (≤48 h) due to timezone differences
         if ($rangeHours <= self::CACHE_MIN_RANGE_HOURS) {
-            $rawData = $this->weatherDataModel->getWeatherHistoryGrouped($startDate, $endDate, '10 MINUTE', $type);
+            $rawData = $this->weatherDataModel->getWeatherHistoryGrouped($startDate, $endDate, self::GROUP_INTERVAL, $type);
 
             if (empty($rawData)) {
                 return $this->failNotFound('No data found for the given date range and type');
@@ -110,11 +123,11 @@ class Heatmap extends ResourceController
             return $this->respond($result);
         }
 
-        $cacheKey = 'heatmap_' . md5($type . '_' . $rawStartDate . '_' . $rawEndDate);
+        $cacheKey = 'heatmap_hourly_' . md5($type . '_' . date('Y-m-d', $startTimestamp) . '_' . date('Y-m-d', $endTimestamp));
         $rawData  = cache()->get($cacheKey);
 
         if (!is_array($rawData)) {
-            $rawData = $this->weatherDataModel->getWeatherHistoryGrouped($startDate, $endDate, '10 MINUTE', $type);
+            $rawData = $this->weatherDataModel->getWeatherHistoryGrouped($startDate, $endDate, self::GROUP_INTERVAL, $type);
 
             if (!empty($rawData)) {
                 // Recent end-dates get a short TTL; purely historical data is cached indefinitely

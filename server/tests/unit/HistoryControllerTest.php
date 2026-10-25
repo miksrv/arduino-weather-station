@@ -329,4 +329,80 @@ final class HistoryControllerTest extends CIUnitTestCase
         $this->assertStringContainsString('UTC Date', $body);
         $this->assertStringContainsString('Temperature', $body);
     }
+
+    public function testEndDateBeforeStartDateReturns400(): void
+    {
+        $this->controller(History::class);
+        $this->request->setMethod('GET');
+        parse_str('start_date=2023-02-10&end_date=2023-01-01', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(400, $result->response()->getStatusCode());
+    }
+
+    public function testArrayDateParamsReturn400(): void
+    {
+        $this->controller(History::class);
+        $this->request->setMethod('GET');
+        parse_str('start_date[]=2023-01-01&end_date[]=2023-01-10', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(400, $result->response()->getStatusCode());
+    }
+
+    /**
+     * Cache key is based on normalised dates, so different spellings of the same range share one entry.
+     */
+    public function testCacheKeyIsNormalisedAcrossDateSpellings(): void
+    {
+        cache()->save('history_' . md5('2023-01-01_2023-01-10'), [['date' => '2023-01-01 10:00:00', 'temperature' => 7.0]], 0);
+
+        $mockRaw = $this->createMock(RawWeatherDataModel::class);
+        $mockRaw->expects($this->never())->method('getWeatherHistoryGrouped');
+
+        $this->controller(History::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockRaw);
+
+        $this->request->setMethod('GET');
+        parse_str('start_date=2023-01-01 00:00:00&end_date=2023-01-10 12:30', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(200, $result->response()->getStatusCode());
+
+        cache()->delete('history_' . md5('2023-01-01_2023-01-10'));
+    }
+
+    /**
+     * CSV column headers must line up with the order of the data columns.
+     */
+    public function testExportHeaderOrderMatchesDataColumns(): void
+    {
+        $fakeRow = array_fill_keys([
+            'temperature', 'feels_like', 'pressure', 'humidity', 'dew_point', 'uv_index', 'sol_energy',
+            'sol_radiation', 'precipitation', 'clouds', 'visibility', 'wind_speed', 'wind_gust', 'wind_deg',
+        ], 1);
+        $fakeRow['date']       = '2023-01-01 10:00:00';
+        $fakeRow['uv_index']   = 11;
+        $fakeRow['visibility'] = 9000;
+
+        $mockRaw = $this->createMock(RawWeatherDataModel::class);
+        $mockRaw->method('getWeatherHistoryGrouped')->willReturn([$fakeRow]);
+
+        $this->controller(History::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockRaw);
+
+        $this->request->setMethod('GET');
+        parse_str('start_date=2023-01-01&end_date=2023-01-02', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHistoryWeatherCSV');
+        $lines  = array_map('str_getcsv', explode("\n", trim((string) $result->response()->getBody())));
+
+        $header = array_flip($lines[0]);
+        $this->assertSame('11', $lines[1][$header['UV Index']]);
+        $this->assertSame('9000', $lines[1][$header['Visibility']]);
+    }
 }

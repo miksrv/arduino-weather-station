@@ -149,6 +149,29 @@ final class HeatmapControllerTest extends CIUnitTestCase
         $this->assertCount(1, $body);
     }
 
+    /**
+     * The heatmap is an hour × day grid: the data is grouped by hour, one value per cell.
+     */
+    public function testDataIsGroupedByHour(): void
+    {
+        cache()->clean();
+
+        $mockModel = $this->createMock(RawWeatherDataModel::class);
+        $mockModel->expects($this->once())
+            ->method('getWeatherHistoryGrouped')
+            ->with('2023-01-01 00:00:00', '2023-01-31 23:59:59', '1 HOUR', 'temperature')
+            ->willReturn([['date' => '2023-01-01 10:00:00', 'temperature' => 5.0]]);
+
+        $this->controller(Heatmap::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockModel);
+
+        $this->request->setMethod('GET');
+        parse_str('type=temperature&start_date=2023-01-01&end_date=2023-01-31', $get);
+        $this->request->setGlobal('get', $get);
+
+        $this->assertSame(200, $this->execute('getHeatmapData')->response()->getStatusCode());
+    }
+
     // -------------------------------------------------------------------------
     // Caching behaviour
     // -------------------------------------------------------------------------
@@ -160,7 +183,7 @@ final class HeatmapControllerTest extends CIUnitTestCase
     public function testGetHeatmapDataReturnsCachedDataWithout200(): void
     {
         $fakeRow  = ['date' => '2023-01-01 10:10:00', 'temperature' => 5.0];
-        $cacheKey = 'heatmap_' . md5('temperature_2023-01-01_2023-01-31');
+        $cacheKey = 'heatmap_hourly_' . md5('temperature_2023-01-01_2023-01-31');
 
         // Pre-seed the cache with the raw row array.
         cache()->save($cacheKey, [$fakeRow], 0);
@@ -256,5 +279,16 @@ final class HeatmapControllerTest extends CIUnitTestCase
 
             $this->assertFalse($isTypeError, "Type '{$type}' must not produce a type-validation error");
         }
+    }
+
+    public function testEndDateBeforeStartDateReturns400(): void
+    {
+        $this->controller(\App\Controllers\Heatmap::class);
+        $this->request->setMethod('GET');
+        parse_str('type=temperature&start_date=2023-02-10&end_date=2023-01-01', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHeatmapData');
+        $this->assertSame(400, $result->response()->getStatusCode());
     }
 }
