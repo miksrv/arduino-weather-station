@@ -12,28 +12,26 @@ export type ToggleSwitchProps = {
 
 interface ThemeSwitcherProps {
     theme?: ThemesType | string
+    label?: string
     onChangeTheme?: (theme: ThemesType) => void
 }
 
-const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ theme, onChangeTheme }) => {
+const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ theme, label, onChangeTheme }) => {
     const handleToggle = () => {
         onChangeTheme?.(theme === 'dark' ? 'light' : 'dark')
     }
 
     return (
-        <div
+        <button
+            type={'button'}
+            role={'switch'}
+            aria-checked={theme === 'dark'}
+            aria-label={label}
             className={styles.toggleContainer}
             onClick={handleToggle}
-            role='button'
-            tabIndex={0}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    handleToggle()
-                }
-            }}
         >
             <ToggleSwitch checked={theme === 'dark'} />
-        </div>
+        </button>
     )
 }
 

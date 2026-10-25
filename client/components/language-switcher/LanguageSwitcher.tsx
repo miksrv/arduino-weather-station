@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { setCookie } from 'cookies-next'
 import { cn } from 'simple-react-ui-kit'
 
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next/pages'
 
@@ -13,6 +14,11 @@ import { LocaleType, StorageKeys } from '@/tools/types'
 
 import styles from './styles.module.sass'
 
+const LANGUAGES: Array<{ locale: Locale; label: string }> = [
+    { locale: 'en', label: 'Eng' },
+    { locale: 'ru', label: 'Rus' }
+]
+
 const LanguageSwitcher: React.FC = () => {
     const { i18n } = useTranslation()
     const router = useRouter()
@@ -21,10 +27,12 @@ const LanguageSwitcher: React.FC = () => {
     const [, setStorageLocale] = useLocalStorage<StorageKeys, LocaleType>(StorageKeys.LOCALE)
 
     const { language: currentLanguage } = i18n
-    const { pathname, query } = router
 
-    const changeLanguage = (locale: Locale) => {
+    // Real links to the page in the other language (crawlable, with hreflang). The switch itself is a full
+    // page load, so every API answer is fetched again with the new Locale header.
+    const handleSelect = (event: React.MouseEvent<HTMLAnchorElement>, locale: Locale) => {
         if (locale === currentLanguage) {
+            event.preventDefault()
             return
         }
 
@@ -32,11 +40,8 @@ const LanguageSwitcher: React.FC = () => {
         setStorageLocale(locale)
         dispatch(setLocale(locale))
 
-        // Формируем новый URL с учётом локали
-        const queryString = new URLSearchParams(query as Record<string, string>).toString()
-        const basePath = locale === 'ru' ? pathname : `/${locale}${pathname}`
-
-        window.location.href = queryString ? `${basePath}?${queryString}` : basePath
+        event.preventDefault()
+        window.location.href = event.currentTarget.href
     }
 
     useEffect(() => {
@@ -45,18 +50,19 @@ const LanguageSwitcher: React.FC = () => {
 
     return (
         <div className={styles.languageSwitcher}>
-            <button
-                className={cn(currentLanguage === 'en' && styles.active)}
-                onClick={() => changeLanguage('en')}
-            >
-                {'Eng'}
-            </button>
-            <button
-                className={cn(currentLanguage === 'ru' && styles.active)}
-                onClick={() => changeLanguage('ru')}
-            >
-                {'Rus'}
-            </button>
+            {LANGUAGES.map(({ locale, label }) => (
+                <Link
+                    key={locale}
+                    href={router.asPath}
+                    locale={locale}
+                    hrefLang={locale}
+                    aria-current={locale === currentLanguage ? 'true' : undefined}
+                    className={cn(locale === currentLanguage && styles.active)}
+                    onClick={(event) => handleSelect(event, locale)}
+                >
+                    {label}
+                </Link>
+            ))}
         </div>
     )
 }

@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes'
 
 import { API } from '@/api'
 import useClientOnly from '@/hooks/useClientOnly'
-import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
+import { POLLING_INTERVAL_CURRENT } from '@/tools/constants'
 import { formatDate, minutesAgo, timeAgo } from '@/tools/date'
 import ThemeSwitcher from '@/ui/theme-switcher'
 
@@ -21,9 +21,11 @@ const OFFLINE_TIME = 30
 
 const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
     const isClient = useClientOnly()
-    const { theme, setTheme } = useTheme()
+    const { resolvedTheme, setTheme } = useTheme()
     const { t } = useTranslation()
-    const { data: current, isLoading } = API.useGetCurrentQuery(undefined, { pollingInterval: POLING_INTERVAL_CURRENT })
+    const { data: current, isLoading } = API.useGetCurrentQuery(undefined, {
+        pollingInterval: POLLING_INTERVAL_CURRENT
+    })
 
     return (
         <header className={styles.appBar}>
@@ -55,12 +57,15 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     )}
                 </div>
 
-                {isClient && (
-                    <ThemeSwitcher
-                        theme={theme}
-                        onChangeTheme={setTheme}
-                    />
-                )}
+                <div className={styles.themeSlot}>
+                    {isClient && (
+                        <ThemeSwitcher
+                            theme={resolvedTheme}
+                            label={t('dark-theme')}
+                            onChangeTheme={setTheme}
+                        />
+                    )}
+                </div>
             </div>
         </header>
     )

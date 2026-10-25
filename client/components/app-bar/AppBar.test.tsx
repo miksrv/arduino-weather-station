@@ -6,8 +6,8 @@ import AppBar from './AppBar'
 
 import '@testing-library/jest-dom'
 
-jest.mock('@/pages/_app', () => ({
-    POLING_INTERVAL_CURRENT: 600000
+jest.mock('@/tools/constants', () => ({
+    POLLING_INTERVAL_CURRENT: 600000
 }))
 
 jest.mock('@/api', () => ({
@@ -39,7 +39,7 @@ const { useTheme } = require('next-themes')
 
 describe('AppBar', () => {
     beforeEach(() => {
-        useTheme.mockReturnValue({ theme: 'light', setTheme: jest.fn() })
+        useTheme.mockReturnValue({ theme: 'light', resolvedTheme: 'light', setTheme: jest.fn() })
         useClientOnly.mockReturnValue(false)
         useGetCurrentQuery.mockReturnValue({ data: undefined, isLoading: false })
     })

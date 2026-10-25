@@ -16,7 +16,7 @@ jest.mock('@/ui/theme-switcher/ToggleSwitch', () => ({ checked }: { checked: boo
 describe('ThemeSwitcher', () => {
     it('renders without crashing', () => {
         render(<ThemeSwitcher />)
-        expect(screen.getByRole('button')).toBeInTheDocument()
+        expect(screen.getByRole('switch')).toBeInTheDocument()
     })
 
     it('passes checked=true to ToggleSwitch when theme is "dark"', () => {
@@ -42,7 +42,7 @@ describe('ThemeSwitcher', () => {
                 onChangeTheme={onChangeTheme}
             />
         )
-        fireEvent.click(screen.getByRole('button'))
+        fireEvent.click(screen.getByRole('switch'))
         expect(onChangeTheme).toHaveBeenCalledWith('light')
     })
 
@@ -54,48 +54,30 @@ describe('ThemeSwitcher', () => {
                 onChangeTheme={onChangeTheme}
             />
         )
-        fireEvent.click(screen.getByRole('button'))
+        fireEvent.click(screen.getByRole('switch'))
         expect(onChangeTheme).toHaveBeenCalledWith('dark')
     })
 
     it('does not throw when onChangeTheme is not provided', () => {
         render(<ThemeSwitcher theme='dark' />)
-        expect(() => fireEvent.click(screen.getByRole('button'))).not.toThrow()
+        expect(() => fireEvent.click(screen.getByRole('switch'))).not.toThrow()
     })
 
-    it('triggers onChangeTheme via Enter key', () => {
-        const onChangeTheme = jest.fn()
+    it('exposes the dark state as aria-checked', () => {
+        const { rerender } = render(<ThemeSwitcher theme='dark' />)
+        expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'true')
+
+        rerender(<ThemeSwitcher theme='light' />)
+        expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'false')
+    })
+
+    it('uses the label as the accessible name', () => {
         render(
             <ThemeSwitcher
                 theme='dark'
-                onChangeTheme={onChangeTheme}
+                label='Dark theme'
             />
         )
-        fireEvent.keyDown(screen.getByRole('button'), { key: 'Enter' })
-        expect(onChangeTheme).toHaveBeenCalledWith('light')
-    })
-
-    it('triggers onChangeTheme via Space key', () => {
-        const onChangeTheme = jest.fn()
-        render(
-            <ThemeSwitcher
-                theme='light'
-                onChangeTheme={onChangeTheme}
-            />
-        )
-        fireEvent.keyDown(screen.getByRole('button'), { key: ' ' })
-        expect(onChangeTheme).toHaveBeenCalledWith('dark')
-    })
-
-    it('does not call onChangeTheme for unrelated key presses', () => {
-        const onChangeTheme = jest.fn()
-        render(
-            <ThemeSwitcher
-                theme='dark'
-                onChangeTheme={onChangeTheme}
-            />
-        )
-        fireEvent.keyDown(screen.getByRole('button'), { key: 'Tab' })
-        expect(onChangeTheme).not.toHaveBeenCalled()
+        expect(screen.getByRole('switch', { name: 'Dark theme' })).toBeInTheDocument()
     })
 })

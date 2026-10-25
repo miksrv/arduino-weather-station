@@ -1,91 +1,102 @@
+@use '../../styles/typography' as type
+
+// Sticky translucent bar over the page background; content aligned with the page column.
+// Installed on iOS the page runs under the status bar (black-translucent), so the bar grows by the safe areas
 .appBar
-    color: var(--text-color-primary)
-    height: 50px
+    position: sticky
+    top: 0
+    z-index: calc(var(--z-dropdown) - 1)
+    height: calc(var(--app-bar-height) + env(safe-area-inset-top))
     width: 100%
-    padding: 0 10px
+    padding-top: env(safe-area-inset-top)
+    padding-left: max(var(--space-3), env(safe-area-inset-left))
+    padding-right: max(var(--space-3), env(safe-area-inset-right))
+    color: var(--text-color-primary)
+    background: var(--app-bar-background)
+    -webkit-backdrop-filter: saturate(180%) blur(12px)
+    backdrop-filter: saturate(180%) blur(12px)
+    box-shadow: 0 1px 0 var(--border)
 
     .loading
         display: flex
         align-items: center
+        gap: var(--space-2)
+        +type.secondary
 
         svg
-            width: 20px
-            height: 20px
-            margin-right: 10px
+            width: 18px
+            height: 18px
 
     .wrapper
         display: flex
         max-width: var(--width-max)
-        background-color: var(--container-background-color)
-        border-radius: var(--container-radius)
-        box-shadow: var(--container-shadow)
         margin: 0 auto
-        padding: 0 10px
         align-items: center
         width: 100%
         height: 100%
         justify-content: space-between
+        gap: var(--space-3)
 
         .aside
             display: flex
             align-items: center
+            gap: var(--space-3)
+            min-width: 0
+            +type.body
+            font-weight: var(--font-weight-medium)
 
     .hamburgerButton
+        display: inline-flex
+        align-items: center
+        justify-content: center
+        width: 36px
+        height: 36px
         border: none
         background: transparent
         padding: 0
-        line-height: 10px
-        margin-right: 10px
         cursor: pointer
-        opacity: .7
-        transition: opacity .3s
+        border-radius: var(--radius-md)
+        transition: background-color var(--duration-fast) var(--ease)
 
         &:hover
-            opacity: 1
+            background-color: var(--surface-2)
+
+        &:focus-visible
+            outline: var(--focus-outline)
 
         svg
-            width: 34px
-            height: 34px
+            width: 24px
+            height: 24px
             fill: var(--text-color-primary)
 
-    .timeAgo
-        font-size: var(--font-size-small)
-        color: var(--text-color-secondary)
-
-    .online, .offline
-        width: 5px
+    // Reserves the switcher's size on the server render, so the bar does not shift on hydration
+    .themeSlot
+        flex: 0 0 auto
+        width: 70px
         height: 32px
-        margin: 0 10px 0 0
+
+    .timeAgo
+        +type.caption
+        font-weight: var(--font-weight-normal)
+
+    // Station status: a dot with a soft halo, pulsing while the data is fresh
+    .online, .offline
+        flex: 0 0 auto
+        width: 8px
+        height: 8px
+        border-radius: var(--radius-full)
 
     .online
         background: var(--color-green)
-        -webkit-animation: pulsate 2s infinite
-        -moz-animation: pulsate 2s infinite
+        box-shadow: 0 0 0 3px var(--color-green-background)
         animation: pulsate 2s infinite
 
     .offline
         background: var(--color-red)
-
-@-webkit-keyframes pulsate
-    0%
-        opacity: 1
-    50%
-        opacity: 0
-    100%
-        opacity: 1
-
-@-moz-keyframes pulsate
-    0%
-        opacity: 1
-    50%
-        opacity: 0
-    100%
-        opacity: 1
+        box-shadow: 0 0 0 3px var(--color-red-background)
 
 @keyframes pulsate
-    0%
+    0%, 100%
         opacity: 1
     50%
-        opacity: 0
-    100%
-        opacity: 1
+        opacity: 0.35

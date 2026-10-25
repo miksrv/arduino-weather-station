@@ -1,93 +1,82 @@
 @use '../../styles/variables'
-@use '../../styles/animations'
-
-@keyframes animation-sideBar-slideIn
-    0%
-        left: - variables.$sideBarWidth
-
-    100%
-        left: 0
-
-@keyframes animation-sideBar-slideOut
-    0%
-        left: 0
-
-    100%
-        left: - variables.$sideBarWidth
+@use '../../styles/mixins'
 
 .menu
     list-style: none
-    padding: 8px
-    margin: 15px 0 0 0
+    padding: var(--space-3)
+    margin: 0
+    display: flex
+    flex-direction: column
+    gap: 2px
 
     a
-        margin-bottom: 5px
-        padding: 8px 16px
+        padding: 0 var(--space-3)
         width: 100%
         display: flex
-        min-height: 32px
+        gap: var(--space-3)
+        min-height: 40px
         align-items: center
-        border-radius: var(--border-radius)
         color: var(--text-color-primary)
-        text-decoration: none
-        font-weight: 400
-        transition: background-color var(--duration-fast) var(--ease), color var(--duration-fast) var(--ease)
+        font-weight: var(--font-weight-normal)
+        +mixins.interactiveRow
 
         &:hover
-            background-color: var(--surface-2)
-
-        &:focus-visible
-            outline: var(--focus-outline)
-            outline-offset: -2px
-
-        svg
-            fill: var(--color-main)
-            margin: -10px 10px -10px 0
-            width: 22px
-            height: 22px
+            color: var(--text-color-primary)
 
     .active, .active:hover
         background-color: var(--color-main-background)
+        color: var(--color-main)
         font-weight: var(--font-weight-medium)
+
+        .iconWrapper svg
+            fill: var(--color-main)
 
     .iconWrapper
         position: relative
         display: inline-flex
-        margin: -10px 10px -10px 0
+        flex: 0 0 auto
 
         svg
             margin: 0
-            width: 22px
-            height: 22px
-            fill: var(--color-main)
+            width: 20px
+            height: 20px
+            fill: var(--text-color-secondary)
 
     .badge
         position: absolute
-        top: 0
+        top: -1px
         right: -2px
-        width: 7px
-        height: 7px
-        border-radius: 50%
+        width: 8px
+        height: 8px
+        border-radius: var(--radius-full)
         background: var(--color-red)
-        border: 1px solid var(--container-background-color)
+        border: 2px solid var(--surface-1)
 
 .appLayout
     width: 100%
     margin: 0 auto
     position: relative
-    padding-top: 10px
 
     .mainContainer
         display: flex
         width: 100%
         margin: 0 auto
-        padding: 5px 10px
+        // Gutters never narrower than the safe areas of an installed app (notch in landscape, home indicator)
+        padding-top: var(--space-4)
+        padding-left: max(var(--space-3), env(safe-area-inset-left))
+        padding-right: max(var(--space-3), env(safe-area-inset-right))
+        padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom))
+
+        @media only screen and (max-width: variables.$mobileMaxWidth)
+            padding-top: var(--space-3)
+            padding-left: max(var(--space-2), env(safe-area-inset-left))
+            padding-right: max(var(--space-2), env(safe-area-inset-right))
+            padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom))
 
         .main
             width: 100%
             max-width: var(--width-max)
-            margin: 0 auto 20px
-
+            margin: 0 auto
 
     &.fullSize
         .mainContainer
@@ -96,42 +85,50 @@
     .overlay
         top: 0
         left: 0
-        position: absolute
+        position: fixed
         width: 100%
         height: 100%
-        z-index: 500
+        z-index: var(--z-overlay)
         background: var(--overlay-background)
-        transition: opacity 167ms ease-out
+        transition: opacity var(--duration-base) var(--ease), visibility var(--duration-base) var(--ease)
 
         &.hidden
             opacity: 0
             visibility: hidden
-            //animation: animation-fadeOut .32s ease
 
         &.displayed
             opacity: 1
             visibility: visible
-            //animation: animation-fadeIn .32s ease
 
+    // Drawer: slides over the page with transform (no layout work per frame)
     .sidebar
         position: fixed
-        background-color: var(--container-background-color)
+        display: flex
+        flex-direction: column
+        background-color: var(--surface-1)
+        box-shadow: var(--shadow-lg)
         width: variables.$sideBarWidth
-        z-index: 600
+        max-width: 85vw
+        z-index: var(--z-dialog)
         top: 0
-        left: - variables.$sideBarWidth
-        transition: left 167ms ease-out
+        left: 0
+        padding: env(safe-area-inset-top) 0 0 env(safe-area-inset-left)
+        overflow-y: auto
+        transform: translateX(-100%)
+        visibility: hidden
+        transition: transform var(--duration-slow) var(--ease), visibility var(--duration-slow) var(--ease)
 
         &.opened
-            left: 0
-            //animation: animation-sideBar-slideIn .32s ease
+            transform: translateX(0)
+            visibility: visible
 
         &.closed
-            left: - variables.$sideBarWidth
-            //animation: animation-sideBar-slideOut .32s ease
+            transform: translateX(-100%)
 
         .content
-            padding: 20px
+            margin-top: auto
+            padding: var(--space-4) var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom))
+            border-top: 1px solid var(--border)
 
         .switchers
             display: flex

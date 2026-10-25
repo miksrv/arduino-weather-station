@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { cn } from 'simple-react-ui-kit'
 
-import NextNProgress from 'nextjs-progressbar'
-
 import { useAppSelector } from '@/api/store'
 import AppBar from '@/components/app-bar'
 import Footer from '@/components/footer'
@@ -45,6 +43,23 @@ const AppLayout: React.FC<AppLayoutProps> = ({ className, fullSize, children }) 
         }
     }, [application.showOverlay, sidebarOpen])
 
+    // Escape closes the menu wherever the focus is
+    useEffect(() => {
+        if (!sidebarOpen) {
+            return
+        }
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setSidebarOpen(false)
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [sidebarOpen])
+
     useEffect(() => {
         const calculatePageHeight = () => {
             if (document.documentElement.scrollHeight) {
@@ -63,20 +78,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ className, fullSize, children }) 
 
     return (
         <div className={cn(className, styles.appLayout, fullSize && styles.fullSize)}>
-            <NextNProgress
-                color={'#2688eb'}
-                options={{ showSpinner: false }}
-            />
-
             <div
-                role={'button'}
-                tabIndex={0}
+                aria-hidden={true}
                 className={cn(
                     styles.overlay,
                     application.showOverlay || sidebarOpen ? styles.displayed : styles.hidden
                 )}
                 style={{ height: overlayHeight }}
-                onKeyDown={handleCloseOverlay}
                 onClick={handleCloseOverlay}
             />
 
