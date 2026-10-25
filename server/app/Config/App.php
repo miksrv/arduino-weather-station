@@ -127,6 +127,16 @@ class App extends BaseConfig
 
     /**
      * --------------------------------------------------------------------------
+     * Station Timezone
+     * --------------------------------------------------------------------------
+     *
+     * IANA time zone of the weather station. Forecast days are bucketed by the
+     * calendar day in this zone (override with app.stationTimezone in .env).
+     */
+    public string $stationTimezone = 'Asia/Yekaterinburg';
+
+    /**
+     * --------------------------------------------------------------------------
      * Default Character Set
      * --------------------------------------------------------------------------
      *

@@ -51,3 +51,17 @@ export const isValidJSON = (string: string) => {
 
     return true
 }
+
+/**
+ * The unit as it follows a number: symbols stick to the number ("21°C", "58%"), words get a space ("780 мм рт. ст.").
+ *
+ * @param unit - The unit label, may be empty.
+ * @returns The unit with the right separator, or an empty string.
+ */
+export const unitSuffix = (unit?: string): string => {
+    if (!unit) {
+        return ''
+    }
+
+    return /^[°%‰]/.test(unit) ? unit : ` ${unit}`
+}

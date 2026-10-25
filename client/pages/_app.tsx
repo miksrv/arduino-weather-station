@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Provider } from 'react-redux'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -6,66 +6,54 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 
 import { AppProps } from 'next/app'
+import { Geist, Geist_Mono } from 'next/font/google'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import Script from 'next/script'
 // import { useReportWebVitals } from 'next/web-vitals'
 import { appWithTranslation, useTranslation } from 'next-i18next/pages'
 import { generateDefaultSeo } from 'next-seo/pages'
 import { ThemeProvider } from 'next-themes'
+import NextNProgress from 'nextjs-progressbar'
 
 import { wrapper } from '@/api/store'
-import { getItem } from '@/tools/localstorage'
-import { StorageKeys } from '@/tools/types'
+import useServiceWorker from '@/hooks/useServiceWorker'
 
 import i18Config from '../next-i18next.config'
 
 import 'dayjs/locale/ru'
 
 import 'simple-react-ui-kit/theme.css'
+import 'simple-react-ui-kit/styles.css'
 import '@/styles/theme.css'
 import '@/styles/globals.sass'
+
+// Self-hosted at build time (no request to Google, no layout shift); exposed as CSS variables for the tokens
+const geist = Geist({ subsets: ['latin', 'cyrillic'], display: 'swap' })
+const geistMono = Geist_Mono({ subsets: ['latin', 'cyrillic'], display: 'swap' })
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 
-export const POLING_INTERVAL_CURRENT = 10 * 60 * 1000
-export const POLING_INTERVAL_FORECAST = 10 * 60 * 1000
-
 const App = ({ Component, pageProps }: AppProps) => {
-    const router = useRouter()
     const { i18n } = useTranslation()
     const { store } = wrapper.useWrappedStore(pageProps)
 
-    useEffect(() => {
-        dayjs.locale(i18n.language ?? i18Config.i18n.defaultLocale)
-    }, [i18n.language])
+    useServiceWorker(process.env.NODE_ENV === 'production')
 
-    // Redirect to the user's previously saved locale preference if it differs from the
-    // current URL locale. Runs after the current locale's content has already rendered
-    // (SSR and first paint are never gated on this), so it may briefly flash the URL's
-    // locale before redirecting — that's the accepted tradeoff for keeping pages crawlable.
-    useEffect(() => {
-        const savedLocale = getItem<string>(StorageKeys.LOCALE)
+    // Set during render (not in an effect), so the server render formats dates in the page's language too.
+    // The visitor's language choice lives in the NEXT_LOCALE cookie (Next.js redirects `/` by it); a link to
+    // a page in a given language is always honoured, so shared links and hreflang alternates work.
+    const locale = i18n.language ?? i18Config.i18n.defaultLocale
 
-        if (
-            savedLocale &&
-            i18n.language !== savedLocale &&
-            i18Config.i18n.locales.includes(savedLocale) &&
-            router.pathname !== '/404'
-        ) {
-            void router.replace(router.asPath, router.asPath, { locale: savedLocale })
-        }
-    }, [])
-
-    // useReportWebVitals((metric) => {
-    //     console.log(metric)
-    // })
+    if (dayjs.locale() !== locale) {
+        dayjs.locale(locale)
+    }
 
     return (
         <ThemeProvider defaultTheme={'dark'}>
             <Head>
+                <style>{`:root { --font-sans: ${geist.style.fontFamily}; --font-mono-face: ${geistMono.style.fontFamily}; }`}</style>
                 {generateDefaultSeo({
                     openGraph: {
                         siteName: 'Meteo Orenburg',
@@ -81,26 +69,37 @@ const App = ({ Component, pageProps }: AppProps) => {
                 />
                 <meta
                     name={'viewport'}
-                    content={'width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no'}
+                    content={'width=device-width, initial-scale=1, viewport-fit=cover'}
                 />
                 <meta
+                    key={'theme-color-light'}
                     name={'theme-color'}
-                    content={'#ebedf0'}
+                    content={'#f7f8fa'}
                     media={'(prefers-color-scheme: light)'}
                 />
                 <meta
+                    key={'theme-color-dark'}
                     name={'theme-color'}
-                    content={'#1b1b1b'}
+                    content={'#0b0d10'}
                     media={'(prefers-color-scheme: dark)'}
                 />
                 <meta
                     name={'apple-mobile-web-app-status-bar-style'}
                     content={'black-translucent'}
                 />
+                <meta
+                    name={'apple-mobile-web-app-title'}
+                    content={'Метео'}
+                />
                 <link
                     rel={'apple-touch-icon'}
                     sizes={'180x180'}
                     href={'/apple-touch-icon.png'}
+                />
+                <link
+                    rel={'icon'}
+                    type={'image/svg+xml'}
+                    href={'/favicon.svg'}
                 />
                 <link
                     rel={'icon'}
@@ -125,6 +124,12 @@ const App = ({ Component, pageProps }: AppProps) => {
                 />
             </Head>
 
+            <NextNProgress
+                color={'var(--color-main)'}
+                height={2}
+                options={{ showSpinner: false }}
+            />
+
             <Provider store={store}>
                 <Component {...pageProps} />
             </Provider>
@@ -134,7 +139,7 @@ const App = ({ Component, pageProps }: AppProps) => {
                     {/* Yandex.Metrika counter */}
                     <Script
                         id={'yandex-metrika'}
-                        strategy={'afterInteractive'}
+                        strategy={'lazyOnload'}
                     >
                         {`
                             (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
@@ -156,7 +161,8 @@ const App = ({ Component, pageProps }: AppProps) => {
                         <div>
                             <img
                                 src={'https://mc.yandex.ru/watch/67014250'}
-                                style={{ position: 'absolute', left: '-9999px' }}
+                                width={1}
+                                height={1}
                                 alt={''}
                             />
                         </div>

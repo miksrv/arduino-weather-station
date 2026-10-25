@@ -227,7 +227,7 @@ final class HistoryControllerTest extends CIUnitTestCase
     public function testGetHistoryWeatherReturnsCachedDataWithout200(): void
     {
         $fakeRow  = ['date' => '2023-01-01 10:00:00', 'temperature' => 7.0];
-        $cacheKey = 'history_' . md5('2023-01-01_2023-01-10');
+        $cacheKey = 'history_' . hash('sha256', '2023-01-01_2023-01-10_daily');
 
         // Pre-seed the cache with the raw row array.
         cache()->save($cacheKey, [$fakeRow], 0);
@@ -251,7 +251,7 @@ final class HistoryControllerTest extends CIUnitTestCase
         $this->assertCount(1, $body);
 
         // Clean up.
-        cache()->delete('history_' . md5('2023-01-01_2023-01-10'));
+        cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-10_daily'));
     }
     public function testCacheTtlConstants(): void
     {
@@ -328,5 +328,105 @@ final class HistoryControllerTest extends CIUnitTestCase
         $body = (string) $result->response()->getBody();
         $this->assertStringContainsString('UTC Date', $body);
         $this->assertStringContainsString('Temperature', $body);
+    }
+
+    public function testEndDateBeforeStartDateReturns400(): void
+    {
+        $this->controller(History::class);
+        $this->request->setMethod('GET');
+        parse_str('start_date=2023-02-10&end_date=2023-01-01', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(400, $result->response()->getStatusCode());
+    }
+
+    public function testArrayDateParamsReturn400(): void
+    {
+        $this->controller(History::class);
+        $this->request->setMethod('GET');
+        parse_str('start_date[]=2023-01-01&end_date[]=2023-01-10', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(400, $result->response()->getStatusCode());
+    }
+
+    /**
+     * Cache key is based on normalised dates, so different spellings of the same range share one entry.
+     */
+    public function testCacheKeyIsNormalisedAcrossDateSpellings(): void
+    {
+        cache()->save('history_' . hash('sha256', '2023-01-01_2023-01-10_daily'), [['date' => '2023-01-01 10:00:00', 'temperature' => 7.0]], 0);
+
+        $mockRaw = $this->createMock(RawWeatherDataModel::class);
+        $mockRaw->expects($this->never())->method('getWeatherHistoryGrouped');
+
+        $this->controller(History::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockRaw);
+
+        $this->request->setMethod('GET');
+        parse_str('start_date=2023-01-01 00:00:00&end_date=2023-01-10 12:30', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(200, $result->response()->getStatusCode());
+
+        cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-10_daily'));
+    }
+
+    /**
+     * Ranges on the same days but on different sides of the 7-day boundary must not share a cache entry.
+     */
+    public function testCacheKeySeparatesHourlyAndDailyGrouping(): void
+    {
+        cache()->save('history_' . hash('sha256', '2023-01-01_2023-01-08_hourly'), [['date' => '2023-01-01 10:00:00', 'temperature' => 7.0]], 0);
+
+        $mockDaily = $this->createMock(DailyAveragesModel::class);
+        $mockDaily->expects($this->once())->method('getWeatherHistoryGrouped')->willReturn([]);
+
+        $this->controller(History::class);
+        $this->setPrivateProperty($this->controller, 'dailyAveragesModel', $mockDaily);
+
+        $this->request->setMethod('GET');
+        parse_str('start_date=2023-01-01&end_date=2023-01-08 12:00', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(200, $result->response()->getStatusCode());
+
+        cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-08_hourly'));
+        cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-08_daily'));
+    }
+
+    /**
+     * CSV column headers must line up with the order of the data columns.
+     */
+    public function testExportHeaderOrderMatchesDataColumns(): void
+    {
+        $fakeRow = array_fill_keys([
+            'temperature', 'feels_like', 'pressure', 'humidity', 'dew_point', 'uv_index', 'sol_energy',
+            'sol_radiation', 'precipitation', 'clouds', 'visibility', 'wind_speed', 'wind_gust', 'wind_deg',
+        ], 1);
+        $fakeRow['date']       = '2023-01-01 10:00:00';
+        $fakeRow['uv_index']   = 11;
+        $fakeRow['visibility'] = 9000;
+
+        $mockRaw = $this->createMock(RawWeatherDataModel::class);
+        $mockRaw->method('getWeatherHistoryGrouped')->willReturn([$fakeRow]);
+
+        $this->controller(History::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockRaw);
+
+        $this->request->setMethod('GET');
+        parse_str('start_date=2023-01-01&end_date=2023-01-02', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHistoryWeatherCSV');
+        $lines  = array_map('str_getcsv', explode("\n", trim((string) $result->response()->getBody())));
+
+        $header = array_flip($lines[0]);
+        $this->assertSame('11', $lines[1][$header['UV Index']]);
+        $this->assertSame('9000', $lines[1][$header['Visibility']]);
     }
 }

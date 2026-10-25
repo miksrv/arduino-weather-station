@@ -1,28 +1,30 @@
 @use '../../styles/variables'
+@use '../../styles/mixins'
+@use '../../styles/typography' as type
 
+// A single derived value: icon in a soft square, label over the reading
 .tile
+    +mixins.card
     display: flex
     align-items: center
-    gap: 10px
-    background: var(--container-background-color)
-    border-radius: var(--container-radius)
-    box-shadow: var(--container-shadow)
-    padding: 12px 14px
-    flex-basis: calc(20% - 8px)
-    width: calc(20% - 8px)
+    gap: var(--space-3)
+    padding: var(--space-3)
+    +mixins.columns(1, 5)
 
     @media only screen and (max-width: variables.$mobileMaxWidth)
-        flex-basis: calc(33.33% - 8px) !important
-        width: calc(33.33% - 8px) !important
+        +mixins.columns(1, 3)
 
-    @media only screen and (max-width: 480px)
-        flex-basis: calc(50% - 5px) !important
-        width: calc(50% - 5px) !important
+    @media only screen and (max-width: variables.$smallMaxWidth)
+        +mixins.columns(1, 2)
 
 .icon
     flex: 0 0 auto
-    width: 22px
-    height: 22px
+    box-sizing: content-box
+    width: 20px
+    height: 20px
+    padding: var(--space-2)
+    border-radius: var(--radius-md)
+    background: var(--surface-2)
     fill: var(--text-color-secondary)
 
 .content
@@ -32,22 +34,18 @@
     min-width: 0
 
 .title
-    font-size: 12px
-    color: var(--text-color-secondary)
+    +type.caption
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
 
 .value
-    font-size: 15px
-    font-weight: 600
-    color: var(--text-color-primary)
+    +type.valueSmall
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
 
 .unit
-    font-size: 12px
-    font-weight: 400
-    color: var(--text-color-secondary)
+    +type.unit
+    font-size: var(--font-size-small)
     margin-left: 3px

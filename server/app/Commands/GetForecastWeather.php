@@ -55,9 +55,16 @@ class GetForecastWeather extends BaseCommand
 
             foreach ($clients as $weatherClient) {
                 $sourceName = $weatherClient->getSourceName();
-                $dataArray  = $weatherClient->getForecastWeatherData();
 
-                if ($dataArray === false) {
+                try {
+                    $dataArray = $weatherClient->getForecastWeatherData();
+                } catch (\Throwable $e) {
+                    log_message('error', 'getForecastWeatherData failed for ' . $sourceName . ': ' . $e->getMessage());
+                    CLI::write('[ERROR] ' . $sourceName . ' — ' . $e->getMessage(), 'red');
+                    continue;
+                }
+
+                if ($dataArray === false || empty($dataArray)) {
                     CLI::write('[SKIP]  ' . $sourceName . ' — no forecast data', 'yellow');
                     continue;
                 }

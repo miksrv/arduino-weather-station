@@ -1,58 +1,23 @@
+@use '../../styles/mixins'
+@use '../../styles/typography' as type
+
 .widget
+    +mixins.card
     flex-basis: 100%
     width: 100%
-    background: var(--container-background-color)
-    color: var(--text-color-primary)
-    border-radius: var(--container-radius)
-    box-shadow: var(--container-shadow)
+    padding: var(--space-3) var(--space-2) var(--space-2)
     overflow: hidden
 
 .progressBar
     display: flex
     align-items: center
-    gap: 8px
-    padding: 8px 12px
-    font-size: 13px
-    color: var(--text-color-secondary)
+    gap: var(--space-2)
+    padding: var(--space-2) var(--space-3)
+    +type.secondary
 
     svg
         width: 18px
         height: 18px
         flex-shrink: 0
 
-.chartTooltipTitle
-    font-family: (--font-family), sans-serif
-    font-size: 12px
-    color: var(--text-color-primary)
-    margin-bottom: 10px
-    margin-top: -5px
-    min-width: 160px
-
-    &:first-letter
-        text-transform: uppercase
-
-.chartTooltipItem
-    margin-top: 0
-
-    &:last-of-type
-        margin-bottom: -5px
-
-    .icon
-        float: left
-        display: inline-block
-        margin-right: 5px
-        margin-top: 7px
-        border-radius: 2px
-        width: 6px
-        height: 6px
-
-    .label
-        font-size: 12px
-        display: flex
-        justify-content: space-between
-        align-items: center
-        color: var(--text-color-secondary)
-
-    .value
-        color: var(--text-color-primary)
-        margin-left: 10px
++mixins.chartTooltip

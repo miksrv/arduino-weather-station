@@ -86,14 +86,15 @@ class PrecipitationModel extends Model
                             DATE_FORMAT(date, \'%Y-%m-%d %H:00:00\') AS hour_slot,
                             AVG(precipitation)                    AS hour_avg
                      FROM raw_weather_data
-                     WHERE YEAR(date) = ?
+                     WHERE date >= ?
+                       AND date < ?
                        AND precipitation IS NOT NULL
                        AND precipitation > 0
                      GROUP BY day, hour_slot
                  ) AS hourly
                  GROUP BY day
                  ORDER BY day',
-                [$year]
+                [sprintf('%04d-01-01 00:00:00', $year), sprintf('%04d-01-01 00:00:00', $year + 1)]
             )
             ->getResultArray();
 

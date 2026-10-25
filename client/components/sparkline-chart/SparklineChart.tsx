@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react'
-import { EChartsOption, graphic } from 'echarts'
-import ReactECharts from 'echarts-for-react'
+import type { EChartsOption } from 'echarts'
 
 import { useTheme } from 'next-themes'
 
-import { hexToRgba, resolveCssVar } from '@/tools/colors'
+import EChart from '@/components/echart'
+import { hexToRgba } from '@/tools/colors'
+import { getChartTokens, verticalGradient } from '@/tools/echart'
 
 /** Maximum number of evenly spaced x-axis labels shown, regardless of point count. */
 const MAX_X_AXIS_LABELS = 5
@@ -52,10 +53,10 @@ const SparklineChart: React.FC<SparklineChartProps> = ({
     areaOpacity,
     lineWidth = 2
 }) => {
-    const { theme } = useTheme()
+    const { resolvedTheme: theme } = useTheme()
 
     const option: EChartsOption = useMemo(() => {
-        const textColor = resolveCssVar('--text-color-secondary', '#76787a')
+        const { textSecondary: textColor, border } = getChartTokens(theme)
 
         const xAxisLength = categories.length
         const labelCount = Math.min(MAX_X_AXIS_LABELS, xAxisLength)
@@ -83,7 +84,7 @@ const SparklineChart: React.FC<SparklineChartProps> = ({
             xAxis: {
                 type: 'category',
                 data: categories,
-                axisLine: { lineStyle: { color: hexToRgba(textColor, 0.3) } },
+                axisLine: { lineStyle: { color: border } },
                 axisTick: { show: false },
                 axisLabel: {
                     show: true,
@@ -95,6 +96,8 @@ const SparklineChart: React.FC<SparklineChartProps> = ({
             },
             yAxis: {
                 type: 'value',
+                // Without an explicit minimum, scale to the data instead of always including 0
+                scale: yAxisMin === undefined,
                 min: yAxisMin,
                 max: yAxisMax,
                 splitNumber: yAxisSplitNumber,
@@ -119,7 +122,9 @@ const SparklineChart: React.FC<SparklineChartProps> = ({
                     itemStyle: { color },
                     ...(areaOpacity && {
                         areaStyle: {
-                            color: new graphic.LinearGradient(0, 0, 0, 1, [
+                            // Fill down to the bottom of the axis, also for negative values
+                            origin: 'start',
+                            color: verticalGradient([
                                 { offset: 0, color: hexToRgba(color, areaOpacity) },
                                 { offset: 1, color: hexToRgba(color, 0) }
                             ])
@@ -143,7 +148,7 @@ const SparklineChart: React.FC<SparklineChartProps> = ({
     ])
 
     return (
-        <ReactECharts
+        <EChart
             option={option}
             style={{ height, width: '100%' }}
         />

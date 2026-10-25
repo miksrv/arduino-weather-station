@@ -324,7 +324,7 @@ After successfully installing and setting up the Arduino Weather Station project
 
 <div align="center">
 
-    ![Weather Station User Interface - History Page](./client/public/images/history.jpg)
+    ![Weather Station User Interface - History Page](./client/public/images/og/history.jpg)
 
 </div>
 
@@ -410,31 +410,31 @@ Add the entries below to your server's crontab (`crontab -e`). Adjust `/var/www/
 
 The **Current** section provides real-time data on the current weather conditions, including temperature, humidity, UV index, and more. Users can quickly view all key environmental metrics at a glance.
 
-![Current Weather Interface](./client/public/images/main.jpg)
+![Current Weather Interface](./client/public/images/og/main.jpg)
 
 #### 2. **Sensors Dashboard**
 
 The **Sensors** section displays a list of all connected weather sensors, including temperature, pressure, wind speed, and solar radiation. This section gives users an in-depth view of each sensor's status and real-time readings.
 
-![Sensors Dashboard](./client/public/images/sensors.jpg)
+![Sensors Dashboard](./client/public/images/og/sensors.jpg)
 
 #### 3. **Weather History and Trends**
 
 The **History** section allows users to explore weather data over a specified time period. Interactive charts provide insights into trends for various weather metrics like temperature, wind speed, and humidity.
 
-![History Interface](./client/public/images/history.jpg)
+![History Interface](./client/public/images/og/history.jpg)
 
 #### 4. **Forecast**
 
 The **Forecast** section offers a comprehensive weather outlook for the next five days, accompanied by a detailed breakdown for the current day. Users can access forecasts for temperature, precipitation, wind speed, humidity, and more, presented in an intuitive interface. This section is designed to help users plan their activities with precision by providing accurate, easy-to-read weather data for both short-term and extended periods.
 
-![History Interface](./client/public/images/forecast.jpg)
+![History Interface](./client/public/images/og/forecast.jpg)
 
 #### 5. **Heatmap**
 
 The **Heatmap** section provides a detailed visualization of weather metrics, including temperature, pressure, humidity, precipitation, and cloud coverage, displayed as a heatmap. Users can select any time period to view trends and patterns across multiple environmental factors at once. This powerful tool allows for quick comparison and in-depth analysis of weather conditions over time.
 
-![History Interface](./client/public/images/heatmap.jpg)
+![History Interface](./client/public/images/og/heatmap.jpg)
 
 #### 6. **Climate Dashboard**
 

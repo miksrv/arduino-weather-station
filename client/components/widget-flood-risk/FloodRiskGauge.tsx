@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react'
-import { EChartsOption } from 'echarts'
-import ReactECharts from 'echarts-for-react'
+import type { EChartsOption } from 'echarts'
 
 import { useTranslation } from 'next-i18next/pages'
 
 import { ApiType } from '@/api'
-import { getEChartBaseConfig } from '@/tools'
+import EChart from '@/components/echart'
+import { getChartTokens, getEChartBaseConfig } from '@/tools'
 
-import { getRiskLevelColor, resolveCssVar } from './utils'
+import { getRiskLevelColor } from './utils'
 
 import styles from './styles.module.sass'
 
@@ -22,8 +22,7 @@ export const FloodRiskGauge: React.FC<FloodRiskGaugeProps> = ({ score, level, th
 
     const option: EChartsOption = useMemo(() => {
         const fillColor = getRiskLevelColor(level)
-        const trackColor = resolveCssVar('--input-border-color', '#e0e0e0')
-        const textColor = resolveCssVar('--text-color-secondary', '#888888')
+        const { border: trackColor, textSecondary: textColor } = getChartTokens(theme)
 
         return {
             ...getEChartBaseConfig(theme),
@@ -56,7 +55,7 @@ export const FloodRiskGauge: React.FC<FloodRiskGaugeProps> = ({ score, level, th
                     detail: {
                         valueAnimation: true,
                         fontSize: 28,
-                        fontWeight: 'bold',
+                        fontWeight: 600,
                         color: fillColor,
                         formatter: '{value}',
                         offsetCenter: [0, -10]
@@ -74,7 +73,7 @@ export const FloodRiskGauge: React.FC<FloodRiskGaugeProps> = ({ score, level, th
 
     return (
         <div className={styles.gaugeWrapper}>
-            <ReactECharts
+            <EChart
                 option={option}
                 style={{ height: '180px', width: '100%' }}
                 className={styles.gaugeChart}

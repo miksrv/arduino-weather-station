@@ -34,7 +34,7 @@ class OpenWeatherAPILibrary extends AbstractWeatherAPILibrary
     {
         $data = $this->request('forecast');
 
-        if (!$data) {
+        if (!$data || empty($data['list']) || !is_array($data['list'])) {
             return false;
         }
 

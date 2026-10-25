@@ -4,14 +4,14 @@ import { Icon } from 'simple-react-ui-kit'
 import { useTranslation } from 'next-i18next/pages'
 
 import { API } from '@/api'
-import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
+import { POLLING_INTERVAL_CURRENT } from '@/tools/constants'
 import { timeAgo } from '@/tools/date'
 
 import styles from './styles.module.sass'
 
 const StaleDataBanner: React.FC = () => {
     const { t } = useTranslation()
-    const { data: current } = API.useGetCurrentQuery(undefined, { pollingInterval: POLING_INTERVAL_CURRENT })
+    const { data: current } = API.useGetCurrentQuery(undefined, { pollingInterval: POLLING_INTERVAL_CURRENT })
 
     if (!current?.isStale) {
         return null

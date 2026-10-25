@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
+use Config\App;
 use App\Entities\WeatherForecastEntity;
+use App\Libraries\ForecastAggregator;
+use DateTimeImmutable;
+use DateTimeZone;
 use CodeIgniter\Model;
 
 /**
  * Model for the forecast_weather_data table.
  *
  * Stores forecast records fetched from external weather APIs. Provides
- * hourly and daily aggregation methods consumed by the Forecast controller
+ * hourly and daily aggregation methods (see ForecastAggregator) consumed by the Forecast controller
  * and the Current controller (next-hour precipitation look-ahead).
  *
  * @package App\Models
@@ -74,63 +78,61 @@ class ForecastWeatherDataModel extends Model
     protected $skipValidation = false;
 
     /**
-     * Returns hourly-averaged forecast data starting from the current UTC hour
-     * through the end of the next calendar day.
+     * Returns hourly forecast rows for the next $hours hours starting at the
+     * current UTC hour. Sources are averaged per hour in PHP.
      *
-     * @return array Rows of hourly aggregated forecast data.
+     * @param int                    $hours Number of hours to return.
+     * @param DateTimeImmutable|null $now   Reference time (defaults to now, UTC).
+     * @return array<int, array<string, mixed>> Hourly rows (camelCase keys).
      */
-    public function getHourlyAverages(): array
+    public function getHourlyAverages(int $hours = 48, ?DateTimeImmutable $now = null): array
     {
-        return $this
-            ->select($this->_getAverageSelect('hour'))
-            ->where('forecast_time >= DATE_FORMAT(UTC_TIMESTAMP(), \'%Y-%m-%d %H:00:00\')')
-            ->where('forecast_time < DATE_FORMAT(DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 DAY), \'%Y-%m-%d %H:00:00\')')
-            ->groupBy('hour')
-            ->get()
-            ->getResultArray();
+        $utc   = new DateTimeZone('UTC');
+        $now   = ($now ?? new DateTimeImmutable('now', $utc))->setTimezone($utc);
+        $start = $now->setTime((int) $now->format('G'), 0, 0);
+        $end = $start->modify('+' . $hours . ' hours');
+
+        return ForecastAggregator::hourly($this->_getSourceRows($start, $end));
     }
 
     /**
-     * Returns daily-averaged forecast data starting from today (UTC).
+     * Returns daily forecast rows grouped by local (station time zone) calendar
+     * day, starting from the current local day.
      *
-     * @return array Rows of daily aggregated forecast data.
+     * @param int                    $days Maximum number of days to return.
+     * @param DateTimeImmutable|null $now  Reference time (defaults to now).
+     * @return array<int, array<string, mixed>> Daily rows (camelCase keys).
      */
-    public function getDailyAverages(): array
+    public function getDailyAverages(int $days = 8, ?DateTimeImmutable $now = null): array
     {
-        return $this
-            ->select($this->_getAverageSelect('day'))
-            ->where('forecast_time >= DATE_FORMAT(UTC_TIMESTAMP(), \'%Y-%m-%d 00:00:00\')')
-            ->groupBy('day')
-            ->get()
-            ->getResultArray();
+        $timezone = new DateTimeZone(config(App::class)->stationTimezone);
+        $localNow = ($now ?? new DateTimeImmutable('now', $timezone))->setTimezone($timezone);
+        $start    = $localNow->setTime(0, 0, 0)->setTimezone(new DateTimeZone('UTC'));
+        $end = $localNow->setTime(0, 0, 0)->modify('+' . $days . ' days')->setTimezone(new DateTimeZone('UTC'));
+
+        return ForecastAggregator::daily(
+            ForecastAggregator::hourly($this->_getSourceRows($start, $end)),
+            $timezone,
+            $days
+        );
     }
 
     /**
-     * Builds the SELECT expression for hourly or daily aggregate grouping.
+     * Fetches the raw per-source rows of a UTC time window with a single query.
      *
-     * @param string $groupBy Grouping level: 'hour' or 'day'.
-     * @return string SQL SELECT fragment including all aggregated weather fields.
+     * @param DateTimeImmutable $from Inclusive start (UTC).
+     * @param DateTimeImmutable $to   Exclusive end (UTC).
+     * @return array<int, array<string, mixed>>
      */
-    private function _getAverageSelect(string $groupBy): string
+    private function _getSourceRows(DateTimeImmutable $from, DateTimeImmutable $to): array
     {
-        $formatHours = $groupBy === 'hour' ? '%H:00:00' : '00:00:00';
-
-        return 'DATE_FORMAT(forecast_time, "%Y-%m-%d ' . $formatHours . '") as ' . $groupBy . ',' .
-            'DATE_FORMAT(forecast_time, "%Y-%m-%d ' . $formatHours . '") AS date,' .
-            'ROUND(AVG(temperature), 2) as temperature,' .
-            'ROUND(AVG(feels_like), 2) as feels_like,' .
-            'ROUND(AVG(pressure), 2) as pressure,' .
-            'ROUND(AVG(humidity), 2) as humidity,' .
-            'ROUND(AVG(dew_point), 2) as dew_point,' .
-            'ROUND(AVG(uv_index), 2) as uv_index,' .
-            'ROUND(AVG(sol_energy), 2) as sol_energy,' .
-            'ROUND(AVG(sol_radiation), 2) as sol_radiation,' .
-            'ROUND(AVG(precipitation), 2) as precipitation,' .
-            'ROUND(AVG(clouds), 2) as clouds,' .
-            'ROUND(AVG(visibility), 2) as visibility,' .
-            'ROUND(AVG(wind_speed), 2) as wind_speed,' .
-            'ROUND(AVG(wind_deg), 2) as wind_deg,' .
-            'ROUND(AVG(wind_gust), 2) as wind_gust,' .
-            'MAX(weather_id) as weather_id,';
+        return $this->builder()
+            ->select('forecast_time, source, temperature, feels_like, pressure, humidity, dew_point, uv_index, '
+                . 'sol_energy, sol_radiation, precipitation, clouds, visibility, wind_speed, wind_deg, wind_gust, weather_id')
+            ->where('forecast_time >=', $from->format('Y-m-d H:i:s'))
+            ->where('forecast_time <', $to->format('Y-m-d H:i:s'))
+            ->orderBy('forecast_time', 'ASC')
+            ->get()
+            ->getResultArray();
     }
 }

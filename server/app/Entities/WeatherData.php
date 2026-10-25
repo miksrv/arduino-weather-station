@@ -98,6 +98,12 @@ class WeatherData
     public ?float  $solRadiation;
     public ?int    $clouds;
     public ?float  $precipitation;
+    public ?int    $precipitationHours;
+    public ?float  $temperatureMin;
+    public ?float  $temperatureMax;
+    public ?float  $feelsLikeMin;
+    public ?float  $feelsLikeMax;
+    public ?float  $windSpeedMax;
     public ?float  $windSpeed;
     public ?float  $windGust;
     public ?int    $windDeg;

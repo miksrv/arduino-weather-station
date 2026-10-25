@@ -6,7 +6,7 @@ import WeatherChart from './WeatherChart'
 
 import '@testing-library/jest-dom'
 
-jest.mock('echarts-for-react', () => (props: { option: unknown; style: unknown }) => (
+jest.mock('@/components/echart', () => (props: { option: unknown; style: unknown }) => (
     <div
         data-testid='echarts'
         data-option={JSON.stringify(props.option)}
@@ -20,6 +20,7 @@ jest.mock('echarts', () => ({
 }))
 
 jest.mock('@/tools/colors', () => ({
+    ...jest.requireActual('@/tools/colors'),
     getSensorColor: jest.fn(() => ['#e53935', '#f25755'])
 }))
 

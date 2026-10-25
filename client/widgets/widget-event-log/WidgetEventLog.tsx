@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next/pages'
 
 import { API } from '@/api'
 import WidgetCard, { WidgetCardProps } from '@/components/widget-card'
-import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
+import { EVENTS_QUERY, POLLING_INTERVAL_CURRENT } from '@/tools/constants'
 
 import EventLogItem from './EventLogItem'
 
@@ -15,10 +15,7 @@ export type WidgetEventLogProps = Pick<WidgetCardProps, 'size'>
 const WidgetEventLog: React.FC<WidgetEventLogProps> = ({ size }) => {
     const { t } = useTranslation()
 
-    const { data, isLoading } = API.useGetEventsQuery(
-        { hours: 24, limit: 50 },
-        { pollingInterval: POLING_INTERVAL_CURRENT }
-    )
+    const { data, isLoading } = API.useGetEventsQuery(EVENTS_QUERY, { pollingInterval: POLLING_INTERVAL_CURRENT })
 
     return (
         <WidgetCard

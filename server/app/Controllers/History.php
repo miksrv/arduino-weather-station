@@ -62,9 +62,9 @@ class History extends ResourceController
         $startDate = $this->request->getGet('start_date');
         $endDate   = $this->request->getGet('end_date');
 
-        // Calculate range in hours for cache decision
-        $startTimestamp = strtotime($startDate ?? 'today');
-        $endTimestamp   = strtotime($endDate ?? 'today');
+        // Calculate range in hours for cache decision (non-string input is rejected by _getData())
+        $startTimestamp = strtotime(is_string($startDate) ? $startDate : 'today') ?: 0;
+        $endTimestamp   = strtotime(is_string($endDate) ? $endDate : 'today') ?: 0;
         $rangeHours     = ($endTimestamp - $startTimestamp) / 3600;
 
         // Disable caching for short ranges (≤48 h) due to timezone differences
@@ -83,7 +83,10 @@ class History extends ResourceController
             return $this->respond($result);
         }
 
-        $cacheKey = 'history_' . md5(($startDate ?? '') . '_' . ($endDate ?? ''));
+        // Key on normalised dates so arbitrary strtotime() spellings cannot create unbounded cache entries;
+        // the grouping is part of the key because _getData() picks hourly or daily rows from the exact time span
+        $grouping = $rangeHours <= 7 * 24 ? 'hourly' : 'daily';
+        $cacheKey = 'history_' . hash('sha256', date('Y-m-d', $startTimestamp) . '_' . date('Y-m-d', $endTimestamp) . '_' . $grouping);
         $rawData  = cache()->get($cacheKey);
 
         if (!is_array($rawData)) {
@@ -132,8 +135,8 @@ class History extends ResourceController
         // CSV column headers
         $csvHeader = [
             'UTC Date', 'Temperature', 'Feels Like', 'Pressure', 'Humidity', 'Dew Point',
-            'Visibility', 'UV Index', 'Solar Energy', 'Solar Radiation', 'Clouds',
-            'Precipitation', 'Wind Speed', 'Wind Gust', 'Wind Degree',
+            'UV Index', 'Solar Energy', 'Solar Radiation', 'Precipitation', 'Clouds',
+            'Visibility', 'Wind Speed', 'Wind Gust', 'Wind Degree',
         ];
 
         // Write CSV into a temporary in-memory stream
@@ -197,6 +200,10 @@ class History extends ResourceController
             return $this->failValidationErrors('Missing required parameters: start_date or end_date');
         }
 
+        if (!is_string($startDate) || !is_string($endDate)) {
+            return $this->failValidationErrors('Invalid date format');
+        }
+
         $startTimestamp      = strtotime($startDate);
         $endTimestamp        = strtotime($endDate);
         $minTimestamp        = strtotime('2020-01-01');
@@ -212,6 +219,10 @@ class History extends ResourceController
 
         if ($startTimestamp < $minTimestamp) {
             return $this->failValidationErrors('Date cannot be before 2020-01-01');
+        }
+
+        if ($endTimestamp < $startTimestamp) {
+            return $this->failValidationErrors('end_date cannot be earlier than start_date');
         }
 
         if ($endTimestamp - $startTimestamp > 366 * 86400) {

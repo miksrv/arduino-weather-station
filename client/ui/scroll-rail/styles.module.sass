@@ -1,0 +1,62 @@
+$fadeWidth: 48px
+
+.rail
+    position: relative
+    min-width: 0
+
+.list
+    display: flex
+    // Room for the items' focus rings, which `overflow` would cut; set wider to inset the row
+    gap: var(--scroll-rail-gap, 0)
+    padding: var(--scroll-rail-inset, 2px)
+    overflow-x: auto
+    overscroll-behavior-x: contain
+    scrollbar-width: none
+
+    &::-webkit-scrollbar
+        display: none
+
+.fadeStart .list
+    mask-image: linear-gradient(to right, transparent, #000 $fadeWidth)
+
+.fadeEnd .list
+    mask-image: linear-gradient(to left, transparent, #000 $fadeWidth)
+
+.fadeStart.fadeEnd .list
+    mask-image: linear-gradient(to right, transparent, #000 $fadeWidth, #000 calc(100% - #{$fadeWidth}), transparent)
+
+// Round floating arrows over the edges; fingers swipe, the arrows are for a mouse
+.arrow
+    position: absolute
+    top: 50%
+    z-index: 1
+    display: grid
+    place-items: center
+    width: 32px
+    height: 32px
+    margin-top: -16px
+    padding: 0
+    border: none
+    border-radius: var(--radius-full)
+    background: var(--surface-1)
+    box-shadow: 0 0 0 1px var(--border), var(--shadow-md)
+    color: var(--text-color-secondary)
+    cursor: pointer
+    transition: color var(--duration-fast) var(--ease)
+
+    &:hover
+        color: var(--text-color-primary)
+
+    svg
+        width: 18px
+        height: 18px
+        fill: currentColor
+
+    @media (hover: none)
+        display: none
+
+.prev
+    left: var(--space-2)
+
+.next
+    right: var(--space-2)

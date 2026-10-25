@@ -1,16 +1,12 @@
+@use '../../styles/mixins'
+
 .languageSwitcher
-    display: flex
+    +mixins.segmented
 
-    button
-        border: none
-        background-color: transparent
-        cursor: pointer
-        padding: 0
-        color: var(--text-color-secondary)
-        margin-right: 10px
+    a
+        +mixins.segment
+        display: inline-flex
+        align-items: center
 
-        &:hover, &:active, &:focus, &.active
-            color: var(--text-color-primary)
-
-        &:last-of-type
-            margin-right: 0
+        &.active
+            +mixins.segmentActive

@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
-import { EChartsOption, SeriesOption } from 'echarts'
-import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
-import ReactECharts from 'echarts-for-react'
+import type { EChartsOption, SeriesOption } from 'echarts'
+import type { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
 
 import { useTheme } from 'next-themes'
 
-import { getEChartBaseConfig } from '@/tools'
+import EChart from '@/components/echart'
+import { getChartTokens, getChartTooltipStyle, getEChartBaseConfig } from '@/tools'
 import { formatDateFromUTC } from '@/tools/date'
 import { round } from '@/tools/helpers'
 
@@ -21,11 +21,8 @@ interface ChartProps {
 }
 
 const Chart: React.FC<ChartProps> = ({ data, height }) => {
-    const { theme } = useTheme()
-
-    const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff'
-    const borderColor = theme === 'dark' ? '#444546' : '#cbcccd'
-    const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99'
+    const { resolvedTheme: theme } = useTheme()
+    const { gridLine: borderColor, textSecondary: textSecondaryColor } = getChartTokens(theme)
 
     const baseConfig: EChartsOption = {
         ...getEChartBaseConfig(theme),
@@ -42,8 +39,7 @@ const Chart: React.FC<ChartProps> = ({ data, height }) => {
                     }
                 }
             },
-            backgroundColor,
-            borderColor,
+            ...getChartTooltipStyle(theme),
             formatter: (params: TopLevelFormatterParams) => {
                 const arr: AxisCallbackDataParams[] = Array.isArray(params) ? params : [params]
                 // An array of strings that will be concatenated and returned as the contents of the tooltip
@@ -143,7 +139,7 @@ const Chart: React.FC<ChartProps> = ({ data, height }) => {
     }, [data, theme])
 
     return (
-        <ReactECharts
+        <EChart
             option={config}
             style={{ height: height ?? '260px', width: '100%' }}
         />

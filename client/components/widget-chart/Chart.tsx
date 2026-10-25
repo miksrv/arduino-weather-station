@@ -1,18 +1,18 @@
 import React, { useCallback, useMemo } from 'react'
-import { EChartsOption, SeriesOption } from 'echarts'
-import { CallbackDataParams, TopLevelFormatterParams, YAXisOption } from 'echarts/types/dist/shared'
-import ReactECharts from 'echarts-for-react'
+import type { EChartsOption, SeriesOption } from 'echarts'
+import type { CallbackDataParams, TopLevelFormatterParams, YAXisOption } from 'echarts/types/dist/shared'
 
 import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
 import { ApiModel } from '@/api'
+import EChart from '@/components/echart'
 import { ChartTypes } from '@/components/widget-chart/WidgetChart'
-import { getEChartBaseConfig } from '@/tools'
+import { getChartTokens, getChartTooltipStyle, getEChartBaseConfig } from '@/tools'
 import { getSensorColor } from '@/tools/colors'
 import { formatDateFromUTC } from '@/tools/date'
 import { round } from '@/tools/helpers'
-import { findMaxValue, findMinValue } from '@/tools/weather'
+import { convertHpaToMmHg, findMaxValue, findMinValue } from '@/tools/weather'
 
 import styles from './styles.module.sass'
 
@@ -25,13 +25,16 @@ interface ChartProps {
     dateFormat?: string
 }
 
-const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
-    const { theme } = useTheme()
-    const { t } = useTranslation()
+const Chart: React.FC<ChartProps> = ({ type, data: rawData, height, dateFormat }) => {
+    const { resolvedTheme: theme } = useTheme()
 
-    const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff' // --container-background-color
-    const borderColor = theme === 'dark' ? '#444546' : '#cbcccd' // --input-border-color
-    const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99' // --text-color-secondary
+    // Pressure is stored in hPa; the site shows it in mm Hg everywhere
+    const data = useMemo(
+        () => rawData?.map((item) => ({ ...item, pressure: convertHpaToMmHg(item.pressure) })),
+        [rawData]
+    )
+    const { gridLine: borderColor, textSecondary: textSecondaryColor } = getChartTokens(theme)
+    const { t } = useTranslation()
 
     const baseConfig: EChartsOption = useMemo(
         () => ({
@@ -50,8 +53,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                         }
                     }
                 },
-                backgroundColor,
-                borderColor,
+                ...getChartTooltipStyle(theme),
                 formatter: (params: TopLevelFormatterParams) => {
                     const arr: AxisCallbackDataParams[] = Array.isArray(params) ? params : [params]
                     // An array of strings that will be concatenated and returned as the contents of the tooltip
@@ -135,7 +137,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                 }
             ]
         }),
-        [theme, backgroundColor, borderColor, textSecondaryColor, dateFormat, t]
+        [theme, borderColor, textSecondaryColor, dateFormat, t]
     )
 
     const getChartLineConfig = useCallback(
@@ -145,13 +147,13 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
             name: name ?? '',
             yAxisIndex: axis ?? 0,
             lineStyle: {
-                color: getSensorColor(source)[0],
-                width: 1
+                color: getSensorColor(source, theme)[0],
+                width: 1.5
             },
-            itemStyle: { color: getSensorColor(source)[0] },
-            areaStyle: area ? { color: getSensorColor(source)[1] } : undefined
+            itemStyle: { color: getSensorColor(source, theme)[0] },
+            areaStyle: area ? { color: getSensorColor(source, theme)[1] } : undefined
         }),
-        [baseConfig, data]
+        [baseConfig, data, theme]
     )
 
     const config: Omit<EChartsOption, 'type'> = useMemo(() => {
@@ -211,7 +213,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
                             max: findMaxValue(data, 'pressure'),
                             axisLabel: {
                                 ...(baseConfig.yAxis as YAXisOption).axisLabel,
-                                formatter: '{value}'
+                                formatter: `{value} ${t('mm-hg')}`
                             }
                         },
                         {
@@ -234,7 +236,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, height, dateFormat }) => {
     }, [type, data, baseConfig, getChartLineConfig, t])
 
     return (
-        <ReactECharts
+        <EChart
             option={config}
             style={{ height: height ?? '260px', width: '100%' }}
         />

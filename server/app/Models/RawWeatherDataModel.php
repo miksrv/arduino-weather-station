@@ -126,12 +126,17 @@ class RawWeatherDataModel extends Model
     /**
      * Retrieves hourly averages of weather data.
      *
-     * @param bool $allTime If true, retrieves all-time data; otherwise, retrieves data for the current hour.
+     * @param bool        $allTime If true, retrieves all-time data; otherwise, retrieves data for the current hour.
+     * @param string|null $since   With $allTime, restricts the result to rows on or after this date (Y-m-d H:i:s).
      * @return array The hourly averages of weather data.
      */
-    public function getHourlyAverages(bool $allTime = false): array
+    public function getHourlyAverages(bool $allTime = false, ?string $since = null): array
     {
         $result = $this->select($this->_getAverageSelect('hour'));
+
+        if ($allTime && $since !== null) {
+            $result->where('date >=', $since);
+        }
 
         if (!$allTime) {
             $result
@@ -148,12 +153,17 @@ class RawWeatherDataModel extends Model
     /**
      * Retrieves daily averages of weather data.
      *
-     * @param bool $allTime If true, retrieves all-time data; otherwise, retrieves data for the current day.
+     * @param bool        $allTime If true, retrieves all-time data; otherwise, retrieves data for the current day.
+     * @param string|null $since   With $allTime, restricts the result to rows on or after this date (Y-m-d H:i:s).
      * @return array The daily averages of weather data.
      */
-    public function getDailyAverages(bool $allTime = false): array
+    public function getDailyAverages(bool $allTime = false, ?string $since = null): array
     {
         $result = $this->select($this->_getAverageSelect('day'));
+
+        if ($allTime && $since !== null) {
+            $result->where('date >=', $since);
+        }
 
         if (!$allTime) {
             $result

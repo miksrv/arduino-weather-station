@@ -1,19 +1,18 @@
 @use '../styles/variables'
+@use '../styles/typography' as type
 
 .sectionHeader
     width: 100%
-    margin: 8px 0 4px
+    margin: var(--space-4) 0 0
 
     h2
         margin: 0
-        color: var(--text-color-primary)
-        font-size: 16px
-        font-weight: 200
+        +type.titleSection
 
 .floodRiskRow
     display: flex
-    align-items: flex-start
-    gap: 10px
+    align-items: stretch
+    gap: var(--gap)
     width: 100%
 
     > :first-child
@@ -23,7 +22,7 @@
         flex: 1
         display: grid
         grid-template-columns: repeat(2, 1fr)
-        gap: 10px
+        gap: var(--gap)
         width: 100%
 
     @media only screen and (max-width: variables.$mobileMaxWidth)
@@ -32,13 +31,10 @@
         > :first-child
             width: 100%
 
-        .zScoreGrid
-            grid-template-columns: repeat(2, 1fr)
-
 .inactiveGrid
     display: grid
     grid-template-columns: repeat(3, 1fr)
-    gap: 10px
+    gap: var(--gap)
     width: 100%
 
     @media only screen and (max-width: variables.$mobileMaxWidth)

@@ -78,7 +78,7 @@ describe('WidgetPrecipCalendar', () => {
         const cells = janRow.querySelectorAll('.cell')
         // day 15 is index 14 (0-based)
         const dataCell = cells[14] as HTMLElement
-        expect(dataCell.style.backgroundColor).not.toBe('var(--input-border-color)')
+        expect(dataCell.style.backgroundColor).not.toBe('var(--surface-2)')
     })
 
     it('renders all 5 legend labels', () => {

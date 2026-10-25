@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
+        <meta
+            name="robots"
+            content="noindex"
+        />
+        <title>Нет соединения — Метеостанция Оренбург</title>
+        <link
+            rel="icon"
+            href="/favicon.svg"
+            type="image/svg+xml"
+        />
+        <style>
+            :root {
+                --body-background: #f7f8fa;
+                --surface-1: #ffffff;
+                --border: #e6e8ec;
+                --text-primary: rgba(0, 0, 0, 0.9);
+                --text-secondary: #66707d;
+                --color-main: #1f6fd1;
+                --color-main-hover: #1a5fb4;
+                color-scheme: light dark;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --body-background: #0b0d10;
+                    --surface-1: #14181d;
+                    --border: #252b33;
+                    --text-primary: #e6e9ee;
+                    --text-secondary: #8e97a4;
+                    --color-main: #2688eb;
+                    --color-main-hover: #4a9cee;
+                }
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+                background: var(--body-background);
+                color: var(--text-primary);
+                font:
+                    15px/1.5 system-ui,
+                    -apple-system,
+                    'Segoe UI',
+                    Roboto,
+                    sans-serif;
+            }
+
+            .card {
+                width: 100%;
+                max-width: 400px;
+                padding: 32px 24px;
+                text-align: center;
+                background: var(--surface-1);
+                border-radius: 8px;
+                box-shadow: 0 0 0 1px var(--border);
+            }
+
+            .logo {
+                width: 64px;
+                height: 64px;
+            }
+
+            h1 {
+                margin: 16px 0 8px;
+                font-size: 20px;
+                font-weight: 600;
+                letter-spacing: -0.02em;
+            }
+
+            p {
+                margin: 0 0 24px;
+                color: var(--text-secondary);
+            }
+
+            button {
+                height: 36px;
+                padding: 0 16px;
+                border: none;
+                border-radius: 6px;
+                background: var(--color-main);
+                color: #fff;
+                font: inherit;
+                font-weight: 500;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background: var(--color-main-hover);
+            }
+
+            button:focus-visible {
+                outline: 2px solid var(--color-main);
+                outline-offset: 2px;
+            }
+        </style>
+    </head>
+    <body>
+        <main class="card">
+            <img
+                class="logo"
+                src="/favicon.svg"
+                alt=""
+            />
+            <h1 id="title">Нет соединения</h1>
+            <p id="message">
+                Эта страница ещё не сохранена на устройстве. Проверьте подключение к интернету и попробуйте снова.
+            </p>
+            <button
+                id="retry"
+                type="button"
+            >
+                Повторить
+            </button>
+        </main>
+        <script>
+            // Same choice as the site: the /en path, then the NEXT_LOCALE cookie, then the browser language
+            var cookie = (document.cookie.match(/(?:^|; )NEXT_LOCALE=(\w+)/) || [])[1]
+            var english =
+                /^\/en(\/|$)/.test(location.pathname) ||
+                (cookie ? cookie === 'en' : !/^ru\b/.test(navigator.language || 'ru'))
+
+            if (english) {
+                document.documentElement.lang = 'en'
+                document.title = 'No connection — Orenburg Weather Station'
+                document.getElementById('title').textContent = 'No connection'
+                document.getElementById('message').textContent =
+                    'This page has not been saved on the device yet. Check the internet connection and try again.'
+                document.getElementById('retry').textContent = 'Try again'
+            }
+
+            document.getElementById('retry').addEventListener('click', function () {
+                location.reload()
+            })
+
+            window.addEventListener('online', function () {
+                location.reload()
+            })
+        </script>
+    </body>
+</html>

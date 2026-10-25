@@ -6,8 +6,8 @@ import StaleDataBanner from './StaleDataBanner'
 
 import '@testing-library/jest-dom'
 
-jest.mock('@/pages/_app', () => ({
-    POLING_INTERVAL_CURRENT: 600000
+jest.mock('@/tools/constants', () => ({
+    POLLING_INTERVAL_CURRENT: 600000
 }))
 
 jest.mock('@/api', () => ({

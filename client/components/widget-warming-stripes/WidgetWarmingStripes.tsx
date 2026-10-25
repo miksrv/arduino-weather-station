@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { Skeleton } from 'simple-react-ui-kit'
+import { cn, Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next/pages'
 
@@ -23,7 +23,9 @@ const WidgetWarmingStripes: React.FC<WidgetWarmingStripesProps> = ({ data, loadi
             return { stripes: [], minTemp: 0, maxTemp: 0, avgTemp: 0 }
         }
 
-        const temps = data.map((d) => d.avgTemp)
+        // The running year misses the cold months: it is shown, but the scale and the extremes come from full years
+        const complete = data.filter((d) => !d.isPartial)
+        const temps = (complete.length ? complete : data).map((d) => d.avgTemp)
         const min = Math.min(...temps)
         const max = Math.max(...temps)
         const avg = temps.reduce((a, b) => a + b, 0) / temps.length
@@ -34,9 +36,10 @@ const WidgetWarmingStripes: React.FC<WidgetWarmingStripesProps> = ({ data, loadi
             minTemp: min,
             stripes: data.map((d) => ({
                 avgTemp: d.avgTemp,
-                color: tempToColor(d.avgTemp, min, max),
-                textColor: getContrastColor(d.avgTemp, min, max),
+                color: d.isPartial ? undefined : tempToColor(d.avgTemp, min, max),
+                textColor: d.isPartial ? undefined : getContrastColor(d.avgTemp, min, max),
                 anomaly: d.avgTemp - avg,
+                isPartial: !!d.isPartial,
                 year: d.year
             }))
         }
@@ -51,8 +54,9 @@ const WidgetWarmingStripes: React.FC<WidgetWarmingStripesProps> = ({ data, loadi
         )
     }
 
-    const coldestYear = stripes.length ? stripes.reduce((a, b) => (a.avgTemp < b.avgTemp ? a : b)) : null
-    const hottestYear = stripes.length ? stripes.reduce((a, b) => (a.avgTemp > b.avgTemp ? a : b)) : null
+    const fullYears = stripes.filter((s) => !s.isPartial)
+    const coldestYear = fullYears.length ? fullYears.reduce((a, b) => (a.avgTemp < b.avgTemp ? a : b)) : null
+    const hottestYear = fullYears.length ? fullYears.reduce((a, b) => (a.avgTemp > b.avgTemp ? a : b)) : null
 
     return (
         <div className={styles.widget}>
@@ -97,7 +101,11 @@ const WidgetWarmingStripes: React.FC<WidgetWarmingStripesProps> = ({ data, loadi
                 {stripes.map((s) => (
                     <div
                         key={s.year}
-                        className={`${styles.stripe} ${hoveredYear === s.year ? styles.stripeActive : ''}`}
+                        className={cn(
+                            styles.stripe,
+                            hoveredYear === s.year && styles.stripeActive,
+                            s.isPartial && styles.stripePartial
+                        )}
                         style={{ backgroundColor: s.color }}
                         onMouseEnter={() => setHoveredYear(s.year)}
                     >
@@ -117,8 +125,14 @@ const WidgetWarmingStripes: React.FC<WidgetWarmingStripesProps> = ({ data, loadi
                             className={styles.stripeAnomaly}
                             style={{ color: s.textColor }}
                         >
-                            {s.anomaly >= 0 ? '+' : ''}
-                            {s.anomaly.toFixed(1)}°
+                            {s.isPartial ? (
+                                t('year-to-date')
+                            ) : (
+                                <>
+                                    {s.anomaly >= 0 ? '+' : ''}
+                                    {s.anomaly.toFixed(1)}°
+                                </>
+                            )}
                         </span>
                     </div>
                 ))}

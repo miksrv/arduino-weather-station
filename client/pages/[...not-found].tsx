@@ -33,7 +33,7 @@ export default function CatchAllPage() {
             </Head>
             <div className={'not-found'}>
                 <h1>{t('page-not-found')}</h1>
-                <div>{t('page-not-found-description')}</div>
+                <p>{t('page-not-found-description')}</p>
                 <div className={'not-found-menu'}>
                     <Menu />
                 </div>
@@ -49,6 +49,9 @@ export const getServerSideProps = wrapper.getServerSideProps(
             const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
+
+            // A real 404 status, not a "soft 404" page answered with 200
+            context.res.statusCode = 404
 
             return { props: { ...translations } }
         }

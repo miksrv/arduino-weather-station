@@ -1,1 +1,1 @@
-export { getEChartBaseConfig } from './echart'
+export { getChartTokens, getChartTooltipStyle, getEChartBaseConfig, verticalGradient } from './echart'

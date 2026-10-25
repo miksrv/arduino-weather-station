@@ -7,12 +7,16 @@ import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslation
 import { generateNextSeo } from 'next-seo/pages'
 
 import { API, setLocale } from '@/api'
-import { wrapper } from '@/api/store'
+import { prefetchQueries } from '@/api/ssr'
+import { useAppDispatch, wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
+import PageHeader from '@/components/page-header'
 import WidgetAnomalyBars from '@/components/widget-anomaly-bars'
 import WidgetClimate, { ClimateType } from '@/components/widget-climate'
 import WidgetMonthlyNormals from '@/components/widget-monthly-normals'
 import WidgetWarmingStripes from '@/components/widget-warming-stripes'
+import { getCurrentDate } from '@/tools/date'
+import { getPageSeo } from '@/tools/seo'
 import { LocaleType } from '@/tools/types'
 
 const START_YEAR = 2022
@@ -20,64 +24,59 @@ const START_YEAR = 2022
 const ClimatePage: NextPage = () => {
     const { i18n, t } = useTranslation()
 
-    const [yearPeriods, setYearPeriods] = useState<string[][]>([])
-    const [currentPeriodIndex, setCurrentPeriodIndex] = useState(0)
+    const dispatch = useAppDispatch()
+
     const [allData, setAllData] = useState<ClimateType[]>([])
+    const [loadedYears, setLoadedYears] = useState(0)
+    const [isStillLoading, setIsStillLoading] = useState(true)
 
-    useEffect(() => {
-        const now = new Date()
-        const currentYear = now.getFullYear()
-        const today = now.toISOString().split('T')[0]
-        const periods: string[][] = []
+    const yearPeriods = useMemo(() => {
+        const now = getCurrentDate()
+        const periods: Array<[string, string]> = []
 
-        for (let year = START_YEAR; year <= currentYear; year++) {
-            const endDate = year === currentYear ? today : `${year}-12-31`
-            periods.push([`${year}-01-01`, endDate])
+        for (let year = START_YEAR; year <= now.year(); year++) {
+            periods.push([`${year}-01-01`, year === now.year() ? now.format('YYYY-MM-DD') : `${year}-12-31`])
         }
 
-        setYearPeriods(periods)
+        return periods
     }, [])
 
-    const isFetchingComplete = yearPeriods.length > 0 && currentPeriodIndex >= yearPeriods.length
+    const totalYears = yearPeriods.length
 
-    const { data: yearHistories, isLoading } = API.useGetHistoryQuery(
-        yearPeriods[currentPeriodIndex]
-            ? { start_date: yearPeriods[currentPeriodIndex][0], end_date: yearPeriods[currentPeriodIndex][1] }
-            : undefined,
-        { skip: !yearPeriods[currentPeriodIndex] || isFetchingComplete, refetchOnMountOrArgChange: true }
-    )
-
+    // All years are requested at once; a failed year is left out instead of stalling the chart
     useEffect(() => {
-        if (yearHistories && yearPeriods[currentPeriodIndex]) {
-            const year = yearPeriods[currentPeriodIndex][0].split('-')[0]
+        const requests = yearPeriods.map(([startDate, endDate]) =>
+            dispatch(API.endpoints.getHistory.initiate({ start_date: startDate, end_date: endDate }))
+        )
 
-            setAllData((prev) => {
-                return prev.some((d) => d.year === year) ? prev : [...prev, { year, weather: yearHistories }]
-            })
+        void Promise.allSettled(
+            requests.map((request) =>
+                request.unwrap().finally(() => {
+                    setLoadedYears((count) => count + 1)
+                })
+            )
+        ).then((results) => {
+            setAllData(
+                results.flatMap((result, index) =>
+                    result.status === 'fulfilled'
+                        ? [{ year: yearPeriods[index][0].slice(0, 4), weather: result.value }]
+                        : []
+                )
+            )
+            setIsStillLoading(false)
+        })
 
-            if (currentPeriodIndex < yearPeriods.length - 1) {
-                const timerId = setTimeout(() => {
-                    setCurrentPeriodIndex((prev) => prev + 1)
-                }, 500)
-
-                return () => clearTimeout(timerId)
-            }
-        }
-    }, [yearHistories])
+        return () => requests.forEach((request) => request.unsubscribe())
+    }, [dispatch, yearPeriods])
 
     const { data: climateData, isLoading: climateLoading } = API.useGetClimateQuery()
-
-    const isStillLoading = !isFetchingComplete && (isLoading || currentPeriodIndex < yearPeriods.length)
-
-    const loadedYears = allData.length
-    const totalYears = yearPeriods.length
 
     const currentYearMonthly = useMemo(() => {
         if (!allData.length) {
             return undefined
         }
 
-        const currentYear = String(new Date().getFullYear())
+        const currentYear = String(getCurrentDate().year())
         const yearEntry = allData.find((d) => d.year === currentYear)
         if (!yearEntry?.weather?.length) {
             return undefined
@@ -107,30 +106,22 @@ const ClimatePage: NextPage = () => {
     return (
         <AppLayout>
             <Head>
-                {generateNextSeo({
-                    title: t('climate-page-title'),
-                    description: t('climate-page-description'),
-                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/climate`,
-                    openGraph: {
-                        description: t('climate-page-description'),
-                        images: [
-                            {
-                                height: 1292,
-                                url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/history.jpg`,
-                                width: 2028
-                            }
-                        ],
-                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
-                        siteName: t('weather-in-orenburg'),
+                {generateNextSeo(
+                    getPageSeo({
+                        path: '/climate',
+                        locale: i18n.language,
                         title: t('climate-page-title'),
-                        type: 'website',
-                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/climate`
-                    },
-                    twitter: {
-                        cardType: 'summary_large_image'
-                    }
-                })}
+                        description: t('climate-page-description'),
+                        siteName: t('weather-in-orenburg'),
+                        image: 'climate'
+                    })
+                )}
             </Head>
+
+            <PageHeader
+                title={t('climate-page-title')}
+                description={t('climate-page-description')}
+            />
 
             <div className={'widgets-list'}>
                 <WidgetClimate
@@ -168,6 +159,8 @@ export const getServerSideProps = wrapper.getServerSideProps(
             const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
+
+            await prefetchQueries(store, [API.endpoints.getClimate.initiate()])
 
             return { props: { ...translations } }
         }

@@ -1,0 +1,130 @@
+// Surface and layout mixins of the design system (see client/DESIGN.md).
+@use 'variables'
+
+// The one card surface: every widget, tile and panel
+=card
+    background: var(--card-background)
+    color: var(--text-color-primary)
+    border-radius: var(--card-radius)
+    box-shadow: var(--card-shadow)
+    padding: var(--card-padding)
+
+// Width of a card spanning $n of $of columns of `.widgets-list`, gap-aware
+@function col($n, $of: 4)
+    @return calc((100% - (#{$of} - 1) * var(--gap)) / #{$of} * #{$n} + (#{$n} - 1) * var(--gap))
+
+=columns($n, $of: 4)
+    flex: 0 0 col($n, $of)
+    width: col($n, $of)
+
+// A card that takes the whole row on phones
+=fullOnMobile
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        flex-basis: 100%
+        width: 100%
+
+// Hover and focus of a list row or a quiet button
+=interactiveRow
+    border-radius: var(--radius-md)
+    transition: background-color var(--duration-fast) var(--ease), color var(--duration-fast) var(--ease)
+
+    &:hover
+        background-color: var(--surface-2)
+
+    &:focus-visible
+        outline: var(--focus-outline)
+        outline-offset: -2px
+
+// Segmented control (period toggles, year pickers): a surface-2 track with the active segment raised
+=segmented
+    display: inline-flex
+    flex-wrap: wrap
+    gap: 2px
+    padding: 3px
+    border-radius: var(--radius-md)
+    background: var(--surface-2)
+
+=segment
+    border: none
+    background: transparent
+    color: var(--text-color-secondary)
+    font: inherit
+    font-size: var(--font-size-small)
+    font-weight: var(--font-weight-medium)
+    padding: 4px 12px
+    min-height: 28px
+    border-radius: var(--radius-sm)
+    cursor: pointer
+    white-space: nowrap
+    transition: background-color var(--duration-fast) var(--ease), color var(--duration-fast) var(--ease)
+
+    &:hover
+        color: var(--text-color-primary)
+
+    &:focus-visible
+        outline: var(--focus-outline)
+        outline-offset: 1px
+
+=segmentActive
+    background: var(--surface-1)
+    color: var(--text-color-primary)
+    box-shadow: 0 0 0 1px var(--border), var(--shadow-sm)
+
+    &:hover
+        color: var(--text-color-primary)
+
+// A horizontal meter track: z-score bars, flood-risk factors
+=track($height: 6px)
+    height: $height
+    border-radius: var(--radius-full)
+    background: var(--surface-3)
+    overflow: hidden
+
+// HTML tooltips of ECharts (`formatter` returns markup with these class names)
+=chartTooltip
+    .chartTooltipTitle
+        font-size: var(--font-size-small)
+        font-weight: var(--font-weight-medium)
+        color: var(--text-color-primary)
+        margin: 0 0 6px
+        min-width: 140px
+
+        &:first-letter
+            text-transform: uppercase
+
+    .chartTooltipItem
+        margin: 0
+
+        .icon
+            float: left
+            display: inline-block
+            margin: 6px 6px 0 0
+            border-radius: var(--radius-full)
+            width: 8px
+            height: 8px
+
+        .label
+            font-size: var(--font-size-small)
+            display: flex
+            justify-content: space-between
+            align-items: center
+            gap: var(--space-3)
+            color: var(--text-color-secondary)
+
+        .value
+            font-variant-numeric: tabular-nums
+            font-weight: var(--font-weight-medium)
+            color: var(--text-color-primary)
+
+// Floating HTML tooltip of the calendars (anomaly, precipitation)
+=floatingTooltip
+    position: fixed
+    transform: translateX(-50%) translateY(-100%)
+    background: var(--surface-1)
+    border-radius: var(--popout-radius)
+    padding: 6px 10px
+    font-size: var(--font-size-small)
+    color: var(--text-color-primary)
+    pointer-events: none
+    z-index: var(--z-tooltip)
+    box-shadow: var(--popout-shadow)

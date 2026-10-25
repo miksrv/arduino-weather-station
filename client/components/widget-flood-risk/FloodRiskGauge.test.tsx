@@ -11,12 +11,13 @@ jest.mock('next-i18next/pages', () => ({
 }))
 
 jest.mock('next-themes', () => ({
-    useTheme: jest.fn(() => ({ theme: 'light' }))
+    useTheme: jest.fn(() => ({ theme: 'light', resolvedTheme: 'light' }))
 }))
 
-jest.mock('echarts-for-react', () => () => <div data-testid='echarts' />)
+jest.mock('@/components/echart', () => () => <div data-testid='echarts' />)
 
 jest.mock('@/tools', () => ({
+    ...jest.requireActual('@/tools'),
     getEChartBaseConfig: jest.fn(() => ({}))
 }))
 

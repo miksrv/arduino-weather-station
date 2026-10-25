@@ -1,25 +1,21 @@
-@use '../../styles/variables'
+@use '../../styles/typography' as type
 
 .banner
     display: flex
     align-items: center
-    gap: 10px
-    max-width: var(--width-max)
-    margin: 0 auto 10px
-    padding: 10px 14px
-    border-radius: var(--message-radius)
+    gap: var(--space-3)
+    margin: 0 0 var(--gap)
+    padding: var(--space-3) var(--space-4)
+    border-radius: var(--card-radius)
     background: var(--color-orange-background)
     color: var(--text-color-primary)
-    box-shadow: var(--container-shadow)
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-orange) 35%, transparent)
 
     svg
         flex-shrink: 0
-        width: 22px
-        height: 22px
+        width: 20px
+        height: 20px
         fill: var(--color-orange)
-
-    @media only screen and (max-width: variables.$mobileMaxWidth)
-        margin: 0 0 10px
 
 .text
     display: flex
@@ -27,8 +23,7 @@
 
 .title
     font-size: var(--font-size)
-    font-weight: 700
+    font-weight: var(--font-weight-medium)
 
 .message
-    font-size: var(--font-size-small)
-    color: var(--text-color-secondary)
+    +type.caption

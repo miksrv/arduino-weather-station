@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import Head from 'next/head'
@@ -7,92 +7,108 @@ import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslation
 import { generateNextSeo } from 'next-seo/pages'
 
 import { API, setLocale } from '@/api'
+import { prefetchQueries } from '@/api/ssr'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
-import WidgetForecastTable from '@/components/widget-forecast-table'
-import WidgetMeteogram from '@/components/widget-meteogram'
-import { POLING_INTERVAL_FORECAST } from '@/pages/_app'
+import PageHeader from '@/components/page-header'
+import { POLLING_INTERVAL_CURRENT, POLLING_INTERVAL_FORECAST } from '@/tools/constants'
+import { findToday } from '@/tools/forecast'
+import { getPageSeo } from '@/tools/seo'
 import { LocaleType } from '@/tools/types'
+import WidgetForecastDaily from '@/widgets/widget-forecast-daily'
+import WidgetForecastDetails from '@/widgets/widget-forecast-details'
+import WidgetForecastHourly from '@/widgets/widget-forecast-hourly'
+import WidgetForecastToday from '@/widgets/widget-forecast-today'
 
-type IndexPageProps = object
+import styles from './forecast.module.sass'
 
-const IndexPage: NextPage<IndexPageProps> = () => {
+type ForecastPageProps = object
+
+/**
+ * The forecast page answers, top to bottom: what is it like now and today → the details of today →
+ * how the next two days go hour by hour → the week ahead.
+ */
+const ForecastPage: NextPage<ForecastPageProps> = () => {
     const { i18n, t } = useTranslation()
 
+    const { data: current, isLoading: currentLoading } = API.useGetCurrentQuery(undefined, {
+        pollingInterval: POLLING_INTERVAL_CURRENT
+    })
+
     const { data: forecastHourly, isLoading: hourlyLoading } = API.useGetForecastQuery('hourly', {
-        pollingInterval: POLING_INTERVAL_FORECAST
+        pollingInterval: POLLING_INTERVAL_FORECAST
     })
 
     const { data: forecastDaily, isLoading: dailyLoading } = API.useGetForecastQuery('daily', {
-        pollingInterval: POLING_INTERVAL_FORECAST
+        pollingInterval: POLLING_INTERVAL_FORECAST
     })
+
+    const today = useMemo(() => findToday(forecastDaily) ?? forecastDaily?.[0], [forecastDaily])
 
     return (
         <AppLayout>
             <Head>
-                {generateNextSeo({
-                    title: t('forecast-weather-in-orenburg'),
-                    description: t('forecast-page-description'),
-                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/forecast`,
-                    openGraph: {
-                        description: t('forecast-page-description'),
-                        images: [
-                            {
-                                height: 1368,
-                                url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/forecast.jpg`,
-                                width: 2040
-                            }
-                        ],
-                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
-                        siteName: t('weather-in-orenburg'),
+                {generateNextSeo(
+                    getPageSeo({
+                        path: '/forecast',
+                        locale: i18n.language,
                         title: t('forecast-weather-in-orenburg'),
-                        type: 'website',
-                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/forecast`
-                    },
-                    twitter: {
-                        cardType: 'summary_large_image'
-                    }
-                })}
+                        description: t('forecast-page-description'),
+                        siteName: t('weather-in-orenburg'),
+                        image: 'forecast'
+                    })
+                )}
             </Head>
 
+            <PageHeader
+                title={t('forecast-weather-in-orenburg')}
+                description={t('forecast-page-description')}
+            />
+
             <div className={'widgets-list'}>
-                <WidgetMeteogram
-                    loading={hourlyLoading}
-                    data={forecastHourly}
+                <WidgetForecastToday
+                    current={current}
+                    today={today}
+                    loading={currentLoading || dailyLoading}
                 />
 
-                <WidgetForecastTable
-                    title={t('weather-forecast-by-days')}
+                <WidgetForecastDetails
+                    today={today}
                     loading={dailyLoading}
-                    data={forecastDaily}
-                    columnsPreset={['date', 'weather', 'temperature', 'clouds', 'pressure', 'precipitation', 'wind']}
-                    defaultSort={{ key: 'date', direction: 'asc' }}
-                    fullWidth={true}
                 />
 
-                <WidgetForecastTable
-                    title={t('weather-forecast-hourly')}
-                    columnsPreset={['time', 'weatherIcon', 'temperature', 'clouds', 'pressure', 'wind']}
+                <WidgetForecastHourly
+                    hours={forecastHourly}
                     loading={hourlyLoading}
-                    data={forecastHourly}
-                    defaultSort={{ key: 'date', direction: 'asc' }}
-                    fullWidth={true}
+                />
+
+                <WidgetForecastDaily
+                    days={forecastDaily}
+                    loading={dailyLoading}
                 />
             </div>
+
+            <p className={styles.sources}>{t('forecast-sources')}</p>
         </AppLayout>
     )
 }
 
 export const getServerSideProps = wrapper.getServerSideProps(
     (store) =>
-        async (context): Promise<GetServerSidePropsResult<IndexPageProps>> => {
+        async (context): Promise<GetServerSidePropsResult<ForecastPageProps>> => {
             const locale: LocaleType = (context.locale as LocaleType) ?? 'en'
             const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
 
+            await prefetchQueries(store, [
+                API.endpoints.getCurrent.initiate(),
+                API.endpoints.getForecast.initiate('hourly'),
+                API.endpoints.getForecast.initiate('daily')
+            ])
+
             return { props: { ...translations } }
         }
 )
 
-export default IndexPage
+export default ForecastPage

@@ -1,8 +1,10 @@
 import React, { useMemo } from 'react'
-import { EChartsOption } from 'echarts'
-import ReactECharts from 'echarts-for-react'
+import type { EChartsOption } from 'echarts'
 
-import { hexToRgba, resolveCssVar } from '@/tools/colors'
+import { useTheme } from 'next-themes'
+
+import EChart from '@/components/echart'
+import { getChartTokens } from '@/tools/echart'
 
 import { WIND_ROSE_DIRECTIONS, WIND_SPEED_BINS } from './utils'
 
@@ -11,9 +13,10 @@ interface WindRoseChartProps {
 }
 
 const WindRoseChart: React.FC<WindRoseChartProps> = ({ directionBins }) => {
+    const { resolvedTheme: theme } = useTheme()
+
     const option: EChartsOption = useMemo(() => {
-        const textColor = resolveCssVar('--text-color-secondary', '#76787a')
-        const gridColor = hexToRgba(textColor, 0.2)
+        const { textSecondary: textColor, border: gridColor } = getChartTokens(theme)
 
         return {
             tooltip: { show: false },
@@ -45,10 +48,10 @@ const WindRoseChart: React.FC<WindRoseChartProps> = ({ directionBins }) => {
                 itemStyle: { color: bin.color }
             }))
         }
-    }, [directionBins])
+    }, [directionBins, theme])
 
     return (
-        <ReactECharts
+        <EChart
             option={option}
             style={{ height: '158px', width: '100%' }}
         />

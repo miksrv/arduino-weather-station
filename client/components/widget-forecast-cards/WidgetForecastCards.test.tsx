@@ -46,9 +46,9 @@ jest.mock('@/components/wind-direction-icon', () => (props: any) => (
     />
 ))
 
-// Carousel simply renders its children so tests can assert on card content
-jest.mock('@/ui/carousel', () => ({
-    Carousel: ({ children }: { children: React.ReactNode }) => <div data-testid='carousel'>{children}</div>
+// The scroll rail simply renders its children so tests can assert on card content
+jest.mock('@/ui/scroll-rail', () => ({
+    ScrollRail: ({ children }: { children: React.ReactNode }) => <div data-testid='scroll-rail'>{children}</div>
 }))
 
 jest.mock('@/tools/helpers', () => ({
@@ -69,7 +69,7 @@ const makeDayjs = (dateStr: string, hour: number) => ({
         if (fmt === 'dddd') {
             return `day-of-${dateStr}`
         }
-        if (fmt === 'MMMM D') {
+        if (fmt === 'date-day-month') {
             return `month-day-of-${dateStr}`
         }
         if (fmt === 'date-only-hour') {
@@ -180,7 +180,7 @@ describe('WidgetForecastCards', () => {
                 />
             )
             expect(screen.getAllByTestId('skeleton')).toHaveLength(6)
-            expect(screen.getByTestId('carousel')).toBeInTheDocument()
+            expect(screen.getByTestId('scroll-rail')).toBeInTheDocument()
         })
 
         it('renders no skeletons when not loading', () => {
@@ -208,9 +208,9 @@ describe('WidgetForecastCards', () => {
             expect(container.firstChild).toBeInTheDocument()
         })
 
-        it('does not render the carousel when forecast is empty', () => {
+        it('does not render the scroll rail when forecast is empty', () => {
             render(<WidgetForecastCards forecast={[]} />)
-            expect(screen.queryByTestId('carousel')).not.toBeInTheDocument()
+            expect(screen.queryByTestId('scroll-rail')).not.toBeInTheDocument()
         })
 
         it('renders the correct number of cards matching the forecast length', () => {
@@ -228,9 +228,9 @@ describe('WidgetForecastCards', () => {
             expect(screen.getAllByText('formatted-dddd')).toHaveLength(dailyForecast.length)
         })
 
-        it('renders date label (MMMM D) via formatDate for each card', () => {
+        it('renders date label (date-day-month) via formatDate for each card', () => {
             render(<WidgetForecastCards forecast={dailyForecast} />)
-            expect(screen.getAllByText('formatted-MMMM D')).toHaveLength(dailyForecast.length)
+            expect(screen.getAllByText('formatted-date-day-month')).toHaveLength(dailyForecast.length)
         })
 
         it('does not render time label (cardTime) in daily mode', () => {
@@ -321,7 +321,7 @@ describe('WidgetForecastCards', () => {
                 />
             )
             expect(screen.queryByText('formatted-dddd')).not.toBeInTheDocument()
-            expect(screen.queryByText('formatted-MMMM D')).not.toBeInTheDocument()
+            expect(screen.queryByText('formatted-date-day-month')).not.toBeInTheDocument()
         })
 
         it('renders a weather icon for every hourly card', () => {
@@ -451,28 +451,28 @@ describe('WidgetForecastCards', () => {
     })
 
     // -------------------------------------------------------------------------
-    // Carousel rendering
+    // Scroll rail rendering
     // -------------------------------------------------------------------------
-    describe('carousel', () => {
-        it('renders the carousel when forecast is non-empty', () => {
+    describe('scroll rail', () => {
+        it('renders the scroll rail when forecast is non-empty', () => {
             render(<WidgetForecastCards forecast={dailyForecast} />)
-            expect(screen.getByTestId('carousel')).toBeInTheDocument()
+            expect(screen.getByTestId('scroll-rail')).toBeInTheDocument()
         })
 
-        it('does not render the carousel when forecast is undefined', () => {
+        it('does not render the scroll rail when forecast is undefined', () => {
             render(<WidgetForecastCards />)
-            expect(screen.queryByTestId('carousel')).not.toBeInTheDocument()
+            expect(screen.queryByTestId('scroll-rail')).not.toBeInTheDocument()
         })
 
-        it('renders the carousel even when loading is true but forecast is non-empty', () => {
-            // Both the skeleton row and the forecast carousel render independently
+        it('renders the scroll rail even when loading is true but forecast is non-empty', () => {
+            // Both the skeleton row and the forecast rail render independently
             render(
                 <WidgetForecastCards
                     loading={true}
                     forecast={dailyForecast}
                 />
             )
-            expect(screen.getByTestId('carousel')).toBeInTheDocument()
+            expect(screen.getByTestId('scroll-rail')).toBeInTheDocument()
         })
     })
 

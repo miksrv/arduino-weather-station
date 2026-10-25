@@ -1,93 +1,96 @@
 @use '../../styles/variables'
+@use '../../styles/mixins'
+@use '../../styles/typography' as type
 
-/* styles.css */
+// Compact sensor card of the home page: title, reading, min / max and a sparkline bleeding to the card edges
 .widget
-    background: var(--container-background-color)
-    color: var(--text-color-primary)
-    border-radius: var(--container-radius)
-    box-shadow: var(--container-shadow)
+    +mixins.card
+    padding: 0
+    display: flex
+    flex-direction: column
     overflow: hidden
 
     &.x1
-        flex-basis: calc(25% - 8px)
-        width: calc(25% - 8px)
+        +mixins.columns(1)
 
     &.x2
-        flex-basis: calc(50% - 8px)
-        width: calc(50% - 8px)
+        +mixins.columns(2)
 
     @media only screen and (max-width: variables.$mobileMaxWidth)
-        flex-basis: calc(50% - 5px) !important
-        width: calc(50% - 5px) !important
+        &.x1, &.x2
+            +mixins.columns(1, 2)
 
-    @media only screen and (max-width: 390px)
-        flex-basis: 100% !important
-        width: 100% !important
+    @media only screen and (max-width: variables.$smallMaxWidth)
+        &.x1, &.x2
+            +mixins.columns(1, 1)
 
     .header
-        padding: 16px 16px 0
+        padding: var(--space-4) var(--space-4) 0
         display: flex
         width: 100%
         justify-content: space-between
         align-items: center
-        white-space: nowrap
-        text-overflow: ellipsis
-        overflow: hidden
+        gap: var(--space-2)
 
-        h3, a
-            color: var(--text-color-secondary)
+        h3
             margin: 0
-            font-weight: 200
-            text-decoration: none
-            transition: color 0.3s
+            min-width: 0
+            overflow: hidden
+            white-space: nowrap
+            text-overflow: ellipsis
+            +type.titleCard
+
+        a
+            color: inherit
+
+            &:hover
+                color: var(--color-main)
+
+                .externalLinkIcon
+                    fill: var(--color-main)
 
         svg
+            flex: 0 0 auto
             fill: var(--text-color-secondary)
-            width: 18px
-            height: 18px
-
-        a:hover
-            color: var(--text-color-primary)
-
-            svg
-                fill: var(--text-color-primary)
+            width: 20px
+            height: 20px
 
         .externalLinkIcon
-            vertical-align: middle
+            vertical-align: baseline
+            margin-left: 2px
             width: 12px
             height: 12px
-            transition: fill 0.3s
+            transition: fill var(--duration-fast) var(--ease)
 
     .value
-        padding: 0 16px
-        font-size: 34px
-        font-weight: 100
-        margin-bottom: 5px
+        padding: var(--space-2) var(--space-4) 0
         display: flex
         align-items: baseline
+        gap: var(--space-1)
+        +type.value
 
         span
-            font-size: 20px
-            margin-left: 5px
-            color: var(--text-color-secondary)
+            +type.unit
 
     .statsContainer
         display: flex
-        padding: 0 16px
+        padding: var(--space-3) var(--space-4)
         justify-content: space-between
-        margin-bottom: 15px
+        gap: var(--space-3)
 
         .block
             display: flex
             flex-direction: column
             align-items: flex-start
+            +type.numbers
+            font-size: var(--font-size)
             color: var(--text-color-primary)
-            font-weight: 200
+
+            &:last-child
+                align-items: flex-end
 
             .title
-                color: var(--text-color-secondary)
-                font-weight: 400
+                +type.caption
 
     .chart
-        margin: -5px
-        //opacity: .6
+        margin-top: auto

@@ -69,7 +69,7 @@ const WidgetAnomalyCard: React.FC<WidgetAnomalyCardProps> = ({
                 <div className={styles.metricRow}>
                     <span className={styles.metricLabel}>{t(getExtraMetricI18nKey(extraMetric.label))}</span>
                     <span className={styles.metricValue}>
-                        {formatExtraMetricValue(extraMetric.label, extraMetric.value)}
+                        {formatExtraMetricValue(extraMetric.label, extraMetric.value, t)}
                     </span>
                 </div>
             )}
@@ -91,7 +91,7 @@ const WidgetAnomalyCard: React.FC<WidgetAnomalyCardProps> = ({
                 <div className={styles.metricRow}>
                     <span className={styles.metricLabel}>{t(getExtraMetricI18nKey(extraMetric.label))}</span>
                     <span className={styles.metricValue}>
-                        {formatExtraMetricValue(extraMetric.label, extraMetric.value)}
+                        {formatExtraMetricValue(extraMetric.label, extraMetric.value, t)}
                     </span>
                 </div>
             )}

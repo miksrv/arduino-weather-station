@@ -10,15 +10,16 @@ jest.mock('next-i18next/pages', () => ({
     useTranslation: () => ({ t: (key: string) => key, i18n: { language: 'en' } })
 }))
 
-const mockUseTheme = jest.fn(() => ({ theme: 'light' }))
+const mockUseTheme = jest.fn(() => ({ theme: 'light', resolvedTheme: 'light' }))
 
 jest.mock('next-themes', () => ({
     useTheme: () => mockUseTheme()
 }))
 
-jest.mock('echarts-for-react', () => () => <div data-testid='echarts' />)
+jest.mock('@/components/echart', () => () => <div data-testid='echarts' />)
 
 jest.mock('@/tools', () => ({
+    ...jest.requireActual('@/tools'),
     getEChartBaseConfig: jest.fn(() => ({ legend: {} }))
 }))
 
@@ -34,7 +35,7 @@ const mockNormals = Array.from({ length: 12 }, (_, i) => ({
 
 describe('WidgetMonthlyNormals', () => {
     beforeEach(() => {
-        mockUseTheme.mockReturnValue({ theme: 'light' })
+        mockUseTheme.mockReturnValue({ theme: 'light', resolvedTheme: 'light' })
     })
 
     it('shows Skeleton when loading', () => {
@@ -76,7 +77,7 @@ describe('WidgetMonthlyNormals', () => {
     })
 
     it('renders without crashing in dark theme', () => {
-        mockUseTheme.mockReturnValue({ theme: 'dark' })
+        mockUseTheme.mockReturnValue({ theme: 'dark', resolvedTheme: 'dark' })
         expect(() =>
             render(
                 <WidgetMonthlyNormals

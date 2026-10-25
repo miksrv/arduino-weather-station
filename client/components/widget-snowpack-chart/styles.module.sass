@@ -1,47 +1,44 @@
-@use '../../styles/variables'
+@use '../../styles/mixins'
+@use '../../styles/typography' as type
 
 .widget
+    +mixins.card
     flex-basis: 100%
     width: 100%
-    background: var(--container-background-color)
-    color: var(--text-color-primary)
-    border-radius: var(--container-radius)
-    box-shadow: var(--container-shadow)
     overflow: hidden
-    padding: 16px
 
     .header
         display: flex
         align-items: center
         justify-content: space-between
-        margin-bottom: 8px
+        margin-bottom: var(--space-2)
         flex-wrap: wrap
-        gap: 4px
+        gap: var(--space-1)
 
     .title
-        color: var(--text-color-primary)
-        font-size: 16px
-        font-weight: 200
+        +type.titleCard
 
     .sweValue
-        font-size: 13px
-        color: var(--text-color-secondary)
+        +type.secondary
 
         strong
+            +type.numbers
             color: var(--text-color-primary)
-
 
     .table
         width: 100%
-        margin-top: 12px
+        margin-top: var(--space-3)
+
+        th, td
+            font-variant-numeric: tabular-nums
 
     .floodYearCell
         color: var(--color-red)
-        font-weight: 600
+        font-weight: var(--font-weight-medium)
 
     .chartTooltipTitle
-        font-size: 13px
-        font-weight: 600
+        font-size: var(--font-size-small)
+        font-weight: var(--font-weight-medium)
         color: var(--text-color-primary)
         margin-bottom: 6px
 
@@ -49,7 +46,7 @@
         display: flex
         align-items: center
         gap: 6px
-        font-size: 12px
+        font-size: var(--font-size-small)
         color: var(--text-color-primary)
         line-height: 1.5
 
@@ -57,7 +54,7 @@
         display: inline-block
         width: 8px
         height: 8px
-        border-radius: 50%
+        border-radius: var(--radius-full)
         flex-shrink: 0
 
     .label
@@ -65,10 +62,10 @@
         display: flex
         justify-content: space-between
         align-items: center
+        gap: var(--space-3)
         color: var(--text-color-secondary)
 
     .value
-        font-weight: 600
-        margin-left: 4px
+        +type.numbers
+        font-weight: var(--font-weight-medium)
         color: var(--text-color-primary)
-

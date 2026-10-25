@@ -50,40 +50,51 @@ describe('getZScoreSign', () => {
     })
 })
 
+const UNITS: Record<string, string> = { hectopascals: 'hPa', 'meters-per-second': 'm/s', millimeters: 'mm' }
+const t = (key: string) => UNITS[key] ?? key
+
 describe('formatExtraMetricValue', () => {
+    it('takes the unit labels from the translation', () => {
+        const ru = (key: string) => ({ hectopascals: 'гПа', 'meters-per-second': 'м/с', millimeters: 'мм' })[key] ?? key
+
+        expect(formatExtraMetricValue('pressure_drop_hpa', 0.5, ru)).toBe('+0.5 гПа')
+        expect(formatExtraMetricValue('wind_speed_ms', 4, ru)).toBe('4.0 м/с')
+        expect(formatExtraMetricValue('precip7d', 0.8, ru)).toBe('0.8 мм')
+    })
+
     it('formats temperature_c with sign and unit', () => {
-        expect(formatExtraMetricValue('temperature_c', 5.5)).toBe('+5.5 °C')
-        expect(formatExtraMetricValue('temperature_c', -3.2)).toBe('-3.2 °C')
-        expect(formatExtraMetricValue('temperature_c', 0)).toBe('0.0 °C')
+        expect(formatExtraMetricValue('temperature_c', 5.5, t)).toBe('+5.5 °C')
+        expect(formatExtraMetricValue('temperature_c', -3.2, t)).toBe('-3.2 °C')
+        expect(formatExtraMetricValue('temperature_c', 0, t)).toBe('0.0 °C')
     })
 
     it('formats pressure_drop_hpa with sign and unit', () => {
-        expect(formatExtraMetricValue('pressure_drop_hpa', 2.0)).toBe('+2.0 hPa')
-        expect(formatExtraMetricValue('pressure_drop_hpa', -1.5)).toBe('-1.5 hPa')
+        expect(formatExtraMetricValue('pressure_drop_hpa', 2.0, t)).toBe('+2.0 hPa')
+        expect(formatExtraMetricValue('pressure_drop_hpa', -1.5, t)).toBe('-1.5 hPa')
     })
 
     it('formats dew_spread_c with delta prefix', () => {
-        expect(formatExtraMetricValue('dew_spread_c', 3.2)).toBe('Δ3.2 °C')
+        expect(formatExtraMetricValue('dew_spread_c', 3.2, t)).toBe('Δ3.2 °C')
     })
 
     it('formats wind_speed_ms with m/s unit', () => {
-        expect(formatExtraMetricValue('wind_speed_ms', 7.3)).toBe('7.3 m/s')
+        expect(formatExtraMetricValue('wind_speed_ms', 7.3, t)).toBe('7.3 m/s')
     })
 
     it('formats heat_index_c with °C unit', () => {
-        expect(formatExtraMetricValue('heat_index_c', 32.1)).toBe('32.1 °C')
+        expect(formatExtraMetricValue('heat_index_c', 32.1, t)).toBe('32.1 °C')
     })
 
     it('formats precip7d with mm unit', () => {
-        expect(formatExtraMetricValue('precip7d', 12.5)).toBe('12.5 mm')
+        expect(formatExtraMetricValue('precip7d', 12.5, t)).toBe('12.5 mm')
     })
 
     it('formats SPI-30 as two decimal places', () => {
-        expect(formatExtraMetricValue('SPI-30', -1.234)).toBe('-1.23')
+        expect(formatExtraMetricValue('SPI-30', -1.234, t)).toBe('-1.23')
     })
 
     it('falls back to String(value) for unknown labels', () => {
-        expect(formatExtraMetricValue('unknown_metric', 42)).toBe('42')
+        expect(formatExtraMetricValue('unknown_metric', 42, t)).toBe('42')
     })
 })
 

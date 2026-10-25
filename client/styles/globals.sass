@@ -1,5 +1,7 @@
 @use 'variables'
 @use 'animations'
+@use 'mixins'
+@use 'typography' as type
 
 *, ::before, ::after
     box-sizing: border-box
@@ -10,24 +12,43 @@ ul
     padding: 0
 
 html
+    -webkit-font-smoothing: antialiased
     -moz-osx-font-smoothing: grayscale
     -webkit-text-size-adjust: 100%
+    color-scheme: light
+
+html[data-theme='dark']
+    color-scheme: dark
 
 body
     background-color: var(--body-background)
     margin: 0
-    line-height: var(--line-height)
-    font-size: var(--font-size)
-    letter-spacing: var(--letter-spacing)
-    font-family: var(--font-family), sans-serif
+    font: var(--font-size) / var(--line-height) var(--font-family)
     color: var(--text-color-primary)
-    transition: background-color 0.5s ease
 
+a
+    color: var(--color-main)
+    text-decoration: none
+
+    &:hover
+        color: var(--color-main-hover)
+
+    &:focus-visible
+        outline: var(--focus-outline)
+        outline-offset: 2px
+        border-radius: var(--radius-sm)
+
+// The weather icons are drawn for a dark card (clouds are a #e5e7eb stroke); on a light card they are
+// darkened so the clouds reach ~3.5:1 on white, the sun and the drops keep their hue
+html[data-theme='light'] .weather-icon
+    filter: brightness(0.6) saturate(1.5)
+
+// The dashboard grid: cards size themselves with the `columns` mixin
 .widgets-list
     display: flex
     flex-wrap: wrap
-    margin-top: 5px
-    gap: 10px
+    align-items: stretch
+    gap: var(--gap)
 
 // Groups widgets that should always sit on their own row together, at equal height
 // (flex's default align-items: stretch matches them to the tallest one), regardless
@@ -37,55 +58,79 @@ body
     flex-wrap: wrap
     flex-basis: 100%
     width: 100%
-    gap: 10px
+    gap: var(--gap)
 
+// Page controls above the grid: date pickers, export buttons
 .toolbar
-    margin: 5px 0 10px
+    margin: 0 0 var(--gap)
     display: flex
-    gap: 10px
+    flex-wrap: wrap
+    align-items: center
+    gap: var(--space-2)
 
     .loading
         display: flex
         align-items: center
+        gap: var(--space-2)
+        +type.caption
 
         svg
             width: 20px
             height: 20px
-            margin-right: 10px
 
         @media only screen and (max-width: variables.$mobileMaxWidth)
             span
                 display: none
 
 .not-found
-    margin: 30px auto 0
+    margin: var(--space-10) auto 0
     text-align: center
 
     h1
-        font-size: 3em
+        +type.titlePage
+        font-size: 40px
+        margin: 0 0 var(--space-2)
+
+    p
+        +type.secondary
+        margin: 0
 
     .not-found-menu
-        margin-top: 40px
+        margin-top: var(--space-8)
 
         menu
-            display: flex
-            justify-content: center
-            gap: 8px
-            flex-wrap: wrap
+            display: grid
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr))
+            gap: var(--gap)
+            margin: 0
+            padding: 0
 
         li
-            background: var(--container-background-color)
-            border-radius: var(--container-radius)
-            flex-basis: calc(33.333% - 8px)
-            width: calc(33.333% - 8px)
+            +mixins.card
+            padding: 0
+            transition: box-shadow var(--duration-fast) var(--ease)
+
+            &:hover
+                box-shadow: var(--card-shadow-hover)
 
         a
             display: flex
             flex-direction: column
-            padding: 20px
+            align-items: center
+            gap: var(--space-2)
+            padding: var(--space-5)
+            color: var(--text-color-primary)
+            font-weight: var(--font-weight-medium)
 
             svg
                 display: block
-                width: 46px
-                height: 46px
-                margin-bottom: 10px
+                width: 32px
+                height: 32px
+                fill: var(--color-main)
+
+@media (prefers-reduced-motion: reduce)
+    *, ::before, ::after
+        animation-duration: 0.01ms !important
+        animation-iteration-count: 1 !important
+        transition-duration: 0.01ms !important
+        scroll-behavior: auto !important

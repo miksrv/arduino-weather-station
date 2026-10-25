@@ -6,6 +6,8 @@
        - main
      paths:
        - 'server/**/*'
+   # Manual run from the Actions tab or `gh workflow run api-deploy.yml`
+   workflow_dispatch:
 
  # https://github.com/codeigniter4/CodeIgniter4/blob/develop/.github/workflows/deploy-apidocs.yml
  jobs:
@@ -50,25 +52,39 @@
        - name: Load Secrets
          run: echo "machine ${{ secrets.FTP_HOSTNAME }} login ${{ secrets.FTP_USERNAME }} password ${{ secrets.FTP_PASSWORD }}" > ~/.netrc
 
+       # One lftp session (credentials from ~/.netrc above): each separate
+       # `lftp -e` call re-connected and re-negotiated TLS, and `rm -r` deleted
+       # app/ and vendor/ file by file before re-uploading everything.
+       # `mirror --delete` keeps app/ and vendor/ in sync instead - files removed
+       # from the repository are removed from the hosting too, with no window
+       # where the code is missing. public/ and writable/ are never deleted
+       # from: they hold user uploads and content.
        - name: Upload API
          run: |
-           lftp -e "put -O / .htaccess" ${{ secrets.FTP_HOSTNAME }} || true
-           lftp -e "put -O / env" ${{ secrets.FTP_HOSTNAME }} || true
-           lftp -e "put -O / spark" ${{ secrets.FTP_HOSTNAME }} || true
-           lftp -e "rm -r /app" ${{ secrets.FTP_HOSTNAME }} || true
-           lftp -e "rm -r /vendor" ${{ secrets.FTP_HOSTNAME }} || true
-           lftp -e "mirror --parallel=100 -R app /app" ${{ secrets.FTP_HOSTNAME }}
-           lftp -e "mirror --parallel=100 -R vendor /vendor" ${{ secrets.FTP_HOSTNAME }}
-           lftp -e "mirror --parallel=100 -R public /public" ${{ secrets.FTP_HOSTNAME }}
-           lftp -e "mirror --parallel=100 -R writable /writable" ${{ secrets.FTP_HOSTNAME }}
+           lftp ${{ secrets.FTP_HOSTNAME }} <<'EOF'
+           set cmd:fail-exit yes
+           set net:max-retries 3
+           set net:timeout 30
+           put -O / .htaccess
+           put -O / env
+           put -O / spark
+           mirror -R --delete --parallel=10 app /app
+           mirror -R --delete --parallel=10 vendor /vendor
+           mirror -R --parallel=10 public /public
+           mirror -R --parallel=10 writable /writable
+           # Permissions are best effort, as before: never fail the deploy.
+           set cmd:fail-exit no
+           # New code may answer differently, while controllers keep responses in the file cache for up
+           # to a day: the cache starts empty. Renamed (one call) instead of deleted file by file; the copy
+           # left by the previous deploy is removed first. Before the chmods, so a failure here (no cache
+           # yet) is not lftp's exit code
+           glob -d rm -r /writable/cache.cleared-*
+           mv /writable/cache /writable/cache.cleared-${{ github.run_id }}-${{ github.run_attempt }}
+           mkdir /writable/cache
+           put -O /writable/cache writable/cache/index.html
+           chmod 755 /spark
+           # The directories only, not -R: one FTP call per file, and the files are written by PHP itself
+           chmod 755 /writable /writable/cache /writable/logs /writable/session /writable/uploads
+           bye
+           EOF
          working-directory: server
-
-       - name: Set permissions
-         run: |
-           lftp -e "chmod 755 /spark" ${{ secrets.FTP_HOSTNAME }} || true
-           lftp -e "chmod -R 755 /writable" ${{ secrets.FTP_HOSTNAME }} || true
-           lftp -e "chmod -R 755 /writable/cache" ${{ secrets.FTP_HOSTNAME }} || true
-           lftp -e "chmod -R 755 /writable/logs" ${{ secrets.FTP_HOSTNAME }} || true
-           lftp -e "chmod -R 755 /writable/session" ${{ secrets.FTP_HOSTNAME }} || true
-           lftp -e "chmod -R 755 /writable/uploads" ${{ secrets.FTP_HOSTNAME }} || true
-         continue-on-error: true

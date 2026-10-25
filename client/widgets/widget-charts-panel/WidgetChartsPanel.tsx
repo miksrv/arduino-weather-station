@@ -2,12 +2,13 @@ import React, { useMemo, useState } from 'react'
 import { Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next/pages'
+import { useTheme } from 'next-themes'
 
 import { API, ApiModel } from '@/api'
 import WidgetCard from '@/components/widget-card'
-import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
 import { getSensorColor } from '@/tools/colors'
-import { currentDate, formatDate } from '@/tools/date'
+import { POLLING_INTERVAL_CURRENT } from '@/tools/constants'
+import { formatDate, getCurrentDate } from '@/tools/date'
 import { convertHpaToMmHg, filterRecentData } from '@/tools/weather'
 
 import MiniChart from './MiniChart'
@@ -42,6 +43,7 @@ export interface WidgetChartsPanelProps {
 
 const WidgetChartsPanel: React.FC<WidgetChartsPanelProps> = ({ history24h, history7d }) => {
     const { t } = useTranslation()
+    const { resolvedTheme: theme } = useTheme()
     const [period, setPeriod] = useState<ChartsPeriod>('24h')
 
     const periodOptions = useMemo(
@@ -57,10 +59,13 @@ const WidgetChartsPanel: React.FC<WidgetChartsPanelProps> = ({ history24h, histo
     // does not fetch) needs its own request here — gated with `skip` so it never fires otherwise.
     const { data: monthlyHistory, isLoading: monthlyHistoryLoading } = API.useGetHistoryQuery(
         {
-            start_date: formatDate(currentDate.subtract(PERIOD_START_DAYS_AGO['30d'], 'days').toDate(), 'YYYY-MM-DD'),
-            end_date: formatDate(currentDate.toDate(), 'YYYY-MM-DD')
+            start_date: formatDate(
+                getCurrentDate().subtract(PERIOD_START_DAYS_AGO['30d'], 'days').toDate(),
+                'YYYY-MM-DD'
+            ),
+            end_date: formatDate(getCurrentDate().toDate(), 'YYYY-MM-DD')
         },
-        { pollingInterval: POLING_INTERVAL_CURRENT, skip: period !== '30d' }
+        { pollingInterval: POLLING_INTERVAL_CURRENT, skip: period !== '30d' }
     )
 
     const isLoading = period === '30d' ? monthlyHistoryLoading : period === '24h' ? !history24h : !history7d
@@ -103,7 +108,7 @@ const WidgetChartsPanel: React.FC<WidgetChartsPanelProps> = ({ history24h, histo
                                 title={`${t('temperature')} (°C)`}
                                 data={periodData}
                                 source={'temperature'}
-                                color={getSensorColor('temperature')[0]}
+                                color={getSensorColor('temperature', theme)[0]}
                                 dateFormat={dateFormat}
                             />
                         </div>
@@ -112,7 +117,7 @@ const WidgetChartsPanel: React.FC<WidgetChartsPanelProps> = ({ history24h, histo
                                 title={`${t('humidity')} (%)`}
                                 data={periodData}
                                 source={'humidity'}
-                                color={getSensorColor('humidity')[0]}
+                                color={getSensorColor('humidity', theme)[0]}
                                 dateFormat={dateFormat}
                             />
                         </div>
@@ -121,7 +126,7 @@ const WidgetChartsPanel: React.FC<WidgetChartsPanelProps> = ({ history24h, histo
                                 title={`${t('pressure')} (${t('mm-hg-full')})`}
                                 data={pressureData}
                                 source={'pressure'}
-                                color={getSensorColor('pressure')[0]}
+                                color={getSensorColor('pressure', theme)[0]}
                                 dateFormat={dateFormat}
                             />
                         </div>
@@ -130,7 +135,7 @@ const WidgetChartsPanel: React.FC<WidgetChartsPanelProps> = ({ history24h, histo
                                 title={`${t('wind')} (${t('meters-per-second')})`}
                                 data={periodData}
                                 source={'windSpeed'}
-                                color={getSensorColor('windSpeed')[0]}
+                                color={getSensorColor('windSpeed', theme)[0]}
                                 dateFormat={dateFormat}
                                 zeroBased
                             />

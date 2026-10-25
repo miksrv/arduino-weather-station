@@ -1,13 +1,13 @@
-import React, { useCallback, useMemo } from 'react'
-import * as echarts from 'echarts'
-import ReactECharts from 'echarts-for-react'
+import React, { useMemo } from 'react'
+import type { EChartsOption } from 'echarts'
 import { Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
 import { ApiType } from '@/api'
-import { getEChartBaseConfig } from '@/tools'
+import EChart from '@/components/echart'
+import { getChartTokens, getChartTooltipStyle, getEChartBaseConfig } from '@/tools'
 import { formatDate } from '@/tools/date'
 
 import { ComparisonTable } from './ComparisonTable'
@@ -35,10 +35,8 @@ const WidgetSnowpackChart: React.FC<WidgetSnowpackChartProps> = ({
     historicalAvgSWE
 }) => {
     const { t } = useTranslation()
-    const { theme } = useTheme()
-
-    const borderColor = theme === 'dark' ? '#444546' : '#cbcccd'
-    const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99'
+    const { resolvedTheme: theme } = useTheme()
+    const { gridLine: borderColor, textSecondary: textSecondaryColor } = getChartTokens(theme)
 
     const currentData = useMemo(() => currentSeries.map((p) => [dateToSeasonDay(p.date), p.swe]), [currentSeries])
 
@@ -118,18 +116,19 @@ const WidgetSnowpackChart: React.FC<WidgetSnowpackChartProps> = ({
         return labels
     }, [])
 
-    const option: echarts.EChartsOption = useMemo(
+    const option: EChartsOption = useMemo(
         () => ({
             ...getEChartBaseConfig(theme),
             grid: {
                 left: 27,
                 right: 20,
-                top: 0,
+                // Room for the "мм" axis name, so it never runs into the temperature chart above
+                top: 28,
                 bottom: 50
             },
             tooltip: {
                 trigger: 'axis',
-                backgroundColor: theme === 'dark' ? '#2c2d2e' : '#ffffff',
+                ...getChartTooltipStyle(theme),
                 borderColor,
                 axisPointer: {
                     type: 'line' as const,
@@ -210,7 +209,7 @@ const WidgetSnowpackChart: React.FC<WidgetSnowpackChartProps> = ({
         [theme, borderColor, textSecondaryColor, currentData, comparisonSeries, historicalAvgSWE, xAxisLabels, t]
     )
 
-    const tempOption: echarts.EChartsOption = useMemo(
+    const tempOption: EChartsOption = useMemo(
         () => ({
             ...getEChartBaseConfig(theme),
             grid: {
@@ -224,7 +223,7 @@ const WidgetSnowpackChart: React.FC<WidgetSnowpackChartProps> = ({
             },
             tooltip: {
                 trigger: 'axis',
-                backgroundColor: theme === 'dark' ? '#2c2d2e' : '#ffffff',
+                ...getChartTooltipStyle(theme),
                 borderColor,
                 axisPointer: {
                     type: 'line' as const,
@@ -298,20 +297,10 @@ const WidgetSnowpackChart: React.FC<WidgetSnowpackChartProps> = ({
         [theme, borderColor, textSecondaryColor, comparisonTempSeries, xAxisLabels]
     )
 
-    const handleSweReady = useCallback((instance: echarts.ECharts) => {
-        instance.group = 'snowpack'
-        echarts.connect('snowpack')
-    }, [])
-
-    const handleTempReady = useCallback((instance: echarts.ECharts) => {
-        instance.group = 'snowpack'
-        echarts.connect('snowpack')
-    }, [])
-
     if (loading) {
         return (
             <div className={styles.widget}>
-                <Skeleton style={{ width: '100%', height: 460 }} />
+                <Skeleton style={{ width: '100%', height: 480 }} />
             </div>
         )
     }
@@ -325,16 +314,16 @@ const WidgetSnowpackChart: React.FC<WidgetSnowpackChartProps> = ({
                 </span>
             </div>
 
-            <ReactECharts
-                onChartReady={handleTempReady}
+            <EChart
+                group={'snowpack'}
                 option={tempOption}
-                style={{ height: '180px', width: '100%', marginBottom: '-20px' }}
+                style={{ height: '180px', width: '100%' }}
             />
 
-            <ReactECharts
-                onChartReady={handleSweReady}
+            <EChart
+                group={'snowpack'}
                 option={option}
-                style={{ height: '280px', width: '100%' }}
+                style={{ height: '300px', width: '100%' }}
             />
 
             <ComparisonTable rows={comparisonYears} />

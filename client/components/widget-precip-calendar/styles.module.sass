@@ -1,14 +1,12 @@
 @use '../../styles/variables'
+@use '../../styles/mixins'
+@use '../../styles/typography' as type
 
 .widget
+    +mixins.card
     flex-basis: 100%
     width: 100%
-    background: var(--container-background-color)
-    color: var(--text-color-primary)
-    border-radius: var(--container-radius)
-    box-shadow: var(--container-shadow)
     overflow: hidden
-    padding: 14px
     position: relative
 
 .grid
@@ -17,11 +15,12 @@
 
 .headerRow, .monthRow
     display: grid
-    grid-template-columns: 36px repeat(31, 1fr)
-    gap: 2px
-    margin-bottom: 2px
+    grid-template-columns: 40px repeat(31, 1fr)
+    gap: 3px
+    margin-bottom: 3px
 
 .dayHeader
+    +type.numbers
     font-size: 10px
     color: var(--text-color-secondary)
     text-align: center
@@ -31,22 +30,23 @@
         display: none
 
 .monthLabel
-    font-size: 11px
-    color: var(--text-color-secondary)
-    line-height: 16px
+    +type.caption
+    font-size: var(--font-size-micro)
+    line-height: 18px
     display: flex
     align-items: center
     text-transform: capitalize
 
 .cell, .cellEmpty
-    height: 16px
-    border-radius: 2px
+    height: 18px
+    border-radius: 3px
 
 .cell
     cursor: pointer
 
     &:hover
         outline: 1px solid var(--text-color-secondary)
+        outline-offset: 1px
 
 .cellEmpty
     background: transparent
@@ -54,39 +54,28 @@
 .legend
     display: flex
     flex-wrap: wrap
-    gap: 12px
-    margin-top: 12px
+    gap: var(--space-3)
+    margin-top: var(--space-3)
 
 .legendItem
     display: flex
     align-items: center
-    gap: 4px
+    gap: var(--space-1)
 
 .legendSwatch
     width: 12px
     height: 12px
-    border-radius: 2px
+    border-radius: 3px
     flex-shrink: 0
 
 .legendLabel
-    font-size: 11px
-    color: var(--text-color-secondary)
+    +type.caption
 
 .tooltip
-    position: fixed
-    transform: translateX(-50%) translateY(-100%)
-    background: var(--container-background-color)
-    border: 1px solid var(--input-border-color)
-    border-radius: var(--popout-radius)
-    padding: 6px 10px
-    font-size: 11px
-    color: var(--text-color-primary)
-    pointer-events: none
-    z-index: 9999
-    box-shadow: var(--popout-shadow)
+    +mixins.floatingTooltip
 
 .tooltipDate
-    font-weight: 600
+    font-weight: var(--font-weight-medium)
     margin-bottom: 2px
 
 .tooltipValue

@@ -1,236 +1,139 @@
 import React, { useMemo } from 'react'
-import dayjs from 'dayjs'
-import { EChartsOption } from 'echarts'
-import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
-import ReactECharts from 'echarts-for-react'
+import type { EChartsOption } from 'echarts'
+import type { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
 
 import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
-import { ApiModel, ApiType } from '@/api'
-import useClientOnly from '@/hooks/useClientOnly'
-import { formatDate } from '@/tools/date'
+import { ApiType } from '@/api'
+import EChart from '@/components/echart'
+import { getChartTokens, getChartTooltipStyle } from '@/tools'
+import { formatDate, getDate } from '@/tools/date'
+import { getHeatmapUnit, HeatmapPoint, PRECIPITATION_EDGES } from '@/tools/heatmap'
 
 import styles from './styles.module.sass'
 
-interface ChartProps {
+interface HeatmapChartProps {
     type: ApiType.Heatmap.SensorType
-    data?: ApiModel.Weather[]
-    title?: string
-    subTitle?: string
+    points: HeatmapPoint[]
     height?: string | number
 }
 
-const HeatmapChart: React.FC<ChartProps> = ({ type, data, title, subTitle, height }) => {
-    const isClient = useClientOnly()
-    const { theme } = useTheme()
+/**
+ * Sequential palettes from low to high. Temperature diverges around the middle (cold blue → warm red);
+ * the others go from a pale tint to the deep tone of the quantity's hue.
+ */
+const PALETTES: Record<ApiType.Heatmap.SensorType, string[]> = {
+    temperature: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#ffffbf', '#fee090', '#f46d43', '#d73027', '#a50026'],
+    pressure: ['#f3e5f5', '#ce93d8', '#ab47bc', '#8e24aa', '#6a1b9a', '#4a148c'],
+    precipitation: ['#bbdefb', '#90caf9', '#42a5f5', '#1e88e5', '#1565c0', '#0d47a1'],
+    clouds: ['#e8eaf6', '#9fa8da', '#5c6bc0', '#3f51b5', '#303f9f', '#1a237e'],
+    humidity: ['#e0f7fa', '#80deea', '#26c6da', '#00acc1', '#00838f', '#006064']
+}
+
+/** Hours of the day (rows, midnight at the top) by days (columns), one cell per hour, coloured by value */
+const HeatmapChart: React.FC<HeatmapChartProps> = ({ type, points, height }) => {
+    const { resolvedTheme: theme } = useTheme()
     const { t } = useTranslation()
 
-    const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff'
-    const borderColor = theme === 'dark' ? '#444546' : '#cbcccd'
-    const textPrimaryColor = theme === 'dark' ? '#e1e3e6' : '#000000E5'
-    const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99' // --text-color-secondary
+    const option: EChartsOption = useMemo(() => {
+        const tokens = getChartTokens(theme)
+        const unit = getHeatmapUnit(type, t)
+        const days = [...new Set(points.map((point) => point.day))]
+        const dayIndex = new Map(days.map((day, index) => [day, index]))
+        const hours = Array.from({ length: 24 }, (_, hour) => `${String(hour).padStart(2, '0')}:00`)
+        const values = points.map((point) => point.value)
 
-    const isMobile = isClient && !!(window?.innerWidth && window?.innerWidth < 500)
-
-    const xData = useMemo(() => {
-        return data ? Array.from(new Set(data.map((d) => dayjs(d.date).format('YYYY-MM-DD')))) : []
-    }, [data, type])
-
-    const yData = useMemo(() => {
-        return Array.from({ length: 24 }, (_, i) => `${i}:00`)
-    }, [])
-
-    const chartData = useMemo(() => {
-        return data
-            ? data.map((item) => {
-                  const dayIndex = xData.indexOf(dayjs(item.date).format('YYYY-MM-DD'))
-                  const hour = dayjs(item.date).hour()
-                  return [dayIndex, 23 - hour, item[type]]
-              })
-            : []
-    }, [data, type, xData])
-
-    const chartUnit = useMemo(() => {
-        switch (type) {
-            case 'temperature':
-                return '°С'
-            case 'pressure':
-                return t('mm-hg')
-            case 'precipitation':
-                return t('millimeters')
-            case 'humidity':
-            case 'clouds':
-                return '%'
-        }
-    }, [type])
-
-    const chartColors = useMemo(() => {
-        switch (type) {
-            case 'temperature':
-                return [
-                    '#313695',
-                    '#4575b4',
-                    '#74add1',
-                    '#abd9e9',
-                    '#ffffbf',
-                    '#fee090',
-                    '#f46d43',
-                    '#d73027',
-                    '#a50026'
-                ]
-
-            case 'pressure':
-                return [
-                    '#4a148c',
-                    '#6a1b9a',
-                    '#7d2ae8',
-                    '#8e24aa',
-                    '#9c27b0',
-                    '#ab47bc',
-                    '#ce93d8',
-                    '#f3e5f5'
-                ].reverse()
-
-            case 'precipitation':
-                return [
-                    '#0d47a1',
-                    '#1565c0',
-                    '#1976d2',
-                    '#1e88e5',
-                    '#2c7eec',
-                    '#42a5f5',
-                    '#90caf9',
-                    '#e3f2fd'
-                ].reverse()
-
-            case 'clouds':
-                return [
-                    '#1a237e',
-                    '#283593',
-                    '#303f9f',
-                    '#3949ab',
-                    '#3f51b5',
-                    '#5c6bc0',
-                    '#9fa8da',
-                    '#e8eaf6'
-                ].reverse()
-
-            case 'humidity':
-                return [
-                    '#006064',
-                    '#00838f',
-                    '#00bcd4',
-                    '#26c6da',
-                    '#4dd0e1',
-                    '#80deea',
-                    '#b2ebf2',
-                    '#e0f7fa'
-                ].reverse()
-        }
-    }, [type])
-
-    const option: EChartsOption = {
-        title: {
-            show: !isMobile,
-            text: title,
-            subtext: subTitle,
-            padding: 0,
-            top: 10,
-            left: 10,
-            itemGap: 5,
-            textStyle: {
-                fontWeight: 400,
-                color: textPrimaryColor
-            },
-            subtextStyle: { color: textSecondaryColor }
-        },
-        tooltip: {
-            backgroundColor: backgroundColor,
-            borderColor: borderColor,
-            formatter: (params: TopLevelFormatterParams) => {
-                const item: CallbackDataParams = Array.isArray(params) ? params[0] : params
-                const tooltipContent: string[] = []
-                const colorSquare = `<span class="${styles.icon}" style="background-color: ${String(item.color ?? '')};"></span>`
-                const value = Array.isArray(item.value) ? item.value[2] : item.value
-                const seriesValue = `<span class="${styles.value}">${String(value ?? '---')} ${chartUnit}</span>`
-                const seriesName = `<span class="${styles.label}">${t(type)}${seriesValue}</span>`
-
-                tooltipContent.push(
-                    `<div class="${styles.chartTooltipTitle}">${formatDate(String(item.name ?? ''), 'dddd, DD MMM YYYY')}</div>`
-                )
-                tooltipContent.push(`<div class="${styles.chartTooltipItem}">${colorSquare} ${seriesName}</div>`)
-
-                return tooltipContent.join('')
-            }
-        },
-        grid: {
-            left: 10,
-            right: 10,
-            top: 55,
-            bottom: 10,
-            containLabel: true,
-            borderColor: borderColor
-        },
-        xAxis: {
-            type: 'category',
-            data: xData,
-            splitArea: { show: true },
-            axisLabel: {
-                show: true,
-                hideOverlap: true,
-                color: textSecondaryColor,
-                fontSize: '11px',
-                formatter: (value: string) => dayjs(value).format('MMM D')
-            }
-        },
-        yAxis: {
-            type: 'category',
-            data: yData,
-            splitArea: { show: true },
-            axisLabel: {
-                show: true,
-                formatter: '{value}',
-                color: textSecondaryColor,
-                fontSize: '11px'
-            }
-        },
-        visualMap: {
-            min: data?.reduce((acc, item) => Math.min(acc, item[type] ?? 0), Infinity) ?? 0,
-            max: data?.reduce((acc, item) => Math.max(acc, item[type] ?? 0), -Infinity) ?? 1,
-            calculable: true,
+        // Rain is rare and skewed: steps by thresholds, the dry hours blend into the card
+        const edges = [0, ...PRECIPITATION_EDGES]
+        const precipitationScale = {
+            type: 'piecewise',
             orient: 'horizontal',
-            right: 10,
-            top: 5,
-            padding: 0,
-            inRange: { color: chartColors },
-            textStyle: {
-                color: textPrimaryColor,
-                fontSize: '10px'
-            }
-        },
-        series: [
-            {
-                type: 'heatmap',
-                data: chartData,
-                emphasis: {
-                    itemStyle: {
-                        borderColor: '#333',
-                        borderWidth: 1
-                    }
-                },
-                progressive: 1000,
-                animation: false
-            }
-        ],
-        backgroundColor: backgroundColor,
-        textStyle: { color: textPrimaryColor }
-    }
+            left: 'center',
+            bottom: 0,
+            itemWidth: 14,
+            itemHeight: 10,
+            itemGap: 12,
+            textStyle: { color: tokens.textSecondary, fontSize: 11 },
+            pieces: edges.map((from, index) => {
+                const to = edges[index + 1]
+                const color = index === 0 ? tokens.gridLine : PALETTES.precipitation[index - 1]
+
+                return to === undefined
+                    ? { gte: from, label: `${from}+ ${unit}`, color }
+                    : { gte: from, lt: to, label: index === 0 ? t('heatmap-dry') : `${from}–${to}`, color }
+            })
+        }
+
+        return {
+            backgroundColor: 'transparent',
+            animation: false,
+            grid: { left: 8, right: 8, top: 8, bottom: 56, containLabel: true },
+            tooltip: {
+                ...getChartTooltipStyle(theme),
+                formatter: (params: TopLevelFormatterParams) => {
+                    const item = (Array.isArray(params) ? params[0] : params) as CallbackDataParams
+                    const [x, y, value] = (item.value as [number, number, number]) ?? []
+                    const title = `${formatDate(`${days[x]} 12:00`, 'dddd, D MMMM YYYY')} · ${hours[y]}`
+                    const dot = `<span class="${styles.icon}" style="background-color: ${String(item.color ?? '')};"></span>`
+
+                    return `<div class="${styles.chartTooltipTitle}">${title}</div><div class="${styles.chartTooltipItem}">${dot}<span class="${styles.label}">${t(type)}<span class="${styles.value}">${value} ${unit}</span></span></div>`
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: days,
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: {
+                    hideOverlap: true,
+                    color: tokens.textSecondary,
+                    fontSize: 11,
+                    // The day string is a local date: read it as such, not as UTC
+                    formatter: (value: string) => getDate(`${value} 12:00`).format('D MMM')
+                }
+            },
+            yAxis: {
+                type: 'category',
+                data: hours,
+                inverse: true,
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: { color: tokens.textSecondary, fontSize: 11, interval: 2 }
+            },
+            visualMap:
+                type === 'precipitation'
+                    ? precipitationScale
+                    : {
+                          min: Math.floor(Math.min(...values)),
+                          max: Math.ceil(Math.max(...values)),
+                          calculable: true,
+                          orient: 'horizontal',
+                          left: 'center',
+                          bottom: 0,
+                          itemHeight: 240,
+                          itemWidth: 10,
+                          inRange: { color: PALETTES[type] },
+                          // The handles carry the range with its unit; drag them to highlight a band of values
+                          formatter: (value: unknown) => `${Math.round(Number(value) * 10) / 10} ${unit}`,
+                          textStyle: { color: tokens.textSecondary, fontSize: 11 }
+                      },
+            series: [
+                {
+                    type: 'heatmap',
+                    data: points.map((point) => [dayIndex.get(point.day) ?? 0, point.hour, point.value]),
+                    emphasis: { itemStyle: { borderColor: tokens.textPrimary, borderWidth: 1 } },
+                    progressive: 2000
+                }
+            ]
+        } as EChartsOption
+    }, [points, type, theme, t])
 
     return (
-        <ReactECharts
+        <EChart
             option={option}
-            style={{ height }}
+            notMerge={true}
+            style={{ height, width: '100%' }}
         />
     )
 }

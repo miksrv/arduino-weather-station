@@ -1,7 +1,11 @@
-@use '../styles/variables'
+@use '../styles/mixins'
 
 .yearSelector
-    display: flex
-    flex-wrap: wrap
-    gap: 6px
-    margin: 5px 0 10px
+    +mixins.segmented
+    margin: 0 0 var(--gap)
+
+.year
+    +mixins.segment
+
+.yearActive
+    +mixins.segmentActive

@@ -1,18 +1,24 @@
+@use '../../styles/typography' as type
+
 .footer
-    text-align: left
-    margin-top: 10px
-    font-size: var(--font-size-small)
-    color: var(--text-color-secondary)
+    display: flex
+    flex-direction: column
+    gap: 2px
+    margin-top: var(--space-3)
+    +type.caption
 
     a
-        color: var(--text-color-primary)
+        color: var(--text-color-secondary)
+        text-decoration: underline
+        text-decoration-color: var(--border-strong)
+        text-underline-offset: 2px
 
         &:hover
-            color: var(--color-orange-hover)
+            color: var(--text-color-primary)
 
     .link
-        margin: 0 3px
+        margin: 0 4px
 
         .copyrightImage
             vertical-align: middle
-            margin: 0 2px 2px 0
+            margin: 0 3px 2px 0

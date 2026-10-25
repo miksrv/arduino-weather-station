@@ -1,19 +1,40 @@
-import { getEChartBaseConfig } from './echart'
+import { getChartTokens, getChartTooltipStyle, getEChartBaseConfig, verticalGradient } from './echart'
+
+describe('getChartTokens', () => {
+    it('returns dark tokens by default and for unknown themes', () => {
+        expect(getChartTokens().surface).toBe('#14181d')
+        expect(getChartTokens('system').surface).toBe('#14181d')
+    })
+
+    it('returns light tokens for the light theme', () => {
+        expect(getChartTokens('light')).toMatchObject({ surface: '#ffffff', textSecondary: '#66707d' })
+    })
+})
+
+describe('verticalGradient', () => {
+    it('builds a top-to-bottom linear gradient object', () => {
+        const stops = [
+            { offset: 0, color: '#000' },
+            { offset: 1, color: '#fff' }
+        ]
+
+        expect(verticalGradient(stops)).toStrictEqual({ type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: stops })
+    })
+})
+
+describe('getChartTooltipStyle', () => {
+    it('uses the theme surface and text colours', () => {
+        const style = getChartTooltipStyle('light')
+
+        expect(style.backgroundColor).toBe('#ffffff')
+        expect(style.textStyle.color).toBe('rgba(0, 0, 0, 0.9)')
+    })
+})
 
 describe('getEChartBaseConfig', () => {
-    it('returns dark theme config by default', () => {
-        const config = getEChartBaseConfig()
-        expect(config.backgroundColor).toBe('#2c2d2e')
-    })
-
-    it('returns dark theme config when theme is "dark"', () => {
-        const config = getEChartBaseConfig('dark')
-        expect(config.backgroundColor).toBe('#2c2d2e')
-    })
-
-    it('returns light theme config when theme is "light"', () => {
-        const config = getEChartBaseConfig('light')
-        expect(config.backgroundColor).toBe('#ffffff')
+    it('has a transparent background so the card shows through', () => {
+        expect(getEChartBaseConfig().backgroundColor).toBe('transparent')
+        expect(getEChartBaseConfig('light').backgroundColor).toBe('transparent')
     })
 
     it('returns correct grid config', () => {
@@ -23,36 +44,25 @@ describe('getEChartBaseConfig', () => {
             right: 10,
             top: 15,
             bottom: 25,
-            containLabel: true
+            containLabel: true,
+            borderColor: '#252b33'
         })
     })
 
-    it('returns correct legend config for dark theme', () => {
-        const config = getEChartBaseConfig('dark')
-        expect(config.legend).toMatchObject({
+    it('uses the secondary text colour for the legend', () => {
+        expect((getEChartBaseConfig('dark').legend as { textStyle: { color: string } }).textStyle.color).toBe('#8e97a4')
+        expect((getEChartBaseConfig('light').legend as { textStyle: { color: string } }).textStyle.color).toBe(
+            '#66707d'
+        )
+    })
+
+    it('returns correct legend layout', () => {
+        expect(getEChartBaseConfig('dark').legend).toMatchObject({
             type: 'plain',
             orient: 'horizontal',
             left: 5,
             bottom: 0,
-            itemWidth: 20,
-            itemHeight: 2,
-            icon: 'rect'
+            icon: 'roundRect'
         })
-        expect((config.legend as { textStyle: { color: string } }).textStyle.color).toBe('#e1e3e6')
-    })
-
-    it('returns correct legend config for light theme', () => {
-        const config = getEChartBaseConfig('light')
-        expect((config.legend as { textStyle: { color: string } }).textStyle.color).toBe('#000000E5')
-    })
-
-    it('uses dark border color for dark theme', () => {
-        const config = getEChartBaseConfig('dark')
-        expect((config.grid as { borderColor: string }).borderColor).toBe('#444546')
-    })
-
-    it('uses light border color for light theme', () => {
-        const config = getEChartBaseConfig('light')
-        expect((config.grid as { borderColor: string }).borderColor).toBe('#cbcccd')
     })
 })

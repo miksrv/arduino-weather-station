@@ -58,9 +58,16 @@ class GetCurrentWeather extends BaseCommand
 
             foreach ($clients as $weatherClient) {
                 $sourceName = $weatherClient->getSourceName();
-                $data       = $weatherClient->getWeatherData();
 
-                if ($data === false) {
+                try {
+                    $data = $weatherClient->getWeatherData();
+                } catch (\Throwable $e) {
+                    log_message('error', 'getWeatherData failed for ' . $sourceName . ': ' . $e->getMessage());
+                    CLI::write('[ERROR] ' . $sourceName . ' — ' . $e->getMessage(), 'red');
+                    continue;
+                }
+
+                if ($data === false || empty($data['date'])) {
                     CLI::write('[SKIP]  ' . $sourceName . ' — no data', 'yellow');
                     continue;
                 }

@@ -74,4 +74,14 @@ describe('WidgetWarmingStripes', () => {
     it('renders without crashing with no props', () => {
         expect(() => render(<WidgetWarmingStripes />)).not.toThrow()
     })
+
+    it('shows the running year as "year to date" and leaves it out of the extremes', () => {
+        const withPartial = [...mockData, { ...mockData[1], avgTemp: 15, year: 2024, isPartial: true }]
+
+        render(<WidgetWarmingStripes data={withPartial} />)
+
+        expect(screen.getByText('year-to-date')).toBeInTheDocument()
+        expect(screen.getByText('2023 (11.0°C)')).toBeInTheDocument()
+        expect(screen.queryByText('2024 (15.0°C)')).not.toBeInTheDocument()
+    })
 })

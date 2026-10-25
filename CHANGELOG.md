@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 3.9.0
+
+### Minor Changes
+
+- Redesigned interface: calmer light and dark themes, new fonts, flat cards, a wider layout, a sticky header, and restyled widgets, menu and charts
+- Every page starts with a title and a short description
+- New forecast page: today at a glance with a one-sentence summary, day details, a 48-hour chart of temperature, precipitation and wind, and the week ahead with temperature ranges
+- Daily forecast shows the day's low and high, total precipitation, strongest gusts and a condition that follows rain and snow
+- Heatmap page: period summary with extremes and totals, the typical day by hour and the distribution of values
+- The site installs as an app on phones and computers: new logo and icons, quick links to the forecast, sensors and archive, and the last loaded data stays available offline
+- Pages open faster and show the data right away instead of loading placeholders
+- Better visibility in search engines in both languages
+
+### Patch Changes
+
+- Better contrast and accessibility: readable colours in the light theme, zoom is allowed, keyboard and screen reader support, reduced motion is respected
+- Performance optimizations and bug fixes
+
 ## 3.8.0
 
 ### Minor Changes

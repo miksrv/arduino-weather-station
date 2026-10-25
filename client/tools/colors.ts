@@ -1,23 +1,3 @@
-// Soft colors
-// export const colors = {
-//     violet: ['#b43dc6', '#c35adb'], // Violet
-//     purple: ['#9b51e0', '#ae71e7'], // Purple
-//     magenta: ['#d62d7c', '#e05799'],// Magenta
-//     red: ['#ea5545', '#f16b63'],    // Red
-//     pink: ['#f46a9b', '#f783b0'],   // Pink
-//     orange: ['#ef9b1f', '#f1aa41'], // Orange
-//     yellow: ['#ede15c', '#f1e877'], // Yellow
-//     lime: ['#bdcf32', '#c6da4d'],   // Lime
-//     green: ['#7cc42c', '#97d74a'],  // Green
-//     teal: ['#27a69a', '#4db9b1'],   // Teal
-//     blue: ['#25afef', '#4fbaf2'],   // Blue
-//     cyan: ['#2f9cc3', '#59b3d5'],   // Cyan
-//     olive: ['#a4a43d', '#b7b74d'],  // Olive
-//     brown: ['#8b572a', '#a26b42'],  // Brown
-//     navy: ['#34495e', '#4b6a7f'],   // Navy
-//     grey: ['#7f8c8d', '#9ea4a5']    // Grey
-// }
-
 import { ApiModel } from '@/api'
 
 /**
@@ -42,26 +22,55 @@ export const hexToRgba = (hex: string, alpha: number): string => {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
+export type ColorName = keyof typeof colors
+
+/**
+ * Data hues of the charts: [line, area / lighter], tuned for the dark card (every hue ≥ 4.5:1 there).
+ * The `--data-*` tokens of `styles/theme.css` mirror them; see client/DESIGN.md, "Data colours".
+ */
 export const colors = {
-    brown: ['#795548', '#8d6e63'], // Brown
-    navy: ['#283593', '#3f51b5'], // Navy
-    violet: ['#8c1fc9', '#a23de3'], // Violet
-    purple: ['#7d2ae8', '#9146ff'], // Purple
-    magenta: ['#c2185b', '#db3c7f'], // Magenta
-    pink: ['#e91e63', '#ff5b85'], // Pink
-    red: ['#e53935', '#f25755'], // Red
-    orange: ['#ff5722', '#ff7043'], // Orange
-    yellow: ['#ffeb3b', '#fff176'], // Yellow
-    lime: ['#cddc39', '#d4e157'], // Lime
-    olive: ['#8c9e35', '#a3b236'], // Olive
-    green: ['#4caf50', '#66bb6a'], // Green
-    teal: ['#009688', '#26a69a'], // Teal
-    blue: ['#2c7eec', '#468de8'], // Blue
-    lightblue: ['#2196f3', '#42a5f5'], // Light Blue
-    cyan: ['#00bcd4', '#4dd0e1'], // Cyan
-    air: ['#8dbdef', '#9bc4f5'], // Air
-    grey: ['#607d8b', '#78909c'] // Grey
+    brown: ['#8d6e63', '#a1887f'], // Brown
+    navy: ['#6b7fe8', '#8b9bed'], // Navy: clouds
+    violet: ['#a35ee0', '#b77ee8'], // Violet: UV
+    purple: ['#9d6ee0', '#b28ce8'], // Purple: pressure
+    magenta: ['#d6457f', '#e06b99'], // Magenta
+    pink: ['#ec5f8a', '#f283a5'], // Pink
+    red: ['#ef5359', '#f47a7f'], // Red: temperature
+    orange: ['#f7802f', '#f99a5a'], // Orange: feels like
+    yellow: ['#e9b51f', '#efc64f'], // Yellow: solar energy
+    lime: ['#a8c43a', '#bbd25f'], // Lime: solar radiation
+    olive: ['#9aa83e', '#adb961'], // Olive
+    green: ['#3db67c', '#64c595'], // Green: wind
+    teal: ['#20a596', '#4bb8ab'], // Teal: gusts
+    blue: ['#3b8ced', '#62a3f0'], // Blue: precipitation
+    lightblue: ['#55a3ea', '#78b6ee'], // Light blue: dew point
+    cyan: ['#1fb3cc', '#4cc3d7'], // Cyan: humidity
+    air: ['#8dbdef', '#a7cdf3'], // Air: visibility
+    grey: ['#7d8896', '#98a1ad'] // Grey
 }
+
+/**
+ * The light card needs deeper tones of the hues that are too pale on white: each line here is at least
+ * 3:1 against #fff (WCAG 1.4.11 for graphics). Same hue, lower lightness; the rest of `colors` already passes.
+ */
+export const lightColors: Partial<Record<ColorName, string[]>> = {
+    orange: ['#ec6509', '#f7802f'],
+    yellow: ['#b28811', '#e9b51f'],
+    lime: ['#83992d', '#a8c43a'],
+    olive: ['#899537', '#9aa83e'],
+    green: ['#36a16e', '#3db67c'],
+    teal: ['#1f9f90', '#20a596'],
+    lightblue: ['#3793e6', '#55a3ea'],
+    cyan: ['#1b9cb1', '#1fb3cc'],
+    air: ['#4392e5', '#8dbdef']
+}
+
+/**
+ * A data hue for the given theme (`resolvedTheme` of next-themes): the light override when there is one,
+ * the shared hue otherwise.
+ */
+export const getColor = (name: ColorName, theme?: string): string[] =>
+    (theme === 'light' ? lightColors[name] : undefined) ?? colors[name]
 
 export const getSensorColorType = (sensor?: keyof ApiModel.Sensors): keyof typeof colors => {
     switch (sensor) {
@@ -101,11 +110,8 @@ export const getSensorColorType = (sensor?: keyof ApiModel.Sensors): keyof typeo
     }
 }
 
-export const getSensorColor = (sensor?: keyof ApiModel.Sensors): string[] => {
-    const sensorColor = getSensorColorType(sensor)
-
-    return colors[sensorColor]
-}
+export const getSensorColor = (sensor?: keyof ApiModel.Sensors, theme?: string): string[] =>
+    getColor(getSensorColorType(sensor), theme)
 
 /** Shared trend chart color for the summary stat widgets (e.g. widget-sensor-stat) — always blue per design, regardless of sensor kind. */
 export const statChartColor: string[] = colors.blue

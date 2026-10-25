@@ -7,12 +7,15 @@ import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslation
 import { generateNextSeo } from 'next-seo/pages'
 
 import { API, setLocale } from '@/api'
+import { prefetchQueries } from '@/api/ssr'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
-import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
+import PageHeader from '@/components/page-header'
 import { getWeatherI18nKey } from '@/tools/conditions'
-import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
+import { EVENTS_QUERY, POLLING_INTERVAL_CURRENT } from '@/tools/constants'
+import { getRecentDateRange } from '@/tools/date'
 import { round } from '@/tools/helpers'
+import { getPageSeo } from '@/tools/seo'
 import { LocaleType } from '@/tools/types'
 import {
     convertHpaToMmHg,
@@ -38,24 +41,16 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n, t } = useTranslation()
 
     const { data: current, isLoading: currentLoading } = API.useGetCurrentQuery(undefined, {
-        pollingInterval: POLING_INTERVAL_CURRENT
+        pollingInterval: POLLING_INTERVAL_CURRENT
     })
 
-    const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
-        {
-            start_date: formatDate(yesterdayDate, 'YYYY-MM-DD'),
-            end_date: formatDate(currentDate.toDate(), 'YYYY-MM-DD')
-        },
-        { pollingInterval: POLING_INTERVAL_CURRENT }
-    )
+    const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(getRecentDateRange(1), {
+        pollingInterval: POLLING_INTERVAL_CURRENT
+    })
 
-    const { data: weeklyHistory, isLoading: weeklyHistoryLoading } = API.useGetHistoryQuery(
-        {
-            start_date: formatDate(currentDate.subtract(6, 'days').toDate(), 'YYYY-MM-DD'),
-            end_date: formatDate(currentDate.toDate(), 'YYYY-MM-DD')
-        },
-        { pollingInterval: POLING_INTERVAL_CURRENT }
-    )
+    const { data: weeklyHistory, isLoading: weeklyHistoryLoading } = API.useGetHistoryQuery(getRecentDateRange(6), {
+        pollingInterval: POLLING_INTERVAL_CURRENT
+    })
 
     // const history12HoursData = useMemo(() => filterRecentData(history, 12), [history])
     const history24HoursData = useMemo(() => filterRecentData(history, 24), [history])
@@ -122,30 +117,22 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     return (
         <AppLayout>
             <Head>
-                {generateNextSeo({
-                    title: t('weather-sensors'),
-                    description: t('sensors-page-description'),
-                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/sensors`,
-                    openGraph: {
+                {generateNextSeo(
+                    getPageSeo({
+                        path: '/sensors',
+                        locale: i18n.language,
+                        title: t('sensors-page-title'),
                         description: t('sensors-page-description'),
-                        images: [
-                            {
-                                height: 1480,
-                                url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/sensors.jpg`,
-                                width: 2026
-                            }
-                        ],
-                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                         siteName: t('weather-in-orenburg'),
-                        title: t('weather-sensors'),
-                        type: 'website',
-                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/sensors`
-                    },
-                    twitter: {
-                        cardType: 'summary_large_image'
-                    }
-                })}
+                        image: 'sensors'
+                    })
+                )}
             </Head>
+
+            <PageHeader
+                title={t('sensors-page-title')}
+                description={t('sensors-page-description')}
+            />
 
             <div className={'widgets-list'}>
                 <WidgetSensorStat
@@ -259,6 +246,11 @@ export const getServerSideProps = wrapper.getServerSideProps(
             const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
+
+            await prefetchQueries(store, [
+                API.endpoints.getCurrent.initiate(),
+                API.endpoints.getEvents.initiate(EVENTS_QUERY)
+            ])
 
             return { props: { ...translations } }
         }

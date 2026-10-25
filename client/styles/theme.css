@@ -1,22 +1,137 @@
 /*
  * Project overrides on top of `simple-react-ui-kit/theme.css` (imported first in `pages/_app.tsx`).
  * Only values that differ from the kit defaults, plus project-only tokens, belong here.
+ * The rules behind these values are in `client/DESIGN.md`.
  */
 
-/* One flat radius for every element instead of the kit's tiered scale (2 / 4 / 6 / 8 / 12px).
-   `--radius-full` (pills, progress bars) is left as is. */
+/* ------------------------------------------------------------------ */
+/* Primitives: type scale and layout                                    */
+/* ------------------------------------------------------------------ */
 :root {
-    --radius: 4px;
-    --radius-xs: var(--radius);
-    --radius-sm: var(--radius);
-    --radius-md: var(--radius);
-    --radius-lg: var(--radius);
-    --radius-xl: var(--radius);
+    /* Fonts: Geist for text and numbers, Geist Mono for small labels (loaded with next/font in `_app.tsx`,
+       which sets --font-sans / --font-mono-face; the system stacks stand in until then) */
+    --font-family:
+        var(--font-sans, -apple-system), BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', system-ui, sans-serif;
+    --font-family-mono: var(--font-mono-face, ui-monospace), SFMono-Regular, Menlo, Consolas, monospace;
+
+    /* Type scale on top of the kit's 12 / 14 / 16px */
+    --font-size-micro: 11px;
+    --font-size-secondary: 13px;
+    --font-size-title-card: 14px;
+    --font-size-title-page: 24px;
+    --font-size-value: 32px;
+    --font-size-display: 56px;
+
+    /* Spacing above the kit's 4…24px */
+    --space-8: 32px;
+    --space-10: 40px;
+
+    /* Layout */
+    --gap: var(--space-3);
+    --width-max: 1200px;
+    --width-menu: 280px;
+    --app-bar-height: 56px;
 }
 
-/* Project-only tokens */
-:root {
-    --letter-spacing: 0.00938em;
-    --width-max: 1000px;
-    --width-menu: 280px;
+@media only screen and (max-width: 768px) {
+    :root {
+        --font-size-title-page: 20px;
+        --font-size-value: 28px;
+        --font-size-display: 48px;
+        --gap: var(--space-2);
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Light theme: cool neutral surfaces                                   */
+/* ------------------------------------------------------------------ */
+:root,
+[data-theme='light'] {
+    --body-background: #f7f8fa;
+    --surface-1: #ffffff;
+    --surface-2: #f3f4f6;
+    --surface-3: #e8eaee;
+
+    --border: #e6e8ec;
+    --border-strong: #cfd4db;
+
+    --text-color-secondary: #66707d;
+    --text-color-secondary-hover: #4f5864;
+
+    /* Brand: one step deeper than the kit's #2688eb, so links, the active menu item and white text on
+       primary buttons reach 4.5:1 on white */
+    --color-main: #1f6fd1;
+    --color-main-hover: #1a5fb4;
+    --color-main-active: #16519a;
+
+    /* Weather data hues: one colour per measured quantity, each line ≥ 3:1 on the card (WCAG 1.4.11).
+       The light theme takes deeper tones of the pale hues. Mirrored in `tools/colors.ts` for the charts. */
+    --data-temperature: #ef5359;
+    --data-feels-like: #ec6509;
+    --data-humidity: #1b9cb1;
+    --data-pressure: #9d6ee0;
+    --data-wind: #36a16e;
+    --data-precipitation: #3b8ced;
+    --data-clouds: #6b7fe8;
+    --data-sun: #b28811;
+    --data-dew-point: #3793e6;
+
+    /* Value accents as text (AA on surface-1): a maximum is warm, a minimum is cool */
+    --color-max: #c8323a;
+    --color-min: #1f6fd1;
+}
+
+/* ------------------------------------------------------------------ */
+/* Dark theme: cool slate surfaces                                      */
+/* ------------------------------------------------------------------ */
+:root[data-theme='dark'],
+[data-theme='dark'] {
+    --body-background: #0b0d10;
+    --surface-1: #14181d;
+    --surface-2: #1b2026;
+    --surface-3: #242a31;
+
+    --border: #252b33;
+    --border-strong: #333a43;
+
+    --text-color-primary: #e6e9ee;
+    --text-color-secondary: #8e97a4;
+    --text-color-secondary-hover: #aab2bd;
+
+    --color-max: #ff7b80;
+    --color-min: #6aaaf5;
+
+    --data-temperature: #ef5359;
+    --data-feels-like: #f7802f;
+    --data-humidity: #1fb3cc;
+    --data-pressure: #9d6ee0;
+    --data-wind: #3db67c;
+    --data-precipitation: #3b8ced;
+    --data-clouds: #6b7fe8;
+    --data-sun: #e9b51f;
+    --data-dew-point: #55a3ea;
+}
+
+/* ------------------------------------------------------------------ */
+/* Component aliases (declared on every themed element, see kit layer 3) */
+/* ------------------------------------------------------------------ */
+:root,
+[data-theme] {
+    --card-background: var(--surface-1);
+    /* Flat cards: a hairline ring, no drop shadow — the surface step and the ring are enough */
+    --card-shadow: 0 0 0 1px var(--border);
+    --card-shadow-hover: 0 0 0 1px var(--border-strong);
+    /* Restrained corners: cards 8px, plates inside them 6px, chips and segments 4px */
+    --card-radius: var(--radius-lg);
+    --card-padding: var(--space-4);
+
+    /* Kit containers and dialogs follow the cards */
+    --container-background-color: var(--card-background);
+    --container-shadow: var(--card-shadow);
+    --container-radius: var(--card-radius);
+    --dialog-radius: var(--card-radius);
+    --popout-radius: var(--radius-md);
+    --message-radius: var(--card-radius);
+
+    --app-bar-background: color-mix(in srgb, var(--body-background) 82%, transparent);
 }

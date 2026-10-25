@@ -1,4 +1,4 @@
-import { encodeQueryData, isValidJSON, round } from './helpers'
+import { encodeQueryData, isValidJSON, round, unitSuffix } from './helpers'
 
 describe('helpers', () => {
     describe('encodeQueryData', () => {
@@ -88,6 +88,23 @@ describe('helpers', () => {
 
         it('returns false for non-JSON string', () => {
             expect(isValidJSON('not a json')).toBe(false)
+        })
+    })
+
+    describe('unitSuffix', () => {
+        it('returns an empty string without a unit', () => {
+            expect(unitSuffix()).toBe('')
+            expect(unitSuffix('')).toBe('')
+        })
+
+        it('sticks symbol units to the number', () => {
+            expect(unitSuffix('°C')).toBe('°C')
+            expect(unitSuffix('%')).toBe('%')
+        })
+
+        it('separates word units with a space', () => {
+            expect(unitSuffix('мм рт. ст.')).toBe(' мм рт. ст.')
+            expect(unitSuffix('m/s')).toBe(' m/s')
         })
     })
 })

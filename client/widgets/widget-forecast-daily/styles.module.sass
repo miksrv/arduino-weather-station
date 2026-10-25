@@ -1,0 +1,148 @@
+@use '../../styles/variables'
+@use '../../styles/typography' as type
+
+.title
+    margin: 0 0 var(--space-2)
+    +type.titleCard
+
+.list
+    display: flex
+    flex-direction: column
+
+// One day: the columns line up across rows, so a column reads top to bottom too
+.row
+    display: grid
+    grid-template-columns: 132px minmax(0, 1fr) 96px minmax(200px, 1.4fr) 128px
+    align-items: center
+    gap: var(--space-4)
+    min-height: 60px
+    padding: var(--space-2) var(--space-3)
+    position: relative
+    margin: 0 calc(-1 * var(--space-3))
+    border-radius: var(--radius-md)
+
+    // A straight hairline between rows (a border or shadow would bend with the rounded corners)
+    & + &::before
+        content: ''
+        position: absolute
+        top: 0
+        left: 0
+        right: 0
+        height: 1px
+        background: var(--border)
+
+    &[aria-current='date']
+        background: var(--color-main-background)
+
+        &::before, & + .row::before
+            display: none
+
+    // The card's own padding is the space under the last row
+    &:last-child:not([aria-current='date'])
+        min-height: calc(60px - var(--space-2))
+        padding-bottom: 0
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        grid-template-columns: 104px 36px minmax(0, 1fr)
+        gap: var(--space-2)
+
+.day
+    display: flex
+    flex-direction: column
+
+.dayName
+    +type.body
+    font-weight: var(--font-weight-medium)
+
+    &:first-letter
+        text-transform: uppercase
+
+.dayDate
+    +type.caption
+
+.sky
+    display: flex
+    align-items: center
+    gap: var(--space-2)
+    min-width: 0
+
+.condition
+    +type.secondary
+    color: var(--text-color-primary)
+    overflow: hidden
+    text-overflow: ellipsis
+    white-space: nowrap
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        display: none
+
+.precip
+    display: flex
+    flex-direction: column
+    +type.numbers
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        display: none
+
+.precipValue
+    font-size: var(--font-size)
+    font-weight: var(--font-weight-medium)
+    color: var(--data-precipitation)
+
+.precipHours, .muted
+    +type.caption
+
+// Low · the day's range on the week's scale · high
+.temperature
+    display: grid
+    grid-template-columns: 40px minmax(0, 1fr) 40px
+    align-items: center
+    gap: var(--space-2)
+
+.low, .high
+    +type.valueSmall
+
+.low
+    text-align: right
+    color: var(--text-color-secondary)
+
+.rangeTrack
+    position: relative
+    height: 6px
+    border-radius: var(--radius-full)
+    background: var(--surface-3)
+
+.rangeFill
+    position: absolute
+    top: 0
+    bottom: 0
+    border-radius: var(--radius-full)
+
+.wind
+    display: grid
+    grid-template-columns: 12px auto
+    column-gap: 6px
+    align-items: center
+    +type.numbers
+
+    svg
+        width: 12px
+        height: 12px
+        fill: var(--text-color-secondary)
+
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        display: none
+
+.windSpeed
+    font-size: var(--font-size)
+    font-weight: var(--font-weight-medium)
+
+.windGust
+    grid-column: 2
+    +type.caption
+
+.empty
+    margin: 0
+    padding: var(--space-4) 0
+    text-align: center
+    +type.secondary

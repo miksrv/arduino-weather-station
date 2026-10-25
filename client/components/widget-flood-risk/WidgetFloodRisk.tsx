@@ -21,7 +21,7 @@ interface WidgetFloodRiskProps {
 
 const WidgetFloodRisk: React.FC<WidgetFloodRiskProps> = ({ loading, score, level, components, season }) => {
     const { t } = useTranslation()
-    const { theme } = useTheme()
+    const { resolvedTheme: theme } = useTheme()
 
     if (loading) {
         return (

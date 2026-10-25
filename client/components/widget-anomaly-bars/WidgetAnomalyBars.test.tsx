@@ -10,13 +10,18 @@ jest.mock('next-i18next/pages', () => ({
     useTranslation: () => ({ t: (key: string) => key })
 }))
 
-const mockUseTheme = jest.fn(() => ({ theme: 'light' }))
+const mockUseTheme = jest.fn(() => ({ theme: 'light', resolvedTheme: 'light' }))
 
 jest.mock('next-themes', () => ({
     useTheme: () => mockUseTheme()
 }))
 
-jest.mock('echarts-for-react', () => () => <div data-testid='echarts' />)
+let mockCapturedOption: { series: Array<{ data: unknown[] }> } | undefined
+
+jest.mock('@/components/echart', () => (props: { option: { series: Array<{ data: unknown[] }> } }) => {
+    mockCapturedOption = props.option
+    return <div data-testid='echarts' />
+})
 
 const mockData = [
     {
@@ -55,7 +60,7 @@ const mockData = [
 
 describe('WidgetAnomalyBars', () => {
     beforeEach(() => {
-        mockUseTheme.mockReturnValue({ theme: 'light' })
+        mockUseTheme.mockReturnValue({ theme: 'light', resolvedTheme: 'light' })
     })
 
     it('shows Skeleton when loading', () => {
@@ -85,7 +90,7 @@ describe('WidgetAnomalyBars', () => {
     })
 
     it('renders in dark theme without crashing', () => {
-        mockUseTheme.mockReturnValue({ theme: 'dark' })
+        mockUseTheme.mockReturnValue({ theme: 'dark', resolvedTheme: 'dark' })
         render(
             <WidgetAnomalyBars
                 data={mockData}
@@ -104,5 +109,16 @@ describe('WidgetAnomalyBars', () => {
             />
         )
         expect(screen.getByTestId('echarts')).toBeInTheDocument()
+    })
+
+    it('fits the trend to full years only and fades the running year', () => {
+        const withPartial = [...mockData, { ...mockData[1], tempAnomaly: 3, year: 2024, isPartial: true }]
+
+        render(<WidgetAnomalyBars data={withPartial} />)
+
+        const [bars, trend] = mockCapturedOption?.series ?? []
+        expect(trend.data).toStrictEqual([-1, 2, null])
+        expect((bars.data[2] as { itemStyle: { opacity: number } }).itemStyle.opacity).toBe(0.4)
+        expect((bars.data[0] as { itemStyle: { opacity: number } }).itemStyle.opacity).toBe(1)
     })
 })

@@ -4,24 +4,18 @@ import { ApiModel } from '@/api'
 import SparklineChart from '@/components/sparkline-chart'
 import { statChartColor } from '@/tools/colors'
 import { formatDate } from '@/tools/date'
-import { findMaxValue, findMinValue, invertData } from '@/tools/weather'
+import { findMaxValue, findMinValue } from '@/tools/weather'
 
 interface StatTrendChartProps {
     data?: ApiModel.Weather[]
     source?: keyof ApiModel.Sensors
 }
 
-/** Sources that can dip negative, where the trend line is inverted so it never looks "flipped". */
-const INVERTIBLE_SOURCES: Array<keyof ApiModel.Sensors> = ['temperature', 'feelsLike', 'dewPoint']
-
 const roundYAxisLabel = (value: number): string => `${Math.round(value)}`
 
-const StatTrendChart: React.FC<StatTrendChartProps> = ({ data, source }) => {
-    const weatherData = useMemo(
-        () => (source && INVERTIBLE_SOURCES.includes(source) ? invertData(data, source) : data),
-        [data, source]
-    )
-
+// Real values on the axis: the area is filled down to the bottom of the axis (SparklineChart),
+// so negative temperatures don't need shifting
+const StatTrendChart: React.FC<StatTrendChartProps> = ({ data: weatherData, source }) => {
     const categories = useMemo(() => weatherData?.map((item) => formatDate(item?.date, 'HH:mm')) ?? [], [weatherData])
 
     const values = useMemo(

@@ -1,9 +1,18 @@
 .toggleContainer
+    display: block
+    position: relative
     cursor: pointer
     width: 70px
     height: 32px
-    border-radius: 17px
+    padding: 0
+    border: none
+    background: transparent
+    border-radius: var(--radius-full)
     overflow: hidden
+
+    &:focus-visible
+        outline: var(--focus-outline)
+        outline-offset: 2px
 
 .dayNightSwitch
     display: flex

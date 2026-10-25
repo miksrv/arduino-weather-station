@@ -70,6 +70,8 @@ interface WeatherIconProps {
     date?: string
     width?: number
     height?: number
+    /** The weather in words, when the icon is the only thing that tells it; decorative (empty) by default */
+    alt?: string
 }
 
 const FALLBACK_ICON = '/icons/unknown.svg'
@@ -94,16 +96,20 @@ export const getWeatherIconUrl = (weatherId?: number, date?: string): string => 
     // Here are weather conditions that are not divided into day and night
     const withoutDayIcon = ['hurricane', 'thunderstorm']
 
-    const time = !date || withoutDayIcon.includes(name) ? '' : isDayTime(date) ? '-day' : '-night'
+    // Full overcast (804) hides the sun and the moon: the plain cloud icon, never the day / night variant
+    const isFullOvercast = weatherId === 804
+
+    const time = !date || isFullOvercast || withoutDayIcon.includes(name) ? '' : isDayTime(date) ? '-day' : '-night'
 
     return `/icons/${name}${time}.svg`
 }
 
-const WeatherIcon: React.FC<WeatherIconProps> = ({ weatherId, date, width, height }) => {
+const WeatherIcon: React.FC<WeatherIconProps> = ({ weatherId, date, width, height, alt = '' }) => {
     return (
         <Image
             src={getWeatherIconUrl(weatherId, date)}
-            alt={''}
+            alt={alt}
+            className={'weather-icon'}
             width={width ?? 24}
             height={height ?? 24}
         />

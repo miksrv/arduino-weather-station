@@ -34,7 +34,10 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
                     {loading ? (
                         <Skeleton style={{ width: 140, height: 21 }} />
                     ) : (
-                        <div>{t(getWeatherI18nKey(weather?.weatherId || ''))}</div>
+                        // Without a condition (stale station data) the line stays empty rather than "unknown"
+                        <div className={styles.condition}>
+                            {weather?.weatherId ? t(getWeatherI18nKey(weather.weatherId)) : '\u00a0'}
+                        </div>
                     )}
 
                     <div className={styles.value}>
@@ -43,19 +46,21 @@ const WidgetSummary: React.FC<WidgetSummaryProps> = ({ loading, weather }) => {
                                 style={{ width: 75, height: 65, marginTop: 10, marginBottom: 10, marginRight: 15 }}
                             />
                         ) : (
-                            <WeatherIcon
-                                weatherId={weather?.weatherId}
-                                date={weather?.date}
-                                height={80}
-                                width={80}
-                            />
+                            weather?.weatherId && (
+                                <WeatherIcon
+                                    weatherId={weather.weatherId}
+                                    date={weather?.date}
+                                    height={80}
+                                    width={80}
+                                />
+                            )
                         )}
 
                         {loading ? (
                             <Skeleton style={{ width: 130, height: 65, marginTop: 10, marginBottom: 10 }} />
                         ) : (
                             <div className={styles.temperature}>
-                                {round(weather?.temperature || 0, 1)}
+                                {weather?.temperature != null ? round(weather.temperature, 1) : t('no-data')}
                                 <span className={styles.sign}>°C</span>
                             </div>
                         )}

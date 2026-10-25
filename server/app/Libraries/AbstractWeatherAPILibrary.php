@@ -58,7 +58,14 @@ abstract class AbstractWeatherAPILibrary implements WeatherProviderInterface
                 'timeout' => $timeout,
             ]);
 
-            return json_decode($response->getBody(), true);
+            $decoded = json_decode((string) $response->getBody(), true);
+
+            if (!is_array($decoded)) {
+                log_message('error', $this->getSourceName() . ' API returned a non-JSON or empty response');
+                return false;
+            }
+
+            return $decoded;
         } catch (Exception $e) {
             log_message('error', $this->getSourceName() . ' API request error: {e}', ['e' => $e->getMessage()]);
             return false;

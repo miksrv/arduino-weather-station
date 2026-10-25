@@ -9,7 +9,7 @@ import '@testing-library/jest-dom'
 
 let mockCapturedOption: EChartsOption | null = null
 
-jest.mock('echarts-for-react', () => (props: { option: EChartsOption; style: unknown }) => {
+jest.mock('@/components/echart', () => (props: { option: EChartsOption; style: unknown }) => {
     mockCapturedOption = props.option
     return (
         <div
@@ -26,7 +26,7 @@ jest.mock('echarts', () => ({
 }))
 
 jest.mock('next-themes', () => ({
-    useTheme: jest.fn(() => ({ theme: 'light' }))
+    useTheme: jest.fn(() => ({ theme: 'light', resolvedTheme: 'light' }))
 }))
 
 jest.mock('@/tools/colors', () => ({
@@ -41,8 +41,7 @@ jest.mock('@/tools/date', () => ({
 
 jest.mock('@/tools/weather', () => ({
     findMinValue: jest.fn(() => 10),
-    findMaxValue: jest.fn(() => 30),
-    invertData: jest.fn((data) => data)
+    findMaxValue: jest.fn(() => 30)
 }))
 
 const mockData = [
@@ -71,7 +70,7 @@ describe('StatTrendChart', () => {
         expect(getByTestId('echarts')).toBeInTheDocument()
     })
 
-    it('renders with temperature-like source that triggers invertData', () => {
+    it('renders with a temperature-like source', () => {
         const { getByTestId } = render(
             <StatTrendChart
                 data={mockData}
@@ -91,7 +90,7 @@ describe('StatTrendChart', () => {
         expect(getByTestId('echarts')).toBeInTheDocument()
     })
 
-    it('resolves axis colors to a literal value instead of an unresolvable CSS variable', () => {
+    it('takes the axis colors from the chart tokens, not from CSS variables', () => {
         const { getByTestId } = render(
             <StatTrendChart
                 data={mockData}
@@ -100,9 +99,9 @@ describe('StatTrendChart', () => {
         )
         const option = JSON.parse(getByTestId('echarts').getAttribute('data-option') ?? '{}')
 
-        expect(option.xAxis.axisLine.lineStyle.color).toBe('rgba(#76787a,0.3)')
-        expect(option.xAxis.axisLabel.color).toBe('#76787a')
-        expect(option.yAxis.axisLabel.color).toBe('#76787a')
+        expect(option.xAxis.axisLine.lineStyle.color).toBe('#e6e8ec')
+        expect(option.xAxis.axisLabel.color).toBe('#66707d')
+        expect(option.yAxis.axisLabel.color).toBe('#66707d')
         expect(JSON.stringify(option)).not.toContain('var(--text-color-secondary)')
     })
 

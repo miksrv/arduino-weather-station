@@ -82,6 +82,21 @@ final class SensorsControllerTest extends CIUnitTestCase
     }
 
     /**
+     * The firmware posts pressure in mmHg with one decimal; it must be converted to hPa and not fail validation.
+     */
+    public function testMmHgPressureFromFirmwarePassesValidation(): void
+    {
+        $testToken = 'test_sensor_token_12345';
+        putenv("app.arduino.token={$testToken}");
+
+        $result = $this->post("sensors?token={$testToken}", ['t' => '20.5', 'p' => '752.3', 'h' => '60']);
+
+        putenv('app.arduino.token=');
+
+        $this->assertNotSame(400, $result->response()->getStatusCode(), 'mmHg pressure must be accepted');
+    }
+
+    /**
      * A second POST within the rate window from the same IP must return 429.
      */
     public function testThrottleReturns429OnSubsequentRequest(): void
@@ -113,5 +128,45 @@ final class SensorsControllerTest extends CIUnitTestCase
             // Also acceptable — route does not exist for GET
             $this->assertTrue(true);
         }
+    }
+
+    /**
+     * An empty server-side token must never authenticate, even with an empty request token.
+     */
+    public function testEmptyServerTokenFailsClosed(): void
+    {
+        putenv('app.arduino.token=');
+
+        $result = $this->post('sensors?token=', ['t' => '20.5']);
+
+        $this->assertSame(401, $result->response()->getStatusCode());
+    }
+
+    /**
+     * A body with only unknown fields stores nothing and is rejected.
+     */
+    public function testPayloadWithoutKnownMeasurementsReturns400(): void
+    {
+        putenv('app.arduino.token=test_sensor_token_12345');
+
+        $result = $this->post('sensors?token=test_sensor_token_12345', ['foo' => 'bar']);
+
+        putenv('app.arduino.token=');
+
+        $this->assertSame(400, $result->response()->getStatusCode());
+    }
+
+    /**
+     * Out-of-range values fail model validation and must not be reported as created.
+     */
+    public function testOutOfRangeValueReturns400(): void
+    {
+        putenv('app.arduino.token=test_sensor_token_12345');
+
+        $result = $this->post('sensors?token=test_sensor_token_12345', ['t' => '999']);
+
+        putenv('app.arduino.token=');
+
+        $this->assertSame(400, $result->response()->getStatusCode());
     }
 }

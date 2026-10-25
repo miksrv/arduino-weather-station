@@ -7,6 +7,7 @@ import { ApiModel } from '@/api'
 import StatBlock from '@/components/stat-block'
 import WidgetCard, { WidgetCardProps } from '@/components/widget-card'
 import { formatDate } from '@/tools/date'
+import { unitSuffix } from '@/tools/helpers'
 import { getMinMaxValues, getRecentDelta, isMinMaxEmpty } from '@/tools/weather'
 
 import StatTrendChart from './StatTrendChart'
@@ -63,14 +64,14 @@ const WidgetSensorStat: React.FC<WidgetSensorStatProps> = ({
                     </div>
 
                     {!loading && delta && (
-                        <div className={cn(styles.delta, styles[`delta--${delta.direction}`])}>
+                        <div className={cn(styles.delta, isHeatSource && styles[`delta--${delta.direction}`])}>
                             {delta.direction !== 'flat' && (
                                 <Icon name={delta.direction === 'down' ? 'ArrowDown' : 'ArrowUp'} />
                             )}
                             <span>
                                 {delta.value > 0 ? '+' : ''}
                                 {formatValue(delta.value)}
-                                {unit}
+                                {unitSuffix(unit)}
                             </span>{' '}
                             {t('change-last-hour')}
                         </div>
@@ -91,7 +92,7 @@ const WidgetSensorStat: React.FC<WidgetSensorStatProps> = ({
                             ) : (
                                 <>
                                     {formatValue(minMax.max.value)}
-                                    {unit}
+                                    {unitSuffix(unit)}
                                 </>
                             )
                         }
@@ -109,7 +110,7 @@ const WidgetSensorStat: React.FC<WidgetSensorStatProps> = ({
                             ) : (
                                 <>
                                     {formatValue(minMax.min.value)}
-                                    {unit}
+                                    {unitSuffix(unit)}
                                 </>
                             )
                         }
