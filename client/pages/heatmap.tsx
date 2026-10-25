@@ -12,9 +12,15 @@ import { API, ApiType, setLocale } from '@/api'
 import { wrapper } from '@/api/store'
 import { Maybe } from '@/api/types'
 import AppLayout from '@/components/app-layout'
+import PageHeader from '@/components/page-header'
 import WidgetHeatmap from '@/components/widget-heatmap'
-import { currentDate, formatDate, halfYearDate } from '@/tools/date'
+import { formatDate, getCurrentDate, getHalfYearDate } from '@/tools/date'
+import { getDiurnalProfile, getHeatmapStats, getHistogram, toHeatmapPoints } from '@/tools/heatmap'
+import { getPageSeo } from '@/tools/seo'
 import { LocaleType } from '@/tools/types'
+import WidgetDiurnalProfile from '@/widgets/widget-diurnal-profile'
+import WidgetHeatmapSummary from '@/widgets/widget-heatmap-summary'
+import WidgetValueDistribution from '@/widgets/widget-value-distribution'
 
 type HeatmapPageProps = object
 
@@ -29,11 +35,18 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
         [period, sensor]
     )
 
+    // `currentData`, not `data`: while another quantity loads, the previous one must not be read as the new one
     const {
-        data: history,
+        currentData: history,
         isLoading: historyLoading,
         isFetching: historyFetching
     } = API.useGetHeatmapQuery(historyDateParam, { skip: !historyDateParam })
+
+    const points = useMemo(() => toHeatmapPoints(history, sensor), [history, sensor])
+    const stats = useMemo(() => getHeatmapStats(points), [points])
+    const profile = useMemo(() => getDiurnalProfile(points, sensor), [points, sensor])
+    const bins = useMemo(() => getHistogram(points, sensor), [points, sensor])
+    const isLoadingData = !history
 
     const currentDatePreset = useMemo((): string => {
         if (!period?.[0] || !period?.[1]) {
@@ -46,36 +59,28 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
     }, [period, i18n.language])
 
     useEffect(() => {
-        setPeriod([formatDate(halfYearDate, 'YYYY-MM-DD'), formatDate(currentDate.toDate(), 'YYYY-MM-DD')])
+        setPeriod([formatDate(getHalfYearDate(), 'YYYY-MM-DD'), formatDate(getCurrentDate().toDate(), 'YYYY-MM-DD')])
     }, [])
 
     return (
         <AppLayout>
             <Head>
-                {generateNextSeo({
-                    title: t('heatmap'),
-                    description: t('heatmap-page-description'),
-                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/heatmap`,
-                    openGraph: {
+                {generateNextSeo(
+                    getPageSeo({
+                        path: '/heatmap',
+                        locale: i18n.language,
+                        title: t('heatmap-page-title'),
                         description: t('heatmap-page-description'),
-                        images: [
-                            {
-                                height: 1130,
-                                url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/heatmap.jpg`,
-                                width: 2026
-                            }
-                        ],
-                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                         siteName: t('weather-in-orenburg'),
-                        title: t('heatmap'),
-                        type: 'website',
-                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/heatmap`
-                    },
-                    twitter: {
-                        cardType: 'summary_large_image'
-                    }
-                })}
+                        image: 'heatmap'
+                    })
+                )}
             </Head>
+
+            <PageHeader
+                title={t('heatmap-page-title')}
+                description={t('heatmap-page-description')}
+            />
 
             <div className={'toolbar'}>
                 <DatePicker
@@ -84,7 +89,7 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
                     locale={i18n.language === 'en' ? 'en' : 'ru'}
                     buttonMode={'secondary'}
                     minDate={'2021-01-01'}
-                    maxDate={formatDate(currentDate.toDate(), 'YYYY-MM-DD')}
+                    maxDate={formatDate(getCurrentDate().toDate(), 'YYYY-MM-DD')}
                     placeholder={t('select-date-range')}
                     onPeriodSelect={(startDate, endDate) => setPeriod([startDate, endDate])}
                 />
@@ -111,12 +116,30 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
             </div>
 
             <div className={'widgets-list'}>
-                <WidgetHeatmap
-                    data={history}
+                <WidgetHeatmapSummary
                     type={sensor}
-                    loading={historyLoading || historyFetching}
+                    stats={stats}
+                    loading={isLoadingData}
+                />
+
+                <WidgetHeatmap
+                    points={points}
+                    type={sensor}
+                    loading={isLoadingData}
                     title={`${t('heatmap')}: ${t(sensor)}`}
-                    subTitle={t('heat-map-data-shown-period', { period: currentDatePreset.toLowerCase() })}
+                    subtitle={t('heat-map-data-shown-period', { period: currentDatePreset.toLowerCase() })}
+                />
+
+                <WidgetDiurnalProfile
+                    type={sensor}
+                    profile={profile}
+                    loading={isLoadingData}
+                />
+
+                <WidgetValueDistribution
+                    type={sensor}
+                    bins={bins}
+                    loading={isLoadingData}
                 />
             </div>
         </AppLayout>
