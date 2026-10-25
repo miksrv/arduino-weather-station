@@ -1,12 +1,5 @@
 User-agent: *
 Allow: /
 
-# Prohibit indexing of authorization pages
-# Disallow: /auth
-# Disallow: /en/auth
-
-# Specify the main mirror of the site
-Host: https://meteo.miksoft.pro
-
 # Sitemap for accelerated indexing
 Sitemap: https://meteo.miksoft.pro/sitemap.xml
