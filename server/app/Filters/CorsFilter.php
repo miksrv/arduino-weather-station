@@ -23,7 +23,8 @@ class CorsFilter implements FilterInterface {
     public function before(RequestInterface $request, $arguments = null): void {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: X-API-KEY, Origin,X-Requested-With, Content-Type, Accept, Access-Control-Requested-Method, Authorization, Locale, Session");
-        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PATCH, PUT, DELETE");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+        header("Access-Control-Max-Age: 86400");
 
         $method = $_SERVER['REQUEST_METHOD'] ?? null;
 
