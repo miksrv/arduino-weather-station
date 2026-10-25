@@ -1,4 +1,4 @@
-import { colors, getSensorColor, getSensorColorType, resolveCssVar } from './colors'
+import { colors, getColor, getSensorColor, getSensorColorType, lightColors, resolveCssVar } from './colors'
 
 describe('colors', () => {
     describe('getSensorColorType', () => {
@@ -38,6 +38,37 @@ describe('colors', () => {
             expect(getSensorColor('windGust')).toStrictEqual(colors.teal)
             expect(getSensorColor('windDeg')).toStrictEqual(colors.olive)
             expect(() => getSensorColor(undefined)).toThrow('Not implemented yet: undefined case')
+        })
+    })
+
+    describe('getColor', () => {
+        it('uses the deeper light tone on the light theme', () => {
+            expect(getColor('cyan', 'light')).toStrictEqual(lightColors.cyan)
+            expect(getSensorColor('humidity', 'light')).toStrictEqual(lightColors.cyan)
+        })
+
+        it('falls back to the shared hue without a light override or on the dark theme', () => {
+            expect(getColor('red', 'light')).toStrictEqual(colors.red)
+            expect(getColor('cyan', 'dark')).toStrictEqual(colors.cyan)
+            expect(getColor('cyan')).toStrictEqual(colors.cyan)
+        })
+
+        // WCAG 1.4.11: chart lines and marks need 3:1 against the card they sit on
+        const luminance = (hex: string) => {
+            const [r, g, b] = [1, 3, 5].map((i) => {
+                const c = parseInt(hex.slice(i, i + 2), 16) / 255
+                return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+            })
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b
+        }
+        const contrast = (a: string, b: string) => {
+            const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+            return (hi + 0.05) / (lo + 0.05)
+        }
+
+        it.each(Object.keys(colors) as Array<keyof typeof colors>)('%s reads on both cards', (name) => {
+            expect(contrast(getColor(name, 'light')[0], '#ffffff')).toBeGreaterThanOrEqual(3)
+            expect(contrast(getColor(name, 'dark')[0], '#14181d')).toBeGreaterThanOrEqual(3)
         })
     })
 
