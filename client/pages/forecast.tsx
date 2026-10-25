@@ -69,7 +69,7 @@ const ForecastPage: NextPage<ForecastPageProps> = () => {
                 <WidgetForecastToday
                     current={current}
                     today={today}
-                    loading={currentLoading && dailyLoading}
+                    loading={currentLoading || dailyLoading}
                 />
 
                 <WidgetForecastDetails

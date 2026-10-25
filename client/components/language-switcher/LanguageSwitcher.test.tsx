@@ -94,7 +94,11 @@ describe('LanguageSwitcher', () => {
         useLocalStorage.mockReturnValue([null, mockSetter])
         render(<LanguageSwitcher />)
         fireEvent.click(screen.getByText('Rus'))
-        expect(setCookie).toHaveBeenCalledWith('NEXT_LOCALE', 'ru')
+        expect(setCookie).toHaveBeenCalledWith(
+            'NEXT_LOCALE',
+            'ru',
+            expect.objectContaining({ maxAge: 31536000, path: '/' })
+        )
         expect(mockSetter).toHaveBeenCalledWith('ru')
     })
 })

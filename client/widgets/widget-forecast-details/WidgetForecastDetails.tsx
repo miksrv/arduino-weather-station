@@ -58,8 +58,10 @@ const WidgetForecastDetails: React.FC<WidgetForecastDetailsProps> = ({ today, lo
             title={t('forecast-day-details')}
             size={'x2'}
         >
-            {loading || !today ? (
+            {loading ? (
                 <Skeleton style={{ width: '100%', height: 168 }} />
+            ) : !today ? (
+                <p className={styles.empty}>{t('forecast-unavailable')}</p>
             ) : (
                 <dl className={styles.grid}>
                     {details.map((detail) => (

@@ -14,6 +14,9 @@ import { LocaleType, StorageKeys } from '@/tools/types'
 
 import styles from './styles.module.sass'
 
+// The choice outlives the browser session: Next.js redirects `/` to the NEXT_LOCALE language on the next visit
+const LOCALE_COOKIE_MAX_AGE = 365 * 24 * 60 * 60
+
 const LANGUAGES: Array<{ locale: Locale; label: string }> = [
     { locale: 'en', label: 'Eng' },
     { locale: 'ru', label: 'Rus' }
@@ -36,7 +39,7 @@ const LanguageSwitcher: React.FC = () => {
             return
         }
 
-        void setCookie('NEXT_LOCALE', locale)
+        void setCookie('NEXT_LOCALE', locale, { maxAge: LOCALE_COOKIE_MAX_AGE, path: '/', sameSite: 'lax' })
         setStorageLocale(locale)
         dispatch(setLocale(locale))
 

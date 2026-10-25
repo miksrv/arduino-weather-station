@@ -46,8 +46,10 @@ const WidgetForecastHourly: React.FC<WidgetForecastHourlyProps> = ({ hours, load
                 </div>
             </div>
 
-            {loading || !hours?.length ? (
+            {loading ? (
                 <Skeleton style={{ width: '100%', height: CHART_HEIGHT + 150 }} />
+            ) : !hours?.length ? (
+                <p className={styles.empty}>{t('forecast-unavailable')}</p>
             ) : (
                 <>
                     <HourlyChart

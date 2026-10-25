@@ -313,6 +313,7 @@
     "forecast-day-details": "Детали дня",
     "forecast-hourly-title": "Почасовой прогноз на 48 часов",
     "forecast-daily-title": "Прогноз по дням",
+    "forecast-unavailable": "Прогноз сейчас недоступен",
     "forecast-mode-temperature": "Температура",
     "forecast-mode-precipitation": "Осадки",
     "forecast-mode-wind": "Ветер",

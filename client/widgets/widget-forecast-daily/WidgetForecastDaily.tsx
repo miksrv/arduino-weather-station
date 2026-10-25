@@ -44,8 +44,10 @@ const WidgetForecastDaily: React.FC<WidgetForecastDailyProps> = ({ days, loading
         <WidgetCard size={'x4'}>
             <h2 className={styles.title}>{t('forecast-daily-title')}</h2>
 
-            {loading || !days?.length || !bounds ? (
+            {loading ? (
                 <Skeleton style={{ width: '100%', height: 420 }} />
+            ) : !days?.length || !bounds ? (
+                <p className={styles.empty}>{t('forecast-unavailable')}</p>
             ) : (
                 <ul className={styles.list}>
                     {days.map((day) => {

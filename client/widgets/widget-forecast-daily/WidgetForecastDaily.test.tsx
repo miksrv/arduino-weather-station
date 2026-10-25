@@ -31,12 +31,15 @@ const day = (offset: number, extra: Record<string, number> = {}) => {
 }
 
 describe('WidgetForecastDaily', () => {
-    it('shows a skeleton while loading or without days', () => {
-        const { rerender } = render(<WidgetForecastDaily loading={true} />)
+    it('shows a skeleton while loading', () => {
+        render(<WidgetForecastDaily loading={true} />)
         expect(screen.getByTestId('skeleton')).toBeInTheDocument()
+    })
 
-        rerender(<WidgetForecastDaily days={[]} />)
-        expect(screen.getByTestId('skeleton')).toBeInTheDocument()
+    it('says the forecast is unavailable when there are no days', () => {
+        render(<WidgetForecastDaily days={[]} />)
+        expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument()
+        expect(screen.getByText('forecast-unavailable')).toBeInTheDocument()
     })
 
     it('renders a row per day with today marked', () => {

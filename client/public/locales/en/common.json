@@ -312,6 +312,7 @@
     "forecast-day-details": "Day details",
     "forecast-hourly-title": "Hourly forecast for 48 hours",
     "forecast-daily-title": "Daily forecast",
+    "forecast-unavailable": "The forecast is not available right now",
     "forecast-mode-temperature": "Temperature",
     "forecast-mode-precipitation": "Precipitation",
     "forecast-mode-wind": "Wind",

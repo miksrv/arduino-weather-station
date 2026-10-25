@@ -66,12 +66,15 @@ describe('WidgetForecastHourly', () => {
         mockOption = undefined
     })
 
-    it('shows a skeleton while loading or without hours', () => {
-        const { rerender } = render(<WidgetForecastHourly loading={true} />)
+    it('shows a skeleton while loading', () => {
+        render(<WidgetForecastHourly loading={true} />)
         expect(screen.getByTestId('skeleton')).toBeInTheDocument()
+    })
 
-        rerender(<WidgetForecastHourly hours={[]} />)
-        expect(screen.getByTestId('skeleton')).toBeInTheDocument()
+    it('says the forecast is unavailable when there are no hours', () => {
+        render(<WidgetForecastHourly hours={[]} />)
+        expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument()
+        expect(screen.getByText('forecast-unavailable')).toBeInTheDocument()
     })
 
     it('draws the temperature with feels-like first', () => {

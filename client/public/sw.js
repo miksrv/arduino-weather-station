@@ -9,6 +9,8 @@ const VERSION = 'v1'
 const STATIC_CACHE = `static-${VERSION}`
 const RUNTIME_CACHE = `runtime-${VERSION}`
 const OFFLINE_URL = '/offline.html'
+// Installed up front and never trimmed: the offline fallback must survive any number of cached build assets
+const PRECACHE = [OFFLINE_URL, '/favicon.svg']
 
 const STATIC_LIMIT = 300
 const RUNTIME_LIMIT = 60
@@ -20,7 +22,7 @@ self.addEventListener('install', (event) => {
     event.waitUntil(
         caches
             .open(STATIC_CACHE)
-            .then((cache) => cache.addAll([OFFLINE_URL, '/favicon.svg']))
+            .then((cache) => cache.addAll(PRECACHE))
             .then(() => self.skipWaiting())
     )
 })
@@ -119,14 +121,14 @@ const networkFirst = async (request, key = request) => {
     return Promise.race([network.catch(() => cached), timeout])
 }
 
-// Oldest entries go first (Cache keeps insertion order)
+// Oldest entries go first (Cache keeps insertion order); the precached files are never evicted
 const put = async (cacheName, request, response, limit) => {
     const cache = await caches.open(cacheName)
 
     await cache.delete(request)
     await cache.put(request, response)
 
-    const keys = await cache.keys()
+    const keys = (await cache.keys()).filter((key) => !PRECACHE.includes(new URL(key.url).pathname))
 
     await Promise.all(keys.slice(0, Math.max(0, keys.length - limit)).map((key) => cache.delete(key)))
 }

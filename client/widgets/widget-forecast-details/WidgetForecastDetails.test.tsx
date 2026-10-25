@@ -13,9 +13,15 @@ jest.mock('next-i18next/pages', () => ({
 }))
 
 describe('WidgetForecastDetails', () => {
-    it('shows a skeleton while loading or without today', () => {
-        render(<WidgetForecastDetails />)
+    it('shows a skeleton while loading', () => {
+        render(<WidgetForecastDetails loading={true} />)
         expect(screen.getByTestId('skeleton')).toBeInTheDocument()
+    })
+
+    it('says the forecast is unavailable without today', () => {
+        render(<WidgetForecastDetails />)
+        expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument()
+        expect(screen.getByText('forecast-unavailable')).toBeInTheDocument()
     })
 
     it('shows the six figures of the day', () => {
