@@ -114,4 +114,44 @@ final class SensorsControllerTest extends CIUnitTestCase
             $this->assertTrue(true);
         }
     }
+
+    /**
+     * An empty server-side token must never authenticate, even with an empty request token.
+     */
+    public function testEmptyServerTokenFailsClosed(): void
+    {
+        putenv('app.arduino.token=');
+
+        $result = $this->post('sensors?token=', ['t' => '20.5']);
+
+        $this->assertSame(401, $result->response()->getStatusCode());
+    }
+
+    /**
+     * A body with only unknown fields stores nothing and is rejected.
+     */
+    public function testPayloadWithoutKnownMeasurementsReturns400(): void
+    {
+        putenv('app.arduino.token=test_sensor_token_12345');
+
+        $result = $this->post('sensors?token=test_sensor_token_12345', ['foo' => 'bar']);
+
+        putenv('app.arduino.token=');
+
+        $this->assertSame(400, $result->response()->getStatusCode());
+    }
+
+    /**
+     * Out-of-range values fail model validation and must not be reported as created.
+     */
+    public function testOutOfRangeValueReturns400(): void
+    {
+        putenv('app.arduino.token=test_sensor_token_12345');
+
+        $result = $this->post('sensors?token=test_sensor_token_12345', ['t' => '999']);
+
+        putenv('app.arduino.token=');
+
+        $this->assertSame(400, $result->response()->getStatusCode());
+    }
 }

@@ -51,9 +51,11 @@ class Sensors extends ResourceController
      */
     public function setWeather(): ResponseInterface
     {
-        $token = $this->request->getGet('token', FILTER_SANITIZE_SPECIAL_CHARS);
+        $token       = $this->request->getGet('token');
+        $secretToken = getenv('app.arduino.token');
 
-        if (!$token || $token !== getenv('app.arduino.token')) {
+        // Constant-time comparison; fail closed when the server token is unset/empty.
+        if (!is_string($token) || !is_string($secretToken) || $secretToken === '' || !hash_equals($secretToken, $token)) {
             log_message('warning', 'Sensors::setWeather - invalid or missing token');
             return $this->failUnauthorized('Invalid token');
         }
@@ -77,8 +79,22 @@ class Sensors extends ResourceController
                 'source'      => RawWeatherDataModel::SOURCE_CUSTOMSTATION,
             ];
 
+            $measurements = array_filter(
+                array_diff_key($parsedData, ['date' => true, 'source' => true]),
+                static fn ($value): bool => $value !== null
+            );
+
+            if (empty($measurements)) {
+                log_message('warning', 'Sensors::setWeather - payload contains no known measurements');
+                return $this->failValidationErrors('No measurements provided');
+            }
+
             $this->weatherDataEntity->fill($parsedData);
-            $this->weatherDataModel->save($this->weatherDataEntity);
+
+            if (!$this->weatherDataModel->save($this->weatherDataEntity)) {
+                log_message('warning', 'Sensors::setWeather - validation failed: ' . json_encode($this->weatherDataModel->errors()));
+                return $this->failValidationErrors($this->weatherDataModel->errors());
+            }
 
             return $this->respondCreated();
         } catch (Exception $e) {
