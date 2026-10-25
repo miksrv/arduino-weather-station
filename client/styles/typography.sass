@@ -1,0 +1,92 @@
+// Text roles of the design system (see client/DESIGN.md, "Type scale").
+// A component takes a role, never a bare font-size: `@use '../../styles/typography' as type`, then `+type.titleCard`.
+
+=numbers
+    font-variant-numeric: tabular-nums lining-nums
+
+// Page h1 (PageHeader)
+=titlePage
+    font-size: var(--font-size-title-page)
+    font-weight: var(--font-weight-semibold)
+    line-height: 1.2
+    letter-spacing: -0.025em
+    text-wrap: balance
+    color: var(--text-color-primary)
+
+// Section h2 between groups of cards
+=titleSection
+    font-size: var(--font-size-large)
+    font-weight: var(--font-weight-semibold)
+    line-height: 1.3
+    color: var(--text-color-primary)
+
+// Card title: WidgetCard header and every widget heading — quiet, the data is the loud part
+=titleCard
+    font-size: var(--font-size-title-card)
+    font-weight: var(--font-weight-medium)
+    line-height: 1.3
+    letter-spacing: -0.005em
+    color: var(--text-color-primary)
+
+// The one big number of the home summary card
+=valueDisplay
+    +numbers
+    font-size: var(--font-size-display)
+    font-weight: 200
+    line-height: 1
+    letter-spacing: -0.04em
+    color: var(--text-color-primary)
+
+// The main reading of a card: "21.4 °C"
+=value
+    +numbers
+    font-size: var(--font-size-value)
+    font-weight: 300
+    line-height: 1.1
+    letter-spacing: -0.03em
+    color: var(--text-color-primary)
+
+// The unit after a value
+=unit
+    font-size: var(--font-size-large)
+    font-weight: var(--font-weight-normal)
+    letter-spacing: 0
+    color: var(--text-color-secondary)
+
+// A secondary reading: tile values, min / max, stats columns
+=valueSmall
+    +numbers
+    font-size: var(--font-size-large)
+    font-weight: var(--font-weight-medium)
+    line-height: 1.3
+    color: var(--text-color-primary)
+
+// Plain UI text
+=body
+    font-size: var(--font-size)
+    font-weight: var(--font-weight-normal)
+    line-height: var(--line-height)
+
+// Labels of values, descriptions
+=secondary
+    font-size: var(--font-size-secondary)
+    font-weight: var(--font-weight-normal)
+    line-height: 1.45
+    color: var(--text-color-secondary)
+
+// Captions, timestamps, legends
+=caption
+    font-size: var(--font-size-small)
+    font-weight: var(--font-weight-normal)
+    line-height: 1.4
+    color: var(--text-color-secondary)
+
+// Small uppercase labels over groups: forecast weekdays, high / low, status pills — set in the mono face
+=overline
+    font-family: var(--font-family-mono)
+    font-size: var(--font-size-micro)
+    font-weight: var(--font-weight-medium)
+    line-height: 1.4
+    letter-spacing: 0.08em
+    text-transform: uppercase
+    color: var(--text-color-secondary)
