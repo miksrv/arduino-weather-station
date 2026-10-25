@@ -159,7 +159,7 @@ final class HeatmapControllerTest extends CIUnitTestCase
         $mockModel = $this->createMock(RawWeatherDataModel::class);
         $mockModel->expects($this->once())
             ->method('getWeatherHistoryGrouped')
-            ->with('2023-01-01 00:00:00', '2023-01-31 23:59:59', '1 HOUR', 'temperature')
+            ->with('2022-12-31 19:00:00', '2023-01-31 18:59:59', '1 HOUR', 'temperature')
             ->willReturn([['date' => '2023-01-01 10:00:00', 'temperature' => 5.0]]);
 
         $this->controller(Heatmap::class);

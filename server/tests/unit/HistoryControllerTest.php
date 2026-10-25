@@ -227,7 +227,7 @@ final class HistoryControllerTest extends CIUnitTestCase
     public function testGetHistoryWeatherReturnsCachedDataWithout200(): void
     {
         $fakeRow  = ['date' => '2023-01-01 10:00:00', 'temperature' => 7.0];
-        $cacheKey = 'history_' . hash('sha256', '2023-01-01_2023-01-10');
+        $cacheKey = 'history_' . hash('sha256', '2023-01-01_2023-01-10_daily');
 
         // Pre-seed the cache with the raw row array.
         cache()->save($cacheKey, [$fakeRow], 0);
@@ -251,7 +251,7 @@ final class HistoryControllerTest extends CIUnitTestCase
         $this->assertCount(1, $body);
 
         // Clean up.
-        cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-10'));
+        cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-10_daily'));
     }
     public function testCacheTtlConstants(): void
     {
@@ -357,7 +357,7 @@ final class HistoryControllerTest extends CIUnitTestCase
      */
     public function testCacheKeyIsNormalisedAcrossDateSpellings(): void
     {
-        cache()->save('history_' . hash('sha256', '2023-01-01_2023-01-10'), [['date' => '2023-01-01 10:00:00', 'temperature' => 7.0]], 0);
+        cache()->save('history_' . hash('sha256', '2023-01-01_2023-01-10_daily'), [['date' => '2023-01-01 10:00:00', 'temperature' => 7.0]], 0);
 
         $mockRaw = $this->createMock(RawWeatherDataModel::class);
         $mockRaw->expects($this->never())->method('getWeatherHistoryGrouped');
@@ -372,7 +372,31 @@ final class HistoryControllerTest extends CIUnitTestCase
         $result = $this->execute('getHistoryWeather');
         $this->assertSame(200, $result->response()->getStatusCode());
 
-        cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-10'));
+        cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-10_daily'));
+    }
+
+    /**
+     * Ranges on the same days but on different sides of the 7-day boundary must not share a cache entry.
+     */
+    public function testCacheKeySeparatesHourlyAndDailyGrouping(): void
+    {
+        cache()->save('history_' . hash('sha256', '2023-01-01_2023-01-08_hourly'), [['date' => '2023-01-01 10:00:00', 'temperature' => 7.0]], 0);
+
+        $mockDaily = $this->createMock(DailyAveragesModel::class);
+        $mockDaily->expects($this->once())->method('getWeatherHistoryGrouped')->willReturn([]);
+
+        $this->controller(History::class);
+        $this->setPrivateProperty($this->controller, 'dailyAveragesModel', $mockDaily);
+
+        $this->request->setMethod('GET');
+        parse_str('start_date=2023-01-01&end_date=2023-01-08 12:00', $get);
+        $this->request->setGlobal('get', $get);
+
+        $result = $this->execute('getHistoryWeather');
+        $this->assertSame(200, $result->response()->getStatusCode());
+
+        cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-08_hourly'));
+        cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-08_daily'));
     }
 
     /**

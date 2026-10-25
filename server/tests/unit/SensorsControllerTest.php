@@ -82,6 +82,21 @@ final class SensorsControllerTest extends CIUnitTestCase
     }
 
     /**
+     * The firmware posts pressure in mmHg with one decimal; it must be converted to hPa and not fail validation.
+     */
+    public function testMmHgPressureFromFirmwarePassesValidation(): void
+    {
+        $testToken = 'test_sensor_token_12345';
+        putenv("app.arduino.token={$testToken}");
+
+        $result = $this->post("sensors?token={$testToken}", ['t' => '20.5', 'p' => '752.3', 'h' => '60']);
+
+        putenv('app.arduino.token=');
+
+        $this->assertNotSame(400, $result->response()->getStatusCode(), 'mmHg pressure must be accepted');
+    }
+
+    /**
      * A second POST within the rate window from the same IP must return 429.
      */
     public function testThrottleReturns429OnSubsequentRequest(): void

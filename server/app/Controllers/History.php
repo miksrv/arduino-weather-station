@@ -83,8 +83,10 @@ class History extends ResourceController
             return $this->respond($result);
         }
 
-        // Key on normalised dates so arbitrary strtotime() spellings cannot create unbounded cache entries
-        $cacheKey = 'history_' . hash('sha256', date('Y-m-d', $startTimestamp) . '_' . date('Y-m-d', $endTimestamp));
+        // Key on normalised dates so arbitrary strtotime() spellings cannot create unbounded cache entries;
+        // the grouping is part of the key because _getData() picks hourly or daily rows from the exact time span
+        $grouping = $rangeHours <= 7 * 24 ? 'hourly' : 'daily';
+        $cacheKey = 'history_' . hash('sha256', date('Y-m-d', $startTimestamp) . '_' . date('Y-m-d', $endTimestamp) . '_' . $grouping);
         $rawData  = cache()->get($cacheKey);
 
         if (!is_array($rawData)) {

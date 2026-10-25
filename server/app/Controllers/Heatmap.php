@@ -6,6 +6,9 @@ use App\Entities\WeatherData;
 use App\Models\RawWeatherDataModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
+use Config\App;
+use DateTimeImmutable;
+use DateTimeZone;
 use Exception;
 
 /**
@@ -102,9 +105,16 @@ class Heatmap extends ResourceController
             return $this->failValidationErrors('Date range cannot exceed 366 days.');
         }
 
-        // Normalise dates to full-day boundaries
-        $startDate  = date('Y-m-d 00:00:00', $startTimestamp);
-        $endDate    = date('Y-m-d 23:59:59', $endTimestamp);
+        // Normalise dates to full days of the station's time zone (the client lays the grid out in local days),
+        // then convert the boundaries to UTC, which the readings are stored in
+        $stationZone = new DateTimeZone(config(App::class)->stationTimezone);
+        $utcZone     = new DateTimeZone('UTC');
+        $startDate   = (new DateTimeImmutable(date('Y-m-d 00:00:00', $startTimestamp), $stationZone))
+            ->setTimezone($utcZone)
+            ->format('Y-m-d H:i:s');
+        $endDate     = (new DateTimeImmutable(date('Y-m-d 23:59:59', $endTimestamp), $stationZone))
+            ->setTimezone($utcZone)
+            ->format('Y-m-d H:i:s');
         $rangeHours = ($endTimestamp - $startTimestamp) / 3600;
 
         // Disable caching for short ranges (≤48 h) due to timezone differences

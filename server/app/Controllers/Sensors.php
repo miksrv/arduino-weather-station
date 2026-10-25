@@ -40,7 +40,7 @@ class Sensors extends ResourceController
      *
      * Expected POST body fields:
      *   - t  (float): temperature
-     *   - p  (float): pressure
+     *   - p  (float): pressure, mmHg from the station firmware (hPa is accepted too)
      *   - h  (float): humidity
      *   - ws (float): wind speed
      *   - wd (int):   wind direction in degrees
@@ -71,7 +71,7 @@ class Sensors extends ResourceController
             $parsedData = [
                 'date'        => new DateTime('now'),
                 'temperature' => $data['t']  ?? null,
-                'pressure'    => $data['p']  ?? null,
+                'pressure'    => $this->_normalizePressure($data['p'] ?? null),
                 'humidity'    => $data['h']  ?? null,
                 'wind_speed'  => $data['ws'] ?? null,
                 'wind_deg'    => $data['wd'] ?? null,
@@ -101,5 +101,25 @@ class Sensors extends ResourceController
             log_message('error', 'Sensors::setWeather - failed to save weather data: ' . $e->getMessage());
             return $this->failServerError('Internal server error.');
         }
+    }
+
+    /**
+     * Converts the posted pressure to whole hPa as stored in the database.
+     *
+     * The station firmware sends mmHg with one decimal (e.g. 752.3); values below 800 can only be mmHg,
+     * since surface pressure in hPa never drops that low. Non-numeric input is passed through for validation to reject.
+     *
+     * @param mixed $pressure Raw POST value
+     * @return mixed Pressure in hPa rounded to an integer, or the original value if it is not numeric
+     */
+    private function _normalizePressure(mixed $pressure): mixed
+    {
+        if (!is_numeric($pressure)) {
+            return $pressure;
+        }
+
+        $value = (float) $pressure;
+
+        return (int) round($value < 800 ? $value * 1.33322 : $value);
     }
 }
