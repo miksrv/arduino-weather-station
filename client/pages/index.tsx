@@ -7,16 +7,21 @@ import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslation
 import { generateNextSeo } from 'next-seo/pages'
 
 import { API, ApiModel, setLocale } from '@/api'
+import { urlAPI } from '@/api/api'
+import { prefetchQueries } from '@/api/ssr'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
+import JsonLd from '@/components/json-ld'
 import WidgetAnomalyCard from '@/components/widget-anomaly-card'
 import WidgetChart from '@/components/widget-chart'
 import WidgetForecastCards from '@/components/widget-forecast-cards'
 import WidgetSensor, { WidgetSensorProps } from '@/components/widget-sensor'
 import WeatherChart from '@/components/widget-sensor/WeatherChart'
 import WidgetSummary from '@/components/widget-summary'
-import { POLING_INTERVAL_CURRENT, POLING_INTERVAL_FORECAST } from '@/pages/_app'
-import { currentDate, formatDate, yesterdayDate } from '@/tools/date'
+import { POLLING_INTERVAL_CURRENT, POLLING_INTERVAL_FORECAST } from '@/tools/constants'
+import { getRecentDateRange } from '@/tools/date'
+import { getPageSeo } from '@/tools/seo'
+import { getDatasetSchema, getWebSiteSchema } from '@/tools/structured-data'
 import { LocaleType } from '@/tools/types'
 import { filterRecentData, getMinMaxValues } from '@/tools/weather'
 
@@ -30,30 +35,26 @@ const IndexPage: NextPage<IndexPageProps> = () => {
     const { i18n, t } = useTranslation()
 
     // const { data: forecastHourly, isLoading: hourlyLoading } = API.useGetForecastQuery('hourly', {
-    //     pollingInterval: POLING_INTERVAL_FORECAST
+    //     pollingInterval: POLLING_INTERVAL_FORECAST
     // })
 
     const { data: forecastDaily, isLoading: dailyLoading } = API.useGetForecastQuery('daily', {
-        pollingInterval: POLING_INTERVAL_FORECAST
+        pollingInterval: POLLING_INTERVAL_FORECAST
     })
 
     const { data: anomalyData, isLoading: anomalyLoading } = API.useGetAnomalyQuery(undefined, {
-        pollingInterval: POLING_INTERVAL_FORECAST
+        pollingInterval: POLLING_INTERVAL_FORECAST
     })
 
     const activeAnomalies = anomalyData?.anomalies.filter((a) => a.active) ?? []
 
     const { data: current, isLoading: currentLoading } = API.useGetCurrentQuery(undefined, {
-        pollingInterval: POLING_INTERVAL_CURRENT
+        pollingInterval: POLLING_INTERVAL_CURRENT
     })
 
-    const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(
-        {
-            start_date: formatDate(yesterdayDate, 'YYYY-MM-DD'),
-            end_date: formatDate(currentDate.toDate(), 'YYYY-MM-DD')
-        },
-        { pollingInterval: POLING_INTERVAL_CURRENT }
-    )
+    const { data: history, isLoading: historyLoading } = API.useGetHistoryQuery(getRecentDateRange(1), {
+        pollingInterval: POLLING_INTERVAL_CURRENT
+    })
 
     const history12HoursData = useMemo(() => filterRecentData(history, 12), [history])
     const history24HoursData = useMemo(() => filterRecentData(history, 24), [history])
@@ -76,33 +77,29 @@ const IndexPage: NextPage<IndexPageProps> = () => {
         [t]
     )
 
+    const structuredDataParams = {
+        locale: i18n.language,
+        siteName: t('weather-in-orenburg'),
+        description: t('main-page-description'),
+        apiUrl: urlAPI
+    }
+
     return (
         <AppLayout>
             <Head>
-                {generateNextSeo({
-                    title: t('weather-orenburg-now', { date: formatDate(current?.date ?? new Date()) }),
-                    description: t('main-page-description'),
-                    canonical: process.env.NEXT_PUBLIC_SITE_LINK,
-                    openGraph: {
-                        description: t('site-description'),
-                        images: [
-                            {
-                                height: 1642,
-                                url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/main.jpg`,
-                                width: 2032
-                            }
-                        ],
-                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
+                {generateNextSeo(
+                    getPageSeo({
+                        path: '/',
+                        locale: i18n.language,
+                        title: t('main-page-title'),
+                        description: t('main-page-description'),
                         siteName: t('weather-in-orenburg'),
-                        title: t('weather-in-orenburg'),
-                        type: 'website',
-                        url: process.env.NEXT_PUBLIC_SITE_LINK
-                    },
-                    twitter: {
-                        cardType: 'summary_large_image'
-                    }
-                })}
+                        image: 'main'
+                    })
+                )}
             </Head>
+
+            <JsonLd data={[getWebSiteSchema(structuredDataParams), getDatasetSchema(structuredDataParams)]} />
 
             <div className={'widgets-list'}>
                 <WidgetSummary
@@ -178,6 +175,11 @@ export const getServerSideProps = wrapper.getServerSideProps(
             const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
+
+            await prefetchQueries(store, [
+                API.endpoints.getCurrent.initiate(),
+                API.endpoints.getForecast.initiate('daily')
+            ])
 
             return { props: { ...translations } }
         }

@@ -4,16 +4,17 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 
 import {
-    currentDate,
     formatDate,
     formatDateFromUTC,
+    getCurrentDate,
     getDate,
     getDateTimeFormat,
-    halfYearDate,
+    getHalfYearDate,
+    getRecentDateRange,
+    getYesterdayDate,
     isValidDateString,
     minutesAgo,
-    timeAgo,
-    yesterdayDate
+    timeAgo
 } from './date'
 
 dayjs.extend(utc)
@@ -24,16 +25,40 @@ describe('date utilities', () => {
     it('should return the current date in the specified timezone', () => {
         // Compare only the date portion to avoid timing issues
         const expectedDate = dayjs().tz('Asia/Yekaterinburg').format('YYYY-MM-DD')
-        const receivedDate = currentDate.format('YYYY-MM-DD')
+        const receivedDate = getCurrentDate().format('YYYY-MM-DD')
         expect(receivedDate).toBe(expectedDate)
     })
 
     it('should return the date for yesterday', () => {
-        expect(yesterdayDate).toStrictEqual(currentDate.subtract(1, 'day').toDate())
+        const expected = getCurrentDate().subtract(1, 'day')
+        expect(dayjs(getYesterdayDate()).diff(expected, 'second')).toBe(0)
     })
 
     it('should return the date for half a year ago', () => {
-        expect(halfYearDate).toStrictEqual(currentDate.subtract(6, 'month').toDate())
+        const expected = getCurrentDate().subtract(6, 'month')
+        expect(dayjs(getHalfYearDate()).diff(expected, 'second')).toBe(0)
+    })
+
+    it('reads the clock on every call instead of freezing it at import', () => {
+        jest.useFakeTimers()
+        jest.setSystemTime(new Date('2026-03-10T12:00:00Z'))
+        const first = getCurrentDate().format('YYYY-MM-DD')
+
+        jest.setSystemTime(new Date('2026-03-12T12:00:00Z'))
+        const second = getCurrentDate().format('YYYY-MM-DD')
+        jest.useRealTimers()
+
+        expect(first).toBe('2026-03-10')
+        expect(second).toBe('2026-03-12')
+    })
+
+    it('builds a day-granular range of the last days', () => {
+        jest.useFakeTimers()
+        jest.setSystemTime(new Date('2026-03-10T12:00:00Z'))
+        const range = getRecentDateRange(6)
+        jest.useRealTimers()
+
+        expect(range).toStrictEqual({ start_date: '2026-03-04', end_date: '2026-03-10' })
     })
 
     it('should parse a date string or Date object to Dayjs object in the specified timezone', () => {

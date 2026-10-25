@@ -4,6 +4,8 @@ export interface ClimateYearStat {
     minTemp: number
     maxTemp: number
     tempAnomaly: number
+    /** The running year: covers only part of the seasons, so it is not compared with full years */
+    isPartial?: boolean
     totalPrecip: number
     precipDays: number
     frostDays: number

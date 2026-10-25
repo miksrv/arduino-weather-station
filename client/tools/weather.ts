@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 
 import { ApiModel } from '@/api'
-import { currentDate, getDate } from '@/tools/date'
+import { getCurrentDate, getDate } from '@/tools/date'
 import { round } from '@/tools/helpers'
 
 /**
@@ -600,7 +600,7 @@ export const filterRecentData = (data?: ApiModel.Weather[], hours: number = 24):
  * @param data Weather data to filter.
  */
 export const filterToday = (data?: ApiModel.Weather[]): ApiModel.Weather[] =>
-    (data ?? []).filter((item) => item.date && getDate(item.date).isSame(currentDate, 'day'))
+    (data ?? []).filter((item) => item.date && getDate(item.date).isSame(getCurrentDate(), 'day'))
 
 /**
  * Sums precipitation readings over the given data — each reading is a per-interval amount

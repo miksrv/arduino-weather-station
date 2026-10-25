@@ -7,14 +7,17 @@ import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslation
 import { generateNextSeo } from 'next-seo/pages'
 
 import { API, ApiType, setLocale } from '@/api'
+import { prefetchQueries } from '@/api/ssr'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
+import PageHeader from '@/components/page-header'
 import WidgetAnomalyCalendar from '@/components/widget-anomaly-calendar'
 import WidgetAnomalyCard from '@/components/widget-anomaly-card'
 import WidgetAnomalyHistory from '@/components/widget-anomaly-history'
 import WidgetFloodRisk from '@/components/widget-flood-risk'
 import WidgetParameterZScore from '@/components/widget-parameter-z-score'
 import WidgetSnowpackChart from '@/components/widget-snowpack-chart'
+import { getPageSeo } from '@/tools/seo'
 import { LocaleType } from '@/tools/types'
 
 import styles from './anomaly.module.sass'
@@ -40,23 +43,22 @@ const AnomalyPage: NextPage<object> = () => {
     return (
         <AppLayout>
             <Head>
-                {generateNextSeo({
-                    title: t('meteorological-anomaly'),
-                    description: t('anomaly-page-description', { location: 'Orenburg' }),
-                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/anomaly`,
-                    openGraph: {
-                        description: t('anomaly-page-description', { location: 'Orenburg' }),
-                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
+                {generateNextSeo(
+                    getPageSeo({
+                        path: '/anomaly',
+                        locale: i18n.language,
+                        title: t('anomaly-page-title'),
+                        description: t('anomaly-page-description'),
                         siteName: t('weather-in-orenburg'),
-                        title: t('meteorological-anomaly'),
-                        type: 'website',
-                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/anomaly`
-                    },
-                    twitter: {
-                        cardType: 'summary_large_image'
-                    }
-                })}
+                        image: 'anomaly'
+                    })
+                )}
             </Head>
+
+            <PageHeader
+                title={t('anomaly-page-title')}
+                description={t('anomaly-page-description')}
+            />
 
             <div className={'widgets-list'}>
                 <div className={styles.floodRiskRow}>
@@ -141,6 +143,8 @@ export const getServerSideProps = wrapper.getServerSideProps(
             const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
+
+            await prefetchQueries(store, [API.endpoints.getAnomaly.initiate()])
 
             return { props: { ...translations } }
         }

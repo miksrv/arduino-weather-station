@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
 import { ApiModel } from '@/api'
-import { currentDate } from '@/tools/date'
+import { getCurrentDate } from '@/tools/date'
 
 import {
     convertHpaToMmHg,
@@ -797,8 +797,8 @@ describe('weather', () => {
 
         it('keeps only readings from the current local calendar day', () => {
             const data: ApiModel.Weather[] = [
-                { date: currentDate.startOf('day').add(1, 'hour').toISOString() },
-                { date: currentDate.subtract(1, 'day').toISOString() }
+                { date: getCurrentDate().startOf('day').add(1, 'hour').toISOString() },
+                { date: getCurrentDate().subtract(1, 'day').toISOString() }
             ]
             const result = filterToday(data)
 

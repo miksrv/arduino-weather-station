@@ -13,10 +13,12 @@ import { urlAPI } from '@/api/api'
 import { wrapper } from '@/api/store'
 import { Maybe } from '@/api/types'
 import AppLayout from '@/components/app-layout'
+import PageHeader from '@/components/page-header'
 import WidgetChart from '@/components/widget-chart'
-import { POLING_INTERVAL_CURRENT } from '@/pages/_app'
-import { currentDate, formatDate, getDateTimeFormat, isValidDateString, yesterdayDate } from '@/tools/date'
+import { POLLING_INTERVAL_CURRENT } from '@/tools/constants'
+import { formatDate, getCurrentDate, getDateTimeFormat, getYesterdayDate, isValidDateString } from '@/tools/date'
 import { encodeQueryData } from '@/tools/helpers'
+import { getPageSeo } from '@/tools/seo'
 import { LocaleType } from '@/tools/types'
 
 interface HistoryPageProps {
@@ -41,7 +43,9 @@ const HistoryPage: NextPage<HistoryPageProps> = ({ initialStartDate, initialEndD
         isLoading: historyLoading,
         isFetching: historyFetching
     } = API.useGetHistoryQuery(historyDateParam, {
-        pollingInterval: POLING_INTERVAL_CURRENT,
+        // A past range never changes: poll only while the range reaches today
+        pollingInterval:
+            historyDateParam?.end_date === getCurrentDate().format('YYYY-MM-DD') ? POLLING_INTERVAL_CURRENT : 0,
         skip: !historyDateParam
     })
 
@@ -52,7 +56,10 @@ const HistoryPage: NextPage<HistoryPageProps> = ({ initialStartDate, initialEndD
 
     useEffect(() => {
         if (!initialStartDate || !initialEndDate) {
-            setPeriod([formatDate(yesterdayDate, 'YYYY-MM-DD'), formatDate(currentDate.toDate(), 'YYYY-MM-DD')])
+            setPeriod([
+                formatDate(getYesterdayDate(), 'YYYY-MM-DD'),
+                formatDate(getCurrentDate().toDate(), 'YYYY-MM-DD')
+            ])
         }
     }, [])
 
@@ -71,32 +78,23 @@ const HistoryPage: NextPage<HistoryPageProps> = ({ initialStartDate, initialEndD
     return (
         <AppLayout>
             <Head>
-                {generateNextSeo({
-                    title: t('historical-weather-data'),
-                    description: t('history-page-description'),
-                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/history`,
-                    noindex: hasDateParams,
-                    nofollow: false,
-                    openGraph: {
+                {generateNextSeo(
+                    getPageSeo({
+                        path: '/history',
+                        locale: i18n.language,
+                        title: t('history-page-title'),
                         description: t('history-page-description'),
-                        images: [
-                            {
-                                height: 1292,
-                                url: `${process.env.NEXT_PUBLIC_SITE_LINK}/images/history.jpg`,
-                                width: 2028
-                            }
-                        ],
-                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
                         siteName: t('weather-in-orenburg'),
-                        title: t('historical-weather-data'),
-                        type: 'website',
-                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/history`
-                    },
-                    twitter: {
-                        cardType: 'summary_large_image'
-                    }
-                })}
+                        image: 'history',
+                        noindex: hasDateParams
+                    })
+                )}
             </Head>
+
+            <PageHeader
+                title={t('history-page-title')}
+                description={t('history-page-description')}
+            />
 
             <div className={'toolbar'}>
                 <DatePicker
@@ -105,7 +103,7 @@ const HistoryPage: NextPage<HistoryPageProps> = ({ initialStartDate, initialEndD
                     locale={i18n.language === 'en' ? 'en' : 'ru'}
                     buttonMode={'secondary'}
                     minDate={'2021-01-01'}
-                    maxDate={formatDate(currentDate.toDate(), 'YYYY-MM-DD')}
+                    maxDate={formatDate(getCurrentDate().toDate(), 'YYYY-MM-DD')}
                     placeholder={t('select-date-range')}
                     onPeriodSelect={handlePeriodSelect}
                 />
@@ -113,7 +111,7 @@ const HistoryPage: NextPage<HistoryPageProps> = ({ initialStartDate, initialEndD
                 <Button
                     mode={'secondary'}
                     icon={'Download'}
-                    link={`${urlAPI}history/export${encodeQueryData(historyDateParam)}`}
+                    link={`${urlAPI.replace(/\/+$/, '')}/history/export${encodeQueryData(historyDateParam)}`}
                 >
                     {t('download-csv')}
                 </Button>

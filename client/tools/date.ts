@@ -9,9 +9,24 @@ dayjs.extend(customParseFormat)
 
 export const TIME_ZONE = 'Asia/Yekaterinburg'
 
-export const currentDate = dayjs().utc(false).tz(TIME_ZONE)
-export const yesterdayDate = currentDate.subtract(1, 'day').toDate()
-export const halfYearDate = currentDate.subtract(6, 'month').toDate()
+// Functions, not constants: a module-level "now" would freeze at server start (SSR) or at page load
+// (a tab left open past midnight would keep asking for yesterday's range)
+export const getCurrentDate = (): Dayjs => dayjs().utc(false).tz(TIME_ZONE)
+export const getYesterdayDate = (): Date => getCurrentDate().subtract(1, 'day').toDate()
+export const getHalfYearDate = (): Date => getCurrentDate().subtract(6, 'month').toDate()
+
+/**
+ * The `start_date` / `end_date` of the last `days` days up to today, in the station's time zone.
+ * Day-granular, so a server render and the browser ask for the same range (and share the cache).
+ */
+export const getRecentDateRange = (days: number): { start_date: string; end_date: string } => {
+    const now = getCurrentDate()
+
+    return {
+        start_date: now.subtract(days, 'day').format('YYYY-MM-DD'),
+        end_date: now.format('YYYY-MM-DD')
+    }
+}
 
 export const getDate = (date: string | Date): Dayjs => dayjs.utc(date).tz(TIME_ZONE)
 

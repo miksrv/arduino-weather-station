@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { Button } from 'simple-react-ui-kit'
+import { cn } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import Head from 'next/head'
@@ -8,12 +8,16 @@ import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslation
 import { generateNextSeo } from 'next-seo/pages'
 
 import { API, setLocale } from '@/api'
+import { prefetchQueries } from '@/api/ssr'
 import { wrapper } from '@/api/store'
 import AppLayout from '@/components/app-layout'
+import PageHeader from '@/components/page-header'
 import WidgetPrecipCalendar from '@/components/widget-precip-calendar'
 import WidgetPrecipChart from '@/components/widget-precip-chart'
 import WidgetPrecipStatCard from '@/components/widget-precip-stat-card'
 import WidgetStreakCard from '@/components/widget-streak-card'
+import { getCurrentDate } from '@/tools/date'
+import { getPageSeo } from '@/tools/seo'
 import { LocaleType } from '@/tools/types'
 
 import styles from './precipitation.module.sass'
@@ -23,7 +27,7 @@ type PrecipitationPageProps = object
 const PrecipitationPage: NextPage<PrecipitationPageProps> = () => {
     const { i18n, t } = useTranslation()
 
-    const [year, setYear] = useState<number>(new Date().getFullYear())
+    const [year, setYear] = useState<number>(getCurrentDate().year())
 
     const { data, isFetching } = API.useGetPrecipitationQuery({ year })
 
@@ -41,34 +45,38 @@ const PrecipitationPage: NextPage<PrecipitationPageProps> = () => {
     return (
         <AppLayout>
             <Head>
-                {generateNextSeo({
-                    title: t('precipitation-calendar'),
-                    description: t('precipitation-page-description', { location: 'Orenburg' }),
-                    canonical: `${process.env.NEXT_PUBLIC_SITE_LINK}/precipitation`,
-                    openGraph: {
-                        description: t('precipitation-page-description', { location: 'Orenburg' }),
-                        locale: i18n.language === 'ru' ? 'ru_RU' : 'en_US',
+                {generateNextSeo(
+                    getPageSeo({
+                        path: '/precipitation',
+                        locale: i18n.language,
+                        title: t('precipitation-page-title'),
+                        description: t('precipitation-page-description'),
                         siteName: t('weather-in-orenburg'),
-                        title: t('precipitation-calendar'),
-                        type: 'website',
-                        url: `${process.env.NEXT_PUBLIC_SITE_LINK}/precipitation`
-                    },
-                    twitter: {
-                        cardType: 'summary_large_image'
-                    }
-                })}
+                        image: 'precipitation'
+                    })
+                )}
             </Head>
 
+            <PageHeader
+                title={t('precipitation-page-title')}
+                description={t('precipitation-page-description')}
+            />
+
             {availableYears.length > 0 && (
-                <div className={styles.yearSelector}>
+                <div
+                    className={styles.yearSelector}
+                    role={'group'}
+                >
                     {availableYears.map((y) => (
-                        <Button
+                        <button
                             key={y}
-                            mode={y === year ? 'primary' : 'secondary'}
+                            type={'button'}
+                            aria-pressed={y === year}
+                            className={cn(styles.year, y === year && styles.yearActive)}
                             onClick={() => setYear(y)}
                         >
                             {y}
-                        </Button>
+                        </button>
                     ))}
                 </div>
             )}
@@ -125,6 +133,8 @@ export const getServerSideProps = wrapper.getServerSideProps(
             const translations = await serverSideTranslations(locale, ['common'])
 
             store.dispatch(setLocale(locale))
+
+            await prefetchQueries(store, [API.endpoints.getPrecipitation.initiate({ year: getCurrentDate().year() })])
 
             return { props: { ...translations } }
         }
