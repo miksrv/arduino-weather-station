@@ -60,7 +60,7 @@ class CacheControlFilter implements FilterInterface
             ? (int) $arguments[0]
             : self::DEFAULT_MAX_AGE;
 
-        $etag = 'W/"' . md5($body) . '"';
+        $etag = 'W/"' . hash('sha256', $body) . '"';
 
         // In development always revalidate via the ETag, so freshly seeded data shows up without waiting out max-age
         $cacheControl = ENVIRONMENT === 'development' ? 'no-cache' : 'public, max-age=' . $maxAge;

@@ -227,7 +227,7 @@ final class HistoryControllerTest extends CIUnitTestCase
     public function testGetHistoryWeatherReturnsCachedDataWithout200(): void
     {
         $fakeRow  = ['date' => '2023-01-01 10:00:00', 'temperature' => 7.0];
-        $cacheKey = 'history_' . md5('2023-01-01_2023-01-10');
+        $cacheKey = 'history_' . hash('sha256', '2023-01-01_2023-01-10');
 
         // Pre-seed the cache with the raw row array.
         cache()->save($cacheKey, [$fakeRow], 0);
@@ -251,7 +251,7 @@ final class HistoryControllerTest extends CIUnitTestCase
         $this->assertCount(1, $body);
 
         // Clean up.
-        cache()->delete('history_' . md5('2023-01-01_2023-01-10'));
+        cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-10'));
     }
     public function testCacheTtlConstants(): void
     {
@@ -357,7 +357,7 @@ final class HistoryControllerTest extends CIUnitTestCase
      */
     public function testCacheKeyIsNormalisedAcrossDateSpellings(): void
     {
-        cache()->save('history_' . md5('2023-01-01_2023-01-10'), [['date' => '2023-01-01 10:00:00', 'temperature' => 7.0]], 0);
+        cache()->save('history_' . hash('sha256', '2023-01-01_2023-01-10'), [['date' => '2023-01-01 10:00:00', 'temperature' => 7.0]], 0);
 
         $mockRaw = $this->createMock(RawWeatherDataModel::class);
         $mockRaw->expects($this->never())->method('getWeatherHistoryGrouped');
@@ -372,7 +372,7 @@ final class HistoryControllerTest extends CIUnitTestCase
         $result = $this->execute('getHistoryWeather');
         $this->assertSame(200, $result->response()->getStatusCode());
 
-        cache()->delete('history_' . md5('2023-01-01_2023-01-10'));
+        cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-10'));
     }
 
     /**

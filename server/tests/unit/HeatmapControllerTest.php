@@ -183,7 +183,7 @@ final class HeatmapControllerTest extends CIUnitTestCase
     public function testGetHeatmapDataReturnsCachedDataWithout200(): void
     {
         $fakeRow  = ['date' => '2023-01-01 10:10:00', 'temperature' => 5.0];
-        $cacheKey = 'heatmap_hourly_' . md5('temperature_2023-01-01_2023-01-31');
+        $cacheKey = 'heatmap_hourly_' . hash('sha256', 'temperature_2023-01-01_2023-01-31');
 
         // Pre-seed the cache with the raw row array.
         cache()->save($cacheKey, [$fakeRow], 0);

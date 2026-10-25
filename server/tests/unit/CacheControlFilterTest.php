@@ -49,12 +49,12 @@ final class CacheControlFilterTest extends CIUnitTestCase
 
         $this->assertNull($result);
         $this->assertSame('public, max-age=300', $response->getHeaderLine('Cache-Control'));
-        $this->assertSame('W/"' . md5('{"a":1}') . '"', $response->getHeaderLine('ETag'));
+        $this->assertSame('W/"' . hash('sha256', '{"a":1}') . '"', $response->getHeaderLine('ETag'));
     }
 
     public function testReturns304WhenEtagMatches(): void
     {
-        $etag     = 'W/"' . md5('{"a":1}') . '"';
+        $etag     = 'W/"' . hash('sha256', '{"a":1}') . '"';
         $response = $this->_response('{"a":1}');
 
         $result = $this->filter->after($this->_request('GET', $etag), $response, ['60']);

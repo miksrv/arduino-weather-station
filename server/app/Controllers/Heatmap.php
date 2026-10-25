@@ -123,7 +123,7 @@ class Heatmap extends ResourceController
             return $this->respond($result);
         }
 
-        $cacheKey = 'heatmap_hourly_' . md5($type . '_' . date('Y-m-d', $startTimestamp) . '_' . date('Y-m-d', $endTimestamp));
+        $cacheKey = 'heatmap_hourly_' . hash('sha256', $type . '_' . date('Y-m-d', $startTimestamp) . '_' . date('Y-m-d', $endTimestamp));
         $rawData  = cache()->get($cacheKey);
 
         if (!is_array($rawData)) {

@@ -84,7 +84,7 @@ class History extends ResourceController
         }
 
         // Key on normalised dates so arbitrary strtotime() spellings cannot create unbounded cache entries
-        $cacheKey = 'history_' . md5(date('Y-m-d', $startTimestamp) . '_' . date('Y-m-d', $endTimestamp));
+        $cacheKey = 'history_' . hash('sha256', date('Y-m-d', $startTimestamp) . '_' . date('Y-m-d', $endTimestamp));
         $rawData  = cache()->get($cacheKey);
 
         if (!is_array($rawData)) {
