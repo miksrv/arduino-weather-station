@@ -48,6 +48,9 @@ export default defineConfig([
             // PM2 Server
             '**/ecosystem.config.js',
 
+            // Service worker: plain browser JS outside the TypeScript project
+            'public/sw.js',
+
             // NextJS
             '**/next-i18next.config.js',
             '**/next.config.js',

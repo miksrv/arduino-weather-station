@@ -1,19 +1,61 @@
 {
-   "name":"Weather Station",
-   "short_name":"Weather",
-   "icons":[
-      {
-         "src":"/android-chrome-192x192.png",
-         "sizes":"192x192",
-         "type":"image/png"
-      },
-      {
-         "src":"/android-chrome-512x512.png",
-         "sizes":"512x512",
-         "type":"image/png"
-      }
-   ],
-   "theme_color":"#1b1b1b",
-   "background_color":"#1b1b1b",
-   "display":"standalone"
+    "id": "/",
+    "name": "Метеостанция Оренбург",
+    "short_name": "Метео",
+    "description": "Погода в Оренбурге с собственной метеостанции: текущие данные, прогноз, история и аномалии",
+    "lang": "ru",
+    "dir": "ltr",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "any",
+    "theme_color": "#0b0d10",
+    "background_color": "#0b0d10",
+    "categories": ["weather"],
+    "icons": [
+        {
+            "src": "/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/maskable-icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Прогноз погоды",
+            "short_name": "Прогноз",
+            "url": "/forecast",
+            "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Датчики",
+            "short_name": "Датчики",
+            "url": "/sensors",
+            "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Архив погоды",
+            "short_name": "Архив",
+            "url": "/history",
+            "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+        }
+    ]
 }
