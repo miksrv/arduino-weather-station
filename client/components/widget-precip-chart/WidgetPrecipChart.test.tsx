@@ -13,17 +13,17 @@ jest.mock('next-i18next/pages', () => ({
     })
 }))
 
-const mockUseTheme = jest.fn(() => ({ theme: 'light' }))
+const mockUseTheme = jest.fn(() => ({ theme: 'light', resolvedTheme: 'light' }))
 
 jest.mock('next-themes', () => ({
     useTheme: () => mockUseTheme()
 }))
 
-jest.mock('echarts-for-react', () => () => <div data-testid='echarts' />)
+jest.mock('@/components/echart', () => () => <div data-testid='echarts' />)
 
 describe('WidgetPrecipChart', () => {
     beforeEach(() => {
-        mockUseTheme.mockReturnValue({ theme: 'light' })
+        mockUseTheme.mockReturnValue({ theme: 'light', resolvedTheme: 'light' })
     })
 
     it('shows Skeleton and no chart when loading', () => {
@@ -60,7 +60,7 @@ describe('WidgetPrecipChart', () => {
     })
 
     it('renders in dark theme without crashing', () => {
-        mockUseTheme.mockReturnValue({ theme: 'dark' })
+        mockUseTheme.mockReturnValue({ theme: 'dark', resolvedTheme: 'dark' })
         expect(() => render(<WidgetPrecipChart loading={false} />)).not.toThrow()
         expect(screen.getByTestId('echarts')).toBeInTheDocument()
     })

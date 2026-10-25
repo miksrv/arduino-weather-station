@@ -1,35 +1,38 @@
+@use '../../styles/typography' as type
+
 .value
-    font-size: 34px
-    font-weight: 100
-    color: var(--text-color-primary)
+    +type.value
 
 .category
-    font-size: 14px
-    color: var(--text-color-secondary)
-    margin-top: 2px
+    +type.secondary
+    font-weight: var(--font-weight-medium)
+    color: var(--text-color-primary)
+    margin-top: var(--space-1)
 
 .scale
-    margin: 16px 0 4px
+    margin: var(--space-5) 0 var(--space-1)
 
 .scaleWrapper
     display: flex
     flex-direction: column
-    gap: 6px
+    gap: var(--space-2)
 
 .track
     position: relative
-    height: 6px
-    border-radius: 3px
+    height: 8px
+    border-radius: var(--radius-full)
 
+// The current value: a ring sitting on the track
 .marker
     position: absolute
-    top: -6px
-    width: 0
-    height: 0
-    border-left: 6px solid transparent
-    border-right: 6px solid transparent
-    border-top: 7px solid #fff
-    transform: translateX(-50%)
+    top: 50%
+    width: 14px
+    height: 14px
+    border-radius: var(--radius-full)
+    background: var(--surface-1)
+    border: 3px solid var(--text-color-primary)
+    box-shadow: var(--shadow-sm)
+    transform: translate(-50%, -50%)
 
 .ticks
     position: relative
@@ -38,11 +41,11 @@
 .tick
     position: absolute
     top: 0
-    font-size: 11px
-    color: var(--text-color-secondary)
     white-space: nowrap
+    +type.numbers
+    +type.caption
 
 .statsRow
     display: flex
     justify-content: space-between
-    margin-top: 12px
+    margin-top: var(--space-4)

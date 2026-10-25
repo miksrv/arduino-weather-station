@@ -1,6 +1,9 @@
+@use '../../styles/typography' as type
+
 .statBlock
     display: flex
     flex-direction: column
+    gap: 1px
 
 .alignStart
     align-items: flex-start
@@ -9,16 +12,16 @@
     align-items: flex-end
 
 .statTitle
-    font-size: 11px
-    color: var(--text-color-secondary)
+    +type.caption
 
 .statValue
-    font-size: 14px
-    font-weight: 600
+    +type.numbers
+    font-size: var(--font-size)
+    font-weight: var(--font-weight-medium)
     color: var(--text-color-primary)
 
     &--max
-        color: var(--color-red)
+        color: var(--color-max)
 
     &--min
-        color: var(--color-main)
+        color: var(--color-min)

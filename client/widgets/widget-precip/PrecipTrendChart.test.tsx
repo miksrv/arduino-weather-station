@@ -9,7 +9,7 @@ import '@testing-library/jest-dom'
 
 let mockCapturedOption: EChartsOption | null = null
 
-jest.mock('echarts-for-react', () => (props: { option: EChartsOption; style: unknown }) => {
+jest.mock('@/components/echart', () => (props: { option: EChartsOption; style: unknown }) => {
     mockCapturedOption = props.option
     return (
         <div
@@ -20,7 +20,7 @@ jest.mock('echarts-for-react', () => (props: { option: EChartsOption; style: unk
 })
 
 jest.mock('next-themes', () => ({
-    useTheme: jest.fn(() => ({ theme: 'light' }))
+    useTheme: jest.fn(() => ({ theme: 'light', resolvedTheme: 'light' }))
 }))
 
 jest.mock('@/tools/colors', () => ({

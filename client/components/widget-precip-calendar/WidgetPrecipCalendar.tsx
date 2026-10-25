@@ -6,7 +6,7 @@ import { useTranslation } from 'next-i18next/pages'
 import { ApiType } from '@/api'
 import { formatDate } from '@/tools/date'
 
-import { getCellColor, isLeapYear } from './utils'
+import { getCellColor, isLeapYear, PRECIP_LEVEL_COLORS } from './utils'
 
 import styles from './styles.module.sass'
 
@@ -112,7 +112,7 @@ const WidgetPrecipCalendar: React.FC<WidgetPrecipCalendarProps> = ({ loading, ye
                                 const total = dayMap.get(dateKey)
                                 const hasData = total != null
                                 const cellTotal = total ?? 0
-                                const color = hasData ? getCellColor(cellTotal) : 'var(--input-border-color)'
+                                const color = hasData ? getCellColor(cellTotal) : PRECIP_LEVEL_COLORS.dry
 
                                 return (
                                     <div
@@ -133,7 +133,7 @@ const WidgetPrecipCalendar: React.FC<WidgetPrecipCalendarProps> = ({ loading, ye
                 <div className={styles.legendItem}>
                     <span
                         className={styles.legendSwatch}
-                        style={{ backgroundColor: 'var(--input-border-color)' }}
+                        style={{ backgroundColor: PRECIP_LEVEL_COLORS.dry }}
                     />
                     <span className={styles.legendLabel}>{t('dry-days')}</span>
                 </div>
@@ -141,7 +141,7 @@ const WidgetPrecipCalendar: React.FC<WidgetPrecipCalendarProps> = ({ loading, ye
                 <div className={styles.legendItem}>
                     <span
                         className={styles.legendSwatch}
-                        style={{ backgroundColor: '#cce5ff' }}
+                        style={{ backgroundColor: PRECIP_LEVEL_COLORS.trace }}
                     />
                     <span className={styles.legendLabel}>{t('precip-level-trace')}</span>
                 </div>
@@ -149,7 +149,7 @@ const WidgetPrecipCalendar: React.FC<WidgetPrecipCalendarProps> = ({ loading, ye
                 <div className={styles.legendItem}>
                     <span
                         className={styles.legendSwatch}
-                        style={{ backgroundColor: '#66b2ff' }}
+                        style={{ backgroundColor: PRECIP_LEVEL_COLORS.light }}
                     />
                     <span className={styles.legendLabel}>{t('precip-level-light')}</span>
                 </div>
@@ -157,7 +157,7 @@ const WidgetPrecipCalendar: React.FC<WidgetPrecipCalendarProps> = ({ loading, ye
                 <div className={styles.legendItem}>
                     <span
                         className={styles.legendSwatch}
-                        style={{ backgroundColor: '#1a7fd4' }}
+                        style={{ backgroundColor: PRECIP_LEVEL_COLORS.moderate }}
                     />
                     <span className={styles.legendLabel}>{t('precip-level-moderate')}</span>
                 </div>
@@ -165,7 +165,7 @@ const WidgetPrecipCalendar: React.FC<WidgetPrecipCalendarProps> = ({ loading, ye
                 <div className={styles.legendItem}>
                     <span
                         className={styles.legendSwatch}
-                        style={{ backgroundColor: '#004080' }}
+                        style={{ backgroundColor: PRECIP_LEVEL_COLORS.heavy }}
                     />
                     <span className={styles.legendLabel}>{t('precip-level-heavy')}</span>
                 </div>

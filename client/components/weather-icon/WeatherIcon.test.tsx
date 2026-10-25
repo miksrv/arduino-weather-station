@@ -18,6 +18,19 @@ jest.mock('@/tools/date', () => ({
 }))
 
 describe('WeatherIcon', () => {
+    it('is decorative by default and takes an alt text when given', () => {
+        const { container, rerender } = render(<WeatherIcon weatherId={800} />)
+        expect(container.querySelector('img')).toHaveAttribute('alt', '')
+
+        rerender(
+            <WeatherIcon
+                weatherId={800}
+                alt={'Clear sky'}
+            />
+        )
+        expect(container.querySelector('img')).toHaveAttribute('alt', 'Clear sky')
+    })
+
     it('renders with default size', () => {
         render(<WeatherIcon weatherId={800} />)
         const img = screen.getByAltText('')
@@ -105,6 +118,12 @@ describe('getWeatherIconUrl', () => {
 
     it('returns icon without date', () => {
         expect(getWeatherIconUrl(800)).toBe('/icons/clear.svg')
+    })
+
+    it('uses the plain cloud for full overcast, day or night', () => {
+        expect(getWeatherIconUrl(804, 'day')).toBe('/icons/overcast.svg')
+        expect(getWeatherIconUrl(804, 'night')).toBe('/icons/overcast.svg')
+        expect(getWeatherIconUrl(803, 'day')).toBe('/icons/overcast-day.svg')
     })
 
     it('returns fallback icon for unknown weatherId', () => {

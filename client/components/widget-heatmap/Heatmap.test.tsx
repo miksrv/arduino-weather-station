@@ -6,148 +6,58 @@ import Heatmap from './Heatmap'
 
 import '@testing-library/jest-dom'
 
-jest.mock('echarts-for-react', () => (props: { option: unknown; style: unknown }) => (
-    <div
-        data-testid='echarts'
-        data-option={JSON.stringify(props.option)}
-    />
-))
+type Option = {
+    xAxis: { data: string[] }
+    yAxis: { data: string[] }
+    visualMap: { min: number; max: number; formatter: (value: number) => string }
+    series: Array<{ data: number[][] }>
+}
 
-jest.mock('dayjs', () => {
-    const actual = jest.requireActual('dayjs')
-    return actual
-})
-
-jest.mock('next-themes', () => ({
-    useTheme: jest.fn(() => ({ theme: 'dark' }))
-}))
+let mockOption: Option | undefined
 
 jest.mock('next-i18next/pages', () => ({
     useTranslation: () => ({ t: (key: string) => key })
 }))
+jest.mock('next-themes', () => ({ useTheme: () => ({ theme: 'dark', resolvedTheme: 'dark' }) }))
+jest.mock('@/components/echart', () => (props: { option: Option }) => {
+    mockOption = props.option
+    return <div data-testid='echarts' />
+})
 
-jest.mock('@/hooks/useClientOnly', () => jest.fn(() => false))
-
-jest.mock('@/tools/date', () => ({
-    formatDate: jest.fn(() => '01.01.2024')
-}))
-
-const mockData = [
-    { date: '2024-01-01T12:00:00Z', temperature: 20, pressure: 1013, humidity: 60 },
-    { date: '2024-01-02T10:00:00Z', temperature: 22, pressure: 1010, humidity: 55 }
+const points = [
+    { day: '2026-10-23', hour: 0, date: '2026-10-22 19:00:00', value: -1.5 },
+    { day: '2026-10-23', hour: 14, date: '2026-10-23 09:00:00', value: 6.2 },
+    { day: '2026-10-24', hour: 3, date: '2026-10-23 22:00:00', value: 0.4 }
 ]
 
 describe('Heatmap', () => {
-    it('renders for temperature type', () => {
-        const { getByTestId } = render(
+    it('lays the days out as columns and the 24 hours as rows', () => {
+        render(
             <Heatmap
-                type='temperature'
-                data={mockData}
+                type={'temperature'}
+                points={points}
             />
         )
-        expect(getByTestId('echarts')).toBeInTheDocument()
+
+        expect(mockOption?.xAxis.data).toStrictEqual(['2026-10-23', '2026-10-24'])
+        expect(mockOption?.yAxis.data).toHaveLength(24)
+        expect(mockOption?.series[0].data).toStrictEqual([
+            [0, 0, -1.5],
+            [0, 14, 6.2],
+            [1, 3, 0.4]
+        ])
     })
 
-    it('renders for humidity type', () => {
-        const { getByTestId } = render(
+    it('scales the colours to the rounded range and labels the handles with the unit', () => {
+        render(
             <Heatmap
-                type='humidity'
-                data={mockData}
+                type={'humidity'}
+                points={points}
             />
         )
-        expect(getByTestId('echarts')).toBeInTheDocument()
-    })
 
-    it('renders for pressure type', () => {
-        const { getByTestId } = render(
-            <Heatmap
-                type='pressure'
-                data={mockData}
-            />
-        )
-        expect(getByTestId('echarts')).toBeInTheDocument()
-    })
-
-    it('renders for clouds type', () => {
-        const mockDataWithClouds = [
-            { date: '2024-01-01T12:00:00Z', clouds: 80 },
-            { date: '2024-01-02T10:00:00Z', clouds: 40 }
-        ]
-        const { getByTestId } = render(
-            <Heatmap
-                type='clouds'
-                data={mockDataWithClouds}
-            />
-        )
-        expect(getByTestId('echarts')).toBeInTheDocument()
-    })
-
-    it('renders for precipitation type', () => {
-        const mockDataWithPrecip = [
-            { date: '2024-01-01T12:00:00Z', precipitation: 5 },
-            { date: '2024-01-02T10:00:00Z', precipitation: 0 }
-        ]
-        const { getByTestId } = render(
-            <Heatmap
-                type='precipitation'
-                data={mockDataWithPrecip}
-            />
-        )
-        expect(getByTestId('echarts')).toBeInTheDocument()
-    })
-
-    it('renders without data', () => {
-        const { getByTestId } = render(<Heatmap type='temperature' />)
-        expect(getByTestId('echarts')).toBeInTheDocument()
-    })
-
-    it('renders with title and subTitle', () => {
-        const { getByTestId } = render(
-            <Heatmap
-                type='temperature'
-                data={mockData}
-                title='Temperature Heatmap'
-                subTitle='2024'
-            />
-        )
-        expect(getByTestId('echarts')).toBeInTheDocument()
-    })
-
-    it('renders with custom height', () => {
-        const { getByTestId } = render(
-            <Heatmap
-                type='pressure'
-                height='500px'
-            />
-        )
-        expect(getByTestId('echarts')).toBeInTheDocument()
-    })
-
-    it('renders in client-only mode (isClient=true)', () => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-        const useClientOnly = require('@/hooks/useClientOnly') as jest.Mock
-        useClientOnly.mockReturnValue(true)
-        const { getByTestId } = render(
-            <Heatmap
-                type='temperature'
-                data={mockData}
-            />
-        )
-        expect(getByTestId('echarts')).toBeInTheDocument()
-        useClientOnly.mockReturnValue(false)
-    })
-
-    it('renders with data spanning multiple days', () => {
-        const multiDayData = Array.from({ length: 48 }, (_, i) => ({
-            date: `2024-01-${String(Math.floor(i / 24) + 1).padStart(2, '0')}T${String(i % 24).padStart(2, '0')}:00:00Z`,
-            temperature: 10 + i * 0.5
-        }))
-        const { getByTestId } = render(
-            <Heatmap
-                type='temperature'
-                data={multiDayData}
-            />
-        )
-        expect(getByTestId('echarts')).toBeInTheDocument()
+        expect(mockOption?.visualMap.min).toBe(-2)
+        expect(mockOption?.visualMap.max).toBe(7)
+        expect(mockOption?.visualMap.formatter(55.04)).toBe('55 %')
     })
 })

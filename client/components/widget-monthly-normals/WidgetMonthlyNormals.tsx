@@ -1,15 +1,15 @@
 import React, { useMemo } from 'react'
-import { EChartsOption } from 'echarts'
-import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
-import ReactECharts from 'echarts-for-react'
+import type { EChartsOption } from 'echarts'
+import type { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
 import { Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
 import { ApiType } from '@/api'
-import { getEChartBaseConfig } from '@/tools'
-import { colors } from '@/tools/colors'
+import EChart from '@/components/echart'
+import { getChartTokens, getChartTooltipStyle, getEChartBaseConfig } from '@/tools'
+import { getColor } from '@/tools/colors'
 
 import styles from './styles.module.sass'
 
@@ -21,16 +21,13 @@ interface WidgetMonthlyNormalsProps {
 
 const WidgetMonthlyNormals: React.FC<WidgetMonthlyNormalsProps> = ({ normals, currentYearMonthly, loading }) => {
     const { t, i18n } = useTranslation()
-    const { theme } = useTheme()
+    const { resolvedTheme: theme } = useTheme()
+    const { gridLine: borderColor, textSecondary: textSecondaryColor } = getChartTokens(theme)
 
-    const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff'
-    const borderColor = theme === 'dark' ? '#444546' : '#cbcccd'
-    const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99'
-
-    const rangeColorTop = colors['red'][1]
-    const rangeColorBottom = colors['blue'][1]
-    const historicalColor = colors['purple'][0]
-    const currentYearColor = colors['green'][0]
+    const rangeColorTop = getColor('red', theme)[1]
+    const rangeColorBottom = getColor('blue', theme)[1]
+    const historicalColor = getColor('purple', theme)[0]
+    const currentYearColor = getColor('green', theme)[0]
 
     const monthLabels = useMemo(
         () =>
@@ -116,7 +113,7 @@ const WidgetMonthlyNormals: React.FC<WidgetMonthlyNormalsProps> = ({ normals, cu
                 {
                     data: minTemps,
                     lineStyle: { opacity: 0 },
-                    itemStyle: { color: colors['blue'][0] },
+                    itemStyle: { color: getColor('blue', theme)[0] },
                     name: t('historical-min'),
                     showSymbol: false,
                     type: 'line',
@@ -125,7 +122,7 @@ const WidgetMonthlyNormals: React.FC<WidgetMonthlyNormalsProps> = ({ normals, cu
                 {
                     data: maxTemps,
                     lineStyle: { opacity: 0 },
-                    itemStyle: { color: colors['red'][0] },
+                    itemStyle: { color: getColor('red', theme)[0] },
                     name: t('historical-max'),
                     showSymbol: false,
                     type: 'line',
@@ -152,8 +149,7 @@ const WidgetMonthlyNormals: React.FC<WidgetMonthlyNormalsProps> = ({ normals, cu
                 }
             ],
             tooltip: {
-                backgroundColor,
-                borderColor,
+                ...getChartTooltipStyle(theme),
                 trigger: 'axis',
                 formatter: (params: TopLevelFormatterParams) => {
                     const arr: CallbackDataParams[] = Array.isArray(params) ? params : [params]
@@ -210,7 +206,7 @@ const WidgetMonthlyNormals: React.FC<WidgetMonthlyNormalsProps> = ({ normals, cu
     }, [
         normals,
         currentYearMonthly,
-        backgroundColor,
+        theme,
         borderColor,
         textSecondaryColor,
         rangeColorTop,
@@ -227,7 +223,7 @@ const WidgetMonthlyNormals: React.FC<WidgetMonthlyNormalsProps> = ({ normals, cu
             {loading ? (
                 <Skeleton style={{ height: 260, width: '100%' }} />
             ) : (
-                <ReactECharts
+                <EChart
                     option={chartOption}
                     style={{ height: '260px', width: '100%' }}
                 />

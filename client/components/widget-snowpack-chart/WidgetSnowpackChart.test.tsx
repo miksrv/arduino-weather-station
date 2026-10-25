@@ -11,10 +11,10 @@ jest.mock('next-i18next/pages', () => ({
 }))
 
 jest.mock('next-themes', () => ({
-    useTheme: jest.fn(() => ({ theme: 'light' }))
+    useTheme: jest.fn(() => ({ theme: 'light', resolvedTheme: 'light' }))
 }))
 
-jest.mock('echarts-for-react', () =>
+jest.mock('@/components/echart', () =>
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ({ onChartReady, style }: { onChartReady?: () => void; style?: React.CSSProperties }) => (
         <div
@@ -30,6 +30,7 @@ jest.mock('echarts', () => ({
 }))
 
 jest.mock('@/tools', () => ({
+    ...jest.requireActual('@/tools'),
     getEChartBaseConfig: jest.fn(() => ({}))
 }))
 

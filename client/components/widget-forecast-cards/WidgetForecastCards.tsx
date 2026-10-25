@@ -6,9 +6,10 @@ import { useTranslation } from 'next-i18next/pages'
 import { ApiModel } from '@/api'
 import WeatherIcon from '@/components/weather-icon'
 import WindDirectionIcon from '@/components/wind-direction-icon'
+import { getWeatherI18nKey } from '@/tools/conditions'
 import { formatDate, getDate } from '@/tools/date'
 import { round } from '@/tools/helpers'
-import { Carousel } from '@/ui/carousel'
+import { ScrollRail } from '@/ui/scroll-rail'
 
 import styles from './styles.module.sass'
 
@@ -46,9 +47,9 @@ const WidgetForecastCards: React.FC<WidgetForecastCardsProps> = ({ loading, isHo
 
             {!!forecast?.length && (
                 <div className={styles.section}>
-                    <Carousel
-                        options={{ dragFree: true, loop: false }}
-                        autoScroll={false}
+                    <ScrollRail
+                        className={styles.rail}
+                        aria-label={t('forecast')}
                     >
                         {forecast.map((item, index) => (
                             <div
@@ -67,7 +68,9 @@ const WidgetForecastCards: React.FC<WidgetForecastCardsProps> = ({ loading, isHo
                                 {!isHourly && (
                                     <>
                                         <span className={styles.cardDay}>{formatDate(item.date, 'dddd')}</span>
-                                        <span className={styles.cardDate}>{formatDate(item.date, 'MMMM D')}</span>
+                                        <span className={styles.cardDate}>
+                                            {formatDate(item.date, t('date-day-month'))}
+                                        </span>
                                     </>
                                 )}
 
@@ -80,6 +83,7 @@ const WidgetForecastCards: React.FC<WidgetForecastCardsProps> = ({ loading, isHo
                                 <div className={styles.cardIcon}>
                                     <WeatherIcon
                                         weatherId={item.weatherId ?? 800}
+                                        alt={t(getWeatherI18nKey(item.weatherId ?? 800))}
                                         date={item.date}
                                         width={42}
                                         height={42}
@@ -111,7 +115,7 @@ const WidgetForecastCards: React.FC<WidgetForecastCardsProps> = ({ loading, isHo
                                 </div>
                             </div>
                         ))}
-                    </Carousel>
+                    </ScrollRail>
                 </div>
             )}
         </div>

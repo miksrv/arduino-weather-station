@@ -1,36 +1,40 @@
 import React from 'react'
 import { Skeleton } from 'simple-react-ui-kit'
 
-import { ApiModel, ApiType } from '@/api'
+import { ApiType } from '@/api'
+import WidgetCard from '@/components/widget-card'
+import { HeatmapPoint } from '@/tools/heatmap'
 
 import Heatmap from './Heatmap'
 
 import styles from './styles.module.sass'
 
-interface WidgetProps {
+interface WidgetHeatmapProps {
     type: ApiType.Heatmap.SensorType
-    data?: ApiModel.Weather[]
+    points?: HeatmapPoint[]
     title?: string
-    subTitle?: string
+    subtitle?: string
     loading?: boolean
 }
 
-const CHART_HEIGHT = '450px'
+const CHART_HEIGHT = 480
 
-const WidgetHeatmap: React.FC<WidgetProps> = ({ type, data, loading, title, subTitle }) => (
-    <div className={styles.widget}>
-        {loading ? (
+const WidgetHeatmap: React.FC<WidgetHeatmapProps> = ({ type, points, loading, title, subtitle }) => (
+    <WidgetCard
+        title={title}
+        size={'x4'}
+    >
+        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+        {loading || !points?.length ? (
             <Skeleton style={{ width: '100%', height: CHART_HEIGHT }} />
         ) : (
             <Heatmap
-                data={data}
                 type={type}
-                title={title}
-                subTitle={subTitle}
+                points={points}
                 height={CHART_HEIGHT}
             />
         )}
-    </div>
+    </WidgetCard>
 )
 
 export default WidgetHeatmap

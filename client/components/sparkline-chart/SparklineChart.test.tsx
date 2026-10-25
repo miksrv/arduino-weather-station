@@ -9,7 +9,7 @@ import '@testing-library/jest-dom'
 
 let mockCapturedOption: EChartsOption | null = null
 
-jest.mock('echarts-for-react', () => (props: { option: EChartsOption; style: unknown }) => {
+jest.mock('@/components/echart', () => (props: { option: EChartsOption; style: unknown }) => {
     mockCapturedOption = props.option
     return (
         <div
@@ -26,7 +26,7 @@ jest.mock('echarts', () => ({
 }))
 
 jest.mock('next-themes', () => ({
-    useTheme: jest.fn(() => ({ theme: 'light' }))
+    useTheme: jest.fn(() => ({ theme: 'light', resolvedTheme: 'light' }))
 }))
 
 jest.mock('@/tools/colors', () => ({
@@ -49,7 +49,7 @@ describe('SparklineChart', () => {
         expect(getByTestId('echarts')).toBeInTheDocument()
     })
 
-    it('resolves axis colors to a literal value instead of an unresolvable CSS variable', () => {
+    it('takes the axis colors from the chart tokens, not from CSS variables', () => {
         render(
             <SparklineChart
                 categories={categories}
@@ -62,8 +62,45 @@ describe('SparklineChart', () => {
             axisLabel: { color: string }
         }
 
-        expect(xAxis.axisLine.lineStyle.color).toBe('rgba(#76787a,0.3)')
-        expect(xAxis.axisLabel.color).toBe('#76787a')
+        expect(xAxis.axisLine.lineStyle.color).toBe('#e6e8ec')
+        expect(xAxis.axisLabel.color).toBe('#66707d')
+    })
+
+    it('scales the y-axis to the data when no minimum is given', () => {
+        render(
+            <SparklineChart
+                categories={categories}
+                values={values}
+                color={'#2c7eec'}
+            />
+        )
+        expect((mockCapturedOption?.yAxis as { scale: boolean }).scale).toBe(true)
+    })
+
+    it('does not auto-scale when an explicit minimum is given', () => {
+        render(
+            <SparklineChart
+                categories={categories}
+                values={values}
+                color={'#2c7eec'}
+                yAxisMin={0}
+            />
+        )
+        expect((mockCapturedOption?.yAxis as { scale: boolean }).scale).toBe(false)
+    })
+
+    it('fills the area down to the bottom of the axis', () => {
+        render(
+            <SparklineChart
+                categories={categories}
+                values={values}
+                color={'#2c7eec'}
+                areaOpacity={0.4}
+            />
+        )
+        const series = mockCapturedOption?.series as Array<{ areaStyle: { origin: string } }>
+
+        expect(series[0].areaStyle.origin).toBe('start')
     })
 
     it('omits the area style when areaOpacity is not given', () => {

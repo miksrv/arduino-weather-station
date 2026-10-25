@@ -47,6 +47,19 @@ describe('WidgetSummary', () => {
         expect(screen.getByText('22.5')).toBeInTheDocument()
     })
 
+    it('shows no-data instead of 0 when the temperature is missing', () => {
+        render(<WidgetSummary weather={{ humidity: 50 }} />)
+        expect(screen.getByText('no-data')).toBeInTheDocument()
+        expect(screen.queryByText('0')).not.toBeInTheDocument()
+    })
+
+    it('hides the condition and its icon without a weather id instead of saying unknown', () => {
+        const { container } = render(<WidgetSummary weather={{ temperature: 1 }} />)
+
+        expect(screen.queryByText('conditions.unknown')).not.toBeInTheDocument()
+        expect(container.querySelector('img')).not.toBeInTheDocument()
+    })
+
     it('renders wind speed badge', () => {
         render(<WidgetSummary weather={{ windSpeed: 5 }} />)
         expect(screen.getByText(/meters-per-second/)).toBeInTheDocument()

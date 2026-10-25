@@ -67,7 +67,7 @@ describe('utils', () => {
 
     describe('color constants', () => {
         it('has correct COLD_COLOR', () => {
-            expect(COLD_COLOR).toBe('#2c7eec')
+            expect(COLD_COLOR).toBe('#3b8ced')
         })
 
         it('has correct MID_COLOR', () => {
@@ -75,7 +75,7 @@ describe('utils', () => {
         })
 
         it('has correct HOT_COLOR', () => {
-            expect(HOT_COLOR).toBe('#e53935')
+            expect(HOT_COLOR).toBe('#ef5359')
         })
     })
 })

@@ -1,15 +1,18 @@
+@use '../../styles/typography' as type
+
 .list
     display: flex
     flex-direction: column
-    max-height: 180px
+    max-height: 200px
     overflow-y: auto
+    scrollbar-width: thin
 
 .item
     display: flex
     align-items: center
-    gap: 5px
-    padding: 5px 0
-    border-bottom: 1px solid var(--input-border-color)
+    gap: var(--space-2)
+    padding: var(--space-2) 0
+    border-bottom: 1px solid var(--border)
 
     &:last-child
         border-bottom: none
@@ -17,44 +20,44 @@
 .time
     flex: 0 0 auto
     width: 40px
-    font-size: 12px
-    color: var(--text-color-secondary)
+    +type.numbers
+    +type.caption
 
 .icon
     flex: 0 0 auto
-    width: 18px
-    height: 18px
+    width: 16px
+    height: 16px
 
 .icon--temperature-up
-    fill: var(--color-red)
+    fill: var(--color-max)
 
 .icon--temperature-down
-    fill: var(--color-main)
+    fill: var(--color-min)
 
 .icon--pressure
-    fill: #6cbb4f
+    fill: var(--data-pressure)
 
 .icon--wind
-    fill: #4a90e2
+    fill: var(--data-wind)
 
 .icon--precipitation
-    fill: #4a90e2
+    fill: var(--data-precipitation)
 
 .icon--system-ok
-    fill: #4caf50
+    fill: var(--color-green)
 
 .icon--system-stale
-    fill: #e0a03e
+    fill: var(--color-orange)
 
 .icon--anomaly
-    fill: #e5544a
+    fill: var(--color-red)
 
 .message
-    font-size: 13px
+    +type.body
+    font-size: var(--font-size-secondary)
     color: var(--text-color-primary)
 
 .empty
-    padding: 16px 0
+    padding: var(--space-4) 0
     text-align: center
-    font-size: 13px
-    color: var(--text-color-secondary)
+    +type.secondary

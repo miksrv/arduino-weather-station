@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react'
-import { EChartsOption } from 'echarts'
-import ReactECharts from 'echarts-for-react'
+import type { EChartsOption } from 'echarts'
 import { cn, Icon, IconTypes, Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next/pages'
+
+import EChart from '@/components/echart'
 
 import { getFilledDots, getZScoreColor } from './utils'
 
@@ -100,7 +101,7 @@ const WidgetParameterZScore: React.FC<WidgetParameterZScoreProps> = ({ loading, 
             </div>
 
             {sparklineData.length > 0 && (
-                <ReactECharts
+                <EChart
                     option={sparkOption}
                     style={{ height: '40px', width: '100%' }}
                     opts={{ renderer: 'canvas' }}

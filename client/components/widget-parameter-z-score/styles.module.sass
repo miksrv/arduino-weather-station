@@ -1,55 +1,49 @@
-@use '../../styles/variables'
+@use '../../styles/mixins'
+@use '../../styles/typography' as type
 
 .card
-    background: var(--container-background-color)
-    color: var(--text-color-primary)
-    border-radius: var(--container-radius)
-    box-shadow: var(--container-shadow)
+    +mixins.card
     overflow: hidden
-    padding: 12px 14px
     display: flex
     flex-direction: column
-    gap: 6px
+    gap: var(--space-2)
 
     .header
-        padding: 0
-        margin: 0 0 12px
-        gap: 6px
         display: flex
         width: 100%
-        justify-content: left
         align-items: center
-        white-space: nowrap
-        text-overflow: ellipsis
-        overflow: hidden
+        gap: var(--space-2)
+        min-width: 0
 
         h3
             margin: 0
-            color: var(--text-color-primary)
-            font-size: 16px
-            font-weight: 200
+            overflow: hidden
+            white-space: nowrap
+            text-overflow: ellipsis
+            +type.titleCard
+            font-size: var(--font-size)
 
         svg
-            width: 16px
-            height: 16px
-            fill: var(--text-color-primary)
+            width: 18px
+            height: 18px
+            fill: var(--text-color-secondary)
             flex-shrink: 0
 
     .zScore
-        font-size: 22px
-        font-weight: 700
+        +type.numbers
+        font-size: 24px
+        font-weight: var(--font-weight-normal)
+        letter-spacing: -0.01em
         line-height: 1
-        margin-bottom: 5px
 
     .dots
         display: flex
-        gap: 4px
-        margin-bottom: 5px
+        gap: var(--space-1)
 
     .dotFilled, .dotEmpty
         width: 8px
         height: 8px
-        border-radius: 50%
+        border-radius: var(--radius-full)
 
     .dotEmpty
-        background: var(--input-border-color)
+        background: var(--surface-3)

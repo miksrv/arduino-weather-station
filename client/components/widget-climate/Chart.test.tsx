@@ -6,20 +6,21 @@ import Chart from './Chart'
 
 import '@testing-library/jest-dom'
 
-jest.mock('echarts-for-react', () => (props: { option: unknown; style: unknown }) => (
+jest.mock('@/components/echart', () => (props: { option: unknown; style: unknown }) => (
     <div
         data-testid='echarts'
         data-option={JSON.stringify(props.option)}
     />
 ))
 
-const mockUseTheme = jest.fn(() => ({ theme: 'dark' }))
+const mockUseTheme = jest.fn(() => ({ theme: 'dark', resolvedTheme: 'dark' }))
 
 jest.mock('next-themes', () => ({
     useTheme: () => mockUseTheme()
 }))
 
 jest.mock('@/tools', () => ({
+    ...jest.requireActual('@/tools'),
     getEChartBaseConfig: jest.fn(() => ({
         backgroundColor: '#2c2d2e',
         grid: {},
@@ -55,7 +56,7 @@ const mockData = [
 
 describe('Chart (widget-climate)', () => {
     beforeEach(() => {
-        mockUseTheme.mockReturnValue({ theme: 'dark' })
+        mockUseTheme.mockReturnValue({ theme: 'dark', resolvedTheme: 'dark' })
     })
 
     it('renders with data', () => {
@@ -100,7 +101,7 @@ describe('Chart (widget-climate)', () => {
     })
 
     it('renders in light theme without crashing', () => {
-        mockUseTheme.mockReturnValue({ theme: 'light' })
+        mockUseTheme.mockReturnValue({ theme: 'light', resolvedTheme: 'light' })
         const { getByTestId } = render(
             <Chart
                 data={mockData}

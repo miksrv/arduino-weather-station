@@ -12,11 +12,15 @@ interface PeriodToggleProps {
 }
 
 const PeriodToggle: React.FC<PeriodToggleProps> = ({ value, onChange, options }) => (
-    <div className={styles.toggle}>
+    <div
+        className={styles.toggle}
+        role={'group'}
+    >
         {options.map((option) => (
             <button
                 key={option.value}
                 type={'button'}
+                aria-pressed={option.value === value}
                 className={cn(styles.toggleButton, option.value === value && styles.toggleButtonActive)}
                 onClick={() => onChange(option.value)}
             >

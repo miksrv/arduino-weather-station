@@ -1,15 +1,15 @@
 import React, { useMemo } from 'react'
-import { EChartsOption } from 'echarts'
-import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
-import ReactECharts from 'echarts-for-react'
+import type { EChartsOption } from 'echarts'
+import type { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
 import { Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
 import { ApiType } from '@/api'
-import { getEChartBaseConfig } from '@/tools'
-import { colors } from '@/tools/colors'
+import EChart from '@/components/echart'
+import { getChartTokens, getChartTooltipStyle, getEChartBaseConfig } from '@/tools'
+import { getColor } from '@/tools/colors'
 
 import { linearRegression } from './utils'
 
@@ -23,39 +23,50 @@ interface WidgetAnomalyBarsProps {
 
 const WidgetAnomalyBars: React.FC<WidgetAnomalyBarsProps> = ({ data, baselineAvgTemp, loading }) => {
     const { t } = useTranslation()
-    const { theme } = useTheme()
-
-    const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff'
-    const borderColor = theme === 'dark' ? '#444546' : '#cbcccd'
-    const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99'
+    const { resolvedTheme: theme } = useTheme()
+    const { gridLine: borderColor, textSecondary: textSecondaryColor } = getChartTokens(theme)
 
     const chartOption: EChartsOption = useMemo(() => {
         const years = data?.map((d) => d.year) ?? []
         const anomalies = data?.map((d) => d.tempAnomaly) ?? []
-        const trendValues = linearRegression(anomalies)
+        // The trend is fitted to full years only; the running year is drawn faded and without a trend point
+        const completeCount = data?.filter((d) => !d.isPartial).length ?? 0
+        const trendValues = [
+            ...linearRegression(anomalies.slice(0, completeCount)),
+            ...Array<null>(anomalies.length - completeCount).fill(null)
+        ]
+        const warmColor = getColor('red', theme)[0]
+        const coldColor = getColor('blue', theme)[1]
+        const trendColor = getColor('orange', theme)[0]
 
         return {
             ...getEChartBaseConfig(theme),
             series: [
                 {
-                    data: anomalies.map((v) => ({
-                        itemStyle: { color: v >= 0 ? colors['red'][0] : colors['blue'][1] },
+                    data: anomalies.map((v, i) => ({
+                        itemStyle: {
+                            color: v >= 0 ? warmColor : coldColor,
+                            opacity: data?.[i]?.isPartial ? 0.4 : 1,
+                            borderRadius: v >= 0 ? [4, 4, 0, 0] : [0, 0, 4, 4]
+                        },
                         value: v
                     })),
+                    // The legend takes the series colour, not the per-bar ones
+                    itemStyle: { color: warmColor },
                     markLine: {
-                        data: [{ type: 'average', yAxis: 0 }],
+                        data: [{ yAxis: 0 }],
                         lineStyle: { color: borderColor, type: 'dashed', width: 1 },
                         symbol: 'none',
-                        label: {
-                            position: 'insideEndTop'
-                        }
+                        label: { show: false },
+                        silent: true
                     },
                     name: t('temp-anomaly'),
                     type: 'bar'
                 },
                 {
                     data: trendValues,
-                    lineStyle: { color: '#ffeb3b', width: 1 },
+                    itemStyle: { color: trendColor },
+                    lineStyle: { color: trendColor, width: 2 },
                     name: t('trend-warming'),
                     showSymbol: false,
                     smooth: true,
@@ -63,11 +74,12 @@ const WidgetAnomalyBars: React.FC<WidgetAnomalyBarsProps> = ({ data, baselineAvg
                 }
             ],
             tooltip: {
-                backgroundColor,
-                borderColor,
+                ...getChartTooltipStyle(theme),
                 formatter: (params: TopLevelFormatterParams) => {
                     const arr: CallbackDataParams[] = Array.isArray(params) ? params : [params]
-                    const header = `<div class="${styles.chartTooltipTitle}">${years[arr[0].dataIndex] ?? ''}</div>`
+                    const index = arr[0].dataIndex
+                    const partial = data?.[index]?.isPartial ? ` (${t('year-to-date')})` : ''
+                    const header = `<div class="${styles.chartTooltipTitle}">${years[index] ?? ''}${partial}</div>`
                     const rows = arr
                         .map((item: CallbackDataParams) => {
                             const dot = `<span class="${styles.icon}" style="background-color:${String(item.color ?? item.borderColor ?? '')};"></span>`
@@ -99,7 +111,7 @@ const WidgetAnomalyBars: React.FC<WidgetAnomalyBarsProps> = ({ data, baselineAvg
                 type: 'value'
             }
         }
-    }, [data, baselineAvgTemp, backgroundColor, borderColor, textSecondaryColor, t])
+    }, [data, baselineAvgTemp, borderColor, textSecondaryColor, t, theme])
 
     return (
         <div className={styles.widget}>
@@ -107,7 +119,7 @@ const WidgetAnomalyBars: React.FC<WidgetAnomalyBarsProps> = ({ data, baselineAvg
             {loading ? (
                 <Skeleton style={{ height: 260, width: '100%' }} />
             ) : (
-                <ReactECharts
+                <EChart
                     option={chartOption}
                     style={{ height: '260px', width: '100%' }}
                 />

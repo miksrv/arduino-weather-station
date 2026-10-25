@@ -1,61 +1,62 @@
+@use '../../styles/typography' as type
+
 .valueRow
     display: flex
     justify-content: space-between
     align-items: flex-start
-    gap: 8px
+    gap: var(--space-2)
 
 .valueBlock
     display: flex
     flex-direction: column
+    gap: var(--space-1)
 
 .value
-    font-size: 34px
-    font-weight: 100
     display: flex
     align-items: baseline
-    color: var(--text-color-primary)
+    gap: var(--space-1)
+    +type.value
 
     span
-        font-size: 20px
-        margin-left: 5px
-        color: var(--text-color-secondary)
+        +type.unit
 
 .delta
     display: flex
     align-items: center
-    gap: 4px
-    font-size: 12px
-    color: var(--text-color-secondary)
-    margin-top: 4px
+    gap: var(--space-1)
+    +type.caption
 
     svg
         width: 12px
         height: 12px
+        fill: var(--text-color-secondary)
 
     span
-        font-weight: 600
+        +type.numbers
+        font-weight: var(--font-weight-medium)
+        color: var(--text-color-primary)
 
     &--up
         span
-            color: var(--color-red)
+            color: var(--color-max)
 
         svg
-            fill: var(--color-red)
+            fill: var(--color-max)
 
     &--down
         span
-            color: var(--color-main)
+            color: var(--color-min)
 
         svg
-            fill: var(--color-main)
+            fill: var(--color-min)
 
 .statsColumn
     display: flex
     flex-direction: column
     align-items: flex-end
-    gap: 4px
+    gap: var(--space-2)
     text-align: right
     white-space: nowrap
 
 .chart
-    margin: 8px -4px -4px
+    margin: var(--space-3) -4px -4px

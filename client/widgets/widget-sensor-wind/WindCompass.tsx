@@ -1,7 +1,5 @@
 import React from 'react'
 
-import { hexToRgba, resolveCssVar, statChartColor } from '@/tools/colors'
-
 import styles from './styles.module.sass'
 
 interface WindCompassProps {
@@ -14,9 +12,6 @@ const OUTER_RADIUS = 88
 const VIEWBOX_MARGIN = 16
 /** Radius at which the N/E/S/W labels are placed — outside the ring, inside the margin. */
 const LABEL_RADIUS = 98
-
-const NEEDLE_HEAD_COLOR = '#f6941d'
-const NEEDLE_TAIL_COLOR = '#8b93a1'
 
 const CARDINAL_LABELS: Record<number, string> = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' }
 const CARDINAL_DEGREES = Object.keys(CARDINAL_LABELS).map(Number)
@@ -32,11 +27,6 @@ const pointOnCircle = (radius: number, angleDeg: number) => ({
 })
 
 const WindCompass: React.FC<WindCompassProps> = ({ direction }) => {
-    const textColor = resolveCssVar('--text-color-secondary', '#76787a')
-    const ringColor = hexToRgba(textColor, 0.3)
-    const tickColor = hexToRgba(textColor, 0.35)
-    const glowColor = hexToRgba(statChartColor[0], 0.1)
-
     const renderTicks = (degrees: number[], length: number, width: number) =>
         degrees.map((deg) => {
             const outer = pointOnCircle(OUTER_RADIUS, deg)
@@ -49,7 +39,7 @@ const WindCompass: React.FC<WindCompassProps> = ({ direction }) => {
                     y1={outer.y}
                     x2={inner.x}
                     y2={inner.y}
-                    stroke={tickColor}
+                    className={styles.tick}
                     strokeWidth={width}
                     strokeLinecap='round'
                 />
@@ -65,12 +55,11 @@ const WindCompass: React.FC<WindCompassProps> = ({ direction }) => {
                 <radialGradient id='windCompassGlow'>
                     <stop
                         offset='0%'
-                        stopColor={glowColor}
+                        className={styles.glowStop}
                     />
                     <stop
                         offset='100%'
-                        stopColor={glowColor}
-                        stopOpacity={0}
+                        className={styles.glowStopEnd}
                     />
                 </radialGradient>
             </defs>
@@ -85,8 +74,7 @@ const WindCompass: React.FC<WindCompassProps> = ({ direction }) => {
                 cx={CENTER}
                 cy={CENTER}
                 r={OUTER_RADIUS}
-                stroke={ringColor}
-                fill='none'
+                className={styles.ring}
             />
 
             {renderTicks(MINOR_DEGREES, 5, 1)}
@@ -104,7 +92,6 @@ const WindCompass: React.FC<WindCompassProps> = ({ direction }) => {
                         y={y}
                         textAnchor='middle'
                         dominantBaseline='central'
-                        fill={isNorth ? NEEDLE_HEAD_COLOR : textColor}
                         className={isNorth ? styles.compassLabelNorth : styles.compassLabel}
                     >
                         {CARDINAL_LABELS[deg]}
@@ -118,17 +105,17 @@ const WindCompass: React.FC<WindCompassProps> = ({ direction }) => {
             >
                 <polygon
                     points='100,36 91,100 109,100'
-                    fill={NEEDLE_HEAD_COLOR}
+                    className={styles.needleHead}
                 />
                 <polygon
                     points='100,132 91,100 109,100'
-                    fill={NEEDLE_TAIL_COLOR}
+                    className={styles.needleTail}
                 />
                 <circle
                     cx={100}
                     cy={100}
                     r={4.5}
-                    fill={textColor}
+                    className={styles.needlePin}
                 />
             </g>
         </svg>

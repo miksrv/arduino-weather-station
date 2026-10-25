@@ -1,9 +1,12 @@
 import React, { useMemo } from 'react'
-import { EChartsOption, graphic } from 'echarts'
-import ReactECharts from 'echarts-for-react'
+import type { EChartsOption } from 'echarts'
+
+import { useTheme } from 'next-themes'
 
 import { ApiModel } from '@/api'
-import { getSensorColor } from '@/tools/colors'
+import EChart from '@/components/echart'
+import { getSensorColor, hexToRgba } from '@/tools/colors'
+import { verticalGradient } from '@/tools/echart'
 import { findMaxValue, findMinValue, invertData } from '@/tools/weather'
 
 interface WeatherChartProps {
@@ -12,6 +15,8 @@ interface WeatherChartProps {
 }
 
 const WeatherChart: React.FC<WeatherChartProps> = ({ data, source }) => {
+    const { resolvedTheme: theme } = useTheme()
+
     const weatherData = useMemo(
         () => (source && ['temperature', 'feelsLike', 'dewPoint'].includes(source) ? invertData(data, source) : data),
         [data, source]
@@ -27,7 +32,7 @@ const WeatherChart: React.FC<WeatherChartProps> = ({ data, source }) => {
     )
 
     const option: EChartsOption = useMemo(() => {
-        const colorsData = getSensorColor(source)
+        const colorsData = getSensorColor(source, theme)
 
         return {
             tooltip: { show: false },
@@ -68,24 +73,18 @@ const WeatherChart: React.FC<WeatherChartProps> = ({ data, source }) => {
                     },
                     itemStyle: { color: colorsData[0] },
                     areaStyle: {
-                        color: new graphic.LinearGradient(0, 0, 0, 1, [
-                            {
-                                offset: 0,
-                                color: colorsData[0]
-                            },
-                            {
-                                offset: 1,
-                                color: colorsData[1]
-                            }
+                        color: verticalGradient([
+                            { offset: 0, color: hexToRgba(colorsData[0], 0.45) },
+                            { offset: 1, color: hexToRgba(colorsData[0], 0.05) }
                         ])
                     }
                 }
             ]
         }
-    }, [weatherFormatedData, weatherData, source])
+    }, [weatherFormatedData, weatherData, source, theme])
 
     return (
-        <ReactECharts
+        <EChart
             option={option}
             style={{ height: '50px', width: '100%' }}
         />

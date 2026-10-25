@@ -32,22 +32,22 @@ export const getZScoreSign = (z: number): string => {
 }
 
 /**
- * Formats an extraMetric value with appropriate units for display.
+ * Formats an extraMetric value with appropriate units for display; `t` translates the unit labels.
  */
-export const formatExtraMetricValue = (label: string, value: number): string => {
+export const formatExtraMetricValue = (label: string, value: number, t: (key: string) => string): string => {
     switch (label) {
         case 'temperature_c':
             return `${value > 0 ? '+' : ''}${value.toFixed(1)} °C`
         case 'pressure_drop_hpa':
-            return `${value >= 0 ? '+' : ''}${value.toFixed(1)} hPa`
+            return `${value >= 0 ? '+' : ''}${value.toFixed(1)} ${t('hectopascals')}`
         case 'dew_spread_c':
             return `Δ${value.toFixed(1)} °C`
         case 'wind_speed_ms':
-            return `${value.toFixed(1)} m/s`
+            return `${value.toFixed(1)} ${t('meters-per-second')}`
         case 'heat_index_c':
             return `${value.toFixed(1)} °C`
         case 'precip7d':
-            return `${value.toFixed(1)} mm`
+            return `${value.toFixed(1)} ${t('millimeters')}`
         case 'SPI-30':
             return value.toFixed(2)
         default:

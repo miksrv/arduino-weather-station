@@ -1,50 +1,31 @@
 @use '../../styles/variables'
+@use '../../styles/mixins'
+@use '../../styles/typography' as type
 
 .header
     display: flex
     align-items: center
     justify-content: space-between
     flex-wrap: wrap
-    gap: 10px
-    margin-bottom: 8px
+    gap: var(--space-2)
+    margin-bottom: var(--space-3)
 
     h3
         margin: 0
-        font-size: 18px
-        font-weight: 300
-        color: var(--text-color-primary)
+        +type.titleCard
 
 .toggle
-    display: flex
-    gap: 2px
-    background: var(--input-background-color)
-    border-radius: var(--border-radius)
-    padding: 3px
+    +mixins.segmented
 
 .toggleButton
-    border: none
-    background: transparent
-    color: var(--text-color-secondary)
-    font-size: 12px
-    padding: 6px 12px
-    border-radius: calc(var(--border-radius) - 2px)
-    cursor: pointer
-    transition: background-color 0.2s, color 0.2s
-    white-space: nowrap
-
-    &:hover
-        color: var(--text-color-primary)
+    +mixins.segment
 
 .toggleButtonActive
-    background: var(--color-main)
-    color: #fff
-
-    &:hover
-        color: #fff
+    +mixins.segmentActive
 
 .chartsRow
     display: flex
-    gap: 8px
+    gap: var(--space-3)
 
     @media only screen and (max-width: variables.$mobileMaxWidth)
         flex-direction: column

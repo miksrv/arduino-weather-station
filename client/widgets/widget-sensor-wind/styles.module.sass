@@ -1,65 +1,96 @@
+@use '../../styles/variables'
+@use '../../styles/typography' as type
+
 .container
     display: flex
     align-items: center
     justify-content: space-between
-    gap: 8px
+    gap: var(--space-3)
+
+    @media only screen and (max-width: variables.$smallMaxWidth)
+        flex-wrap: wrap
 
 .valueBlock
     display: flex
     flex-direction: column
+    gap: var(--space-1)
     flex: 1
 
 .value
-    font-size: 34px
-    font-weight: 100
     display: flex
     align-items: baseline
-    color: var(--text-color-primary)
+    gap: var(--space-1)
+    +type.value
 
     span
-        font-size: 20px
-        margin-left: 5px
-        color: var(--text-color-secondary)
+        +type.unit
 
 .direction
-    font-size: 16px
-    font-weight: 500
+    +type.body
+    font-weight: var(--font-weight-medium)
     color: var(--text-color-primary)
-    margin-top: 2px
 
 .gust
-    font-size: 13px
-    color: var(--text-color-secondary)
-    margin-top: 16px
+    +type.secondary
+    margin-top: var(--space-3)
 
 .gustValue
-    font-weight: 600
+    +type.numbers
+    font-weight: var(--font-weight-medium)
     color: var(--text-color-primary)
 
 .compassWrapper
     flex: 0 0 auto
-    width: 160px
-    height: 160px
+    width: 150px
+    height: 150px
 
+// The compass is drawn with tokens, so it follows the theme without re-rendering
 .compass
     width: 100%
     height: 100%
 
+.ring
+    fill: none
+    stroke: var(--border-strong)
+
+.tick
+    stroke: var(--text-color-secondary)
+    stroke-opacity: 0.45
+
+.glowStop, .glowStopEnd
+    stop-color: var(--data-precipitation)
+    stop-opacity: 0.12
+
+.glowStopEnd
+    stop-opacity: 0
+
 .compassLabel
     font-size: 13px
+    fill: var(--text-color-secondary)
 
 .compassLabelNorth
     font-size: 13px
-    font-weight: 700
+    font-weight: var(--font-weight-medium)
+    fill: var(--data-feels-like)
 
 .needle
-    transition: transform 0.6s ease
+    transition: transform var(--duration-slow) var(--ease)
+
+.needleHead
+    fill: var(--data-feels-like)
+
+.needleTail
+    fill: var(--text-color-secondary)
+    fill-opacity: 0.6
+
+.needlePin
+    fill: var(--text-color-primary)
 
 .statsColumn
     display: flex
     flex-direction: column
     align-items: flex-end
-    gap: 10px
+    gap: var(--space-2)
     text-align: right
     white-space: nowrap
     flex: 1

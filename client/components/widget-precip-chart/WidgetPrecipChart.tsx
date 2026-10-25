@@ -1,11 +1,14 @@
 import React, { useMemo } from 'react'
-import { EChartsOption } from 'echarts'
-import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
-import ReactECharts from 'echarts-for-react'
+import type { EChartsOption } from 'echarts'
+import type { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared'
 import { Skeleton } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
+
+import EChart from '@/components/echart'
+import { getChartTokens, getChartTooltipStyle } from '@/tools'
+import { getColor } from '@/tools/colors'
 
 import styles from './styles.module.sass'
 
@@ -16,11 +19,8 @@ interface WidgetPrecipChartProps {
 
 const WidgetPrecipChart: React.FC<WidgetPrecipChartProps> = ({ loading, monthlyTotals }) => {
     const { i18n, t } = useTranslation()
-    const { theme } = useTheme()
-
-    const backgroundColor = theme === 'dark' ? '#2c2d2e' : '#ffffff'
-    const borderColor = theme === 'dark' ? '#444546' : '#cbcccd'
-    const textSecondaryColor = theme === 'dark' ? '#76787a' : '#818c99' // --text-color-secondary
+    const { resolvedTheme: theme } = useTheme()
+    const { gridLine: borderColor, textSecondary: textSecondaryColor } = getChartTokens(theme)
 
     const monthlyChartOption: EChartsOption = useMemo(() => {
         const totals = monthlyTotals ?? []
@@ -38,14 +38,13 @@ const WidgetPrecipChart: React.FC<WidgetPrecipChartProps> = ({ loading, monthlyT
                 {
                     barMaxWidth: 32,
                     data: values,
-                    itemStyle: { borderRadius: [3, 3, 0, 0], color: '#1a7fd4' },
+                    itemStyle: { borderRadius: [4, 4, 0, 0], color: getColor('blue', theme)[0] },
                     type: 'bar'
                 }
             ],
             tooltip: {
                 trigger: 'axis',
-                backgroundColor,
-                borderColor,
+                ...getChartTooltipStyle(theme),
                 formatter: (params: TopLevelFormatterParams) => {
                     const arr: CallbackDataParams[] = Array.isArray(params) ? params : [params]
                     const tooltipContent: string[] = []
@@ -95,7 +94,7 @@ const WidgetPrecipChart: React.FC<WidgetPrecipChartProps> = ({ loading, monthlyT
                 type: 'value'
             }
         }
-    }, [monthlyTotals, i18n.language, backgroundColor, borderColor, t])
+    }, [monthlyTotals, i18n.language, borderColor, t])
 
     return (
         <div className={styles.widget}>
@@ -103,7 +102,7 @@ const WidgetPrecipChart: React.FC<WidgetPrecipChartProps> = ({ loading, monthlyT
             {loading ? (
                 <Skeleton style={{ width: '100%', height: 220 }} />
             ) : (
-                <ReactECharts
+                <EChart
                     option={monthlyChartOption}
                     style={{ height: '220px', width: '100%' }}
                 />

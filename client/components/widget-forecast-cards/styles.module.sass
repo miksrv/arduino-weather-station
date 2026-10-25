@@ -1,75 +1,77 @@
-@use '../../styles/variables'
+@use '../../styles/variables' as variables
+@use '../../styles/mixins'
+@use '../../styles/typography' as type
 
 .widget
     flex-basis: 100%
     width: 100%
     color: var(--text-color-primary)
-    margin-top: -10px
 
+    // One forecast period: weekday → date → icon → temperature → clouds and wind
     .card
+        +mixins.card
         flex-shrink: 0
         display: flex
         flex-direction: column
         align-items: center
-        gap: 4px
-        border-radius: var(--container-radius)
-        box-shadow: var(--container-shadow)
-        background: var(--container-background-color)
-        padding: 10px 12px
-        width: 100px
+        gap: var(--space-1)
+        flex: 0 0 160px
+        padding: var(--space-3)
+
+        @media only screen and (max-width: variables.$mobileMaxWidth)
+            flex-basis: 200px
         cursor: default
-        transition: box-shadow 0.2s
-        min-width: 158px
+        transition: box-shadow var(--duration-fast) var(--ease)
 
         &.highlighted
-            box-shadow: 0 0 0 1px var(--color-main)
+            background: var(--color-main-background)
+            box-shadow: 0 0 0 1px var(--color-main), var(--shadow-sm)
 
     .cardDay
-        font-size: var(--font-size-small)
+        +type.overline
         color: var(--text-color-primary)
-        font-weight: 400
-        text-transform: uppercase
-        letter-spacing: 0.05em
         white-space: nowrap
 
     .cardDate
-        font-size: var(--font-size-small)
-        color: var(--text-color-secondary)
+        +type.caption
         white-space: nowrap
-        text-transform: capitalize
+
+        &:first-letter
+            text-transform: uppercase
 
     .cardTime
+        +type.numbers
         font-size: var(--font-size)
-        font-weight: 500
-        color: var(--text-color-primary)
+        font-weight: var(--font-weight-medium)
         white-space: nowrap
-        text-transform: capitalize
 
     .cardIcon
         display: flex
         align-items: center
         justify-content: center
+        margin: var(--space-1) 0
 
         svg
-            width: 42px
-            height: 42px
+            width: 44px
+            height: 44px
 
     .cardTempRange
         display: flex
-        gap: 4px
-        align-items: center
+        gap: var(--space-1)
+        align-items: baseline
         white-space: nowrap
 
     .cardTempHigh
-        font-size: 25px
-        font-weight: 100
-        color: var(--text-color-primary)
-
+        +type.numbers
+        font-size: 26px
+        font-weight: var(--font-weight-normal)
+        letter-spacing: -0.02em
+        line-height: 1.1
 
     .cardTemp
+        +type.numbers
         font-size: var(--font-size)
-        font-weight: 500
-        color: var(--text-color-primary)
+        font-weight: var(--font-weight-medium)
         white-space: nowrap
 
     .cardMeta
@@ -82,24 +84,29 @@
     .cardMetaRow
         display: flex
         align-items: center
-        gap: 4px
-        font-size: var(--font-size-small)
-        color: var(--text-color-secondary)
+        gap: var(--space-1)
+        +type.numbers
+        +type.caption
         white-space: nowrap
 
         svg
-            height: 16px
-            width: 16px
+            height: 14px
+            width: 14px
             fill: var(--text-color-secondary)
             flex-shrink: 0
 
     .section
         width: 100%
 
+    // The rail's 2px inset keeps the cards' outer ring from being clipped; the margin keeps them on the grid
+    .rail
+        --scroll-rail-gap: var(--gap)
+        margin: -2px
+
     .skeletonRow
         // 1px of padding (offset by the negative margin) keeps the cards' outer ring from being clipped
-        margin: 19px -1px -1px
+        margin: -1px
         padding: 1px
         display: flex
-        gap: 10px
+        gap: var(--gap)
         overflow: hidden

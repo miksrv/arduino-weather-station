@@ -10,7 +10,7 @@ jest.mock('next-i18next/pages', () => ({
     useTranslation: () => ({ t: (key: string) => key })
 }))
 
-jest.mock('echarts-for-react', () => () => <div data-testid='echarts' />)
+jest.mock('@/components/echart', () => () => <div data-testid='echarts' />)
 
 describe('WidgetParameterZScore', () => {
     it('renders the i18n label for a known parameter', () => {

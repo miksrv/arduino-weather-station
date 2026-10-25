@@ -1,25 +1,21 @@
 @use '../../styles/variables'
+@use '../../styles/mixins'
+@use '../../styles/typography' as type
 
 .widget
+    +mixins.card
     flex-basis: 100%
     width: 100%
-    background: var(--container-background-color)
-    color: var(--text-color-primary)
-    border-radius: var(--container-radius)
-    box-shadow: var(--container-shadow)
     overflow: hidden
-    padding: 14px
 
     .title
-        color: var(--text-color-primary)
-        font-size: 16px
-        font-weight: 200
+        +type.titleCard
 
 .header
     display: flex
     flex-direction: column
-    gap: 8px
-    margin-bottom: 12px
+    gap: var(--space-2)
+    margin-bottom: var(--space-3)
 
     @media screen and (min-width: variables.$mobileMaxWidth)
         flex-direction: row
@@ -29,8 +25,9 @@
 .stats
     display: flex
     flex-wrap: wrap
-    gap: 12px
-    font-size: 12px
+    gap: var(--space-3)
+    +type.caption
+    color: var(--text-color-primary)
 
 .statItem
     display: flex
@@ -40,13 +37,14 @@
     color: var(--text-color-secondary)
 
 .statValue
-    font-weight: 500
+    +type.numbers
+    font-weight: var(--font-weight-medium)
 
 .stripesContainer
     position: relative
     display: flex
     width: 100%
-    border-radius: 4px
+    border-radius: var(--radius-md)
     overflow: hidden
 
 .stripe
@@ -54,7 +52,7 @@
     min-width: 60px
     height: 100px
     cursor: crosshair
-    transition: transform 0.15s ease, box-shadow 0.15s ease
+    transition: transform var(--duration-fast) var(--ease), box-shadow var(--duration-fast) var(--ease)
     display: flex
     flex-direction: column
     align-items: center
@@ -65,12 +63,16 @@
     &:hover,
     &.stripeActive
         transform: scaleY(1.05)
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.3)
+        box-shadow: var(--shadow-md)
         z-index: 2
+
+.stripePartial
+    color: var(--text-color-secondary)
+    background: repeating-linear-gradient(-45deg, var(--surface-2), var(--surface-2) 6px, var(--surface-3) 6px, var(--surface-3) 12px)
 
 .stripeYear
     font-size: 13px
-    font-weight: 600
+    font-weight: var(--font-weight-medium)
     white-space: nowrap
 
 .stripeTemp
@@ -86,12 +88,11 @@
 .legend
     display: flex
     align-items: center
-    gap: 8px
-    margin-top: 10px
-    font-size: 11px
-    color: var(--text-color-secondary)
+    gap: var(--space-2)
+    margin-top: var(--space-3)
+    +type.caption
 
 .legendGradient
     flex: 1
     height: 8px
-    border-radius: 4px
+    border-radius: var(--radius-full)

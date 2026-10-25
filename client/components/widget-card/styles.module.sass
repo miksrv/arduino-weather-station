@@ -1,73 +1,72 @@
 @use '../../styles/variables'
+@use '../../styles/mixins'
+@use '../../styles/typography' as type
 
 .widget
-    background: var(--container-background-color)
-    color: var(--text-color-primary)
-    border-radius: var(--container-radius)
-    box-shadow: var(--container-shadow)
+    +mixins.card
+    display: flex
+    flex-direction: column
+    min-width: 0
     overflow: hidden
-    padding: 16px
 
     &.x1
-        flex-basis: calc(25% - 7.5px)
-        width: calc(25% - 7.5px)
+        +mixins.columns(1)
 
     &.x2
-        flex-basis: calc(50% - 5px)
-        width: calc(50% - 5px)
+        +mixins.columns(2)
 
     &.x3
-        flex-basis: calc(75% - 2.5px)
-        width: calc(75% - 2.5px)
+        +mixins.columns(3)
 
     &.x4
-        flex-basis: 100%
-        width: 100%
+        +mixins.columns(4)
 
+    // Tablets and large phones: quarter cards go two per row, wider cards take the row
     @media only screen and (max-width: variables.$mobileMaxWidth)
-        flex-basis: calc(50% - 5px) !important
-        width: calc(50% - 5px) !important
+        &.x1
+            +mixins.columns(1, 2)
 
-        &.x4
-            flex-basis: 100% !important
-            width: 100% !important
+        &.x2, &.x3, &.x4
+            +mixins.columns(1, 1)
 
-    @media only screen and (max-width: 390px)
-        flex-basis: 100% !important
-        width: 100% !important
+    @media only screen and (max-width: variables.$smallMaxWidth)
+        &.x1
+            +mixins.columns(1, 1)
 
     .header
         display: flex
         width: 100%
         justify-content: space-between
         align-items: center
-        white-space: nowrap
-        text-overflow: ellipsis
-        overflow: hidden
-        margin-bottom: 4px
+        gap: var(--space-2)
+        margin-bottom: var(--space-2)
 
-        h3, a
-            color: var(--text-color-primary)
+        h3
             margin: 0
-            font-weight: 300
-            font-size: 18px
-            text-decoration: none
-            transition: color 0.3s
+            min-width: 0
+            overflow: hidden
+            white-space: nowrap
+            text-overflow: ellipsis
+            +type.titleCard
+
+        a
+            color: inherit
+
+            &:hover
+                color: var(--color-main)
+
+                .externalLinkIcon
+                    fill: var(--color-main)
 
         svg
-            fill: var(--text-color-primary)
-            width: 26px
-            height: 26px
-            opacity: 0.5
-
-        a:hover
-            color: var(--text-color-primary)
-
-            svg
-                fill: var(--text-color-primary)
+            flex: 0 0 auto
+            fill: var(--text-color-secondary)
+            width: 20px
+            height: 20px
 
         .externalLinkIcon
-            vertical-align: middle
+            vertical-align: baseline
+            margin-left: 2px
             width: 12px
             height: 12px
-            transition: fill 0.3s
+            transition: fill var(--duration-fast) var(--ease)

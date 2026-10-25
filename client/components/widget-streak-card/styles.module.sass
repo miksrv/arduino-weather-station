@@ -1,45 +1,38 @@
-@use '../../styles/variables'
+@use '../../styles/mixins'
+@use '../../styles/typography' as type
 
 .card
-    background: var(--container-background-color)
-    color: var(--text-color-primary)
-    border-radius: var(--container-radius)
-    box-shadow: var(--container-shadow)
+    +mixins.card
+    +mixins.columns(1, 2)
+    +mixins.fullOnMobile
+    display: flex
+    flex-direction: column
+    gap: var(--space-1)
     overflow: hidden
-    padding: 12px 14px
-    width: calc(50% - 5px)
-
-    @media only screen and (max-width: variables.$mobileMaxWidth)
-        width: 100%
-        flex-basis: 100%
 
     .header
         display: flex
         align-items: center
-        gap: 6px
-        margin-bottom: 6px
+        gap: var(--space-2)
 
     .iconWrapper
         display: flex
         align-items: center
-        color: var(--text-color-secondary)
 
         svg
             width: 16px
             height: 16px
-            fill: var(--text-color-primary)
+            fill: var(--text-color-secondary)
 
     .title
-        color: var(--text-color-primary)
-        font-size: 16px
-        font-weight: 200
+        +type.secondary
 
     .value
-        font-size: 18px
-        font-weight: 400
+        +type.numbers
+        font-size: 22px
+        font-weight: var(--font-weight-normal)
+        letter-spacing: -0.01em
         color: var(--text-color-primary)
-        margin-bottom: 2px
 
     .range
-        font-size: 12px
-        color: var(--text-color-secondary)
+        +type.caption
