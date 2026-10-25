@@ -49,9 +49,20 @@ class ClimateModel extends Model
     {
         $years          = $this->_getAnnualStats();
         $monthlyNormals = $this->_getMonthlyNormals();
+        $currentYear    = (int) date('Y');
 
-        $baseline = count($years) > 0
-            ? array_sum(array_column($years, 'avgTemp')) / count($years)
+        // The running year covers only part of the seasons (a year to October misses the coldest months),
+        // so it is flagged and left out of the baseline that the anomalies are measured against.
+        foreach ($years as &$year) {
+            $year['isPartial'] = (int) $year['year'] >= $currentYear;
+        }
+        unset($year);
+
+        $completeYears = array_values(array_filter($years, static fn (array $year): bool => !$year['isPartial']));
+        $baselineYears = count($completeYears) > 0 ? $completeYears : $years;
+
+        $baseline = count($baselineYears) > 0
+            ? array_sum(array_column($baselineYears, 'avgTemp')) / count($baselineYears)
             : 0.0;
 
         $baseline = round($baseline, 2);
@@ -92,7 +103,7 @@ class ClimateModel extends Model
                 AVG(wind_speed)           AS avg_wind_speed,
                 AVG(clouds)               AS avg_clouds
             FROM daily_averages
-            WHERE YEAR(date) >= ' . self::START_YEAR . '
+            WHERE date >= \'' . self::START_YEAR . '-01-01\'
             GROUP BY YEAR(date)
             ORDER BY year ASC
         ')->getResultArray();
@@ -133,7 +144,7 @@ class ClimateModel extends Model
                 AVG(clouds)        AS avg_clouds,
                 AVG(wind_speed)    AS avg_wind_speed
             FROM daily_averages
-            WHERE YEAR(date) >= ' . self::START_YEAR . '
+            WHERE date >= \'' . self::START_YEAR . '-01-01\'
             GROUP BY MONTH(date)
             ORDER BY month ASC
         ')->getResultArray();

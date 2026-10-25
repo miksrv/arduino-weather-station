@@ -167,6 +167,39 @@ final class ClimateModelTest extends CIUnitTestCase
         $this->assertSame(2.0,  $result['years'][1]['tempAnomaly']);
     }
 
+    /**
+     * The running year is flagged as partial and does not move the baseline: a year to October
+     * misses November and December and would look warmer than a full year.
+     */
+    public function testRunningYearIsPartialAndLeftOutOfBaseline(): void
+    {
+        $currentYear = (int) date('Y');
+        $years       = [
+            $this->_makeYearRow($currentYear - 2, 8.0),
+            $this->_makeYearRow($currentYear - 1, 12.0),
+            $this->_makeYearRow($currentYear, 20.0),
+        ];
+
+        $result = $this->_mockModel($years, [])->getClimateStats();
+
+        $this->assertFalse($result['years'][0]['isPartial']);
+        $this->assertFalse($result['years'][1]['isPartial']);
+        $this->assertTrue($result['years'][2]['isPartial']);
+        $this->assertSame(10.0, $result['baselineAvgTemp']);
+        $this->assertSame(10.0, $result['years'][2]['tempAnomaly']);
+    }
+
+    /**
+     * With only the running year there is nothing complete to compare with, so it is its own baseline.
+     */
+    public function testBaselineFallsBackToPartialYearWhenItIsTheOnlyOne(): void
+    {
+        $result = $this->_mockModel([$this->_makeYearRow((int) date('Y'), 7.0)], [])->getClimateStats();
+
+        $this->assertSame(7.0, $result['baselineAvgTemp']);
+        $this->assertSame(0.0, $result['years'][0]['tempAnomaly']);
+    }
+
     // -------------------------------------------------------------------------
     // 4. Monthly normals always has 12 entries
     // -------------------------------------------------------------------------

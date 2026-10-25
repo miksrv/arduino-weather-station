@@ -374,7 +374,8 @@ class AnomalyModel
         try {
             $today = (new \DateTime('today'))->format('Y-m-d');
             $row   = $this->dailyModel
-                ->where('DATE(date)', $today)
+                ->where('date >=', $today . ' 00:00:00')
+                ->where('date <=', $today . ' 23:59:59')
                 ->first();
 
             return $row
