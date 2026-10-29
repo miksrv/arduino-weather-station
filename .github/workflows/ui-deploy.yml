@@ -91,16 +91,19 @@ jobs:
       # If we run NextJS on a Node server using PM2
       - name: Send files
         run: |
-          ssh vps "cd /var/www/meteo.miksoft.pro && rm -rf .next"
+          # Everything but .next/cache and .next/static. The optimized images in the cache do not depend on
+          # the build, and a wiped cache makes every image a slow miss after a release; images nobody
+          # requested for a month go. The previous builds' static files stay for a week: pages rendered
+          # before the release (open tabs, the crawler page cache) still load their chunks and icons
+          ssh vps "cd /var/www/meteo.miksoft.pro && mkdir -p .next && find .next -mindepth 1 -maxdepth 1 ! -name cache ! -name static -exec rm -rf {} + && (find .next/static -type f -mtime +7 -delete; find .next/static -mindepth 1 -type d -empty -delete; find .next/cache/images -type f -atime +30 -delete) 2>/dev/null || true"
           rsync -avz -e ssh client/.next/standalone/ vps:/var/www/meteo.miksoft.pro
           rsync -avz -e ssh client/.next/static vps:/var/www/meteo.miksoft.pro/.next
           rsync -avz -e ssh client/public vps:/var/www/meteo.miksoft.pro
           rsync -avz -e ssh client/ecosystem.config.js vps:/var/www/meteo.miksoft.pro
 
-      # For the first launch of the application on the server:
-      # pm2 start ecosystem.config.js && pm2 save
+      # Restarting by the ecosystem file applies its env changes; pm2 save keeps the list for a reboot
       - name: Restart PM2
-        run: ssh vps "pm2 restart meteo.miksoft.pro"
+        run: ssh vps "cd /var/www/meteo.miksoft.pro && pm2 restart ecosystem.config.js --update-env && pm2 save"
 
       # If for deployment we use not SSH, but an FTP connection
       # - name: Export UI

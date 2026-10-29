@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.9.1
+
+### Patch Changes
+
+- Optimized page and image delivery: pages load faster, no broken pages after a release
+
 ## 3.9.0
 
 ### Minor Changes

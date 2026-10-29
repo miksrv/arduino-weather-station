@@ -4,6 +4,9 @@ module.exports = {
             args: 'start',
             autorestart: true,
             env: {
+                // Fewer glibc malloc arenas: the image optimizer (sharp) otherwise bloats RSS
+                // far beyond the JS heap on a 1 CPU VPS
+                MALLOC_ARENA_MAX: '2',
                 NODE_ENV: 'production',
                 PORT: 3007
             },
