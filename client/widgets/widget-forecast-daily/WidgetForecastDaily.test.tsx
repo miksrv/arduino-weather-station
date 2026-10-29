@@ -2,6 +2,8 @@ import React from 'react'
 
 import { render, screen } from '@testing-library/react'
 
+import { getCurrentDate } from '@/tools/date'
+
 import WidgetForecastDaily from './WidgetForecastDaily'
 
 import '@testing-library/jest-dom'
@@ -14,11 +16,12 @@ jest.mock('next-i18next/pages', () => ({
 // eslint-disable-next-line next/no-img-element
 jest.mock('next/image', () => (props: { alt: string }) => <img alt={props.alt} />)
 
+// Days of the site's time zone, not UTC: from 19:00 to 24:00 UTC it is already tomorrow in Yekaterinburg
 const day = (offset: number, extra: Record<string, number> = {}) => {
-    const date = new Date(Date.now() + offset * 86_400_000)
+    const date = getCurrentDate().add(offset, 'day').format('YYYY-MM-DD')
 
     return {
-        date: `${date.toISOString().slice(0, 10)} 00:00:00`,
+        date: `${date} 00:00:00`,
         temperatureMin: -2,
         temperatureMax: 6,
         precipitation: 0,
