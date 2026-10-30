@@ -10,6 +10,9 @@ module.exports = {
                 NODE_ENV: 'production',
                 PORT: 3007
             },
+            // Fork, not cluster: in cluster mode PM2 hands the env to the worker after the start,
+            // too late for glibc to read MALLOC_ARENA_MAX
+            exec_mode: 'fork',
             instances: 1,
             max_memory_restart: '256M',
             name: 'meteo.miksoft.pro',
