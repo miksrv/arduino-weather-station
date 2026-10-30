@@ -4,11 +4,14 @@ namespace App\Controllers;
 
 use App\Entities\WeatherData;
 use App\Libraries\EventFeedBuilder;
+use App\Libraries\ObservatorySafety;
 use App\Models\ForecastWeatherDataModel;
 use App\Models\RawWeatherDataModel;
+use CodeIgniter\Entity\Entity;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use Exception;
@@ -25,14 +28,27 @@ class Current extends ResourceController
 {
     protected $format = 'json';
 
+    /**
+     * Extra plain-text keys duplicating API fields under the names the INDI
+     * Weather Watcher driver reads by default (precip / wind / gust).
+     */
+    private const WATCHER_KEY_ALIASES = [
+        'precipitation' => 'precip',
+        'wind_speed'    => 'wind',
+        'wind_gust'     => 'gust',
+    ];
+
     protected RawWeatherDataModel $weatherDataModel;
 
+    protected ForecastWeatherDataModel $forecastModel;
+
     /**
-     * Initialises the raw weather data model.
+     * Initialises the raw weather data and forecast models.
      */
     public function __construct()
     {
         $this->weatherDataModel = new RawWeatherDataModel();
+        $this->forecastModel    = new ForecastWeatherDataModel();
     }
 
     /**
@@ -63,43 +79,51 @@ class Current extends ResourceController
 
     /**
      * Returns the latest weather observation formatted as plain text, with
-     * an optional one-hour precipitation forecast appended.
+     * a precipitation forecast flag appended.
+     *
+     * This feed drives the observatory's INDI Weather Watcher, where a false
+     * alarm closes the roof. So precipitation, clouds, wind, gust and the forecast flag
+     * are the confirmed values of {@see ObservatorySafety}: one source or one
+     * spike can not make them unsafe. The response is never cached.
      *
      * @return ResponseInterface
-     * @throws Exception
      */
     public function getCurrentTextWeather(): ResponseInterface
     {
-        $weatherForecastModel = new ForecastWeatherDataModel();
-
-        $hourlyForecast = $weatherForecastModel->getHourlyAverages();
-        $weatherData    = $this->_getWeatherData();
+        $weatherData = $this->_getWeatherData();
 
         if ($weatherData instanceof ResponseInterface) {
             return $weatherData;
         }
 
-        // Convert the current date to a DateTime object
-        $currentDateTime = new DateTime($weatherData['date']);
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
-        // Find the first forecast entry whose date is greater than the current one
-        $nextForecast = null;
-        foreach ($hourlyForecast as $forecast) {
-            $forecastDate = new DateTime($forecast['date']);
-            if ($forecastDate > $currentDateTime) {
-                $nextForecast = $forecast;
-                break;
-            }
+        try {
+            $since        = new DateTime('-' . ObservatorySafety::REPORT_WINDOW_MINUTES . ' minutes', new DateTimeZone('UTC'));
+            $rows         = array_map(
+                static fn ($row): array => $row instanceof Entity ? $row->toRawArray() : (array) $row,
+                $this->weatherDataModel->getRowsSince($since)
+            );
+            $forecastRows = $this->forecastModel->getSourceRowsAhead(ObservatorySafety::FORECAST_LOOKAHEAD_HOURS + 1, $now);
+
+            $weatherData['precipitation'] = round(ObservatorySafety::precipitation($rows, $now), 2);
+            $weatherData['clouds']        = round(ObservatorySafety::clouds($rows, $now), 2);
+            $weatherData['wind_speed']    = round(ObservatorySafety::windSpeed($rows, $now), 2);
+            $weatherData['wind_gust']     = round(ObservatorySafety::windGust($rows, $now), 2);
+            $forecast                     = ObservatorySafety::forecastFlag($forecastRows, $now);
+        } catch (Throwable $e) {
+            log_message('error', 'Current::getCurrentTextWeather - failed to get safety data: ' . $e->getMessage());
+            return $this->failServerError('An error occurred while retrieving current weather data.');
         }
-
-        // Only precipitation is considered for the one-hour forecast flag
-        $forecast = isset($nextForecast['precipitation']) && (float) $nextForecast['precipitation'] > 0 ? -1 : 1;
 
         $formattedResponse = $this->_formatWeatherDataToText($weatherData, $forecast);
 
+        // No caching anywhere: the observatory must always see the latest values
         return $this->response
             ->setBody($formattedResponse)
-            ->setContentType('text/plain');
+            ->setContentType('text/plain')
+            ->setHeader('Cache-Control', 'no-store, max-age=0')
+            ->setHeader('Expires', 'Thu, 01 Jan 1970 00:00:00 GMT');
     }
 
     // -------------------------------------------------------------------------
@@ -108,6 +132,9 @@ class Current extends ResourceController
 
     /**
      * Formats a weather data array into a key=value plain-text string.
+     *
+     * Empty values are left out: the Weather Watcher parser reads the line
+     * after a bare `key=` as that key's value, swallowing the next key.
      *
      * @param array    $data     Associative weather data array.
      * @param int|null $forecast Precipitation forecast flag (1 = clear, -1 = rain, null = omit).
@@ -119,11 +146,17 @@ class Current extends ResourceController
         $formattedData = "dataGMTTime={$formattedDate}" . PHP_EOL;
 
         foreach ($data as $key => $item) {
-            if ($key === 'date') {
+            if ($key === 'date' || $item === null || $item === '') {
                 continue;
             }
 
             $formattedData .= "{$key}={$item}" . PHP_EOL;
+        }
+
+        foreach (self::WATCHER_KEY_ALIASES as $key => $alias) {
+            if (isset($data[$key]) && $data[$key] !== '') {
+                $formattedData .= "{$alias}={$data[$key]}" . PHP_EOL;
+            }
         }
 
         if ($forecast !== null) {

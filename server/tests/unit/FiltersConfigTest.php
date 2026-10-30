@@ -32,13 +32,25 @@ final class FiltersConfigTest extends CIUnitTestCase
         $this->assertContains($expected, $filters->getFilters()['after'], $uri);
     }
 
-    public function testSensorsIsNotCached(): void
+    /**
+     * @return array<string, array{0: string}>
+     */
+    public static function uncachedRoutesProvider(): array
+    {
+        return [
+            'sensors'      => ['sensors'],
+            'current/text' => ['current/text'],
+        ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('uncachedRoutesProvider')]
+    public function testRouteIsNotCached(string $uri): void
     {
         $filters = Services::filters()->reset();
-        $filters->initialize('sensors');
+        $filters->initialize($uri);
 
         foreach ($filters->getFilters()['after'] as $alias) {
-            $this->assertStringStartsNotWith('cachecontrol', $alias);
+            $this->assertStringStartsNotWith('cachecontrol', $alias, $uri);
         }
     }
 }

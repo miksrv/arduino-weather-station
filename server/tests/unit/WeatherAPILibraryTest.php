@@ -72,7 +72,8 @@ final class WeatherAPILibraryTest extends CIUnitTestCase
                 'humidity'            => 68,
                 'vis_km'              => 10,
                 'wind_kph'            => 14.4,
-                'gust_mph'            => 20.0,
+                'gust_mph'            => 20.1,
+                'gust_kph'            => 32.4,
                 'wind_degree'         => 270,
                 'cloud'               => 25,
                 'uv'                  => 4.0,
@@ -94,6 +95,8 @@ final class WeatherAPILibraryTest extends CIUnitTestCase
         $this->assertSame(10000, $result['visibility']);
         // wind_kph=14.4 → kmh_to_ms → 4.0
         $this->assertEqualsWithDelta(4.0, (float) $result['wind_speed'], 0.01);
+        // gust_kph=32.4 → 9.0 m/s (gust_mph must not be read as km/h)
+        $this->assertEqualsWithDelta(9.0, (float) $result['wind_gust'], 0.01);
         $this->assertSame(270,   $result['wind_deg']);
         $this->assertSame(800,   $result['weather_id']);
         $this->assertSame(RawWeatherDataModel::SOURCE_WEATHERAPI, $result['source']);
