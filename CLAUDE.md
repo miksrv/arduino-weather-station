@@ -245,6 +245,8 @@ CodeIgniter dotted-key env vars — database (`database.production.*`), app coor
 | GET | `/anomaly/history` | Anomaly::history |
 | GET | `/climate` | Climate::index |
 
+`/current/text` is the `key=value` feed of the observatory's INDI Weather Watcher (the roof closes on its alerts), so it is never cached and never emits an empty value (the driver's parser would swallow the next line). Its `precipitation`, `clouds`, `wind_speed`, `wind_gust` and `forecast` lines are the confirmed values of `App\Libraries\ObservatorySafety`: unsafe only when at least two API sources agree (clouds: their median), or for wind, the station's 30-minute median; a single source or spike never raises an alarm. These lines are always present, since the driver only creates parameters for keys it sees on connect.
+
 ---
 
 ## Testing

@@ -12,8 +12,8 @@ use Exception;
  * Class GetForecastWeather
  *
  * Spark CLI command that fetches forecast weather data from all configured
- * external API sources (OpenWeatherMap, WeatherAPI, VisualCrossing) and
- * bulk-inserts or bulk-updates records in the forecast_weather_data table.
+ * external API sources and bulk-inserts or bulk-updates records in the
+ * forecast_weather_data table, one row per source and forecast time.
  *
  * Usage:
  *   php spark system:getForecastWeather
@@ -33,7 +33,7 @@ class GetForecastWeather extends BaseCommand
 
     /**
      * Iterates over each configured weather API client, determines which
-     * forecast records need inserting versus updating based on forecast_time,
+     * forecast records need inserting versus updating based on source and forecast_time,
      * then executes bulk insert and update operations.
      *
      * @param array $params CLI parameters (unused)
@@ -74,18 +74,14 @@ class GetForecastWeather extends BaseCommand
                 $minTime = min($times);
                 $maxTime = max($times);
 
-                // Load all existing records within that window
-                $existingRecords = $forecastWeatherDataModel
-                    ->select('id, forecast_time')
-                    ->where('forecast_time >=', $minTime)
-                    ->where('forecast_time <=', $maxTime)
-                    ->findAll();
-
-                // Index existing records by their forecast_time string for O(1) lookup
-                $existingMap = [];
-                foreach ($existingRecords as $record) {
-                    $existingMap[$record->forecast_time->format('Y-m-d H:i:s')] = $record->id;
-                }
+                // Existing records of this source within that window, keyed by forecast_time.
+                // The source must be part of the match: every provider forecasts the same hours,
+                // and matching by time alone made each provider overwrite the previous one's rows
+                $existingMap = $forecastWeatherDataModel->getExistingIds(
+                    (string) ($dataArray[0]['source'] ?? $sourceName),
+                    $minTime,
+                    $maxTime
+                );
 
                 // Partition incoming data into inserts and updates
                 $insertData = [];

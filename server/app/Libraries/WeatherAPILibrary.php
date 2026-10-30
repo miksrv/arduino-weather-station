@@ -165,7 +165,7 @@ class WeatherAPILibrary extends AbstractWeatherAPILibrary
             'humidity'      => (float) $data['humidity'] ?? null,
             'visibility'    => !empty($data['vis_km']) ? (int) $data['vis_km'] * 1000 : null,
             'wind_speed'    => !empty($data['wind_kph']) ? kmh_to_ms($data['wind_kph']) : null,
-            'wind_gust'     => !empty($data['gust_mph']) ? kmh_to_ms($data['gust_mph']) : null,
+            'wind_gust'     => !empty($data['gust_kph']) ? kmh_to_ms($data['gust_kph']) : null,
             'wind_deg'      => (int) $data['wind_degree'] ?? null,
             'clouds'        => $data['cloud'] ?? null,
             'uv_index'      => $data['uv'] ?? null,

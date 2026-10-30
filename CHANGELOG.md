@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 3.9.2
+
+### Patch Changes
+
+- The plain-text weather feed for the observatory reports rain, cloud cover, wind, gusts and the precipitation forecast only when they are confirmed by at least two weather sources (wind also by the station's own sensor), so a single faulty reading no longer closes the roof
+- The precipitation forecast in the feed also covers the current hour and ignores drizzle below 0.1 mm
+- The feed is never cached and no longer contains empty values that the observatory software misread
+- Fixed wind gusts from WeatherAPI being reported about 40% too low
+- Fixed forecasts of different weather services overwriting each other: the forecast now really averages all services
+- Lower memory and disk use of the web server
+
 ## 3.9.1
 
 ### Patch Changes

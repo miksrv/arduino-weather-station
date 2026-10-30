@@ -70,8 +70,9 @@ class Filters extends BaseConfig {
     public array $filters = [
         'throttle' => ['before' => ['sensors']],
 
-        // HTTP caching (Cache-Control + ETag) for read-only GET endpoints; argument = max-age in seconds
-        'cachecontrol:30'   => ['after' => ['current', 'current/text']],
+        // HTTP caching (Cache-Control + ETag) for read-only GET endpoints; argument = max-age in seconds.
+        // current/text is left out on purpose: it drives the observatory and must never be cached
+        'cachecontrol:30'   => ['after' => ['current']],
         'cachecontrol:60'   => ['after' => ['events']],
         'cachecontrol:300'  => ['after' => ['history', 'heatmap', 'forecast/*', 'precipitation', 'anomaly', 'anomaly/history']],
         'cachecontrol:3600' => ['after' => ['climate']],
