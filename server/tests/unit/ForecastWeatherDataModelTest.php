@@ -79,4 +79,37 @@ final class ForecastWeatherDataModelTest extends CIUnitTestCase
         $this->assertArrayNotHasKey('forecast_time', $casts,
             'forecast_time must not appear in $casts when already listed in $dates');
     }
+
+    // -------------------------------------------------------------------------
+    // getExistingIds() — used by the forecast fetch to decide insert vs update
+    // -------------------------------------------------------------------------
+
+    /**
+     * Existing rows must be matched by source as well as time: every provider
+     * forecasts the same hours, and matching by time alone made each provider
+     * overwrite the rows of the previous one.
+     */
+    public function testGetExistingIdsFiltersBySourceAndKeysByTime(): void
+    {
+        $calls = [];
+
+        $stub = $this->getMockBuilder(ForecastWeatherDataModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['__call', 'findAll'])
+            ->getMock();
+
+        $stub->method('__call')->willReturnCallback(static function (string $name, array $args) use (&$calls, &$stub) {
+            $calls[] = [$name, $args];
+            return $stub;
+        });
+        $stub->method('findAll')->willReturn([
+            (object) ['id' => '7', 'forecast_time' => new \DateTime('2024-01-15 11:00:00')],
+            (object) ['id' => '9', 'forecast_time' => new \DateTime('2024-01-15 12:00:00')],
+        ]);
+
+        $ids = $stub->getExistingIds('OpenMeteo', '2024-01-15 11:00:00', '2024-01-15 12:00:00');
+
+        $this->assertContains(['where', ['source', 'OpenMeteo']], $calls);
+        $this->assertSame(['2024-01-15 11:00:00' => 7, '2024-01-15 12:00:00' => 9], $ids);
+    }
 }

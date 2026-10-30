@@ -14,7 +14,7 @@ use CodeIgniter\Model;
  *
  * Stores forecast records fetched from external weather APIs. Provides
  * hourly and daily aggregation methods (see ForecastAggregator) consumed by the Forecast controller
- * and the Current controller (next-hour precipitation look-ahead).
+ * and per-source rows for the Current controller (plain-text precipitation forecast flag).
  *
  * @package App\Models
  */
@@ -96,6 +96,24 @@ class ForecastWeatherDataModel extends Model
     }
 
     /**
+     * Returns the raw per-source forecast rows (not averaged) for the next
+     * $hours hours starting at the current UTC hour, so the caller can tell
+     * how many sources agree on a forecast.
+     *
+     * @param int                    $hours Number of hours to return.
+     * @param DateTimeImmutable|null $now   Reference time (defaults to now, UTC).
+     * @return array<int, array<string, mixed>> Raw rows (snake_case keys).
+     */
+    public function getSourceRowsAhead(int $hours, ?DateTimeImmutable $now = null): array
+    {
+        $utc   = new DateTimeZone('UTC');
+        $now   = ($now ?? new DateTimeImmutable('now', $utc))->setTimezone($utc);
+        $start = $now->setTime((int) $now->format('G'), 0, 0);
+
+        return $this->_getSourceRows($start, $start->modify('+' . $hours . ' hours'));
+    }
+
+    /**
      * Returns daily forecast rows grouped by local (station time zone) calendar
      * day, starting from the current local day.
      *
@@ -115,6 +133,31 @@ class ForecastWeatherDataModel extends Model
             $timezone,
             $days
         );
+    }
+
+    /**
+     * Returns the ids of a source's existing rows within a time window, keyed
+     * by forecast_time, so a forecast fetch can update them instead of inserting.
+     *
+     * @param string $source Source name (RawWeatherDataModel::SOURCE_*).
+     * @param mixed  $from   Inclusive window start (Time|DateTimeInterface|string).
+     * @param mixed  $to     Inclusive window end (Time|DateTimeInterface|string).
+     * @return array<string, int> Row id per forecast_time (Y-m-d H:i:s).
+     */
+    public function getExistingIds(string $source, mixed $from, mixed $to): array
+    {
+        $records = $this->select('id, forecast_time')
+            ->where('source', $source)
+            ->where('forecast_time >=', $from)
+            ->where('forecast_time <=', $to)
+            ->findAll();
+
+        $ids = [];
+        foreach ($records as $record) {
+            $ids[$record->forecast_time->format('Y-m-d H:i:s')] = (int) $record->id;
+        }
+
+        return $ids;
     }
 
     /**
