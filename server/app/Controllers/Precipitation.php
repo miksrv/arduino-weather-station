@@ -18,11 +18,14 @@ use Exception;
  */
 class Precipitation extends ResourceController
 {
-    /** @var int Cache TTL for recent data requests (1 hour) */
+    /** @var int Cache TTL for the current year (5 minutes; its last day is still being measured) */
+    public const CACHE_TTL_CURRENT = 5 * 60;
+
+    /** @var int Cache TTL for years that ended within the last few days (1 hour) */
     public const CACHE_TTL_RECENT = 60 * 60;
 
-    /** @var int Cache TTL for purely historical requests (indefinite — use 0 for no expiry) */
-    public const CACHE_TTL_HISTORICAL = 0;
+    /** @var int Cache TTL for past years (7 days; always finite so rebuilt aggregates show up) */
+    public const CACHE_TTL_HISTORICAL = 7 * 24 * 60 * 60;
 
     /** @var int Number of days to consider data as "recent" (not fully historical) */
     public const CACHE_RECENT_DAYS_THRESHOLD = 7;
@@ -79,9 +82,11 @@ class Precipitation extends ResourceController
         // Current year uses today as the effective end date; past years use Dec 31
         $yearEndDate     = ($year === $currentYear) ? time() : strtotime($year . '-12-31');
         $recentThreshold = strtotime('-' . self::CACHE_RECENT_DAYS_THRESHOLD . ' days');
-        $ttl             = $yearEndDate >= $recentThreshold
-            ? self::CACHE_TTL_RECENT
-            : self::CACHE_TTL_HISTORICAL;
+        $ttl             = match (true) {
+            $year === $currentYear          => self::CACHE_TTL_CURRENT,
+            $yearEndDate >= $recentThreshold => self::CACHE_TTL_RECENT,
+            default                         => self::CACHE_TTL_HISTORICAL,
+        };
 
         $cacheKey = 'precipitation_index_' . $year;
         $cached   = cache()->get($cacheKey);
@@ -93,7 +98,11 @@ class Precipitation extends ResourceController
         try {
             $dailyTotals = $this->precipitationModel->getDailyTotals($year);
             $years       = $this->precipitationModel->getAvailableYears();
-            $stats       = $this->precipitationModel->getStats($year, $dailyTotals);
+            $stats       = $this->precipitationModel->getStats(
+                $year,
+                $dailyTotals,
+                $this->precipitationModel->getObservedDays($year)
+            );
 
             $response = [
                 'year'           => $year,

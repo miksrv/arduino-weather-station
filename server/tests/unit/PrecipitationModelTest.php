@@ -153,33 +153,60 @@ final class PrecipitationModelTest extends CIUnitTestCase
     // -------------------------------------------------------------------------
 
     /**
-     * Jan 1–5 dry (0.0 mm), Jan 6 trace (RAIN_THRESHOLD_MM), Jan 7–10 dry (0.0 mm).
-     *
-     * The trace amount on Jan 6 must break the dry streak even though it is not
-     * counted as a "rainy day" in the rainyDays counter (threshold is strictly
-     * greater than RAIN_THRESHOLD_MM).
-     *
-     * _buildFullCalendar() fills all 366 days of 2024 (leap year). Days Jan 11–Dec 31
-     * (356 days) are filled with 0.0, extending the post-trace dry run from 4 (Jan 7–10)
-     * to 360 consecutive dry days (Jan 7 – Dec 31). That run is longer than Jan 1–5 (5 days).
-     * Expected: longestDryStreak = 360 days (Jan 7 – Dec 31 2024).
+     * Wet and dry use the same threshold: an amount equal to RAIN_THRESHOLD_MM is a dry
+     * day (it neither counts as rainy nor breaks the dry streak), an amount above it
+     * is rainy and breaks the streak.
      */
-    public function testTraceAmountBreaksDryStreak(): void
+    public function testTraceAmountDoesNotBreakDryStreakButRainDoes(): void
     {
-        $days = array_merge(
-            $this->_makeDays('2024-01-01', 5, 0.0),  // dry: Jan 1–5
-            $this->_makeDays('2024-01-06', 1, PrecipitationModel::RAIN_THRESHOLD_MM),  // trace: Jan 6
-            $this->_makeDays('2024-01-07', 4, 0.0)   // dry: Jan 7–10
+        $trace = array_merge(
+            $this->_makeDays('2024-01-01', 5, 0.0),
+            $this->_makeDays('2024-01-06', 1, PrecipitationModel::RAIN_THRESHOLD_MM)
         );
+        $stats = $this->model->getStats(2024, $trace);
+        $this->assertSame(366, $stats['longestDryStreak']['days']);
+        $this->assertSame(0, $stats['rainyDays']);
+        $this->assertSame(0, $stats['longestWetStreak']['days']);
 
-        $stats = $this->model->getStats(2024, $days);
+        $rain = array_merge(
+            $this->_makeDays('2024-01-01', 5, 0.0),
+            $this->_makeDays('2024-01-06', 1, PrecipitationModel::RAIN_THRESHOLD_MM + 0.1)
+        );
+        $stats = $this->model->getStats(2024, $rain);
+        $this->assertSame(360, $stats['longestDryStreak']['days']);
+        $this->assertSame('2024-01-07', $stats['longestDryStreak']['start']);
+        $this->assertSame(1, $stats['rainyDays']);
+        $this->assertSame(1, $stats['longestWetStreak']['days']);
+    }
 
-        // The trace on Jan 6 breaks the Jan 1–5 dry streak (correct behaviour).
-        // After calendar fill, the post-trace dry run (Jan 7 – Dec 31) is the longest.
-        $dry = $stats['longestDryStreak'];
-        $this->assertSame(360, $dry['days'], 'Trace amount (RAIN_THRESHOLD_MM) must break the dry streak');
-        $this->assertSame('2024-01-07', $dry['start']);
-        $this->assertSame('2024-12-31', $dry['end']);
+    /**
+     * Days without data (not in $observedDays) are not dry days and break a streak.
+     */
+    public function testUnobservedDaysAreNotDryAndBreakStreaks(): void
+    {
+        // Observed: Jan 1-3 (dry) and Jan 5-6 (dry), with Jan 4 missing; rain Jan 7.
+        $observed = ['2024-01-01', '2024-01-02', '2024-01-03', '2024-01-05', '2024-01-06', '2024-01-07'];
+        $days     = $this->_makeDays('2024-01-07', 1, 2.0);
+
+        $stats = $this->model->getStats(2024, $days, $observed);
+
+        $this->assertSame(5, $stats['dryDays']);
+        $this->assertSame(1, $stats['rainyDays']);
+        $this->assertSame(3, $stats['longestDryStreak']['days']);
+        $this->assertSame('2024-01-01', $stats['longestDryStreak']['start']);
+        $this->assertSame('2024-01-03', $stats['longestDryStreak']['end']);
+        $this->assertSame(2.0, $stats['totalYear']);
+    }
+
+    /**
+     * An empty observed list means no data at all: no dry days, no streaks.
+     */
+    public function testNoObservedDaysGivesNoDryDays(): void
+    {
+        $stats = $this->model->getStats(2024, [], []);
+
+        $this->assertSame(0, $stats['dryDays']);
+        $this->assertSame(0, $stats['longestDryStreak']['days']);
     }
 
     // -------------------------------------------------------------------------

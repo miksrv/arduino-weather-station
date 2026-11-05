@@ -273,7 +273,7 @@ class DevWeatherGenerator
     /**
      * Builds one external-API observation (columns each provider really fills).
      *
-     * @param string $source One of OpenWeatherMap, WeatherAPI, VisualCrossing, OpenMeteo
+     * @param string $source One of OpenWeatherMap, WeatherAPI, VisualCrossing, OpenMeteo, Metar
      * @param int    $ts     Observation timestamp (unix seconds)
      * @return array<string, mixed> raw_weather_data row
      */
@@ -333,6 +333,20 @@ class DevWeatherGenerator
                 $row['so2']            = round(max(0.1, 1.2 + 0.6 * self::noise(44, $ts, 43200)), 1);
                 $row['o3']             = round(max(5.0, 60 + 15 * self::noise(45, $ts, 86400)), 1);
                 break;
+            case 'Metar':
+                // Airport report: cover in oktas, no gust in calm air, precipitation only as an intensity
+                $row['clouds']        = self::_metarCover($row['clouds']);
+                $row['feels_like']    = null;
+                $row['wind_gust']     = null;
+                $row['visibility']    = min(10000, $row['visibility']);
+                $row['dew_point']     = round(self::dewPoint($temp, $hum), 1);
+                $row['precipitation'] = match (true) {
+                    $precip <= 0  => 0.0,
+                    $precip < 1.0 => 0.5,
+                    $precip < 4.0 => 2.0,
+                    default       => 6.0,
+                };
+                break;
         }
 
         return $row;
@@ -375,5 +389,22 @@ class DevWeatherGenerator
             'wind_gust'     => round($s['wind_gust'], 2),
             'weather_id'    => $s['weather_id'],
         ];
+    }
+
+    /**
+     * Snaps a cloud cover percentage to the METAR okta classes (CLR/FEW/SCT/BKN/OVC).
+     *
+     * @param int $clouds Cloud cover, %
+     * @return int
+     */
+    private static function _metarCover(int $clouds): int
+    {
+        return match (true) {
+            $clouds < 6   => 0,
+            $clouds < 31  => 19,
+            $clouds < 56  => 44,
+            $clouds < 94  => 75,
+            default       => 100,
+        };
     }
 }

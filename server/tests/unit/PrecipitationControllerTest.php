@@ -69,11 +69,12 @@ final class PrecipitationControllerTest extends CIUnitTestCase
     ): PrecipitationModel {
         $mock = $this->getMockBuilder(PrecipitationModel::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getDailyTotals', 'getAvailableYears', 'getStats'])
+            ->onlyMethods(['getDailyTotals', 'getAvailableYears', 'getStats', 'getObservedDays'])
             ->getMock();
 
         $mock->method('getDailyTotals')->willReturn($dailyTotals);
         $mock->method('getAvailableYears')->willReturn($years);
+        $mock->method('getObservedDays')->willReturn([]);
         $mock->method('getStats')->willReturn($stats ?: $this->_fakeStats());
 
         return $mock;
@@ -169,7 +170,7 @@ final class PrecipitationControllerTest extends CIUnitTestCase
     {
         $mock = $this->getMockBuilder(PrecipitationModel::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getDailyTotals', 'getAvailableYears', 'getStats'])
+            ->onlyMethods(['getDailyTotals', 'getAvailableYears', 'getStats', 'getObservedDays'])
             ->getMock();
 
         $mock->method('getDailyTotals')->willThrowException(new \Exception('DB error'));
@@ -204,7 +205,7 @@ final class PrecipitationControllerTest extends CIUnitTestCase
 
         $mock = $this->getMockBuilder(PrecipitationModel::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getDailyTotals', 'getAvailableYears', 'getStats'])
+            ->onlyMethods(['getDailyTotals', 'getAvailableYears', 'getStats', 'getObservedDays'])
             ->getMock();
 
         $mock->expects($this->never())->method('getDailyTotals');
@@ -234,7 +235,8 @@ final class PrecipitationControllerTest extends CIUnitTestCase
     public function testCacheTtlConstants(): void
     {
         $this->assertSame(60 * 60, Precipitation::CACHE_TTL_RECENT);
-        $this->assertSame(0, Precipitation::CACHE_TTL_HISTORICAL);
+        $this->assertSame(5 * 60, Precipitation::CACHE_TTL_CURRENT);
+        $this->assertSame(604800, Precipitation::CACHE_TTL_HISTORICAL);
         $this->assertSame(7, Precipitation::CACHE_RECENT_DAYS_THRESHOLD);
     }
 

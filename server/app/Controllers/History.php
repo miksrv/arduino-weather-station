@@ -8,6 +8,9 @@ use App\Models\HourlyAveragesModel;
 use App\Models\RawWeatherDataModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
+use Config\App;
+use DateTimeImmutable;
+use DateTimeZone;
 use Exception;
 
 /**
@@ -19,11 +22,14 @@ use Exception;
  */
 class History extends ResourceController
 {
-    /** @var int Cache TTL for recent data requests (1 hour) */
+    /** @var int Cache TTL for ranges that include today of the station (5 minutes; the client polls them) */
+    public const CACHE_TTL_CURRENT = 5 * 60;
+
+    /** @var int Cache TTL for ranges ending within the last few days (1 hour) */
     public const CACHE_TTL_RECENT = 60 * 60;
 
-    /** @var int Cache TTL for purely historical requests (indefinite — use 0 for no expiry) */
-    public const CACHE_TTL_HISTORICAL = 0;
+    /** @var int Cache TTL for purely historical requests (7 days; always finite so rebuilt aggregates show up) */
+    public const CACHE_TTL_HISTORICAL = 7 * 24 * 60 * 60;
 
     /** @var int Minimum range in hours to enable caching */
     public const CACHE_MIN_RANGE_HOURS = 48;
@@ -96,13 +102,10 @@ class History extends ResourceController
                 return $rawData;
             }
 
-            // Recent end-dates get a short TTL; purely historical data is cached indefinitely
-            $recentThreshold = strtotime('-' . self::CACHE_RECENT_DAYS_THRESHOLD . ' days');
-            $ttl = $endTimestamp >= $recentThreshold
-                ? self::CACHE_TTL_RECENT
-                : self::CACHE_TTL_HISTORICAL;
-
-            cache()->save($cacheKey, $rawData, $ttl);
+            // Empty results are not cached: data may arrive (or be rebuilt) shortly after
+            if ($rawData !== []) {
+                cache()->save($cacheKey, $rawData, $this->_cacheTtl($endTimestamp));
+            }
         }
 
         $result = [];
@@ -229,9 +232,10 @@ class History extends ResourceController
             return $this->failValidationErrors('Date range cannot exceed 366 days.');
         }
 
+        // The client sends dates of the station's time zone; the readings are stored in UTC
         $dateDiff  = ($endTimestamp - $startTimestamp) / (60 * 60 * 24);
-        $startDate = date('Y-m-d 00:00:00', $startTimestamp);
-        $endDate   = date('Y-m-d 23:59:59', $endTimestamp);
+        $startDate = $this->_stationToUtc(date('Y-m-d 00:00:00', $startTimestamp));
+        $endDate   = $this->_stationToUtc(date('Y-m-d 23:59:59', $endTimestamp));
 
         if ($dateDiff <= 1) {
             return $this->weatherDataModel->getWeatherHistoryGrouped($startDate, $endDate, '10 MINUTE');
@@ -242,5 +246,38 @@ class History extends ResourceController
         }
 
         return $this->dailyAveragesModel->getWeatherHistoryGrouped($startDate, $endDate, '1 DAY');
+    }
+
+    /**
+     * Converts a date-time of the station's time zone to a UTC Y-m-d H:i:s string.
+     *
+     * @param string $stationDateTime Date-time in the station's time zone.
+     * @return string The same instant in UTC.
+     */
+    private function _stationToUtc(string $stationDateTime): string
+    {
+        return (new DateTimeImmutable($stationDateTime, new DateTimeZone(config(App::class)->stationTimezone)))
+            ->setTimezone(new DateTimeZone('UTC'))
+            ->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * Picks the cache TTL by how close the range end is to today of the station.
+     *
+     * @param int $endTimestamp Range end (its date part is a station-local date).
+     * @return int TTL in seconds.
+     */
+    private function _cacheTtl(int $endTimestamp): int
+    {
+        $today = (new DateTimeImmutable('now', new DateTimeZone(config(App::class)->stationTimezone)))->format('Y-m-d');
+        $endDay = date('Y-m-d', $endTimestamp);
+
+        if ($endDay >= $today) {
+            return self::CACHE_TTL_CURRENT;
+        }
+
+        $threshold = date('Y-m-d', strtotime($today . ' -' . self::CACHE_RECENT_DAYS_THRESHOLD . ' days'));
+
+        return $endDay >= $threshold ? self::CACHE_TTL_RECENT : self::CACHE_TTL_HISTORICAL;
     }
 }

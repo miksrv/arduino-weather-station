@@ -211,12 +211,32 @@ final class HeatmapControllerTest extends CIUnitTestCase
     }
 
     /**
+     * Today of the station is not "in the future", even when the UTC date is still yesterday.
+     */
+    public function testTodayOfStationIsAccepted(): void
+    {
+        $today = (new \DateTimeImmutable('now', new \DateTimeZone(config(\Config\App::class)->stationTimezone)))->format('Y-m-d');
+
+        $mockModel = $this->createMock(RawWeatherDataModel::class);
+        $mockModel->method('getWeatherHistoryGrouped')->willReturn([['date' => $today . ' 00:00:00', 'temperature' => 1.0]]);
+
+        $this->controller(Heatmap::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockModel);
+
+        $this->request->setMethod('GET');
+        $this->request->setGlobal('get', ['type' => 'temperature', 'start_date' => $today, 'end_date' => $today]);
+
+        $this->assertSame(200, $this->execute('getHeatmapData')->response()->getStatusCode());
+    }
+
+    /**
      * Cache TTL constants are defined with expected values.
      */
     public function testCacheTtlConstants(): void
     {
         $this->assertSame(60 * 60, Heatmap::CACHE_TTL_RECENT);
-        $this->assertSame(0, Heatmap::CACHE_TTL_HISTORICAL);
+        $this->assertSame(5 * 60, Heatmap::CACHE_TTL_CURRENT);
+        $this->assertSame(604800, Heatmap::CACHE_TTL_HISTORICAL);
         $this->assertSame(48, Heatmap::CACHE_MIN_RANGE_HOURS);
         $this->assertSame(7, Heatmap::CACHE_RECENT_DAYS_THRESHOLD);
     }

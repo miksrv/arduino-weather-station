@@ -20,11 +20,14 @@ use Exception;
  */
 class Heatmap extends ResourceController
 {
-    /** @var int Cache TTL for recent data requests (1 hour) */
+    /** @var int Cache TTL for ranges that include today of the station (5 minutes; the client polls them) */
+    public const CACHE_TTL_CURRENT = 5 * 60;
+
+    /** @var int Cache TTL for ranges ending within the last few days (1 hour) */
     public const CACHE_TTL_RECENT = 60 * 60;
 
-    /** @var int Cache TTL for purely historical requests (indefinite — use 0 for no expiry) */
-    public const CACHE_TTL_HISTORICAL = 0;
+    /** @var int Cache TTL for purely historical requests (7 days; always finite so rebuilt aggregates show up) */
+    public const CACHE_TTL_HISTORICAL = 7 * 24 * 60 * 60;
 
     /** @var int Minimum range in hours to enable caching */
     public const CACHE_MIN_RANGE_HOURS = 48;
@@ -90,7 +93,10 @@ class Heatmap extends ResourceController
             return $this->failValidationErrors('Invalid date format');
         }
 
-        $currentTimestamp = time();
+        // "Today" is a day of the station's time zone: compare the (midnight) start with the end of that day
+        $stationZone      = new DateTimeZone(config(App::class)->stationTimezone);
+        $stationToday     = (new DateTimeImmutable('now', $stationZone))->format('Y-m-d');
+        $currentTimestamp = strtotime($stationToday . ' 23:59:59');
         $minTimestamp     = strtotime('2020-01-01');
 
         if ($startTimestamp > $currentTimestamp || $startTimestamp < $minTimestamp) {
@@ -107,7 +113,6 @@ class Heatmap extends ResourceController
 
         // Normalise dates to full days of the station's time zone (the client lays the grid out in local days),
         // then convert the boundaries to UTC, which the readings are stored in
-        $stationZone = new DateTimeZone(config(App::class)->stationTimezone);
         $utcZone     = new DateTimeZone('UTC');
         $startDate   = (new DateTimeImmutable(date('Y-m-d 00:00:00', $startTimestamp), $stationZone))
             ->setTimezone($utcZone)
@@ -140,11 +145,15 @@ class Heatmap extends ResourceController
             $rawData = $this->weatherDataModel->getWeatherHistoryGrouped($startDate, $endDate, self::GROUP_INTERVAL, $type);
 
             if (!empty($rawData)) {
-                // Recent end-dates get a short TTL; purely historical data is cached indefinitely
-                $recentThreshold = strtotime('-' . self::CACHE_RECENT_DAYS_THRESHOLD . ' days');
-                $ttl = $endTimestamp >= $recentThreshold
-                    ? self::CACHE_TTL_RECENT
-                    : self::CACHE_TTL_HISTORICAL;
+                $endDay = date('Y-m-d', $endTimestamp);
+
+                if ($endDay >= $stationToday) {
+                    $ttl = self::CACHE_TTL_CURRENT;
+                } elseif ($endDay >= date('Y-m-d', strtotime($stationToday . ' -' . self::CACHE_RECENT_DAYS_THRESHOLD . ' days'))) {
+                    $ttl = self::CACHE_TTL_RECENT;
+                } else {
+                    $ttl = self::CACHE_TTL_HISTORICAL;
+                }
 
                 cache()->save($cacheKey, $rawData, $ttl);
             }

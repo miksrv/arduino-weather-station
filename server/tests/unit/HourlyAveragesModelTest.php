@@ -1,7 +1,9 @@
 <?php
 
 use App\Entities\WeatherDataEntity;
+use App\Libraries\ForecastAggregator;
 use App\Models\HourlyAveragesModel;
+use App\Models\RawWeatherDataModel;
 use CodeIgniter\Test\CIUnitTestCase;
 
 /**
@@ -80,5 +82,49 @@ final class HourlyAveragesModelTest extends CIUnitTestCase
 
             $this->assertFalse($threw, "Interval '{$interval}' must not throw InvalidArgumentException");
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Daily roll-up expressions
+    // -------------------------------------------------------------------------
+
+    public function testDailyPrecipitationIsTheSumOfHours(): void
+    {
+        $expressions = $this->_dailyExpressions();
+
+        $this->assertSame('ROUND(SUM(precipitation), 2)', $expressions['precipitation']);
+        $this->assertSame('ROUND(AVG(temperature), 2)', $expressions['temperature']);
+    }
+
+    public function testDailyWindDirectionIsVectorMean(): void
+    {
+        $this->assertSame(RawWeatherDataModel::windDirectionSQL(), $this->_dailyExpressions()['wind_deg']);
+    }
+
+    public function testDailyWeatherIdFollowsForecastDayRules(): void
+    {
+        $sql = $this->_dailyExpressions()['weather_id'];
+
+        $this->assertStringContainsString('>= ' . ForecastAggregator::WET_DAY_HOURS, $sql);
+        $this->assertStringContainsString('>= ' . ForecastAggregator::WET_DAY_TOTAL_MM, $sql);
+        $this->assertStringContainsString('>= ' . ForecastAggregator::FOG_DAY_HOURS, $sql);
+        $this->assertStringContainsString(RawWeatherDataModel::mostSevereWeatherIdSQL(), $sql);
+    }
+
+    public function testDailyExpressionsCoverEveryStoredField(): void
+    {
+        $fields = array_diff($this->model->allowedFields, ['date']);
+
+        $this->assertEqualsCanonicalizing(array_values($fields), array_keys($this->_dailyExpressions()));
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function _dailyExpressions(): array
+    {
+        $method = new \ReflectionMethod(HourlyAveragesModel::class, '_dailyExpressions');
+
+        return $method->invoke(null);
     }
 }
