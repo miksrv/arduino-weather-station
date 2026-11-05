@@ -24,7 +24,7 @@ jest.mock('next-themes', () => ({
 }))
 
 jest.mock('@/tools/colors', () => ({
-    statChartColor: ['#2c7eec', '#468de8'],
+    getSensorColor: jest.fn((sensor: string) => [sensor === 'precipitation' ? '#3b8ced' : '#ef5359']),
     resolveCssVar: jest.fn((_variable: string, fallback: string) => fallback),
     hexToRgba: jest.fn((hex: string, alpha: number) => `rgba(${hex},${alpha})`)
 }))
@@ -114,5 +114,11 @@ describe('PrecipTrendChart', () => {
         const shownIndexes = Array.from({ length: 12 }, (_, i) => i).filter((i) => xAxis.axisLabel.interval(i))
 
         expect(shownIndexes).toStrictEqual([0, 3, 6, 8, 11])
+    })
+
+    it('draws the line in the precipitation hue', () => {
+        findMaxValue.mockReturnValue(1)
+        render(<PrecipTrendChart data={mockData} />)
+        expect(JSON.stringify(mockCapturedOption)).toContain('#3b8ced')
     })
 })

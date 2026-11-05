@@ -217,6 +217,51 @@ export const getHistogram = (points: HeatmapPoint[], type: SensorType, bins: num
     return result
 }
 
+/**
+ * Sequential palettes of the heatmap from low to high. Temperature diverges around the middle (cold blue → warm red);
+ * the others go from a pale tint to the deep tone of the quantity's hue.
+ */
+export const HEATMAP_PALETTES: Record<SensorType, string[]> = {
+    temperature: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#ffffbf', '#fee090', '#f46d43', '#d73027', '#a50026'],
+    pressure: ['#f3e5f5', '#ce93d8', '#ab47bc', '#8e24aa', '#6a1b9a', '#4a148c'],
+    precipitation: ['#bbdefb', '#90caf9', '#42a5f5', '#1e88e5', '#1565c0', '#0d47a1'],
+    clouds: ['#e8eaf6', '#9fa8da', '#5c6bc0', '#3f51b5', '#303f9f', '#1a237e'],
+    humidity: ['#e0f7fa', '#80deea', '#26c6da', '#00acc1', '#00838f', '#006064']
+}
+
+/** The ends of a continuous heatmap scale: the period's lowest and highest values, rounded outwards */
+export const getHeatmapRange = (points: HeatmapPoint[]): [number, number] => {
+    if (!points.length) {
+        return [0, 0]
+    }
+
+    const values = points.map((point) => point.value)
+
+    return [Math.floor(Math.min(...values)), Math.ceil(Math.max(...values))]
+}
+
+/** A step of the precipitation scale; `color` is missing for the dry step, which takes the grid-line tone */
+export interface PrecipitationPiece {
+    gte: number
+    lt?: number
+    label: string
+    color?: string
+}
+
+/** The stepped precipitation scale: dry, then the thresholds of `PRECIPITATION_EDGES`, the last one open */
+export const getPrecipitationPieces = (unit: string, dryLabel: string): PrecipitationPiece[] => {
+    const edges = [0, ...PRECIPITATION_EDGES]
+
+    return edges.map((from, index) => {
+        const to = edges[index + 1]
+        const color = index === 0 ? undefined : HEATMAP_PALETTES.precipitation[index - 1]
+
+        return to === undefined
+            ? { gte: from, label: `${from}+ ${unit}`, color }
+            : { gte: from, lt: to, label: index === 0 ? dryLabel : `${from}–${to}`, color }
+    })
+}
+
 /** The unit of a heatmap quantity as the site shows it */
 export const getHeatmapUnit = (type: SensorType, t: (key: string) => string): string => {
     switch (type) {

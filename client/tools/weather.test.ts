@@ -15,6 +15,7 @@ import {
     getAirDensity,
     getAverageWindDirection,
     getCloudinessColor,
+    getMeanValue,
     getMinMaxValues,
     getPressureAltitude,
     getRecentAverage,
@@ -466,6 +467,24 @@ describe('weather', () => {
         it('returns the single value when only one item exists', () => {
             const data = [makeItem(15, '2024-01-01')]
             expect(findMinValue(data, 'temperature')).toBe(15)
+        })
+    })
+
+    describe('getMeanValue', () => {
+        it('averages the readings that have the value, to one decimal', () => {
+            const data = [
+                { date: '2026-11-05 10:00', temperature: 1 },
+                { date: '2026-11-05 11:00', temperature: 2.5 },
+                { date: '2026-11-05 12:00' },
+                { date: '2026-11-05 13:00', temperature: 3 }
+            ] as ApiModel.Weather[]
+
+            expect(getMeanValue(data, 'temperature')).toBe(2.2)
+        })
+
+        it('is undefined without readings', () => {
+            expect(getMeanValue([], 'temperature')).toBeUndefined()
+            expect(getMeanValue(undefined, 'temperature')).toBeUndefined()
         })
     })
 

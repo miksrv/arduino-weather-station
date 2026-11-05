@@ -7,8 +7,8 @@ import { ApiModel } from '@/api'
 import StatBlock from '@/components/stat-block'
 import WidgetCard, { WidgetCardProps } from '@/components/widget-card'
 import { formatDate } from '@/tools/date'
-import { unitSuffix } from '@/tools/helpers'
-import { getMinMaxValues, getRecentDelta, isMinMaxEmpty } from '@/tools/weather'
+import { round, unitSuffix } from '@/tools/helpers'
+import { getMeanValue, getMinMaxValues, getRecentDelta, isMinMaxEmpty } from '@/tools/weather'
 
 import StatTrendChart from './StatTrendChart'
 
@@ -41,9 +41,30 @@ const WidgetSensorStat: React.FC<WidgetSensorStatProps> = ({
 
     const minMax = useMemo(() => getMinMaxValues(history, source), [history, source])
     const delta = useMemo(() => getRecentDelta(history, source, 1), [history, source])
+    const mean = useMemo(() => getMeanValue(history, source), [history, source])
     const isHeatSource = source === 'temperature'
 
-    const formatValue = (value?: string | number) => (formatter ? formatter(value) : value)
+    // Readings to one decimal unless the widget formats them itself
+    const formatValue = (value?: string | number) =>
+        formatter ? formatter(value) : typeof value === 'number' ? round(value, 1) : value
+
+    // A short unit (°C, %) follows each figure; a long one (мм рт. ст.) stays with the main value only, so the
+    // three figures fit side by side on a phone
+    const statUnit = unit && unit.length <= 3 ? unitSuffix(unit) : ''
+
+    const statValue = (value?: number) =>
+        chartLoading ? (
+            <Skeleton style={{ width: 60, height: 16 }} />
+        ) : value === undefined ? (
+            '—'
+        ) : (
+            <>
+                {formatValue(value)}
+                {statUnit}
+            </>
+        )
+
+    const hasMinMax = minMax && !isMinMaxEmpty(minMax)
 
     return (
         <WidgetCard
@@ -78,42 +99,24 @@ const WidgetSensorStat: React.FC<WidgetSensorStatProps> = ({
                     )}
                 </div>
 
-                <div className={styles.statsColumn}>
+                <div className={styles.stats}>
                     <StatBlock
                         title={t('today-max-time', {
                             time: minMax?.max?.date ? formatDate(minMax.max.date, 'HH:mm') : '—'
                         })}
                         modifier={isHeatSource ? 'max' : undefined}
-                        value={
-                            chartLoading ? (
-                                <Skeleton style={{ width: 60, height: 16 }} />
-                            ) : !minMax || isMinMaxEmpty(minMax) || minMax.max?.value === undefined ? (
-                                '—'
-                            ) : (
-                                <>
-                                    {formatValue(minMax.max.value)}
-                                    {unitSuffix(unit)}
-                                </>
-                            )
-                        }
+                        value={statValue(hasMinMax ? minMax.max?.value : undefined)}
                     />
                     <StatBlock
                         title={t('today-min-time', {
                             time: minMax?.min?.date ? formatDate(minMax.min.date, 'HH:mm') : '—'
                         })}
                         modifier={'min'}
-                        value={
-                            chartLoading ? (
-                                <Skeleton style={{ width: 60, height: 16 }} />
-                            ) : !minMax || isMinMaxEmpty(minMax) || minMax.min?.value === undefined ? (
-                                '—'
-                            ) : (
-                                <>
-                                    {formatValue(minMax.min.value)}
-                                    {unitSuffix(unit)}
-                                </>
-                            )
-                        }
+                        value={statValue(hasMinMax ? minMax.min?.value : undefined)}
+                    />
+                    <StatBlock
+                        title={t('average')}
+                        value={statValue(mean)}
                     />
                 </div>
             </div>

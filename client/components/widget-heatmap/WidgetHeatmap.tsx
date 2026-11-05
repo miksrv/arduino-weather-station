@@ -6,8 +6,7 @@ import WidgetCard from '@/components/widget-card'
 import { HeatmapPoint } from '@/tools/heatmap'
 
 import Heatmap from './Heatmap'
-
-import styles from './styles.module.sass'
+import HeatmapLegend from './HeatmapLegend'
 
 interface WidgetHeatmapProps {
     type: ApiType.Heatmap.SensorType
@@ -22,9 +21,17 @@ const CHART_HEIGHT = 480
 const WidgetHeatmap: React.FC<WidgetHeatmapProps> = ({ type, points, loading, title, subtitle }) => (
     <WidgetCard
         title={title}
+        subtitle={subtitle}
+        action={
+            !loading && points?.length ? (
+                <HeatmapLegend
+                    type={type}
+                    points={points}
+                />
+            ) : undefined
+        }
         size={'x4'}
     >
-        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
         {loading || !points?.length ? (
             <Skeleton style={{ width: '100%', height: CHART_HEIGHT }} />
         ) : (

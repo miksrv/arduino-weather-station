@@ -112,6 +112,3 @@ export const getSensorColorType = (sensor?: keyof ApiModel.Sensors): keyof typeo
 
 export const getSensorColor = (sensor?: keyof ApiModel.Sensors, theme?: string): string[] =>
     getColor(getSensorColorType(sensor), theme)
-
-/** Shared trend chart color for the summary stat widgets (e.g. widget-sensor-stat) — always blue per design, regardless of sensor kind. */
-export const statChartColor: string[] = colors.blue

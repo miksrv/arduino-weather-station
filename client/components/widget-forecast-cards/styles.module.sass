@@ -15,7 +15,9 @@
         flex-direction: column
         align-items: center
         gap: var(--space-1)
-        flex: 0 0 160px
+        // Six cards fill the row; below the minimum width the rail scrolls instead of squeezing them
+        flex: 0 0 calc((100% - 5 * var(--gap)) / 6)
+        min-width: 140px
         padding: var(--space-3)
 
         @media only screen and (max-width: variables.$mobileMaxWidth)

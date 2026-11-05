@@ -6,6 +6,8 @@
     grid-template-columns: repeat(3, minmax(0, 1fr))
     gap: var(--space-2)
     margin: 0
+    // The card is stretched to its neighbour's height: the figures sit on its bottom edge
+    margin-top: auto
 
     @media only screen and (max-width: variables.$smallMaxWidth)
         grid-template-columns: repeat(2, minmax(0, 1fr))

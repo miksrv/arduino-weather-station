@@ -9,7 +9,7 @@ import '@testing-library/jest-dom'
 type Option = {
     xAxis: { data: string[] }
     yAxis: { data: string[] }
-    visualMap: { min: number; max: number; formatter: (value: number) => string }
+    visualMap: { min: number; max: number; show: boolean }
     series: Array<{ data: number[][] }>
 }
 
@@ -48,7 +48,7 @@ describe('Heatmap', () => {
         ])
     })
 
-    it('scales the colours to the rounded range and labels the handles with the unit', () => {
+    it('scales the colours to the rounded range and leaves the legend to the card header', () => {
         render(
             <Heatmap
                 type={'humidity'}
@@ -58,6 +58,6 @@ describe('Heatmap', () => {
 
         expect(mockOption?.visualMap.min).toBe(-2)
         expect(mockOption?.visualMap.max).toBe(7)
-        expect(mockOption?.visualMap.formatter(55.04)).toBe('55 %')
+        expect(mockOption?.visualMap.show).toBe(false)
     })
 })

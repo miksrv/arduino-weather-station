@@ -100,7 +100,7 @@ describe('WidgetSensorStat', () => {
         expect(screen.getByText('today-min-time:{"time":"05:30"}')).toBeInTheDocument()
     })
 
-    it('renders dashes for min/max when history is empty', () => {
+    it('renders dashes for max, min and mean when history is empty', () => {
         render(
             <WidgetSensorStat
                 source={'temperature'}
@@ -108,7 +108,7 @@ describe('WidgetSensorStat', () => {
                 history={[]}
             />
         )
-        expect(screen.getAllByText('—')).toHaveLength(2)
+        expect(screen.getAllByText('—')).toHaveLength(3)
     })
 
     it('renders skeletons for min/max while chart is loading', () => {

@@ -6,6 +6,7 @@ import utc from 'dayjs/plugin/utc'
 import {
     formatDate,
     formatDateFromUTC,
+    formatDateRange,
     getCurrentDate,
     getDate,
     getDateTimeFormat,
@@ -120,6 +121,21 @@ describe('date utilities', () => {
                 .tz('Asia/Yekaterinburg')
                 .format('DD.MM.YYYY')
             expect(formatDateFromUTC(utcMs, 'DD.MM.YYYY')).toBe(expected)
+        })
+    })
+
+    describe('formatDateRange', () => {
+        it('names the year once when both days are in the same year', () => {
+            expect(formatDateRange('2026-05-06', '2026-11-06')).toBe('6 May – 6 November 2026')
+        })
+
+        it('names both years when the period crosses a new year', () => {
+            expect(formatDateRange('2025-11-06', '2026-05-06')).toBe('6 November 2025 – 6 May 2026')
+        })
+
+        it('returns an empty string without both days', () => {
+            expect(formatDateRange(undefined, '2026-05-06')).toBe('')
+            expect(formatDateRange('2026-05-06')).toBe('')
         })
     })
 

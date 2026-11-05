@@ -1,8 +1,10 @@
 import React, { useMemo } from 'react'
 
+import { useTheme } from 'next-themes'
+
 import { ApiModel } from '@/api'
 import SparklineChart from '@/components/sparkline-chart'
-import { statChartColor } from '@/tools/colors'
+import { getSensorColor } from '@/tools/colors'
 import { formatDate } from '@/tools/date'
 import { findMaxValue } from '@/tools/weather'
 
@@ -13,6 +15,7 @@ interface PrecipTrendChartProps {
 const formatOneDecimal = (value: number): string => value.toFixed(1)
 
 const PrecipTrendChart: React.FC<PrecipTrendChartProps> = ({ data }) => {
+    const { resolvedTheme: theme } = useTheme()
     const categories = useMemo(() => data?.map((item) => formatDate(item?.date, 'HH:mm')) ?? [], [data])
     const values = useMemo(() => data?.map((item) => item?.precipitation ?? 0) ?? [], [data])
 
@@ -25,7 +28,7 @@ const PrecipTrendChart: React.FC<PrecipTrendChartProps> = ({ data }) => {
         <SparklineChart
             categories={categories}
             values={values}
-            color={statChartColor[0]}
+            color={getSensorColor('precipitation', theme)[0]}
             yAxisMin={0}
             yAxisMax={axisMax}
             yAxisLabelFormatter={formatOneDecimal}

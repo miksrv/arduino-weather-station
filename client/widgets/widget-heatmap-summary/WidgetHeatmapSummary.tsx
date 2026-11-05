@@ -78,7 +78,12 @@ const WidgetHeatmapSummary: React.FC<WidgetHeatmapSummaryProps> = ({ type, stats
                         <>
                             <span className={styles.label}>{figure.label}</span>
                             <span className={figure.accent ? styles[figure.accent] : styles.value}>{figure.value}</span>
-                            <span className={styles.note}>{figure.note ?? ' '}</span>
+                            <span
+                                className={styles.note}
+                                title={figure.note}
+                            >
+                                {figure.note ?? ' '}
+                            </span>
                         </>
                     ) : (
                         <Skeleton style={{ width: '100%', height: 64 }} />
