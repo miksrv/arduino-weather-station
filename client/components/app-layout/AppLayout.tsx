@@ -5,7 +5,6 @@ import { useAppSelector } from '@/api/store'
 import AppBar from '@/components/app-bar'
 import Footer from '@/components/footer'
 import LanguageSwitcher from '@/components/language-switcher'
-import StaleDataBanner from '@/components/stale-data-banner'
 
 import Menu from './Menu'
 
@@ -99,18 +98,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ className, fullSize, children }) 
             >
                 <Menu onClick={handleCloseOverlay} />
                 <div className={styles.content}>
-                    <div className={styles.switchers}>
-                        <LanguageSwitcher />
-                    </div>
-                    <Footer />
+                    <Footer action={<LanguageSwitcher />} />
                 </div>
             </aside>
 
             <section className={styles.mainContainer}>
-                <main className={styles.main}>
-                    <StaleDataBanner />
-                    {children}
-                </main>
+                <main className={styles.main}>{children}</main>
             </section>
         </div>
     )

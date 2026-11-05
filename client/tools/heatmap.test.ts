@@ -1,4 +1,13 @@
-import { getDiurnalProfile, getHeatmapStats, getHistogram, percentile, toHeatmapPoints } from './heatmap'
+import {
+    getDiurnalProfile,
+    getHeatmapRange,
+    getHeatmapStats,
+    getHistogram,
+    getPrecipitationPieces,
+    HEATMAP_PALETTES,
+    percentile,
+    toHeatmapPoints
+} from './heatmap'
 
 describe('heatmap', () => {
     describe('toHeatmapPoints', () => {
@@ -119,6 +128,41 @@ describe('heatmap', () => {
 
         it('is empty without values', () => {
             expect(getHistogram([], 'temperature')).toStrictEqual([])
+        })
+    })
+
+    describe('getHeatmapRange', () => {
+        it('rounds the lowest value down and the highest up', () => {
+            const points = [-5.8, 12.3, 32.5].map((value, hour) => ({
+                day: '2026-05-06',
+                hour,
+                date: '2026-05-06 00:00',
+                value
+            }))
+            expect(getHeatmapRange(points)).toStrictEqual([-6, 33])
+        })
+
+        it('is zero without values', () => {
+            expect(getHeatmapRange([])).toStrictEqual([0, 0])
+        })
+    })
+
+    describe('getPrecipitationPieces', () => {
+        it('starts with a dry step without a colour and ends with an open step with the unit', () => {
+            const pieces = getPrecipitationPieces('mm', 'Dry')
+
+            expect(pieces[0]).toStrictEqual({ gte: 0, lt: 0.1, label: 'Dry', color: undefined })
+            expect(pieces[1]).toStrictEqual({
+                gte: 0.1,
+                lt: 0.5,
+                label: '0.1–0.5',
+                color: HEATMAP_PALETTES.precipitation[0]
+            })
+            expect(pieces[pieces.length - 1]).toStrictEqual({
+                gte: 10,
+                label: '10+ mm',
+                color: HEATMAP_PALETTES.precipitation[5]
+            })
         })
     })
 })

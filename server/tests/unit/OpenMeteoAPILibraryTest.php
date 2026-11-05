@@ -335,4 +335,27 @@ final class OpenMeteoAPILibraryTest extends CIUnitTestCase
 
         $this->assertFalse($library->getForecastWeatherData());
     }
+
+    public function testCurrentPrecipitationIsSumOfLastFourQuarterHours(): void
+    {
+        $payload = json_decode($this->_weatherCurrentPayload(), true);
+        $payload['minutely_15'] = [
+            'time'          => ['2026-07-12T04:15', '2026-07-12T04:30', '2026-07-12T04:45', '2026-07-12T05:00', '2026-07-12T05:15', '2026-07-12T05:30', '2026-07-12T05:45'],
+            'precipitation' => [9.0, 0.2, 0.3, 0.5, 0.4, 0.6, 9.0],
+        ];
+
+        $library = $this->_buildLibraryWithMockClient(json_encode($payload), $this->_airQualityCurrentPayload());
+        $result  = $library->getWeatherData();
+
+        // slots 05:00..05:30 plus 04:45 (current time 05:30) = 0.3 + 0.5 + 0.4 + 0.6
+        $this->assertEqualsWithDelta(1.8, (float) $result['precipitation'], 0.001);
+    }
+
+    public function testCurrentPrecipitationIsNullWithoutFullHourOfSlots(): void
+    {
+        $library = $this->_buildLibraryWithMockClient($this->_weatherCurrentPayload(), $this->_airQualityCurrentPayload());
+        $result  = $library->getWeatherData();
+
+        $this->assertNull($result['precipitation']);
+    }
 }

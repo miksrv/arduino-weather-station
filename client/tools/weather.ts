@@ -369,6 +369,19 @@ export const invertData = (weatherData: ApiModel.Weather[] = [], key?: keyof Api
 }
 
 /**
+ * The mean of a quantity over the readings that have it, to one decimal.
+ * @returns The mean, or undefined when no reading has the value
+ */
+export const getMeanValue = (weatherData?: ApiModel.Weather[], key?: keyof ApiModel.Sensors): number | undefined => {
+    const values =
+        weatherData
+            ?.map((data) => (key ? data[key] : undefined))
+            .filter((value): value is number => typeof value === 'number' && Number.isFinite(value)) ?? []
+
+    return values.length ? round(values.reduce((sum, value) => sum + value, 0) / values.length, 1) : undefined
+}
+
+/**
  * Function to find the maximum value
  * @param weatherData
  * @param key

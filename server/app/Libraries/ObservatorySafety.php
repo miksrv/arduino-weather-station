@@ -88,7 +88,9 @@ class ObservatorySafety
     /**
      * Current cloud cover, %: the median of the latest reports of the API
      * sources (the station has no cloud sensor), so one source can not move it
-     * on its own. 0 when fewer than two sources report.
+     * on its own. With exactly two sources the lower value is used (their mean
+     * would let one outlier, 100% vs 0%, show 50%): cloud is only reported as
+     * high when both agree. 0 when fewer than two sources report.
      *
      * @param array<int, array<string, mixed>> $rows Raw observation rows of the last {@see self::REPORT_WINDOW_MINUTES} minutes.
      * @param DateTimeInterface                $now  Reference time.
@@ -102,7 +104,7 @@ class ObservatorySafety
             return 0.0;
         }
 
-        return self::_median($values);
+        return count($values) === self::MIN_CONFIRMING_SOURCES ? min($values) : self::_median($values);
     }
 
     /**

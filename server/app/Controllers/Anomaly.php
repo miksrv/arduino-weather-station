@@ -132,7 +132,7 @@ class Anomaly extends ResourceController
             return $this->failValidationErrors('Missing required parameter: season');
         }
 
-        if (!preg_match('/^\d{4}-\d{4}$/', $season)) {
+        if (!is_string($season) || !preg_match('/^\d{4}-\d{4}$/', $season)) {
             return $this->failValidationErrors('Invalid season format. Expected YYYY-YYYY');
         }
 

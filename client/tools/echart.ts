@@ -16,19 +16,19 @@ export interface ChartTokens {
 const CHART_TOKENS: Record<ChartTheme, ChartTokens> = {
     light: {
         surface: '#ffffff', // --surface-1
-        border: '#e6e8ec', // --border
-        borderStrong: '#cfd4db', // --border-strong
-        textPrimary: 'rgba(0, 0, 0, 0.9)', // --text-color-primary
-        textSecondary: '#66707d', // --text-color-secondary
-        gridLine: '#f0f1f4'
+        border: '#e6e4dc', // --border
+        borderStrong: '#d3d0c6', // --border-strong
+        textPrimary: '#141413', // --text-color-primary
+        textSecondary: '#5f5e57', // --text-color-secondary
+        gridLine: '#f1f0eb'
     },
     dark: {
-        surface: '#14181d',
-        border: '#252b33',
-        borderStrong: '#333a43',
-        textPrimary: '#e6e9ee',
-        textSecondary: '#8e97a4',
-        gridLine: '#1b2026'
+        surface: '#141413',
+        border: '#2a2926',
+        borderStrong: '#3d3c38',
+        textPrimary: '#faf9f5',
+        textSecondary: '#a3a197',
+        gridLine: '#1c1c1a'
     }
 }
 

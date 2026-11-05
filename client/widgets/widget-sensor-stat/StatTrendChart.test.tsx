@@ -3,7 +3,7 @@ import type { EChartsOption } from 'echarts'
 
 import { render } from '@testing-library/react'
 
-import StatTrendChart from './StatTrendChart'
+import StatTrendChart, { getYAxisLabelFormatter } from './StatTrendChart'
 
 import '@testing-library/jest-dom'
 
@@ -30,7 +30,7 @@ jest.mock('next-themes', () => ({
 }))
 
 jest.mock('@/tools/colors', () => ({
-    statChartColor: ['#2c7eec', '#468de8'],
+    getSensorColor: jest.fn((sensor: string) => [sensor === 'precipitation' ? '#3b8ced' : '#ef5359']),
     resolveCssVar: jest.fn((_variable: string, fallback: string) => fallback),
     hexToRgba: jest.fn((hex: string, alpha: number) => `rgba(${hex},${alpha})`)
 }))
@@ -99,9 +99,9 @@ describe('StatTrendChart', () => {
         )
         const option = JSON.parse(getByTestId('echarts').getAttribute('data-option') ?? '{}')
 
-        expect(option.xAxis.axisLine.lineStyle.color).toBe('#e6e8ec')
-        expect(option.xAxis.axisLabel.color).toBe('#66707d')
-        expect(option.yAxis.axisLabel.color).toBe('#66707d')
+        expect(option.xAxis.axisLine.lineStyle.color).toBe('#e6e4dc')
+        expect(option.xAxis.axisLabel.color).toBe('#5f5e57')
+        expect(option.yAxis.axisLabel.color).toBe('#5f5e57')
         expect(JSON.stringify(option)).not.toContain('var(--text-color-secondary)')
     })
 
@@ -134,5 +134,20 @@ describe('StatTrendChart', () => {
 
         expect(shownIndexes).toEqual([0, 3, 6, 8, 11])
         expect(shownIndexes).toHaveLength(5)
+    })
+
+    it('draws the line in the hue of the quantity', () => {
+        render(
+            <StatTrendChart
+                data={mockData}
+                source={'temperature'}
+            />
+        )
+        expect(JSON.stringify(mockCapturedOption)).toContain('#ef5359')
+    })
+
+    it('labels a narrow range in tenths so the ticks differ', () => {
+        expect(getYAxisLabelFormatter(760.6, 761.3)(760.95)).toBe('761.0')
+        expect(getYAxisLabelFormatter(1, 8.2)(4.6)).toBe('5')
     })
 })

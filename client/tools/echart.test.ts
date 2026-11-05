@@ -2,12 +2,12 @@ import { getChartTokens, getChartTooltipStyle, getEChartBaseConfig, verticalGrad
 
 describe('getChartTokens', () => {
     it('returns dark tokens by default and for unknown themes', () => {
-        expect(getChartTokens().surface).toBe('#14181d')
-        expect(getChartTokens('system').surface).toBe('#14181d')
+        expect(getChartTokens().surface).toBe('#141413')
+        expect(getChartTokens('system').surface).toBe('#141413')
     })
 
     it('returns light tokens for the light theme', () => {
-        expect(getChartTokens('light')).toMatchObject({ surface: '#ffffff', textSecondary: '#66707d' })
+        expect(getChartTokens('light')).toMatchObject({ surface: '#ffffff', textSecondary: '#5f5e57' })
     })
 })
 
@@ -27,7 +27,7 @@ describe('getChartTooltipStyle', () => {
         const style = getChartTooltipStyle('light')
 
         expect(style.backgroundColor).toBe('#ffffff')
-        expect(style.textStyle.color).toBe('rgba(0, 0, 0, 0.9)')
+        expect(style.textStyle.color).toBe('#141413')
     })
 })
 
@@ -45,14 +45,14 @@ describe('getEChartBaseConfig', () => {
             top: 15,
             bottom: 25,
             containLabel: true,
-            borderColor: '#252b33'
+            borderColor: '#2a2926'
         })
     })
 
     it('uses the secondary text colour for the legend', () => {
-        expect((getEChartBaseConfig('dark').legend as { textStyle: { color: string } }).textStyle.color).toBe('#8e97a4')
+        expect((getEChartBaseConfig('dark').legend as { textStyle: { color: string } }).textStyle.color).toBe('#a3a197')
         expect((getEChartBaseConfig('light').legend as { textStyle: { color: string } }).textStyle.color).toBe(
-            '#66707d'
+            '#5f5e57'
         )
     })
 

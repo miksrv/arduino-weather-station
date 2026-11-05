@@ -34,7 +34,7 @@ class Filters extends BaseConfig {
         'before' => [
             // 'honeypot',
             // CSRF filter is intentionally disabled: this is a stateless REST API.
-            // Protection is provided by token-based auth on POST /sensors and CORS allowlist.
+            // The API sends no cookies or credentials (CORS is `*`); the only write endpoint, POST /sensors, is protected by token-based auth.
             // 'csrf',
             'invalidchars',
             'cors'

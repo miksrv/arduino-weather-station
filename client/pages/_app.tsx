@@ -74,13 +74,13 @@ const App = ({ Component, pageProps }: AppProps) => {
                 <meta
                     key={'theme-color-light'}
                     name={'theme-color'}
-                    content={'#f7f8fa'}
+                    content={'#faf9f5'}
                     media={'(prefers-color-scheme: light)'}
                 />
                 <meta
                     key={'theme-color-dark'}
                     name={'theme-color'}
-                    content={'#0b0d10'}
+                    content={'#0b0b0a'}
                     media={'(prefers-color-scheme: dark)'}
                 />
                 <meta

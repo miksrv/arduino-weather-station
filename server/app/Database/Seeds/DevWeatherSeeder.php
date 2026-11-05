@@ -54,6 +54,7 @@ class DevWeatherSeeder extends Seeder
         'WeatherAPI'     => [3600, 0],
         'VisualCrossing' => [3600, 30 * 60],
         'OpenMeteo'      => [3600, 0],
+        'Metar'          => [1800, 0],
     ];
 
     /**
@@ -130,7 +131,7 @@ class DevWeatherSeeder extends Seeder
 
     /**
      * Rebuilds hourly_averages and daily_averages for the generated period using the same
-     * RawWeatherDataModel aggregation methods as system:getCurrentWeather.
+     * aggregation methods as system:getCurrentWeather (daily rows are rolled up from hourly ones).
      *
      * @param RawWeatherDataModel $rawModel Raw data model
      * @param int                 $start    Gap start (unix seconds)
@@ -143,12 +144,12 @@ class DevWeatherSeeder extends Seeder
         $sinceHour   = gmdate('Y-m-d H:00:00', $start);
         $sinceDay    = gmdate('Y-m-d 00:00:00', $start);
 
-        $hourly = $rawModel->getHourlyAverages(true, $sinceHour);
+        $hourly = $rawModel->getHourlyAverages($sinceHour);
         $hourlyModel->where('date >=', $sinceHour)->delete();
         $this->_insertAverages($hourlyModel, $hourly);
         CLI::write('[AVG]  hourly_averages ' . count($hourly) . ' rows', 'white');
 
-        $daily = $rawModel->getDailyAverages(true, $sinceDay);
+        $daily = $hourlyModel->getDailyAverages($sinceDay);
         $dailyModel->where('date >=', $sinceDay)->delete();
         $this->_insertAverages($dailyModel, $daily);
         CLI::write('[AVG]  daily_averages  ' . count($daily) . ' rows', 'white');
@@ -158,7 +159,7 @@ class DevWeatherSeeder extends Seeder
      * Batch-inserts aggregate rows, dropping the helper `hour`/`day` group columns.
      *
      * @param HourlyAveragesModel|DailyAveragesModel $model Target model
-     * @param array                                  $rows  Rows from RawWeatherDataModel::get*Averages()
+     * @param array                                  $rows  Rows from RawWeatherDataModel::getHourlyAverages() / HourlyAveragesModel::getDailyAverages()
      * @return void
      */
     private function _insertAverages(HourlyAveragesModel|DailyAveragesModel $model, array $rows): void

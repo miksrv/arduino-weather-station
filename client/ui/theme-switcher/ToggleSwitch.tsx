@@ -16,14 +16,11 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ checked }) => {
         ref.current!.style.transform = `scale(${scaleValue})`
     }, [isHovered, isActive])
 
-    const backgroundColor = checked ? '#595dde' : '#80c7cb'
-
     return (
         <div
             ref={ref}
             className={styles.dayNightSwitch}
             style={{
-                backgroundColor: isHovered ? (checked ? '#5559cc' : '#79bfc3') : backgroundColor,
                 transform: `scale(${isActive ? 1.03 : isHovered ? 1.05 : 1})`
             }}
             onMouseEnter={() => setIsHovered(true)}

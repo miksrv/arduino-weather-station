@@ -253,10 +253,74 @@ final class HistoryControllerTest extends CIUnitTestCase
         // Clean up.
         cache()->delete('history_' . hash('sha256', '2023-01-01_2023-01-10_daily'));
     }
+    /**
+     * Day boundaries are station-local dates converted to UTC (Asia/Yekaterinburg = UTC+5).
+     */
+    public function testDayBoundariesAreConvertedFromStationTimeToUtc(): void
+    {
+        $mockRaw = $this->createMock(RawWeatherDataModel::class);
+        $mockRaw->expects($this->once())
+            ->method('getWeatherHistoryGrouped')
+            ->with('2022-12-31 19:00:00', '2023-01-01 18:59:59', '10 MINUTE')
+            ->willReturn([]);
+
+        $this->controller(History::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockRaw);
+
+        $this->request->setMethod('GET');
+        parse_str('start_date=2023-01-01&end_date=2023-01-01', $get);
+        $this->request->setGlobal('get', $get);
+
+        $this->assertSame(200, $this->execute('getHistoryWeather')->response()->getStatusCode());
+    }
+
+    /**
+     * An empty result must not be cached, so data arriving later shows up.
+     */
+    public function testEmptyResultIsNotCached(): void
+    {
+        $cacheKey = 'history_' . hash('sha256', '2023-02-01_2023-02-10_daily');
+        cache()->delete($cacheKey);
+
+        $mockDaily = $this->createMock(DailyAveragesModel::class);
+        $mockDaily->method('getWeatherHistoryGrouped')->willReturn([]);
+
+        $this->controller(History::class);
+        $this->setPrivateProperty($this->controller, 'dailyAveragesModel', $mockDaily);
+
+        $this->request->setMethod('GET');
+        parse_str('start_date=2023-02-01&end_date=2023-02-10', $get);
+        $this->request->setGlobal('get', $get);
+
+        $this->assertSame(200, $this->execute('getHistoryWeather')->response()->getStatusCode());
+        $this->assertNull(cache()->get($cacheKey));
+    }
+
+    /**
+     * TTL depends on how close the range end is to today of the station.
+     */
+    public function testCacheTtlDependsOnRangeEnd(): void
+    {
+        $this->controller(History::class);
+        $method = new \ReflectionMethod(History::class, '_cacheTtl');
+        $method->setAccessible(true);
+
+        // The range end the way a request carries it: the station's date as a string, read as midnight
+        // (not time(), whose UTC date lags the station's from 19:00 UTC, when the station is a day ahead)
+        $stationToday = (new \DateTimeImmutable('now', new \DateTimeZone(config(\Config\App::class)->stationTimezone)))
+            ->format('Y-m-d');
+        $endOf        = static fn (string $shift): int => strtotime($stationToday . ' ' . $shift);
+
+        $this->assertSame(History::CACHE_TTL_CURRENT, $method->invoke($this->controller, $endOf('+0 days')));
+        $this->assertSame(History::CACHE_TTL_RECENT, $method->invoke($this->controller, $endOf('-3 days')));
+        $this->assertSame(History::CACHE_TTL_HISTORICAL, $method->invoke($this->controller, $endOf('-30 days')));
+    }
+
     public function testCacheTtlConstants(): void
     {
         $this->assertSame(60 * 60, History::CACHE_TTL_RECENT);
-        $this->assertSame(0, History::CACHE_TTL_HISTORICAL);
+        $this->assertSame(5 * 60, History::CACHE_TTL_CURRENT);
+        $this->assertSame(604800, History::CACHE_TTL_HISTORICAL);
         $this->assertSame(48, History::CACHE_MIN_RANGE_HOURS);
         $this->assertSame(7, History::CACHE_RECENT_DAYS_THRESHOLD);
     }

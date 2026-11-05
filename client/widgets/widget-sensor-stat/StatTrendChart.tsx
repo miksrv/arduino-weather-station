@@ -1,8 +1,10 @@
 import React, { useMemo } from 'react'
 
+import { useTheme } from 'next-themes'
+
 import { ApiModel } from '@/api'
 import SparklineChart from '@/components/sparkline-chart'
-import { statChartColor } from '@/tools/colors'
+import { getSensorColor } from '@/tools/colors'
 import { formatDate } from '@/tools/date'
 import { findMaxValue, findMinValue } from '@/tools/weather'
 
@@ -11,11 +13,17 @@ interface StatTrendChartProps {
     source?: keyof ApiModel.Sensors
 }
 
-const roundYAxisLabel = (value: number): string => `${Math.round(value)}`
+/** Whole numbers on the axis, or tenths when the day's range is too narrow for whole numbers to differ */
+export const getYAxisLabelFormatter =
+    (min?: number, max?: number) =>
+    (value: number): string =>
+        min !== undefined && max !== undefined && max - min < 3 ? value.toFixed(1) : `${Math.round(value)}`
 
 // Real values on the axis: the area is filled down to the bottom of the axis (SparklineChart),
-// so negative temperatures don't need shifting
+// so negative temperatures don't need shifting. The line is in the hue of the quantity, as on every chart
 const StatTrendChart: React.FC<StatTrendChartProps> = ({ data: weatherData, source }) => {
+    const { resolvedTheme: theme } = useTheme()
+
     const categories = useMemo(() => weatherData?.map((item) => formatDate(item?.date, 'HH:mm')) ?? [], [weatherData])
 
     const values = useMemo(
@@ -23,14 +31,17 @@ const StatTrendChart: React.FC<StatTrendChartProps> = ({ data: weatherData, sour
         [weatherData, source]
     )
 
+    const min = findMinValue(weatherData, source)
+    const max = findMaxValue(weatherData, source)
+
     return (
         <SparklineChart
             categories={categories}
             values={values}
-            color={statChartColor[0]}
-            yAxisMin={findMinValue(weatherData, source)}
-            yAxisMax={findMaxValue(weatherData, source)}
-            yAxisLabelFormatter={roundYAxisLabel}
+            color={getSensorColor(source, theme)[0]}
+            yAxisMin={min}
+            yAxisMax={max}
+            yAxisLabelFormatter={getYAxisLabelFormatter(min, max)}
             areaOpacity={0.45}
         />
     )

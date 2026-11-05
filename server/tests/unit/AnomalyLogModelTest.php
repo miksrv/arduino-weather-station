@@ -583,4 +583,163 @@ final class AnomalyLogModelTest extends CIUnitTestCase
             $this->assertSame(0, $entry['activeCount'], 'Closed-long-ago row must not be active today');
         }
     }
+
+    // -------------------------------------------------------------------------
+    // applyDayState — episode bookkeeping (in-memory fake of the table)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns an AnomalyLogModel whose persistence is an in-memory array, exposed
+     * through the public $rows property of the returned object.
+     */
+    private function _memoryModel(): AnomalyLogModel
+    {
+        return new class extends AnomalyLogModel {
+            /** @var array<int, array> */
+            public array $rows = [];
+            private int $seq = 0;
+
+            public function __construct()
+            {
+            }
+
+            public function openAnomaly(string $type, string $date, ?float $peakValue = null, ?string $description = null): int
+            {
+                $id = ++$this->seq;
+                $this->rows[$id] = [
+                    'id' => $id, 'type' => $type, 'start_date' => $date, 'end_date' => null,
+                    'peak_value' => $peakValue, 'description' => $description,
+                ];
+
+                return $id;
+            }
+
+            public function update($id = null, $row = null): bool
+            {
+                $this->rows[$id] = array_merge($this->rows[$id], $row);
+
+                return true;
+            }
+
+            public function delete($id = null, bool $purge = false)
+            {
+                unset($this->rows[$id]);
+
+                return true;
+            }
+
+            public function updatePeakIfHigher(int $id, ?float $newValue): void
+            {
+                if ($newValue !== null && ($this->rows[$id]['peak_value'] === null
+                    || abs($newValue) > abs((float) $this->rows[$id]['peak_value']))) {
+                    $this->rows[$id]['peak_value'] = $newValue;
+                }
+            }
+
+            public function getLatestByType(string $type): ?array
+            {
+                $best = null;
+
+                foreach ($this->rows as $row) {
+                    if ($row['type'] === $type && ($best === null || $row['start_date'] >= $best['start_date'])) {
+                        $best = $row;
+                    }
+                }
+
+                return $best;
+            }
+        };
+    }
+
+    /**
+     * Feeds a list of [date => active] days to the model like the cron does.
+     *
+     * @param array<string, bool> $days
+     */
+    private function _feed(AnomalyLogModel $model, array $days, string $type = 'fog_risk'): void
+    {
+        foreach ($days as $date => $active) {
+            $model->applyDayState($type, $active, $date, 1.0, 'd', $model->getLatestByType($type));
+        }
+    }
+
+    /**
+     * end_date is the LAST ACTIVE day (inclusive), not the first inactive one.
+     */
+    public function testApplyDayStateClosesWithLastActiveDay(): void
+    {
+        $model = $this->_memoryModel();
+
+        $this->_feed($model, ['2026-03-10' => true, '2026-03-11' => true, '2026-03-12' => false]);
+
+        $this->assertCount(1, $model->rows);
+        $row = reset($model->rows);
+        $this->assertSame('2026-03-10', $row['start_date']);
+        $this->assertSame('2026-03-11', $row['end_date']);
+    }
+
+    /**
+     * Evaluating the same days again (cron run twice, catch-up window) changes nothing.
+     */
+    public function testApplyDayStateIsIdempotent(): void
+    {
+        $model = $this->_memoryModel();
+        $days  = ['2026-03-10' => true, '2026-03-11' => true, '2026-03-12' => false, '2026-03-13' => true];
+
+        $this->_feed($model, $days);
+        $once = $model->rows;
+        $this->_feed($model, $days);
+        $this->_feed($model, $days);
+
+        $this->assertEquals($once, $model->rows);
+        $this->assertCount(2, $model->rows);
+    }
+
+    /**
+     * A day evaluated active and then inactive (data changed, rerun) drops the
+     * one-day episode instead of leaving end_date < start_date.
+     */
+    public function testApplyDayStateDropsEpisodeThatStartedOnTheDay(): void
+    {
+        $model = $this->_memoryModel();
+
+        $this->_feed($model, ['2026-03-10' => true]);
+        $this->_feed($model, ['2026-03-10' => false]);
+
+        $this->assertSame([], $model->rows);
+    }
+
+    /**
+     * An episode closed the previous day is re-opened (no duplicate row) when the
+     * anomaly is active again; with a gap of an inactive day a new episode starts.
+     */
+    public function testApplyDayStateReopensAdjacentEpisodeButNotAcrossGap(): void
+    {
+        $model = $this->_memoryModel();
+
+        // closed with end 03-10 (e.g. by an earlier partial evaluation of 03-11)
+        $this->_feed($model, ['2026-03-09' => true, '2026-03-10' => true, '2026-03-11' => false]);
+        $result = $model->applyDayState('fog_risk', true, '2026-03-11', 1.0, 'd', $model->getLatestByType('fog_risk'));
+
+        $this->assertSame('reopened', $result['action']);
+        $this->assertCount(1, $model->rows);
+        $this->assertNull(reset($model->rows)['end_date']);
+
+        // real gap: 03-12 inactive, 03-13 active -> second row
+        $this->_feed($model, ['2026-03-12' => false, '2026-03-13' => true]);
+        $this->assertCount(2, $model->rows);
+    }
+
+    /**
+     * Different types do not interfere.
+     */
+    public function testApplyDayStateKeepsTypesSeparate(): void
+    {
+        $model = $this->_memoryModel();
+
+        $this->_feed($model, ['2026-03-10' => true], 'fog_risk');
+        $this->_feed($model, ['2026-03-10' => true], 'heat_wave');
+
+        $this->assertCount(2, $model->rows);
+    }
 }

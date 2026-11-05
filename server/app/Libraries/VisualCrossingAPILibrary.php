@@ -113,34 +113,77 @@ class VisualCrossingAPILibrary extends AbstractWeatherAPILibrary
     {
         helper('weather');
 
+        $c = $data['currentConditions'] ?? [];
+
         return [
-            'temperature'   => (float) $data['currentConditions']['temp'] ?? null,
-            'dew_point'     => (float) $data['currentConditions']['dew'] ?? null,
-            'feels_like'    => (float) $data['currentConditions']['feelslike'] ?? null,
-            'pressure'      => (int) $data['currentConditions']['pressure'] ?? null,
-            'humidity'      => (float) $data['currentConditions']['humidity'] ?? null,
-            'visibility'    => !empty($data['currentConditions']['visibility']) ? (int) $data['currentConditions']['visibility'] * 1000 : null,
-            'wind_speed'    => !empty($data['currentConditions']['windspeed']) ? kmh_to_ms($data['currentConditions']['windspeed']) : null,
-            'wind_gust'     => !empty($data['currentConditions']['windgust']) ? kmh_to_ms($data['currentConditions']['windgust']) : null,
-            'wind_deg'      => (int) $data['currentConditions']['winddir'] ?? null,
-            'clouds'        => (int) $data['currentConditions']['cloudcover'] ?? null,
-            'uv_index'      => (float) $data['currentConditions']['uvindex'] ?? null,
-            'sol_energy'    => (float) $data['currentConditions']['solarenergy'] ?? null,
-            'sol_radiation' => (float) $data['currentConditions']['solarradiation'] ?? null,
-            'precipitation' => (float) $data['currentConditions']['precip'] ?? null,
-            'weather_id'    => !empty($data['currentConditions']['conditions']) ? self::convertWeatherCondition($data['currentConditions']['conditions']) : null,
-            'date'          => !empty($data['currentConditions']['datetimeEpoch']) ? Time::createFromTimestamp($data['currentConditions']['datetimeEpoch']) : null,
+            'temperature'   => isset($c['temp']) ? (float) $c['temp'] : null,
+            'dew_point'     => isset($c['dew']) ? (float) $c['dew'] : null,
+            'feels_like'    => isset($c['feelslike']) ? (float) $c['feelslike'] : null,
+            'pressure'      => isset($c['pressure']) ? (int) round((float) $c['pressure']) : null,
+            'humidity'      => isset($c['humidity']) ? (float) $c['humidity'] : null,
+            'visibility'    => isset($c['visibility']) ? (int) round((float) $c['visibility'] * 1000) : null,
+            'wind_speed'    => isset($c['windspeed']) ? kmh_to_ms((float) $c['windspeed']) : null,
+            'wind_gust'     => isset($c['windgust']) ? kmh_to_ms((float) $c['windgust']) : null,
+            'wind_deg'      => isset($c['winddir']) ? (int) $c['winddir'] : null,
+            'clouds'        => isset($c['cloudcover']) ? (int) $c['cloudcover'] : null,
+            'uv_index'      => isset($c['uvindex']) ? (float) $c['uvindex'] : null,
+            'sol_energy'    => isset($c['solarenergy']) ? (float) $c['solarenergy'] : null,
+            'sol_radiation' => isset($c['solarradiation']) ? (float) $c['solarradiation'] : null,
+            'precipitation' => isset($c['precip']) ? (float) $c['precip'] : null,
+            'weather_id'    => !empty($c['conditions'])
+                ? self::convertWeatherCondition((string) $c['conditions'], isset($c['precip']) ? (float) $c['precip'] : null)
+                : null,
+            'date'          => !empty($c['datetimeEpoch']) ? Time::createFromTimestamp($c['datetimeEpoch']) : null,
             'source'        => RawWeatherDataModel::SOURCE_VISUALCROSSING
         ];
     }
 
     /**
-     * @param string $conditions
+     * Maps a comma-separated Visual Crossing `conditions` string (e.g. "Rain, Partially cloudy").
+     *
+     * Every token is mapped and the most significant one wins: thunderstorm, then precipitation, then
+     * atmosphere (fog, mist, ...), then sky cover, so "Rain, Overcast" is rain. The generic "Rain" /
+     * "Snow" tokens are refined by the hourly precipitation amount (mm) when it is known.
+     *
+     * @param string     $conditions The `conditions` field.
+     * @param float|null $precip     Precipitation, mm (null = unknown, generic code is kept).
      * @return int|null
      * @link https://www.visualcrossing.com/resources/documentation/weather-api/weather-condition-fields/
      */
-    public static function convertWeatherCondition(string $conditions): ?int {
-        $conditions = explode(',', $conditions);
-        return self::$conditionMapping[trim($conditions[0])] ?? null;
+    public static function convertWeatherCondition(string $conditions, ?float $precip = null): ?int
+    {
+        $best     = null;
+        $bestRank = PHP_INT_MAX;
+
+        foreach (explode(',', $conditions) as $token) {
+            $token = trim($token);
+            $id    = self::$conditionMapping[$token] ?? null;
+
+            if ($id === null) {
+                continue;
+            }
+
+            if ($precip !== null && $precip > 0) {
+                if ($token === 'Rain') {
+                    $id = $precip < 2.5 ? 500 : ($precip < 7.6 ? 501 : 502);
+                } elseif ($token === 'Snow') {
+                    $id = $precip < 1.0 ? 600 : ($precip < 4.0 ? 601 : 602);
+                }
+            }
+
+            $rank = match (intdiv($id, 100)) {
+                2       => 0,
+                3, 5, 6 => 1,
+                7       => 2,
+                default => 3,
+            };
+
+            if ($rank < $bestRank) {
+                $best     = $id;
+                $bestRank = $rank;
+            }
+        }
+
+        return $best;
     }
 }

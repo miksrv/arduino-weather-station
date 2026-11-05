@@ -15,19 +15,21 @@ jest.mock('@/package.json', () => ({
 
 jest.mock('@/tools/date', () => ({ formatDate: jest.fn() }))
 
-jest.mock('@/update', () => new Date(2023, 0, 1, 12, 0, 0))
-
 describe('Footer', () => {
     it('displays the correct version information', () => {
-        ;(formatDate as jest.Mock).mockImplementation((date, format) =>
-            format === 'DD.MM.YYYY, HH:mm' ? '01.01.2023, 12:00' : '2023'
-        )
+        ;(formatDate as jest.Mock).mockReturnValue('2023')
 
         render(<Footer />)
 
         expect(screen.getByText('v')).toBeInTheDocument()
         expect(screen.getByText('GitHub')).toBeInTheDocument()
         expect(screen.getByText('1.0.0')).toBeInTheDocument()
-        expect(screen.getByText('(01.01.2023, 12:00)')).toBeInTheDocument()
+        expect(screen.queryByText(/\d{2}\.\d{2}\.\d{4}/)).not.toBeInTheDocument()
+    })
+
+    it('renders the action on the copyright line', () => {
+        render(<Footer action={<span data-testid={'action'} />} />)
+
+        expect(screen.getByTestId('action').parentElement).toHaveTextContent('Copyright ©')
     })
 })

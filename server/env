@@ -32,6 +32,9 @@ app.visualcrossing.key = ''
 app.lat = 00.0000
 app.lon = 00.0000
 
+# ICAO code of the nearest airport for METAR observations (e.g. UWOO); empty disables the source
+app.metar.station = ''
+
 # app.narodmon.mac = ''
 app.narodmon.lat = 00.0000
 app.narodmon.lon = 00.0000

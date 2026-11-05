@@ -2,6 +2,9 @@ void webclient_send_data() {
   // Clear the buffer before adding new data
   memset(webclient_data, 0, sizeof(webclient_data));
 
+  // Payload version: the server takes the wind only from a firmware that sends m/s and degrees
+  strcat(webclient_data, "fw=" API_PAYLOAD_VERSION);
+
   // Append pressure value (mmHg)
   strcat(webclient_data, "&p=");
   strcat(webclient_data, mmHg);

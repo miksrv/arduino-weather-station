@@ -195,4 +195,25 @@ final class WeatherDataTest extends CIUnitTestCase
 
         $this->assertFalse($entity->isStale);
     }
+
+    /**
+     * SQL averages arrive as numeric strings: integer properties are rounded (not truncated),
+     * float properties are cast, and no deprecation is raised.
+     */
+    public function testNumericStringsAreCastToPropertyTypes(): void
+    {
+        $entity = new WeatherData([
+            'pressure'    => '1009.67',
+            'humidity'    => '64.5',
+            'clouds'      => '99.4',
+            'visibility'  => '10000.0000',
+            'temperature' => '21.5',
+        ]);
+
+        $this->assertSame(1010, $entity->pressure);
+        $this->assertSame(65, $entity->humidity);
+        $this->assertSame(99, $entity->clouds);
+        $this->assertSame(10000, $entity->visibility);
+        $this->assertSame(21.5, $entity->temperature);
+    }
 }

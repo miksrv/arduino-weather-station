@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import dayjs from 'dayjs'
-import { DatePicker, findPresetByDate, Select, Spinner } from 'simple-react-ui-kit'
+import { DatePicker, Select, Spinner } from 'simple-react-ui-kit'
 
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import Head from 'next/head'
@@ -14,7 +13,7 @@ import { Maybe } from '@/api/types'
 import AppLayout from '@/components/app-layout'
 import PageHeader from '@/components/page-header'
 import WidgetHeatmap from '@/components/widget-heatmap'
-import { formatDate, getCurrentDate, getHalfYearDate } from '@/tools/date'
+import { formatDate, formatDateRange, getCurrentDate, getHalfYearDate } from '@/tools/date'
 import { getDiurnalProfile, getHeatmapStats, getHistogram, toHeatmapPoints } from '@/tools/heatmap'
 import { getPageSeo } from '@/tools/seo'
 import { LocaleType } from '@/tools/types'
@@ -48,16 +47,6 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
     const bins = useMemo(() => getHistogram(points, sensor), [points, sensor])
     const isLoadingData = !history
 
-    const currentDatePreset = useMemo((): string => {
-        if (!period?.[0] || !period?.[1]) {
-            return ''
-        }
-
-        const preset = findPresetByDate(dayjs.utc(), period[0], period[1], i18n.language as LocaleType)
-
-        return preset ? preset : period?.[0] && period?.[1] ? `${period?.[0]} - ${period?.[1]}` : ''
-    }, [period, i18n.language])
-
     useEffect(() => {
         setPeriod([formatDate(getHalfYearDate(), 'YYYY-MM-DD'), formatDate(getCurrentDate().toDate(), 'YYYY-MM-DD')])
     }, [])
@@ -90,6 +79,8 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
                     buttonMode={'secondary'}
                     minDate={'2021-01-01'}
                     maxDate={formatDate(getCurrentDate().toDate(), 'YYYY-MM-DD')}
+                    // The station's today, not the browser's: the presets count back from it and match it
+                    today={getCurrentDate().format('YYYY-MM-DD')}
                     placeholder={t('select-date-range')}
                     onPeriodSelect={(startDate, endDate) => setPeriod([startDate, endDate])}
                 />
@@ -127,7 +118,7 @@ const HeatmapPage: NextPage<HeatmapPageProps> = () => {
                     type={sensor}
                     loading={isLoadingData}
                     title={`${t('heatmap')}: ${t(sensor)}`}
-                    subtitle={t('heat-map-data-shown-period', { period: currentDatePreset.toLowerCase() })}
+                    subtitle={t('heat-map-data-shown-period', { period: formatDateRange(period?.[0], period?.[1]) })}
                 />
 
                 <WidgetDiurnalProfile

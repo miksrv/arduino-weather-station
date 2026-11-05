@@ -19,6 +19,7 @@ module.exports = {
         React.createElement('div', { 'data-testid': 'skeleton', style }),
     Spinner: () =>
         React.createElement('div', { 'data-testid': 'spinner' }),
-    Badge: ({ icon, label }) =>
-        React.createElement('span', { 'data-testid': 'badge', 'data-icon': icon }, label),
+    // Like the kit's: the rest of the props (className, role, aria-*) land on the badge element
+    Badge: ({ icon, label, size, onClickRemove, tooltip, ...rest }) =>
+        React.createElement('span', { 'data-testid': 'badge', 'data-icon': icon, ...rest }, label),
 };

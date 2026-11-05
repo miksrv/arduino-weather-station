@@ -126,7 +126,7 @@ class WeatherData
             $property = $this->_toCamelCase($key);
 
             if (property_exists($this, $property) && $value !== null) {
-                $this->$property = $value;
+                $this->$property = $this->_coerce($property, $value);
             }
         }
 
@@ -139,6 +139,29 @@ class WeatherData
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * Casts a raw value to the declared type of the property.
+     *
+     * SQL averages arrive as numeric strings such as "1009.67"; integer properties are rounded
+     * (not truncated) and no implicit float-string conversion deprecation is raised. Values that
+     * are not numeric are returned untouched for non-numeric properties.
+     *
+     * @param string $property Property name.
+     * @param mixed  $value    Raw non-null value.
+     * @return mixed Value matching the property type.
+     */
+    private function _coerce(string $property, mixed $value): mixed
+    {
+        $type = (new \ReflectionProperty($this, $property))->getType();
+        $name = $type instanceof \ReflectionNamedType ? $type->getName() : null;
+
+        if (($name === 'int' || $name === 'float') && is_numeric($value)) {
+            return $name === 'int' ? (int) round((float) $value) : (float) $value;
+        }
+
+        return $value;
+    }
 
     /**
      * Converts a snake_case string to camelCase for property resolution.

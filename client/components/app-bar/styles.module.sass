@@ -1,6 +1,7 @@
+@use '../../styles/variables'
 @use '../../styles/typography' as type
 
-// Sticky translucent bar over the page background; content aligned with the page column.
+// Sticky bar on the card surface; content aligned with the page column.
 // Installed on iOS the page runs under the status bar (black-translucent), so the bar grows by the safe areas
 .appBar
     position: sticky
@@ -13,8 +14,6 @@
     padding-right: max(var(--space-3), env(safe-area-inset-right))
     color: var(--text-color-primary)
     background: var(--app-bar-background)
-    -webkit-backdrop-filter: saturate(180%) blur(12px)
-    backdrop-filter: saturate(180%) blur(12px)
     box-shadow: 0 1px 0 var(--border)
 
     .loading
@@ -79,21 +78,50 @@
         +type.caption
         font-weight: var(--font-weight-normal)
 
-    // Station status: a dot with a soft halo, pulsing while the data is fresh
-    .online, .offline
+    // Station status: a dot with a soft halo — green and pulsing while the data is fresh, steady yellow while it
+    // may be outdated, red when the station has been silent for over an hour
+    .dot
         flex: 0 0 auto
         width: 8px
         height: 8px
         border-radius: var(--radius-full)
 
-    .online
-        background: var(--color-green)
-        box-shadow: 0 0 0 3px var(--color-green-background)
-        animation: pulsate 2s infinite
+        &.online
+            background: var(--color-green)
+            box-shadow: 0 0 0 3px var(--color-green-background)
+            animation: pulsate 2s infinite
 
-    .offline
-        background: var(--color-red)
-        box-shadow: 0 0 0 3px var(--color-red-background)
+        &.stale
+            background: var(--color-yellow)
+            box-shadow: 0 0 0 3px var(--color-yellow-background)
+
+        &.offline
+            background: var(--color-red)
+            box-shadow: 0 0 0 3px var(--color-red-background)
+
+    // "Data may be outdated" (`StatusBadge` in the colour of the dot) right after the time; on phones a strip
+    // under the bar's row
+    .notice
+        margin-right: auto
+
+    // Phones: the bar grows by the notice, which takes a row of its own under the menu, the time and the switch
+    @media only screen and (max-width: variables.$mobileMaxWidth)
+        height: auto
+        min-height: calc(var(--app-bar-height) + env(safe-area-inset-top))
+
+        .wrapper
+            flex-wrap: wrap
+            row-gap: 0
+            height: auto
+
+            .aside
+                flex: 1 1 0
+                height: var(--app-bar-height)
+
+        .notice
+            order: 1
+            flex: 1 0 100%
+            margin: 0 0 var(--space-2)
 
 @keyframes pulsate
     0%, 100%

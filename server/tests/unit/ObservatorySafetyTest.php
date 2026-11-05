@@ -183,9 +183,20 @@ final class ObservatorySafetyTest extends CIUnitTestCase
 
     public function testCloudsReportsOvercastConfirmedBySources(): void
     {
-        $this->assertSame(85.0, ObservatorySafety::clouds([
+        $this->assertSame(80.0, ObservatorySafety::clouds([
             $this->_row('10:00:00', 'OpenWeatherMap', ['clouds' => 90]),
             $this->_row('10:00:00', 'WeatherAPI', ['clouds' => 80]),
+        ], $this->now));
+    }
+
+    /**
+     * With two sources one outlier must not show the mean (100% vs 0% is not 50%).
+     */
+    public function testCloudsWithTwoSourcesUsesTheLowerValue(): void
+    {
+        $this->assertSame(0.0, ObservatorySafety::clouds([
+            $this->_row('10:00:00', 'OpenWeatherMap', ['clouds' => 100]),
+            $this->_row('10:00:00', 'WeatherAPI', ['clouds' => 0]),
         ], $this->now));
     }
 

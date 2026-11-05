@@ -58,7 +58,9 @@ jobs:
         id: cache-build
         with:
           path: client/.next
-          key: ${{ runner.os }}-build-${{ hashFiles('client/**/*.ts', 'client/**/*.tsx') }}
+          # Every input of the build, not only TypeScript: with a cache hit the build is skipped, so a change
+          # to styles, translations, config or a dependency alone would ship the previous build
+          key: ${{ runner.os }}-build-${{ hashFiles('client/yarn.lock', 'client/**/*.ts', 'client/**/*.tsx', 'client/**/*.sass', 'client/**/*.scss', 'client/**/*.css', 'client/**/*.json', 'client/**/*.js', 'client/**/*.svg', '!client/node_modules/**', '!client/.next/**') }}
           restore-keys: |
             ${{ runner.os }}-build-
             ${{ runner.os }}-

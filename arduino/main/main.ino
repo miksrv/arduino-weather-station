@@ -36,6 +36,15 @@ const long SEND_DATA_INTERVAL = 60; // Interval (in seconds) to send data to the
 const char API_SERVER[] = "api.meteo.miksoft.pro"; // API server address
 const char API_METHOD[] = "/sensors";  // API endpoint to send sensor data
 const char API_SECRET[] = "";  // API token for authorization (must be provided)
+// Payload version sent as `fw`: from 2 on the wind is in m/s and degrees, and only then does the server
+// store it (the older firmware sent anemometer pulses and a sector number)
+#define API_PAYLOAD_VERSION "2"
+
+// Anemometer calibration. Pulses are counted for ANEMOMETER_WINDOW_MS and converted to m/s.
+// Assumption: common cup anemometer, 1 pulse per revolution, 2.4 km/h per 1 Hz = 0.667 m/s per Hz.
+// NEEDS CALIBRATION against a reference anemometer for the installed sensor.
+#define ANEMOMETER_WINDOW_MS 5000      // Pulse counting window, ms
+#define ANEMOMETER_MS_PER_HZ 0.667     // Wind speed (m/s) per 1 Hz of pulses
 
 // Pin assignments for different sensors
 const int PIN_ANEMOMETR = 3; // Digital PIN for the anemometer (wind speed sensor)
@@ -58,10 +67,10 @@ BMP085 dps = BMP085();       // Initialize the BMP085 pressure sensor
 BH1750 lightmeter;           // Initialize the BH1750 light sensor
 
 // Variables for storing sensor data and transmission
-int rps_impulses = -1;       // Impulse count for anemometer (used to calculate wind speed)
+volatile unsigned int rps_impulses = 0; // Impulse count for anemometer (used to calculate wind speed)
 unsigned long previousMillis; // Variable for tracking time between data transmissions
 char webclient_data[120], temp[6], humd[6], mmHg[6], // Data buffers for various sensor readings
-     lux[5], uvindex[5], wind_dir[5], wind_speed[5]; // Buffers for light, UV index, wind direction, and wind speed
+     lux[6], uvindex[8], wind_dir[5], wind_speed[8]; // Buffers for light, UV index, wind direction, and wind speed
 
 void setup() {
   // Start the serial port for debug messages if DEBUG is enabled
@@ -173,18 +182,22 @@ void loop() {
 
 // Function to read wind speed from the anemometer
 void get_sensor_anemometer() {
-  rps_impulses = -1;  // Reset the impulse count
+  rps_impulses = 0;  // Reset the impulse count
 
   attachInterrupt(digitalPinToInterrupt(PIN_ANEMOMETR), rps, RISING);  // Attach interrupt to count pulses
-  delay(5000);  // Wait 5 seconds to accumulate data
+  delay(ANEMOMETER_WINDOW_MS);  // Accumulate pulses
   detachInterrupt(digitalPinToInterrupt(PIN_ANEMOMETR));  // Detach interrupt after measurement
 
-  dtostrf(rps_impulses, 0, 0, wind_speed);  // Convert the impulse count to a string for transmission
+  // Pulses -> frequency (Hz) -> wind speed in m/s (the server stores m/s)
+  float frequency = rps_impulses / (ANEMOMETER_WINDOW_MS / 1000.0);
+  float windSpeed = frequency * ANEMOMETER_MS_PER_HZ;
+
+  dtostrf(windSpeed, 0, 1, wind_speed);  // Convert to a string for transmission
 
   #ifdef DEBUG
     Serial.print(" - Wind speed: ");
     Serial.print(wind_speed);
-    Serial.println(" RPS");  // Display the wind speed in Revolutions Per Second
+    Serial.println(" m/s");
   #endif
 
   delay(500);

@@ -79,6 +79,18 @@ final class AnomalyControllerTest extends CIUnitTestCase
     }
 
     /**
+     * An array season (?season[]=x) must return 400, not a TypeError.
+     */
+    public function testHistoryArraySeasonReturns400(): void
+    {
+        $this->controller(Anomaly::class);
+        $this->request->setMethod('GET');
+        $this->request->setGlobal('get', ['season' => ['2022-2023']]);
+
+        $this->assertSame(400, $this->execute('history')->response()->getStatusCode());
+    }
+
+    /**
      * Invalid season format (underscore separator) must return 400.
      */
     public function testHistoryInvalidSeasonFormatReturns400(): void

@@ -186,4 +186,39 @@ final class WeatherAPILibraryTest extends CIUnitTestCase
         $library = $this->_buildLibraryWithMockClient('[]');
         $this->assertFalse($library->getForecastWeatherData());
     }
+
+    public function testConditionMappingFixes(): void
+    {
+        $this->assertSame(300, WeatherAPILibrary::convertWeatherCondition(1150));
+        $this->assertSame(301, WeatherAPILibrary::convertWeatherCondition(1153));
+        $this->assertSame(511, WeatherAPILibrary::convertWeatherCondition(1072));
+        $this->assertSame(701, WeatherAPILibrary::convertWeatherCondition(1030));
+        $this->assertSame(500, WeatherAPILibrary::convertWeatherCondition(1180));
+        $this->assertSame(211, WeatherAPILibrary::convertWeatherCondition(1282));
+    }
+
+    public function testSubKilometreVisibilityAndZerosAreKept(): void
+    {
+        $library = $this->_buildLibraryWithMockClient(json_encode(['current' => [
+            'last_updated_epoch' => 1700000000, 'temp_c' => 0.0, 'pressure_mb' => 1000.0, 'humidity' => 50,
+            'vis_km' => 0.5, 'wind_kph' => 0.0, 'gust_kph' => 0.0, 'precip_mm' => 0.0,
+        ]]));
+        $result = $library->getWeatherData();
+
+        $this->assertSame(500, $result['visibility']);
+        $this->assertSame(0.0, (float) $result['wind_speed']);
+        $this->assertSame(0.0, (float) $result['wind_gust']);
+        $this->assertSame(0.0, (float) $result['precipitation']);
+    }
+
+    public function testMissingFieldsStayNullNotZero(): void
+    {
+        $library = $this->_buildLibraryWithMockClient(json_encode(['current' => ['last_updated_epoch' => 1700000000, 'temp_c' => 5.0]]));
+        $result  = $library->getWeatherData();
+
+        $this->assertNull($result['pressure']);
+        $this->assertNull($result['humidity']);
+        $this->assertNull($result['wind_deg']);
+        $this->assertNull($result['visibility']);
+    }
 }

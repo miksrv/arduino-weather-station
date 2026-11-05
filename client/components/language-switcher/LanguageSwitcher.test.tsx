@@ -58,23 +58,23 @@ describe('LanguageSwitcher', () => {
 
     it('renders both languages as links to the current page', () => {
         render(<LanguageSwitcher />)
-        expect(screen.getByRole('link', { name: 'Eng' })).toHaveAttribute('href', '/en/test')
-        expect(screen.getByRole('link', { name: 'Rus' })).toHaveAttribute('href', '/ru/test')
-        expect(screen.getByRole('link', { name: 'Rus' })).toHaveAttribute('hreflang', 'ru')
+        expect(screen.getByRole('link', { name: 'En' })).toHaveAttribute('href', '/en/test')
+        expect(screen.getByRole('link', { name: 'Ru' })).toHaveAttribute('href', '/ru/test')
+        expect(screen.getByRole('link', { name: 'Ru' })).toHaveAttribute('hreflang', 'ru')
     })
 
     it('marks the active language', () => {
         render(<LanguageSwitcher />)
-        expect(screen.getByText('Eng').className).toMatch(/active/)
-        expect(screen.getByText('Eng')).toHaveAttribute('aria-current', 'true')
-        expect(screen.getByText('Rus').className).not.toMatch(/active/)
+        expect(screen.getByText('En').className).toMatch(/active/)
+        expect(screen.getByText('En')).toHaveAttribute('aria-current', 'true')
+        expect(screen.getByText('Ru').className).not.toMatch(/active/)
     })
 
     it('does nothing when the active language is chosen again', () => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
         const { setCookie } = require('cookies-next')
         render(<LanguageSwitcher />)
-        fireEvent.click(screen.getByText('Eng'))
+        fireEvent.click(screen.getByText('En'))
         expect(setCookie).not.toHaveBeenCalled()
     })
 
@@ -93,7 +93,7 @@ describe('LanguageSwitcher', () => {
         const mockSetter = jest.fn()
         useLocalStorage.mockReturnValue([null, mockSetter])
         render(<LanguageSwitcher />)
-        fireEvent.click(screen.getByText('Rus'))
+        fireEvent.click(screen.getByText('Ru'))
         expect(setCookie).toHaveBeenCalledWith(
             'NEXT_LOCALE',
             'ru',

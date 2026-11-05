@@ -46,6 +46,18 @@ describe('WidgetCard', () => {
         expect(link).toHaveAttribute('href', '/history')
     })
 
+    it('renders the subtitle and the action in the header', () => {
+        render(
+            <WidgetCard
+                title={'Test Title'}
+                subtitle={'Test Subtitle'}
+                action={<span data-testid={'action'} />}
+            />
+        )
+        expect(screen.getByText('Test Subtitle')).toBeInTheDocument()
+        expect(screen.getByTestId('action').parentElement).toHaveClass('header', 'withAction')
+    })
+
     it('renders skeleton instead of children while loading', () => {
         render(
             <WidgetCard loading>

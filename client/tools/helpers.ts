@@ -1,3 +1,5 @@
+import { minutesAgo } from './date'
+
 /**
  * Encodes an object into a query string.
  *
@@ -64,4 +66,28 @@ export const unitSuffix = (unit?: string): string => {
     }
 
     return /^[°%‰]/.test(unit) ? unit : ` ${unit}`
+}
+
+/** The station as the app bar shows it: fresh data, data that may be outdated, or no data for a long time */
+export type StationStatus = 'online' | 'stale' | 'offline'
+
+/** The server's freshness window (`EventFeedBuilder::SYSTEM_FRESHNESS_MINUTES`): older data may be outdated */
+export const STATION_STALE_MINUTES = 15
+
+/** Past this many minutes without a reading, outdated data turns into a station that is offline */
+export const STATION_OFFLINE_MINUTES = 60
+
+/**
+ * The server's `isStale`, plus the age of the last reading counted here: when polling fails, the last answer
+ * stays in the cache with its old `isStale: false`, so the age is what turns a silent API yellow and then red.
+ * No reading at all is offline.
+ */
+export const getStationStatus = (isStale?: boolean, lastUpdated?: string): StationStatus => {
+    const age = lastUpdated ? minutesAgo(lastUpdated) : Infinity
+
+    if (age > STATION_OFFLINE_MINUTES) {
+        return 'offline'
+    }
+
+    return isStale || age > STATION_STALE_MINUTES ? 'stale' : 'online'
 }

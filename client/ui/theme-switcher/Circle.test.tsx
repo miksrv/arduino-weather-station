@@ -28,22 +28,16 @@ describe('Circle', () => {
     it('renders with initial checked=false styles', () => {
         render(<Circle checked={false} />)
         const circle = screen.getByTestId('moon-icon').parentElement
-        expect(circle).toHaveStyle({
-            transform: 'translateX(5px)',
-            backgroundColor: '#fddf75',
-            borderColor: '#d6b05eb5'
-        })
+        expect(circle).toHaveStyle({ transform: 'translateX(5px)' })
+        expect(circle).toHaveClass('circle', 'sun')
         expect(screen.getByTestId('moon-icon')).toHaveAttribute('data-clicked', '0')
     })
 
     it('renders with initial checked=true styles', () => {
         render(<Circle checked={true} />)
         const circle = screen.getByTestId('moon-icon').parentElement
-        expect(circle).toHaveStyle({
-            transform: 'translateX(calc(100% + 15px))',
-            backgroundColor: 'rgba(255,255,255,0.4)',
-            borderColor: 'rgba(255,255,255,0.9)'
-        })
+        expect(circle).toHaveStyle({ transform: 'translateX(calc(100% + 15px))' })
+        expect(circle).toHaveClass('circle', 'moon')
         expect(screen.getByTestId('moon-icon')).toHaveAttribute('data-clicked', '1')
     })
 

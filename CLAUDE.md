@@ -54,7 +54,8 @@ CodeIgniter 4 REST API  ──► MySQL Database
   │                              ▲
   │  CLI cron commands           │
   └─► External Weather APIs ─────┘
-        (OpenWeatherMap, WeatherAPI, VisualCrossing)
+        (OpenWeatherMap, WeatherAPI, VisualCrossing, OpenMeteo)
+        (airport METAR — observed clouds/precipitation)
         (NarodMon — data push)
 
 Next.js Frontend (SSR)
@@ -63,8 +64,8 @@ Next.js Frontend (SSR)
 
 ### Data Flow
 1. Arduino POSTs sensor readings to `POST /sensors`
-2. `spark system:getCurrentWeather` periodically fetches from external APIs, ingests raw data, and recalculates hourly/daily averages (no separate averaging commands)
-3. `spark system:detectAnomalies` scans recent data for statistically unusual conditions (z-score + composite flood-risk scoring) and writes to `anomaly_log`
+2. `spark system:getCurrentWeather` periodically fetches from external APIs, ingests raw data, and recalculates the hourly averages of the previous and current hour (from raw) and the daily averages of the previous and current day (rolled up from hourly; daily precipitation is the day's total). `system:rebuildAverages` recalculates all history after the aggregation rules change
+3. `spark system:detectAnomalies` evaluates the last complete UTC days (yesterday and two days before, idempotent) for statistically unusual conditions (z-score + composite flood-risk scoring) and writes to `anomaly_log`; `system:backfillAnomalyLog --force` wipes and replays the whole log
 4. Next.js pages fetch data via RTK Query endpoints; locale is sent as a custom `Locale` HTTP header
 5. `spark system:sendNarodmonData` pushes data to narodmon.ru
 
@@ -94,7 +95,7 @@ arduino-weather-station/
 │   │   ├── Controllers/   # REST controllers (Current, Forecast, Heatmap, History, Sensors, Precipitation, Anomaly, Climate)
 │   │   ├── Database/      # Migrations + Seeds
 │   │   ├── Entities/      # Data entities (WeatherData, WeatherDataEntity, WeatherForecastEntity)
-│   │   ├── Libraries/     # External API clients (OpenWeather, WeatherAPI, VisualCrossing, NarodMon) + AnomalyDetector, SnowpackCalculator
+│   │   ├── Libraries/     # External API clients (OpenWeather, WeatherAPI, VisualCrossing, OpenMeteo, Metar, NarodMon) + AnomalyDetector, SnowpackCalculator
 │   │   ├── Models/        # DB models (RawWeatherDataModel, Hourly/DailyAveragesModel, ForecastWeatherDataModel, ClimateModel, PrecipitationModel, AnomalyModel, AnomalyLogModel)
 │   │   └── Config/        # Routes.php, app configuration
 │   └── tests/             # PHPUnit test suites (unit/, database/, session/)
@@ -139,6 +140,7 @@ php spark system:getCurrentWeather      # Fetches current weather from external 
 php spark system:getForecastWeather     # Fetches forecast weather from external APIs, upserts forecast_weather_data
 php spark system:detectAnomalies        # Checks meteorological anomaly conditions, updates anomaly_log
 php spark system:backfillAnomalyLog     # One-off backfill of anomaly_log from historical daily records
+php spark system:rebuildAverages        # Recalculates hourly_averages + daily_averages from raw data, month by month (--since Y-m-d)
 php spark system:sendNarodmonData       # Sends current sensor reading to narodmon.ru
 ```
 
@@ -211,7 +213,7 @@ Load `arduino/main/main.ino` in Arduino IDE and upload to the board.
 
 ### Server (`server/.env`)
 
-CodeIgniter dotted-key env vars — database (`database.production.*`), app coordinates (`app.lat`, `app.lon`), external API keys (`app.openweather.key`, `app.weatherapi.key`, `app.visualcrossing.key`), and NarodMon settings (`app.narodmon.mac`, `.lat`, `.lon`, `.alt`).
+CodeIgniter dotted-key env vars — database (`database.production.*`), app coordinates (`app.lat`, `app.lon`), external API keys (`app.openweather.key`, `app.weatherapi.key`, `app.visualcrossing.key`), METAR airport ICAO code (`app.metar.station`, e.g. `UWOO`; empty disables the source), and NarodMon settings (`app.narodmon.mac`, `.lat`, `.lon`, `.alt`).
 
 ---
 

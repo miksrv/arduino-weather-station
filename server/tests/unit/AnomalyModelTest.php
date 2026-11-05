@@ -454,4 +454,27 @@ final class AnomalyModelTest extends CIUnitTestCase
         $this->assertSame('insufficient', $result['dataQuality']);
         $this->assertSame('active', $result['season']);
     }
+
+    /**
+     * Off-season (Jul): the upcoming season has not started, so the SWE z-score and the
+     * historical statistics are neutral instead of comparing summer 0 with mid-winter SWE.
+     */
+    public function testSnowpackComparisonIsNeutralOffSeason(): void
+    {
+        $rows = [
+            ['date' => '2022-12-01', 'temperature' => '-10', 'precipitation' => '5.0'],
+            ['date' => '2022-12-15', 'temperature' => '-12', 'precipitation' => '5.0'],
+            ['date' => '2023-01-15', 'temperature' => '-15', 'precipitation' => '8.0'],
+            ['date' => '2023-12-01', 'temperature' => '-10', 'precipitation' => '5.0'],
+            ['date' => '2024-01-15', 'temperature' => '-15', 'precipitation' => '8.0'],
+        ];
+
+        $model  = $this->_makeModel($this->_stubDaily($rows));
+        $result = $model->getSnowpackComparison(new \DateTime('2026-07-15'));
+
+        $this->assertSame(0.0, $result['sweZScore']);
+        $this->assertSame(0.0, $result['historicalAvgSWE']);
+        $this->assertSame(0.0, $result['historicalStdSWE']);
+        $this->assertSame(0.0, $result['estimatedSWE']);
+    }
 }

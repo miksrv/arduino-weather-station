@@ -18,6 +18,9 @@ use Exception;
  */
 class Sensors extends ResourceController
 {
+    /** @var int First firmware payload version (`fw`) that sends wind in m/s and degrees */
+    public const WIND_UNITS_PAYLOAD_VERSION = 2;
+
     protected $format = 'json';
 
     protected RawWeatherDataModel $weatherDataModel;
@@ -42,9 +45,13 @@ class Sensors extends ResourceController
      *   - t  (float): temperature
      *   - p  (float): pressure, mmHg from the station firmware (hPa is accepted too)
      *   - h  (float): humidity
-     *   - ws (float): wind speed
+     *   - ws (float): wind speed, m/s
      *   - wd (int):   wind direction in degrees
      *   - uv (float): UV index
+     *   - fw (int):   payload version; wind is taken only from version {@see self::WIND_UNITS_PAYLOAD_VERSION} on
+     *
+     * Every field is checked on its own: a non-numeric or out-of-range value is dropped (and logged) instead of
+     * rejecting the whole reading; negative wind speed / UV (calm anemometer, night) is clamped to 0.
      *
      * @return ResponseInterface
      * @throws Exception
@@ -69,14 +76,9 @@ class Sensors extends ResourceController
 
         try {
             $parsedData = [
-                'date'        => new DateTime('now'),
-                'temperature' => $data['t']  ?? null,
-                'pressure'    => $this->_normalizePressure($data['p'] ?? null),
-                'humidity'    => $data['h']  ?? null,
-                'wind_speed'  => $data['ws'] ?? null,
-                'wind_deg'    => $data['wd'] ?? null,
-                'uv_index'    => $data['uv'] ?? null,
-                'source'      => RawWeatherDataModel::SOURCE_CUSTOMSTATION,
+                'date'   => new DateTime('now'),
+                ...$this->_parseMeasurements($data),
+                'source' => RawWeatherDataModel::SOURCE_CUSTOMSTATION,
             ];
 
             $measurements = array_filter(
@@ -104,6 +106,35 @@ class Sensors extends ResourceController
     }
 
     /**
+     * Turns the posted fields into database columns, each validated on its own.
+     *
+     * Wind is taken only from firmware that says it sends m/s and degrees (`fw` >= {@see self::WIND_UNITS_PAYLOAD_VERSION}).
+     * The older firmware posts raw anemometer pulses as `ws` (several times the speed) and a sector number 0-7 as
+     * `wd`; stored as m/s they would reach the observatory feed as strong wind and close its roof. Its other
+     * measurements are kept.
+     *
+     * @param array<string, mixed> $data POST fields
+     * @return array<string, float|int|null> Column => value (null when missing or invalid)
+     */
+    private function _parseMeasurements(array $data): array
+    {
+        $windInUnits = is_numeric($data['fw'] ?? null) && (int) $data['fw'] >= self::WIND_UNITS_PAYLOAD_VERSION;
+
+        if (!$windInUnits && (isset($data['ws']) || isset($data['wd']))) {
+            log_message('info', 'Sensors::setWeather - wind dropped: firmware without fw >= ' . self::WIND_UNITS_PAYLOAD_VERSION . ' sends pulses and sectors');
+        }
+
+        return [
+            'temperature' => $this->_sanitize('t', $data['t'] ?? null, -80, 60),
+            'pressure'    => $this->_sanitize('p', $this->_normalizePressure($data['p'] ?? null), 800, 1100, true),
+            'humidity'    => $this->_sanitize('h', $data['h'] ?? null, 0, 100),
+            'wind_speed'  => $windInUnits ? $this->_sanitize('ws', $data['ws'] ?? null, 0, 100, false, true) : null,
+            'wind_deg'    => $windInUnits ? $this->_sanitize('wd', $data['wd'] ?? null, 0, 360, true) : null,
+            'uv_index'    => $this->_sanitize('uv', $data['uv'] ?? null, 0, 20, false, true),
+        ];
+    }
+
+    /**
      * Converts the posted pressure to whole hPa as stored in the database.
      *
      * The station firmware sends mmHg with one decimal (e.g. 752.3); values below 800 can only be mmHg,
@@ -121,5 +152,44 @@ class Sensors extends ResourceController
         $value = (float) $pressure;
 
         return (int) round($value < 800 ? $value * 1.33322 : $value);
+    }
+
+    /**
+     * Validates a single posted measurement so one bad sensor does not reject the whole reading.
+     *
+     * The limits mirror the validation rules of RawWeatherDataModel. A missing value stays null; a non-numeric or
+     * out-of-range one is dropped (null) with a warning.
+     *
+     * @param string $field        POST field name (for the log)
+     * @param mixed  $value        Raw value
+     * @param float  $min          Lowest accepted value
+     * @param float  $max          Highest accepted value
+     * @param bool   $integer      Whether the value is stored as a whole number
+     * @param bool   $clampNegative Clamp a negative value to 0 instead of dropping it
+     * @return float|int|null
+     */
+    private function _sanitize(string $field, mixed $value, float $min, float $max, bool $integer = false, bool $clampNegative = false): float|int|null
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (!is_numeric($value)) {
+            log_message('warning', "Sensors::setWeather - dropped non-numeric '{$field}'");
+            return null;
+        }
+
+        $number = (float) $value;
+
+        if ($clampNegative && $number < 0) {
+            $number = 0.0;
+        }
+
+        if ($number < $min || $number > $max) {
+            log_message('warning', "Sensors::setWeather - dropped out-of-range '{$field}': {$number}");
+            return null;
+        }
+
+        return $integer ? (int) round($number) : $number;
     }
 }

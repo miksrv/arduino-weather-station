@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Entities\WeatherDataEntity;
+use App\Libraries\ForecastAggregator;
 use CodeIgniter\Model;
 use DateTime;
 
@@ -10,7 +11,7 @@ use DateTime;
  * Model for the raw_weather_data table.
  *
  * Stores per-observation readings from all sources (Arduino sensor, OpenWeatherMap,
- * WeatherAPI, VisualCrossing). Provides aggregation helpers consumed by the
+ * WeatherAPI, VisualCrossing, OpenMeteo, airport METAR). Provides aggregation helpers consumed by the
  * GetCurrentWeather command and the History / Heatmap controllers.
  *
  * @package App\Models
@@ -21,11 +22,23 @@ class RawWeatherDataModel extends Model
     public const SOURCE_WEATHERAPI     = 'WeatherAPI';
     public const SOURCE_VISUALCROSSING = 'VisualCrossing';
     public const SOURCE_OPENMETEO      = 'OpenMeteo';
+    public const SOURCE_METAR          = 'Metar';
     public const SOURCE_CUSTOMSTATION  = 'CustomStation';
     public const SOURCE_OTHERSOURCE    = 'OtherSource';
 
     /** @var string[] Allowed interval strings for GROUP BY calculations */
     private const ALLOWED_INTERVALS = ['10 MINUTE', '1 HOUR', '1 DAY'];
+
+    /**
+     * Mean of the per-source mean precipitation of an hour (`r` = raw rows, `w` = rows per
+     * hour and source, see {@see self::getHourlyAverages()}).
+     */
+    private const SOURCE_BALANCED_PRECIPITATION =
+        'SUM(r.precipitation / w.n_precipitation) / COUNT(DISTINCT CASE WHEN r.precipitation IS NOT NULL THEN r.source END)';
+
+    /** Mean of the per-source mean cloud cover of an hour, like {@see self::SOURCE_BALANCED_PRECIPITATION}. */
+    private const SOURCE_BALANCED_CLOUDS =
+        'SUM(r.clouds / w.n_clouds) / COUNT(DISTINCT CASE WHEN r.clouds IS NOT NULL THEN r.source END)';
 
     protected $table            = 'raw_weather_data';
     protected $primaryKey       = 'id';
@@ -64,7 +77,7 @@ class RawWeatherDataModel extends Model
 
     protected $validationRules = [
         'date'          => 'required|valid_date',
-        'source'        => 'required|in_list[OpenWeatherMap,WeatherAPI,VisualCrossing,OpenMeteo,CustomStation,OtherSource]',
+        'source'        => 'required|in_list[OpenWeatherMap,WeatherAPI,VisualCrossing,OpenMeteo,Metar,CustomStation,OtherSource]',
         'temperature'   => 'permit_empty|decimal|greater_than_equal_to[-80]|less_than_equal_to[60]',
         'feels_like'    => 'permit_empty|decimal|greater_than_equal_to[-80]|less_than_equal_to[60]',
         'pressure'      => 'permit_empty|integer|greater_than_equal_to[800]|less_than_equal_to[1100]',
@@ -90,7 +103,7 @@ class RawWeatherDataModel extends Model
 
     protected $validationMessages = [
         'source' => [
-            'in_list' => 'The source must be one of: OpenWeatherMap, WeatherAPI, VisualCrossing, OpenMeteo, CustomStation, OtherSource.',
+            'in_list' => 'The source must be one of: OpenWeatherMap, WeatherAPI, VisualCrossing, OpenMeteo, Metar, CustomStation, OtherSource.',
         ],
     ];
 
@@ -113,7 +126,7 @@ class RawWeatherDataModel extends Model
         $startDateTime = clone $currentDateTime;
         $startDateTime->modify("-$intervalMinutes minutes");
 
-        // Get data for the last 20 minutes
+        // Average of every row in that 30-minute window
         $recentAverages = $this->getRecentAverages($startDateTime, $currentDateTime);
 
         // Get the latest data for fields that are updated less frequently
@@ -124,61 +137,52 @@ class RawWeatherDataModel extends Model
     }
 
     /**
-     * Retrieves hourly averages of weather data.
+     * Retrieves hourly averages of weather data, one row per UTC hour.
      *
-     * @param bool        $allTime If true, retrieves all-time data; otherwise, retrieves data for the current hour.
-     * @param string|null $since   With $allTime, restricts the result to rows on or after this date (Y-m-d H:i:s).
+     * Every field is averaged over the rows of the hour, so the station (a reading every
+     * minute) dominates the fields it measures. Precipitation and cloud cover come only from
+     * the API sources, which report at different cadences, so those two are the mean of the
+     * per-source means: a source reporting twice an hour does not count twice.
+     *
+     * By default it covers the previous and the current hour: API sources report with a
+     * delay, so a row of the previous hour can still arrive after that hour is over.
+     *
+     * @param string|null $since First hour (Y-m-d H:i:s, inclusive); null = start of the previous hour.
+     * @param string|null $until End (Y-m-d H:i:s, exclusive); null = no end.
      * @return array The hourly averages of weather data.
      */
-    public function getHourlyAverages(bool $allTime = false, ?string $since = null): array
+    public function getHourlyAverages(?string $since = null, ?string $until = null): array
     {
-        $result = $this->select($this->_getAverageSelect('hour'));
+        $since ??= gmdate('Y-m-d H:00:00', time() - 3600);
+        $range   = 'date >= ?' . ($until !== null ? ' AND date < ?' : '');
+        $binds   = $until !== null ? [$since, $until] : [$since];
+        $hour    = 'DATE_FORMAT(r.date, "%Y-%m-%d %H:00:00")';
 
-        if ($allTime && $since !== null) {
-            $result->where('date >=', $since);
-        }
+        $fields = self::_averageExpressions(self::SOURCE_BALANCED_PRECIPITATION, self::SOURCE_BALANCED_CLOUDS);
+        $fields['precipitation'] = 'ROUND(' . self::SOURCE_BALANCED_PRECIPITATION . ', 2) as precipitation';
+        $fields['clouds']        = 'ROUND(' . self::SOURCE_BALANCED_CLOUDS . ', 2) as clouds';
 
-        if (!$allTime) {
-            $result
-                ->where('date >= DATE_FORMAT(UTC_TIMESTAMP(), \'%Y-%m-%d %H:00:00\')')
-                ->where('date < DATE_FORMAT(DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 HOUR), \'%Y-%m-%d %H:00:00\')');
-        }
-
-        return $result
-            ->groupBy('hour')
-            ->get()
+        return $this->db
+            ->query(
+                'SELECT ' . $hour . ' AS hour, ' . $hour . ' AS date, ' . implode(', ', $fields) . '
+                 FROM raw_weather_data r
+                 JOIN (
+                     SELECT DATE_FORMAT(date, "%Y-%m-%d %H:00:00") AS slot, source,
+                            COUNT(precipitation) AS n_precipitation, COUNT(clouds) AS n_clouds
+                     FROM raw_weather_data
+                     WHERE ' . $range . '
+                     GROUP BY slot, source
+                 ) w ON w.slot = ' . $hour . ' AND w.source = r.source
+                 WHERE r.' . $range . '
+                 GROUP BY hour
+                 ORDER BY hour',
+                array_merge($binds, $binds)
+            )
             ->getResultArray();
     }
 
     /**
-     * Retrieves daily averages of weather data.
-     *
-     * @param bool        $allTime If true, retrieves all-time data; otherwise, retrieves data for the current day.
-     * @param string|null $since   With $allTime, restricts the result to rows on or after this date (Y-m-d H:i:s).
-     * @return array The daily averages of weather data.
-     */
-    public function getDailyAverages(bool $allTime = false, ?string $since = null): array
-    {
-        $result = $this->select($this->_getAverageSelect('day'));
-
-        if ($allTime && $since !== null) {
-            $result->where('date >=', $since);
-        }
-
-        if (!$allTime) {
-            $result
-                ->where('date >= DATE_FORMAT(UTC_TIMESTAMP(), \'%Y-%m-%d 00:00:00\')')
-                ->where('date < DATE_FORMAT(DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 DAY), \'%Y-%m-%d 00:00:00\')');
-        }
-
-        return $result
-            ->groupBy('day')
-            ->get()
-            ->getResultArray();
-    }
-
-    /**
-     * Retrieves recent averages of weather data for the last 3 records within a specified time range.
+     * Retrieves the averages of all weather rows within a specified time range.
      *
      * @param DateTime $startDateTime The start of the time range for sampling data.
      * @param DateTime $currentDateTime The end of the time range for sampling data.
@@ -190,7 +194,6 @@ class RawWeatherDataModel extends Model
             ->select(RawWeatherDataModel::getSelectAverageSQL())
             ->where('date >=', $startDateTime->format('Y-m-d H:i:s'))
             ->where('date <=', $currentDateTime->format('Y-m-d H:i:s'))
-            ->limit(3)
             ->get()
             ->getRowArray() ?? [];
     }
@@ -286,9 +289,11 @@ class RawWeatherDataModel extends Model
     /**
      * Retrieves the SQL query string for selecting average weather data.
      *
-     * All fields use AVG() with ROUND(). This method is used by multiple callers
-     * that may query tables without a `source` column (e.g. hourly_averages,
-     * daily_averages), so expressions that reference `source` must not appear here.
+     * Most fields use AVG() with ROUND(); wind direction is a vector mean and the weather
+     * code is the one representing the bucket ({@see self::weatherIdSQL()}). This method
+     * is used by multiple callers that may query tables without a `source` column
+     * (e.g. hourly_averages, daily_averages), so expressions that reference `source`
+     * must not appear here.
      *
      * @param string|null $type The specific type of weather data to retrieve averages for (e.g., 'temperature', 'humidity').
      *                          If null, retrieves averages for all types of weather data.
@@ -296,7 +301,92 @@ class RawWeatherDataModel extends Model
      */
     public static function getSelectAverageSQL(?string $type = null): string
     {
-        $fields = [
+        $fields = self::_averageExpressions('AVG(precipitation)', 'AVG(clouds)');
+
+        // If a type is specified, return only it
+        if ($type && isset($fields[$type])) {
+            return $fields[$type] . ',';
+        }
+
+        // If type is not specified, return all fields
+        return implode(',', $fields) . ',';
+    }
+
+    /**
+     * Vector mean of `wind_deg` as an integer 0..359: the arithmetic mean of 350° and 10°
+     * would be 180°, the vector mean is 0°.
+     *
+     * @return string SQL expression.
+     */
+    public static function windDirectionSQL(): string
+    {
+        return 'MOD(ROUND(DEGREES(ATAN2(AVG(SIN(RADIANS(wind_deg))), AVG(COS(RADIANS(wind_deg)))))) + 360, 360)';
+    }
+
+    /**
+     * The weather code representing a group of rows, by the rules of
+     * {@see ForecastAggregator::representativeWeatherId()}: thunderstorm, rain or snow when
+     * the group is wet or most sources report it (the most severe one; within that group
+     * the highest code), then fog when most sources report it, then the code of the mean
+     * cloud cover. MAX() alone would pick overcast (804) over rain (5xx).
+     *
+     * @param string $precipitation SQL expression of the group's mean precipitation, mm.
+     * @param string $clouds        SQL expression of the group's mean cloud cover, %.
+     * @return string SQL expression.
+     */
+    public static function weatherIdSQL(string $precipitation, string $clouds): string
+    {
+        $isPrecipitation = self::_isPrecipitationSQL();
+        $isFog           = '(weather_id BETWEEN 700 AND 799)';
+
+        return 'CASE
+            WHEN SUM(' . $isPrecipitation . ') > 0
+                AND (COALESCE(' . $precipitation . ', 0) >= ' . ForecastAggregator::WET_HOUR_MM . '
+                    OR SUM(' . $isPrecipitation . ') * 2 > COUNT(weather_id))
+                THEN ' . self::mostSevereWeatherIdSQL() . '
+            WHEN SUM(' . $isFog . ') * 2 > COUNT(weather_id)
+                THEN MAX(CASE WHEN ' . $isFog . ' THEN weather_id END)
+            WHEN ' . $clouds . ' IS NOT NULL
+                THEN ' . self::cloudsWeatherIdSQL($clouds) . '
+            ELSE MAX(weather_id)
+        END';
+    }
+
+    /**
+     * The most severe precipitation code of a group (thunderstorm > snow > rain > drizzle,
+     * the highest code within that class), by {@see ForecastAggregator}'s severity order.
+     *
+     * @return string SQL expression.
+     */
+    public static function mostSevereWeatherIdSQL(): string
+    {
+        return 'MOD(MAX(CASE WHEN ' . self::_isPrecipitationSQL() . ' THEN '
+            . '(CASE FLOOR(weather_id / 100) WHEN 2 THEN 4 WHEN 6 THEN 3 WHEN 5 THEN 2 ELSE 1 END) * 1000 + weather_id'
+            . ' END), 1000)';
+    }
+
+    /**
+     * Clear/clouds code (800..804) of a cloud cover, by {@see ForecastAggregator::cloudsToWeatherId()}.
+     *
+     * @param string $clouds SQL expression of the cloud cover, %.
+     * @return string SQL expression.
+     */
+    public static function cloudsWeatherIdSQL(string $clouds): string
+    {
+        return 'CASE WHEN ' . $clouds . ' < 11 THEN 800 WHEN ' . $clouds . ' < 25 THEN 801 WHEN '
+            . $clouds . ' < 50 THEN 802 WHEN ' . $clouds . ' < 85 THEN 803 ELSE 804 END';
+    }
+
+    /**
+     * Aggregate expression of every weather field, keyed by field name.
+     *
+     * @param string $precipitation SQL expression of the mean precipitation (used by the weather code).
+     * @param string $clouds        SQL expression of the mean cloud cover (used by the weather code).
+     * @return array<string, string>
+     */
+    private static function _averageExpressions(string $precipitation, string $clouds): array
+    {
+        return [
             'temperature'   => 'ROUND(AVG(temperature), 2) as temperature',
             'feels_like'    => 'ROUND(AVG(feels_like), 2) as feels_like',
             'pressure'      => 'ROUND(AVG(pressure), 2) as pressure',
@@ -309,9 +399,9 @@ class RawWeatherDataModel extends Model
             'clouds'        => 'ROUND(AVG(clouds), 2) as clouds',
             'visibility'    => 'ROUND(AVG(visibility), 2) as visibility',
             'wind_speed'    => 'ROUND(AVG(wind_speed), 2) as wind_speed',
-            'wind_deg'      => 'ROUND(AVG(wind_deg), 2) as wind_deg',
+            'wind_deg'      => self::windDirectionSQL() . ' as wind_deg',
             'wind_gust'     => 'ROUND(AVG(wind_gust), 2) as wind_gust',
-            'weather_id'    => 'MAX(weather_id) as weather_id',
+            'weather_id'    => self::weatherIdSQL($precipitation, $clouds) . ' as weather_id',
             'pm2_5'         => 'ROUND(AVG(pm2_5), 2) as pm2_5',
             'pm10'          => 'ROUND(AVG(pm10), 2) as pm10',
             'co'            => 'ROUND(AVG(co), 2) as co',
@@ -319,27 +409,15 @@ class RawWeatherDataModel extends Model
             'so2'           => 'ROUND(AVG(so2), 2) as so2',
             'o3'            => 'ROUND(AVG(o3), 2) as o3',
         ];
-
-        // If a type is specified, return only it
-        if ($type && isset($fields[$type])) {
-            return $fields[$type] . ',';
-        }
-
-        // If type is not specified, return all fields
-        return implode(',', $fields) . ',';
     }
 
     /**
-     * Retrieves the SQL query string for selecting average weather data grouped by a specified interval.
+     * Whether `weather_id` is thunderstorm, drizzle, rain or snow (2xx, 3xx, 5xx, 6xx).
      *
-     * @param string $groupBy The interval for grouping data (e.g., 'hour', 'day').
-     * @return string The SQL query string for selecting average weather data grouped by the specified interval.
+     * @return string SQL condition.
      */
-    private function _getAverageSelect(string $groupBy): string
+    private static function _isPrecipitationSQL(): string
     {
-        $formatHours = $groupBy === 'hour' ? '%H:00:00' : '00:00:00';
-
-        return 'DATE_FORMAT(date, "%Y-%m-%d ' . $formatHours . '") as ' . $groupBy . ',
-                DATE_FORMAT(date, "%Y-%m-%d ' . $formatHours . '") AS date, ' . RawWeatherDataModel::getSelectAverageSQL();
+        return '(weather_id BETWEEN 200 AND 399 OR weather_id BETWEEN 500 AND 699)';
     }
 }

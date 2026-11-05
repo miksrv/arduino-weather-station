@@ -1,6 +1,7 @@
 <?php
 
 use App\Entities\WeatherDataEntity;
+use App\Libraries\ForecastAggregator;
 use App\Models\RawWeatherDataModel;
 use CodeIgniter\Test\CIUnitTestCase;
 
@@ -63,6 +64,7 @@ final class RawWeatherDataModelTest extends CIUnitTestCase
         $this->assertSame('VisualCrossing', RawWeatherDataModel::SOURCE_VISUALCROSSING);
         $this->assertSame('CustomStation',  RawWeatherDataModel::SOURCE_CUSTOMSTATION);
         $this->assertSame('OtherSource',    RawWeatherDataModel::SOURCE_OTHERSOURCE);
+        $this->assertSame('Metar',          RawWeatherDataModel::SOURCE_METAR);
     }
 
     // -------------------------------------------------------------------------
@@ -106,6 +108,54 @@ final class RawWeatherDataModelTest extends CIUnitTestCase
 
         $this->assertStringContainsString('temperature', $sql);
         $this->assertStringContainsString('humidity',    $sql);
+    }
+
+    public function testGetSelectAverageSQLWindDirectionIsVectorMean(): void
+    {
+        $sql = RawWeatherDataModel::getSelectAverageSQL('wind_deg');
+
+        $this->assertStringNotContainsString('AVG(wind_deg)', $sql);
+        $this->assertStringContainsString('ATAN2(AVG(SIN(RADIANS(wind_deg))), AVG(COS(RADIANS(wind_deg))))', $sql);
+        $this->assertStringContainsString('as wind_deg', $sql);
+    }
+
+    public function testGetSelectAverageSQLWeatherIdIsRepresentativeNotMax(): void
+    {
+        $sql = RawWeatherDataModel::getSelectAverageSQL('weather_id');
+
+        $this->assertStringNotContainsString('MAX(weather_id) as weather_id', $sql);
+        $this->assertStringContainsString(RawWeatherDataModel::mostSevereWeatherIdSQL(), $sql);
+        $this->assertStringContainsString('as weather_id', $sql);
+    }
+
+    public function testWeatherIdSQLUsesWetHourThresholdAndCloudsFallback(): void
+    {
+        $sql = RawWeatherDataModel::weatherIdSQL('AVG(precipitation)', 'AVG(clouds)');
+
+        $this->assertStringContainsString('COALESCE(AVG(precipitation), 0) >= ' . ForecastAggregator::WET_HOUR_MM, $sql);
+        $this->assertStringContainsString(RawWeatherDataModel::cloudsWeatherIdSQL('AVG(clouds)'), $sql);
+    }
+
+    public function testMostSevereWeatherIdSQLRanksThunderstormSnowRainDrizzle(): void
+    {
+        $sql = RawWeatherDataModel::mostSevereWeatherIdSQL();
+
+        $this->assertStringContainsString('WHEN 2 THEN 4 WHEN 6 THEN 3 WHEN 5 THEN 2 ELSE 1', $sql);
+        $this->assertStringStartsWith('MOD(MAX(', $sql);
+    }
+
+    public function testCloudsWeatherIdSQLMatchesForecastThresholds(): void
+    {
+        $sql = RawWeatherDataModel::cloudsWeatherIdSQL('c');
+
+        // Same thresholds as ForecastAggregator::cloudsToWeatherId()
+        $this->assertSame(800, ForecastAggregator::cloudsToWeatherId(10.9));
+        $this->assertSame(
+            'CASE WHEN c < 11 THEN 800 WHEN c < 25 THEN 801 WHEN c < 50 THEN 802 WHEN c < 85 THEN 803 ELSE 804 END',
+            $sql
+        );
+        $this->assertSame(803, ForecastAggregator::cloudsToWeatherId(84.9));
+        $this->assertSame(804, ForecastAggregator::cloudsToWeatherId(85.0));
     }
 
     // -------------------------------------------------------------------------

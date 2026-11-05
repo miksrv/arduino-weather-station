@@ -7451,14 +7451,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-react-ui-kit@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "simple-react-ui-kit@npm:2.1.1"
+"simple-react-ui-kit@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "simple-react-ui-kit@npm:2.2.0"
   peerDependencies:
     dayjs: ^1.11.0
     react: ^19.0.0
     react-dom: ^19.0.0
-  checksum: 10c0/7793ae2c8ac6672498ff321cee15f1f5ebf08fcbc6113fe9617416129d7a3283c016882a06ac19e69391f4a8f5ff130b858add71c4c9de0c7a0e132bb3e96e73
+  checksum: 10c0/de6d95af0ba7bc7a2cb9589228586e7ca112a079c8f2940c107c52cb2d285df8d7a345acb86e3637c90afcd9ed934dea291f3dbaaa0a4f17521b5a350d8c928f
   languageName: node
   linkType: hard
 
@@ -8342,7 +8342,7 @@ __metadata:
     sass: "npm:^1.106.1"
     schema-dts: "npm:^2.1.0"
     sharp: "npm:^0.35.5"
-    simple-react-ui-kit: "npm:^2.1.1"
+    simple-react-ui-kit: "npm:^2.2.0"
     ts-jest: "npm:^29.4.15"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^6.0.3"

@@ -28,31 +28,7 @@ describe('ToggleSwitch', () => {
         expect(screen.getByTestId('circle')).toBeInTheDocument()
         expect(screen.getByTestId('stars')).toBeInTheDocument()
         const div = screen.getByTestId('circle').parentElement as HTMLElement
-        expect(div).toHaveStyle('background-color: #80c7cb')
-    })
-
-    it('renders with checked=true', () => {
-        render(<ToggleSwitch checked={true} />)
-        const div = screen.getByTestId('circle').parentElement
-        expect(div).toHaveStyle('background-color: #595dde')
-    })
-
-    it('changes background on hover (checked=false)', () => {
-        render(<ToggleSwitch checked={false} />)
-        const div = screen.getByTestId('circle').parentElement as HTMLElement
-        fireEvent.mouseEnter(div)
-        expect(div).toHaveStyle('background-color: #79bfc3')
-        fireEvent.mouseLeave(div)
-        expect(div).toHaveStyle('background-color: #80c7cb')
-    })
-
-    it('changes background on hover (checked=true)', () => {
-        render(<ToggleSwitch checked={true} />)
-        const div = screen.getByTestId('circle').parentElement as HTMLElement
-        fireEvent.mouseEnter(div)
-        expect(div).toHaveStyle('background-color: #5559cc')
-        fireEvent.mouseLeave(div)
-        expect(div).toHaveStyle('background-color: #595dde')
+        expect(div).toHaveClass('dayNightSwitch')
     })
 
     it('scales on hover and active', () => {

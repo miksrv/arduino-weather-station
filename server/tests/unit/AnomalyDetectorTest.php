@@ -176,18 +176,45 @@ final class AnomalyDetectorTest extends CIUnitTestCase
     // -------------------------------------------------------------------------
 
     /**
-     * ANY hourly row with temp +1.5°C (upper boundary, inclusive) and precip > 0 → true.
-     * An array where ALL rows have temp +1.6°C (above +1.5 boundary) → false.
+     * Band is -4..+1 °C (inclusive) with at least RAIN_THRESHOLD_MM of precipitation.
      */
     public function testFreezingRainAtBoundaryTemp(): void
     {
         $detector = $this->_makeDetector();
 
-        $trueRows  = [['temperature' =>  1.5, 'precipitation' => 0.5]];
-        $falseRows = [['temperature' =>  1.6, 'precipitation' => 0.5]];
+        $this->assertTrue($detector->checkFreezingRain([['temperature' => 1.0, 'precipitation' => 0.5]]));
+        $this->assertTrue($detector->checkFreezingRain([['temperature' => -4.0, 'precipitation' => 0.5]]));
+        $this->assertFalse($detector->checkFreezingRain([['temperature' => 1.1, 'precipitation' => 0.5]]));
+        $this->assertFalse($detector->checkFreezingRain([['temperature' => -4.1, 'precipitation' => 0.5]]));
+    }
 
-        $this->assertTrue($detector->checkFreezingRain($trueRows));
-        $this->assertFalse($detector->checkFreezingRain($falseRows));
+    /**
+     * Trace amounts (below RAIN_THRESHOLD_MM) are no freezing rain.
+     */
+    public function testFreezingRainIgnoresTraceAmounts(): void
+    {
+        $detector = $this->_makeDetector();
+
+        $this->assertFalse($detector->checkFreezingRain([['temperature' => -1.0, 'precipitation' => 0.05]]));
+        $this->assertFalse($detector->checkFreezingRain([['temperature' => -1.0, 'precipitation' => 0.0]]));
+        $this->assertTrue($detector->checkFreezingRain([['temperature' => -1.0, 'precipitation' => 0.1]]));
+    }
+
+    /**
+     * With a weather code the precipitation must be drizzle/rain (3xx, 5xx incl. 511), not snow.
+     */
+    public function testFreezingRainRequiresLiquidWeatherCode(): void
+    {
+        $detector = $this->_makeDetector();
+        $row      = ['temperature' => -1.0, 'precipitation' => 1.0];
+
+        $this->assertTrue($detector->checkFreezingRain([$row + ['weather_id' => 511]]));
+        $this->assertTrue($detector->checkFreezingRain([$row + ['weather_id' => 500]]));
+        $this->assertTrue($detector->checkFreezingRain([$row + ['weather_id' => 301]]));
+        $this->assertFalse($detector->checkFreezingRain([$row + ['weather_id' => 600]]));
+        $this->assertFalse($detector->checkFreezingRain([$row + ['weather_id' => 616]]));
+        $this->assertFalse($detector->checkFreezingRain([$row + ['weather_id' => 804]]));
+        $this->assertTrue($detector->checkFreezingRain([$row + ['weather_id' => null]]));
     }
 
     // -------------------------------------------------------------------------
@@ -221,19 +248,15 @@ final class AnomalyDetectorTest extends CIUnitTestCase
     // -------------------------------------------------------------------------
 
     /**
-     * When accumulated precipitation is significantly lower than the historical
-     * mean, SPI must be negative (drought signal).
+     * Builds a daily stub for SPI: findAll() returns $current for the first call and
+     * the next entries of $historical for the following ones; first() gives the first
+     * data date.
      *
-     * The stub returns [['precipitation' => 0.5]] for all findAll() calls.
-     * The first call is the current period (sum = 0.5 mm).
-     * Subsequent calls (26 iterations for years 2024..1999) also return 0.5mm rows,
-     * but we control the pattern so that historical sums around 50mm are produced
-     * by returning 100 rows of 0.5mm each for historical calls.
-     *
-     * Simpler approach: build a stub that returns current=0.5 on first call, then
-     * returns 100 rows of 0.5mm each (sum=50mm) for subsequent historical calls.
+     * @param array  $current    Rows of the current window
+     * @param array  $historical Rows per historical window, newest year first
+     * @param string $firstDate  Value of MIN(date)
      */
-    public function testSPINegativeUnderDrought(): void
+    private function _spiStub(array $current, array $historical, string $firstDate): DailyAveragesModel
     {
         $stub = $this->getMockBuilder(DailyAveragesModel::class)
             ->disableOriginalConstructor()
@@ -241,73 +264,99 @@ final class AnomalyDetectorTest extends CIUnitTestCase
 
         $stub->method('__call')->willReturnCallback(fn() => $stub);
 
-        // Build 100 rows of 0.5mm = 50mm historical sum
-        $historicalRows = array_fill(0, 100, ['precipitation' => 0.5]);
-
-        // Historical returns vary: alternating 40mm and 60mm sums so std > 0
-        $callCount = 0;
-        $stub->method('findAll')->willReturnCallback(function () use (&$callCount) {
-            $callCount++;
-            if ($callCount === 1) {
-                // Current period: only 1 row with 0.1mm = drought
-                return [['precipitation' => 0.1]];
-            }
-            // Alternate between 80 × 0.5mm (= 40mm) and 120 × 0.5mm (= 60mm)
-            $size = ($callCount % 2 === 0) ? 80 : 120;
-            return array_fill(0, $size, ['precipitation' => 0.5]);
+        $queue = array_merge([$current], $historical);
+        $stub->method('findAll')->willReturnCallback(function () use (&$queue) {
+            return array_shift($queue) ?? [];
         });
+        $stub->method('first')->willReturn(['first_date' => $firstDate]);
 
-        $stub->method('first')->willReturn(null);
+        return $stub;
+    }
 
-        $hourly   = $this->createMock(HourlyAveragesModel::class);
+    /**
+     * Dry current window against wetter, varying history gives a negative SPI.
+     * History starts at the first data year (2021): 2024, 2023, 2022 and 2021 are used.
+     */
+    public function testSPINegativeUnderDrought(): void
+    {
+        $stub = $this->_spiStub(
+            array_fill(0, 30, ['precipitation' => 0.1]),
+            [
+                array_fill(0, 30, ['precipitation' => 1.0]),
+                array_fill(0, 30, ['precipitation' => 2.0]),
+                array_fill(0, 30, ['precipitation' => 1.0]),
+                array_fill(0, 30, ['precipitation' => 2.0]),
+            ],
+            '2021-11-08 00:00:00'
+        );
+
+        $hourly = $this->createMock(HourlyAveragesModel::class);
         $hourly->method('__call')->willReturnSelf();
-        $detector = new AnomalyDetector($stub, $hourly);
 
-        $spi = $detector->computeSPI('2025-08-01', 30);
+        $spi = (new AnomalyDetector($stub, $hourly))->computeSPI('2025-08-01', 30);
 
         $this->assertNotNull($spi);
         $this->assertLessThan(0.0, $spi);
     }
 
     /**
-     * When fewer than 3 historical years of data exist, computeSPI must return null.
-     *
-     * The stub returns rows for exactly 2 historical year calls, then empty arrays.
-     * The SPI loop starts from endYear-1 and goes down to 2000. We need only 2 years
-     * with data and all the rest empty, so that count($historicalSums) = 2 < 3.
+     * A current window with less than 90% of its days present gives no SPI.
+     */
+    public function testSPINullWhenCurrentWindowIncomplete(): void
+    {
+        $stub = $this->_spiStub(
+            array_fill(0, 26, ['precipitation' => 0.0]),   // 26 < 27 of 30 days
+            array_fill(0, 4, array_fill(0, 30, ['precipitation' => 1.0])),
+            '2021-01-01 00:00:00'
+        );
+
+        $hourly = $this->createMock(HourlyAveragesModel::class);
+        $hourly->method('__call')->willReturnSelf();
+
+        $this->assertNull((new AnomalyDetector($stub, $hourly))->computeSPI('2025-08-01', 30));
+    }
+
+    /**
+     * Historical windows with less than 90% of their days are not part of the baseline:
+     * with only 2 complete ones (< 3) no SPI is computed.
      */
     public function testSPINullInsufficientHistory(): void
+    {
+        $stub = $this->_spiStub(
+            array_fill(0, 30, ['precipitation' => 1.0]),
+            [
+                array_fill(0, 30, ['precipitation' => 1.0]),
+                array_fill(0, 30, ['precipitation' => 2.0]),
+                array_fill(0, 5, ['precipitation' => 0.5]),    // partial window, skipped
+                array_fill(0, 5, ['precipitation' => 0.5]),    // partial window, skipped
+            ],
+            '2021-11-08 00:00:00'
+        );
+
+        $hourly = $this->createMock(HourlyAveragesModel::class);
+        $hourly->method('__call')->willReturnSelf();
+
+        $this->assertNull((new AnomalyDetector($stub, $hourly))->computeSPI('2025-08-01', 30));
+    }
+
+    /**
+     * The baseline starts at the first data year instead of 2000: exactly one
+     * window query per year from endYear-1 down to the first year, plus the current one.
+     */
+    public function testSPIQueriesOnlyYearsFromFirstData(): void
     {
         $stub = $this->getMockBuilder(DailyAveragesModel::class)
             ->disableOriginalConstructor()
             ->getMock();
-
         $stub->method('__call')->willReturnCallback(fn() => $stub);
+        $stub->method('first')->willReturn(['first_date' => '2023-01-01 00:00:00']);
+        $stub->expects($this->exactly(3))->method('findAll')->willReturn(array_fill(0, 30, ['precipitation' => 1.0]));
 
-        $callCount = 0;
-        $stub->method('findAll')->willReturnCallback(function () use (&$callCount) {
-            $callCount++;
-            if ($callCount === 1) {
-                // Current period
-                return [['precipitation' => 10.0]];
-            }
-            if ($callCount === 2 || $callCount === 3) {
-                // First 2 historical years: return rows summing to ~50mm
-                return array_fill(0, 100, ['precipitation' => 0.5]);
-            }
-            // All subsequent years: empty — no data
-            return [];
-        });
-
-        $stub->method('first')->willReturn(null);
-
-        $hourly   = $this->createMock(HourlyAveragesModel::class);
+        $hourly = $this->createMock(HourlyAveragesModel::class);
         $hourly->method('__call')->willReturnSelf();
-        $detector = new AnomalyDetector($stub, $hourly);
 
-        $spi = $detector->computeSPI('2024-03-01', 30);
-
-        $this->assertNull($spi);
+        // 1 current window + 2024 + 2023 = 3 queries (not 26); only 2 baseline windows -> null
+        $this->assertNull((new AnomalyDetector($stub, $hourly))->computeSPI('2025-08-01', 30));
     }
 
     // -------------------------------------------------------------------------
@@ -390,10 +439,7 @@ final class AnomalyDetectorTest extends CIUnitTestCase
     // Private helper: _computePressureDrop
     // -------------------------------------------------------------------------
 
-    /**
-     * With 3 rows (oldest=1010, newest=1005) the drop must be 5.0 hPa.
-     */
-    public function testComputePressureDropThreeRows(): void
+    public function testMaxPressureDropWithoutDates(): void
     {
         $detector = $this->_makeDetector();
         $rows = [
@@ -402,24 +448,76 @@ final class AnomalyDetectorTest extends CIUnitTestCase
             ['pressure' => 1010.0],  // oldest
         ];
 
-        $ref = new \ReflectionMethod($detector, '_computePressureDrop');
+        $ref = new \ReflectionMethod($detector, '_maxPressureDrop');
         $ref->setAccessible(true);
 
         $this->assertEqualsWithDelta(5.0, $ref->invoke($detector, $rows), 0.001);
     }
 
     /**
-     * With fewer than 2 rows the method must return 0.0.
+     * With fewer than 2 readings the drop is 0.0.
      */
-    public function testComputePressureDropFewerThanTwoRows(): void
+    public function testMaxPressureDropFewerThanTwoRows(): void
     {
         $detector = $this->_makeDetector();
 
-        $ref = new \ReflectionMethod($detector, '_computePressureDrop');
+        $ref = new \ReflectionMethod($detector, '_maxPressureDrop');
         $ref->setAccessible(true);
 
         $this->assertSame(0.0, $ref->invoke($detector, []));
         $this->assertSame(0.0, $ref->invoke($detector, [['pressure' => 1010.0]]));
+    }
+
+    /**
+     * A collapse in the middle of the day (not in the newest rows) is found, using the
+     * real timestamps: 6 hPa between 10:00 and 13:00.
+     */
+    public function testPressureCollapseScansWholeDay(): void
+    {
+        $detector = $this->_makeDetector();
+        $rows     = [];
+
+        // DESC: 23:00 .. 00:00; pressure steady except 10:00 -> 13:00 (-6)
+        for ($h = 23; $h >= 0; $h--) {
+            $p = $h <= 10 ? 1010.0 : ($h >= 13 ? 1004.0 : 1010.0 - ($h - 10) * 2.0);
+            $rows[] = ['date' => sprintf('2026-03-10 %02d:00:00', $h), 'pressure' => $p];
+        }
+
+        $this->assertTrue($detector->checkPressureCollapse($rows));
+    }
+
+    /**
+     * The same 6 hPa spread over 4 hours (> 3 h window) is no collapse.
+     */
+    public function testPressureCollapseIgnoresSlowFall(): void
+    {
+        $detector = $this->_makeDetector();
+        $rows     = [];
+
+        for ($h = 4; $h >= 0; $h--) {
+            $rows[] = ['date' => sprintf('2026-03-10 %02d:00:00', $h), 'pressure' => 1010.0 - (4 - $h) * 1.5];
+        }
+
+        $this->assertFalse($detector->checkPressureCollapse($rows));
+    }
+
+    /**
+     * A drop straddling midnight is found through the previous day's tail rows.
+     */
+    public function testPressureCollapseAcrossMidnightUsesContextRows(): void
+    {
+        $detector = $this->_makeDetector();
+        $day      = [
+            ['date' => '2026-03-10 01:00:00', 'pressure' => 1004.0],
+            ['date' => '2026-03-10 00:00:00', 'pressure' => 1006.0],
+        ];
+        $tail     = [
+            ['date' => '2026-03-09 23:00:00', 'pressure' => 1008.0],
+            ['date' => '2026-03-09 22:00:00', 'pressure' => 1010.0],
+        ];
+
+        $this->assertFalse($detector->checkPressureCollapse($day));
+        $this->assertTrue($detector->checkPressureCollapse($day, $tail));
     }
 
     // -------------------------------------------------------------------------
@@ -573,5 +671,115 @@ final class AnomalyDetectorTest extends CIUnitTestCase
         $ref->setAccessible(true);
 
         $this->assertNull($ref->invoke($detector, $rows));
+    }
+
+    // -------------------------------------------------------------------------
+    // extreme_uv / evaluateDay
+    // -------------------------------------------------------------------------
+
+    /**
+     * extreme_uv looks at the day's maximum hourly uv_index, not the 24h mean.
+     */
+    public function testExtremeUvUsesHourlyMaximum(): void
+    {
+        $detector = $this->_makeDetector();
+        $today    = new \DateTime('2026-07-10');
+        $hourly   = [
+            ['date' => '2026-07-10 12:00:00', 'uv_index' => 7.5],
+            ['date' => '2026-07-10 06:00:00', 'uv_index' => 1.0],
+            ['date' => '2026-07-10 00:00:00', 'uv_index' => 0.0],
+        ];
+
+        $states = $detector->checkAllAnomalies($today, $hourly, ['uv_index' => 2.4]);
+
+        $this->assertTrue($states['extreme_uv']['active']);
+        $this->assertSame(7.5, $states['extreme_uv']['extraMetric']['value']);
+
+        $states = $detector->checkAllAnomalies($today, [['uv_index' => 6.9]], ['uv_index' => 6.9]);
+        $this->assertFalse($states['extreme_uv']['active']);
+
+        $states = $detector->checkAllAnomalies($today, [], ['uv_index' => 9.0]);
+        $this->assertFalse($states['extreme_uv']['active']);
+        $this->assertNull($states['extreme_uv']['extraMetric']);
+    }
+
+    /**
+     * evaluateDay() returns null when daily_averages has no row for the day.
+     */
+    public function testEvaluateDayReturnsNullWithoutDailyRow(): void
+    {
+        $daily = $this->getMockBuilder(DailyAveragesModel::class)->disableOriginalConstructor()->getMock();
+        $daily->method('__call')->willReturnCallback(fn() => $daily);
+        $daily->method('first')->willReturn(null);
+
+        $hourly = $this->createMock(HourlyAveragesModel::class);
+        $hourly->method('__call')->willReturnSelf();
+
+        $this->assertNull((new AnomalyDetector($daily, $hourly))->evaluateDay(new \DateTime('2026-07-10')));
+    }
+
+    /**
+     * evaluateDay() evaluates the stored row of that day (not "today") and feeds the
+     * previous day's tail to the pressure check.
+     */
+    public function testEvaluateDayRunsAllChecksOnTheDay(): void
+    {
+        $daily = $this->getMockBuilder(DailyAveragesModel::class)->disableOriginalConstructor()->getMock();
+        $daily->method('__call')->willReturnCallback(fn() => $daily);
+        $daily->method('findAll')->willReturn([]);
+        $daily->method('first')->willReturn(['date' => '2026-03-10 00:00:00', 'temperature' => 1.0, 'uv_index' => 0.2]);
+
+        $hourly = $this->getMockBuilder(HourlyAveragesModel::class)->disableOriginalConstructor()->getMock();
+        $hourly->method('__call')->willReturnCallback(fn() => $hourly);
+        $calls = 0;
+        $hourly->method('findAll')->willReturnCallback(function () use (&$calls) {
+            return $calls++ === 0
+                ? [['date' => '2026-03-10 01:00:00', 'pressure' => 1004.0]]
+                : [['date' => '2026-03-09 22:00:00', 'pressure' => 1010.0]];   // tail of the previous day
+        });
+
+        $states = (new AnomalyDetector($daily, $hourly))->evaluateDay(new \DateTime('2026-03-10'));
+
+        $this->assertIsArray($states);
+        $this->assertTrue($states['pressure_collapse']['active']);
+        $this->assertFalse($states['extreme_uv']['active']);
+    }
+
+    // -------------------------------------------------------------------------
+    // _checkConsecutiveZScore (heat wave / cold snap)
+    // -------------------------------------------------------------------------
+
+    public function testConsecutiveZScoreRequiresConsecutiveDates(): void
+    {
+        // The two latest rows are 2026-07-10 and 2026-07-08: a missing day in between
+        $daily = $this->_stubDaily([
+            ['date' => '2026-07-10 00:00:00', 'temperature' => 35.0],
+            ['date' => '2026-07-08 00:00:00', 'temperature' => 35.0],
+        ]);
+        $hourly = $this->createMock(HourlyAveragesModel::class);
+        $hourly->method('__call')->willReturnSelf();
+
+        $method = new \ReflectionMethod(AnomalyDetector::class, '_checkConsecutiveZScore');
+
+        $this->assertFalse(
+            $method->invoke(new AnomalyDetector($daily, $hourly), new \DateTime('2026-07-10'), 'temperature', 1.5, 2, 'above')
+        );
+    }
+
+    public function testConsecutiveZScoreRequiresTodayAsLatestRow(): void
+    {
+        // Latest data is two days old: the run of days does not reach the evaluated day
+        $daily = $this->_stubDaily([
+            ['date' => '2026-07-08 00:00:00', 'temperature' => 35.0],
+            ['date' => '2026-07-07 00:00:00', 'temperature' => 35.0],
+        ]);
+        $hourly = $this->createMock(HourlyAveragesModel::class);
+        $hourly->method('__call')->willReturnSelf();
+
+        $method = new \ReflectionMethod(AnomalyDetector::class, '_checkConsecutiveZScore');
+
+        $this->assertFalse(
+            $method->invoke(new AnomalyDetector($daily, $hourly), new \DateTime('2026-07-10'), 'temperature', 1.5, 2, 'above')
+        );
     }
 }

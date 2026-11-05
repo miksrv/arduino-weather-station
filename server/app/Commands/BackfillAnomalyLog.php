@@ -40,9 +40,9 @@ class BackfillAnomalyLog extends BaseCommand
     /**
      * Executes the backfill workflow:
      * 1. Guard clause — abort if anomaly_log is non-empty unless --force is passed.
-     * 2. Fetch all daily rows ordered ASC by date.
+     * 2. Fetch all complete (before today, UTC) daily rows ordered ASC by date.
      * 3. For each day, run AnomalyDetector::checkAllAnomalies() and open/close anomaly_log rows.
-     * 4. Track open anomalies in-memory to avoid a DB query per type per day.
+     * 4. With --force the existing rows are deleted first, in the same transaction as the replay.
      * 5. Report progress every 100 rows and print a final summary.
      *
      * @param array $params CLI parameters (unused; options read via CLI::getOption)
@@ -73,7 +73,7 @@ class BackfillAnomalyLog extends BaseCommand
 
             if ($existingCount > 0 && $force) {
                 CLI::write(
-                    "[FORCE] anomaly_log contains {$existingCount} row(s) — proceeding anyway.",
+                    "[FORCE] anomaly_log contains {$existingCount} row(s) — they are deleted and rebuilt.",
                     'yellow'
                 );
             }
@@ -81,7 +81,10 @@ class BackfillAnomalyLog extends BaseCommand
             // ----------------------------------------------------------------
             // Fetch all daily rows, ASC by date
             // ----------------------------------------------------------------
+            // Complete days only: today's partial averages are never evaluated
+            // (the daily cron does not either).
             $allDailyRows = $dailyModel
+                ->where('date <', gmdate('Y-m-d') . ' 00:00:00')
                 ->orderBy('date', 'ASC')
                 ->findAll();
 
@@ -94,20 +97,13 @@ class BackfillAnomalyLog extends BaseCommand
 
             CLI::write("[INFO] Starting backfill over {$total} daily records...", 'cyan');
 
-            // ----------------------------------------------------------------
-            // Pre-load any already-open anomaly rows into the in-memory map.
-            // This matters when --force is used and there are partial records.
-            // ----------------------------------------------------------------
-            $openAnomalies = [];   // [ type => ['id' => int, 'peak' => ?float] ]
+            // The log is rebuilt from scratch: wipe it and replay in one transaction,
+            // so a failure leaves the old content untouched.
+            $db = \Config\Database::connect();
+            $db->transStart();
+            $logModel->deleteAllRows();
 
-            $existingOpen = $logModel->getActiveAnomalies();
-            foreach ($existingOpen as $row) {
-                $rowArr = is_array($row) ? $row : (array) $row;
-                $openAnomalies[(string) $rowArr['type']] = [
-                    'id'   => (int) $rowArr['id'],
-                    'peak' => isset($rowArr['peak_value']) ? (float) $rowArr['peak_value'] : null,
-                ];
-            }
+            $latestByType = [];   // [ type => latest episode row ], kept in memory
 
             // ----------------------------------------------------------------
             // Iterate day by day
@@ -128,54 +124,30 @@ class BackfillAnomalyLog extends BaseCommand
                     continue;
                 }
 
-                $date = new \DateTime($dateStr);
+                $date          = new \DateTime($dateStr);
+                $anomalyStates = $detector->evaluateDay($date);
 
-                // Fetch all hourly rows for this specific day (DESC)
-                $recentHourlyRaw = $hourlyModel
-                    ->where('date >=', $dateStr . ' 00:00:00')
-                    ->where('date <=', $dateStr . ' 23:59:59')
-                    ->orderBy('date', 'DESC')
-                    ->findAll();
-
-                $recentHourlyArr = array_map(
-                    fn($r) => $r instanceof \CodeIgniter\Entity\Entity
-                        ? $r->toRawArray()
-                        : (is_array($r) ? $r : (array) $r),
-                    $recentHourlyRaw
-                );
-
-                // Run all anomaly checks for this day
-                $anomalyStates = $detector->checkAllAnomalies($date, $recentHourlyArr, $rowArr);
+                if ($anomalyStates === null) {
+                    continue;
+                }
 
                 foreach ($anomalyStates as $type => $state) {
-                    $isActive  = (bool) $state['active'];
-                    $isOpen    = isset($openAnomalies[$type]);
-                    $peakValue = $this->_extractPeakValue($state);
+                    $result = $logModel->applyDayState(
+                        $type,
+                        (bool) $state['active'],
+                        $dateStr,
+                        $this->_extractPeakValue($state),
+                        $this->_buildDescription($type, $state),
+                        $latestByType[$type] ?? null
+                    );
 
-                    if ($isActive && !$isOpen) {
-                        // Open new episode
-                        $id = $logModel->openAnomaly(
-                            $type,
-                            $dateStr,
-                            $peakValue,
-                            $this->_buildDescription($type, $state)
-                        );
-                        $openAnomalies[$type] = ['id' => $id, 'peak' => $peakValue];
+                    $latestByType[$type] = $result['row'];
+
+                    if ($result['action'] === 'opened') {
                         $opened++;
-                    } elseif ($isActive && $isOpen) {
-                        // Update in-memory peak if higher (avoid DB write every day)
-                        $storedPeak = $openAnomalies[$type]['peak'];
-                        if ($peakValue !== null && ($storedPeak === null || abs($peakValue) > abs($storedPeak))) {
-                            $logModel->updatePeakIfHigher((int) $openAnomalies[$type]['id'], $peakValue);
-                            $openAnomalies[$type]['peak'] = $peakValue;
-                        }
-                    } elseif (!$isActive && $isOpen) {
-                        // Close episode
-                        $logModel->closeAnomaly((int) $openAnomalies[$type]['id'], $dateStr);
-                        unset($openAnomalies[$type]);
+                    } elseif ($result['action'] === 'closed') {
                         $closed++;
                     }
-                    // else: not active, not open — do nothing
                 }
 
                 // Progress report every 100 rows
@@ -183,6 +155,12 @@ class BackfillAnomalyLog extends BaseCommand
                 if ($processed % 100 === 0) {
                     CLI::write("Processed {$processed} / {$total} days...", 'cyan');
                 }
+            }
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                throw new \RuntimeException('Transaction failed, anomaly_log was left unchanged.');
             }
 
             // ----------------------------------------------------------------
@@ -195,7 +173,10 @@ class BackfillAnomalyLog extends BaseCommand
             log_message('info', $summary);
 
             // Report any anomalies left open at the end of history
-            $stillOpen = array_keys($openAnomalies);
+            $stillOpen = array_keys(array_filter(
+                $latestByType,
+                static fn(?array $row): bool => $row !== null && $row['end_date'] === null
+            ));
             if (!empty($stillOpen)) {
                 $stillOpenTypes = implode(', ', $stillOpen);
                 CLI::write(
@@ -205,6 +186,10 @@ class BackfillAnomalyLog extends BaseCommand
                 log_message('info', "system:backfillAnomalyLog — open at end of history: {$stillOpenTypes}");
             }
         } catch (\Exception $e) {
+            if (isset($db) && $db->transDepth > 0) {
+                $db->transRollback();
+            }
+
             $msg = 'system:backfillAnomalyLog failed: ' . $e->getMessage();
             log_message('error', $msg);
             CLI::write('[ERROR] ' . $msg, 'red');
@@ -249,7 +234,7 @@ class BackfillAnomalyLog extends BaseCommand
             'heat_wave'         => 'Heat wave' . ($z !== null ? sprintf(' (temp Z-score: %+.2f)', $z) : ''),
             'cold_snap'         => 'Cold snap' . ($z !== null ? sprintf(' (temp Z-score: %+.2f)', $z) : ''),
             'pressure_collapse' => 'Rapid pressure collapse (≥5 hPa drop in 3 hours)',
-            'freezing_rain'     => 'Freezing rain (precipitation with temperature between -5°C and +1.5°C)',
+            'freezing_rain'     => 'Freezing rain (precipitation with temperature between -4°C and +1°C)',
             'fog_risk'          => 'Fog risk (dew-point spread ≤2.5°C, wind <2 m/s, clouds <40%)',
             'drought_spi30'     => 'Drought' . ($em ? sprintf(' (SPI-30: %+.2f)', (float) $em['value']) : ''),
             'extreme_uv'        => 'Extreme UV index (≥7)' . ($z !== null ? sprintf(' (UV Z-score: %+.2f)', $z) : ''),

@@ -364,8 +364,8 @@ The backend exposes several `php spark` commands for pulling external weather da
 | `php spark system:getCurrentWeather` | Fetches current weather observations from all configured external APIs (VisualCrossing, WeatherAPI, OpenWeatherMap, Open-Meteo), saves new records to `raw_weather_data`, and recalculates hourly and daily averages. |
 | `php spark system:getForecastWeather` | Fetches forecast data from all configured external APIs and bulk-upserts records into `forecast_weather_data`. |
 | `php spark system:sendNarodmonData` | Retrieves the latest sensor reading from the database and pushes it to the [narodmon.ru](https://narodmon.ru) monitoring service. |
-| `php spark system:detectAnomalies` | Runs all meteorological anomaly checks against today's daily and hourly data and updates the `anomaly_log` table. Must run after daily averages are available. |
-| `php spark system:backfillAnomalyLog` | Iterates all historical daily records and populates `anomaly_log` from scratch. Intended for initial bootstrapping. Accepts `--force` to bypass the non-empty table guard. |
+| `php spark system:detectAnomalies` | Runs all meteorological anomaly checks for the last complete UTC days (yesterday and the two days before it, so a skipped run is caught up; today's partial data is never logged) and updates the `anomaly_log` table. Idempotent. `end_date` of an episode is its last active day (inclusive). Must run after daily averages are available. |
+| `php spark system:backfillAnomalyLog` | Iterates all historical daily records and populates `anomaly_log` from scratch. Intended for initial bootstrapping. Accepts `--force`, which deletes all existing rows and rebuilds the log (in one transaction). |
 
 ### Recommended Schedule
 
@@ -374,7 +374,7 @@ The backend exposes several `php spark` commands for pulling external weather da
 | `system:getCurrentWeather` | Every hour | Keeps raw observations and hourly/daily averages up to date. |
 | `system:getForecastWeather` | Every 3–6 hours | Forecast data changes slowly; 4-hour intervals balance freshness against API quota. |
 | `system:sendNarodmonData` | Every 15 minutes | Near-real-time push to the public monitoring network. |
-| `system:detectAnomalies` | Once daily (e.g. 01:30) | Runs after midnight when the previous day's daily averages are fully computed. |
+| `system:detectAnomalies` | Once daily (e.g. 01:30) | Runs after midnight UTC when the previous day's daily averages are fully computed; it evaluates that completed day. |
 | `system:backfillAnomalyLog` | One-time / manual | Run once on a fresh deployment to seed historical anomaly records. |
 
 ### Example Crontab

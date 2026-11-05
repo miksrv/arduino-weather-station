@@ -86,7 +86,15 @@ class OpenWeatherAPILibrary extends AbstractWeatherAPILibrary
      */
     protected function mapForecastData(array $data): array
     {
-        return array_merge($this->_mapCommonFields($data), [
+        $fields = $this->_mapCommonFields($data);
+
+        // /forecast items carry the precipitation of the 3-hour step in rain.3h / snow.3h (never 1h),
+        // so it is spread evenly into mm per hour like every other source stores it. Unlike the current
+        // endpoint, a dry step is stored as 0: a forecast row is one explicit vote of this source for
+        // the hour (the aggregator averages the sources that have a value), and OWM omits the key when dry.
+        $fields['precipitation'] = self::_forecastPrecipitation($data);
+
+        return array_merge($fields, [
             'forecast_time' => !empty($data['dt']) ? Time::createFromTimestamp($data['dt']) : null,
         ]);
     }
@@ -114,6 +122,18 @@ class OpenWeatherAPILibrary extends AbstractWeatherAPILibrary
             'weather_id'    => !empty($data['weather'][0]['id']) ? self::convertWeatherCondition($data['weather'][0]['id']) : null,
             'source'        => RawWeatherDataModel::SOURCE_OPENWEATHERMAP
         ];
+    }
+
+    /**
+     * Precipitation of a 3-hourly forecast step as mm per hour.
+     * @param array $data Forecast list item.
+     * @return float
+     */
+    private static function _forecastPrecipitation(array $data): float
+    {
+        $threeHour = $data['rain']['3h'] ?? ($data['snow']['3h'] ?? null);
+
+        return $threeHour !== null ? round((float) $threeHour / 3, 3) : 0.0;
     }
 
     /**

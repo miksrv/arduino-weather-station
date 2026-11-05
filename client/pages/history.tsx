@@ -104,6 +104,8 @@ const HistoryPage: NextPage<HistoryPageProps> = ({ initialStartDate, initialEndD
                     buttonMode={'secondary'}
                     minDate={'2021-01-01'}
                     maxDate={formatDate(getCurrentDate().toDate(), 'YYYY-MM-DD')}
+                    // The station's today, not the browser's: the presets count back from it and match it
+                    today={getCurrentDate().format('YYYY-MM-DD')}
                     placeholder={t('select-date-range')}
                     onPeriodSelect={handlePeriodSelect}
                 />

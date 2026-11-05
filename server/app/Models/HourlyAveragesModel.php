@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Entities\WeatherDataEntity;
+use App\Libraries\ForecastAggregator;
 use CodeIgniter\Model;
 
 /**
@@ -105,5 +106,87 @@ class HourlyAveragesModel extends Model
             ->orderBy('date', 'ASC')
             ->get()
             ->getResultArray();
+    }
+
+    /**
+     * Rolls the hourly averages up into one row per UTC day, for daily_averages.
+     *
+     * Each hour weighs the same however many raw rows it had. Precipitation is the day's
+     * total (sum of the hourly amounts), not an hourly mean; wind direction is a vector
+     * mean; the weather code follows {@see ForecastAggregator::dailyWeatherId()}.
+     *
+     * By default it covers the previous and the current day, since the previous day's
+     * last hour can still change after midnight ({@see RawWeatherDataModel::getHourlyAverages()}).
+     *
+     * @param string|null $since First day (Y-m-d H:i:s, inclusive); null = start of the previous day.
+     * @param string|null $until End (Y-m-d H:i:s, exclusive); null = no end.
+     * @return array<int, array<string, mixed>> Rows with `day`, `date` and the weather fields.
+     */
+    public function getDailyAverages(?string $since = null, ?string $until = null): array
+    {
+        $since ??= gmdate('Y-m-d 00:00:00', time() - 86400);
+        $day     = 'DATE_FORMAT(date, "%Y-%m-%d 00:00:00")';
+        $fields  = [];
+
+        foreach (self::_dailyExpressions() as $field => $expression) {
+            $fields[] = $expression . ' as ' . $field;
+        }
+
+        $builder = $this->builder()
+            ->select($day . ' AS day, ' . $day . ' AS date, ' . implode(', ', $fields), false)
+            ->where('date >=', $since);
+
+        if ($until !== null) {
+            $builder->where('date <', $until);
+        }
+
+        return $builder
+            ->groupBy('day')
+            ->orderBy('day', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+
+    /**
+     * Aggregate expression of every daily field over the hourly rows, keyed by field name.
+     *
+     * @return array<string, string>
+     */
+    private static function _dailyExpressions(): array
+    {
+        $isPrecipitation = '(weather_id BETWEEN 200 AND 399 OR weather_id BETWEEN 500 AND 699)';
+        $weatherId       = 'CASE
+            WHEN SUM(' . $isPrecipitation . ') > 0
+                AND (SUM(precipitation >= ' . ForecastAggregator::WET_HOUR_MM . ') >= ' . ForecastAggregator::WET_DAY_HOURS . '
+                    OR COALESCE(SUM(precipitation), 0) >= ' . ForecastAggregator::WET_DAY_TOTAL_MM . ')
+                THEN ' . RawWeatherDataModel::mostSevereWeatherIdSQL() . '
+            WHEN SUM(weather_id BETWEEN 700 AND 799) >= ' . ForecastAggregator::FOG_DAY_HOURS . '
+                THEN MAX(CASE WHEN weather_id BETWEEN 700 AND 799 THEN weather_id END)
+            WHEN AVG(clouds) IS NOT NULL
+                THEN ' . RawWeatherDataModel::cloudsWeatherIdSQL('AVG(clouds)') . '
+            ELSE MAX(weather_id)
+        END';
+
+        $expressions = [];
+
+        foreach (['temperature', 'feels_like', 'pressure', 'humidity', 'dew_point', 'uv_index', 'sol_energy', 'sol_radiation'] as $field) {
+            $expressions[$field] = 'ROUND(AVG(' . $field . '), 2)';
+        }
+
+        return array_merge($expressions, [
+            'precipitation' => 'ROUND(SUM(precipitation), 2)',
+            'clouds'        => 'ROUND(AVG(clouds), 2)',
+            'visibility'    => 'ROUND(AVG(visibility), 2)',
+            'wind_speed'    => 'ROUND(AVG(wind_speed), 2)',
+            'wind_deg'      => RawWeatherDataModel::windDirectionSQL(),
+            'wind_gust'     => 'ROUND(AVG(wind_gust), 2)',
+            'weather_id'    => $weatherId,
+            'pm2_5'         => 'ROUND(AVG(pm2_5), 2)',
+            'pm10'          => 'ROUND(AVG(pm10), 2)',
+            'co'            => 'ROUND(AVG(co), 2)',
+            'no2'           => 'ROUND(AVG(no2), 2)',
+            'so2'           => 'ROUND(AVG(so2), 2)',
+            'o3'            => 'ROUND(AVG(o3), 2)',
+        ]);
     }
 }

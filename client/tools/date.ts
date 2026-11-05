@@ -45,6 +45,21 @@ export const formatDateFromUTC = (utc?: number, format: string = 'D MMMM YYYY, H
 export const formatDate = (date?: string | number | Date, format: string = 'D MMMM YYYY, HH:mm'): string =>
     date ? getDate(typeof date === 'number' ? new Date(date) : date).format(format) : ''
 
+/**
+ * A period of local calendar days ('YYYY-MM-DD') in words: "6 мая – 6 ноября 2026", or with both years when
+ * they differ: "6 ноября 2025 – 6 мая 2026". The month names follow the active dayjs locale.
+ */
+export const formatDateRange = (startDate?: string, endDate?: string): string => {
+    if (!startDate || !endDate) {
+        return ''
+    }
+
+    const start = dayjs(startDate, 'YYYY-MM-DD')
+    const end = dayjs(endDate, 'YYYY-MM-DD')
+
+    return `${start.format(start.year() === end.year() ? 'D MMMM' : 'D MMMM YYYY')} – ${end.format('D MMMM YYYY')}`
+}
+
 export const timeAgo = (date?: string | Date, withoutSuffix?: boolean): string =>
     date ? getDate(date).fromNow(withoutSuffix) : ''
 

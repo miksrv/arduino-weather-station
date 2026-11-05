@@ -1,8 +1,37 @@
 @use '../../styles/mixins'
 @use '../../styles/typography' as type
 
-.subtitle
-    margin: calc(-1 * var(--space-1)) 0 var(--space-2)
+// The colour scale in the card header: the period's range around a gradient, or the precipitation steps
+.legend
+    display: flex
+    flex-wrap: wrap
+    align-items: center
+    gap: var(--space-1) var(--space-2)
+    margin: 0
+    padding: 0
+    list-style: none
     +type.caption
+    +type.numbers
+    white-space: nowrap
+
+.gradient
+    width: 160px
+    height: 8px
+    border-radius: var(--radius-full)
+
+.step
+    display: inline-flex
+    align-items: center
+    gap: 6px
+
+.swatch, .swatchDry
+    width: 12px
+    height: 10px
+    border-radius: var(--radius-xs)
+
+// Dry hours are the grid-line tone on the map: a ring keeps the swatch visible on the card
+.swatchDry
+    background: var(--surface-2)
+    box-shadow: inset 0 0 0 1px var(--border-strong)
 
 +mixins.chartTooltip

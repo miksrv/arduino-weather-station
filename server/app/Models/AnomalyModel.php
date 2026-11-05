@@ -95,7 +95,7 @@ class AnomalyModel
             $sweZScore    = $this->_computeSweSweZScore($today, $currentSWE, $dailyArr);
             $meltRate     = $this->snowpack->computeMeltRateLast14Days($sweSeries);
             $rainOnSnow   = $this->snowpack->countRainOnSnowDays($dailyArr, $sweSeries);
-            $precipZScore = $this->detector->computeZScore('precipitation', $today, (float) ($dailyArr[count($dailyArr) - 1]['precipitation'] ?? 0.0));
+            $precipZScore = $this->_computeLastCompleteDayPrecipZScore($dailyArr, $today);
             $tempSlope    = $this->_compute14DayTempSlope($dailyArr);
 
             // Normalise each component to 0–1 and multiply by weight
@@ -147,11 +147,15 @@ class AnomalyModel
      * Sets floodOccurred=true for season '2023-2024' (hardcoded historical fact),
      * null for the current in-progress season, false for all others.
      *
+     * Between June and September (off-season) there is no snowpack to compare:
+     * the z-score and the historical statistics stay neutral (0).
+     *
+     * @param \DateTime|null $today Reference day (defaults to today)
      * @return array Snowpack comparison data matching the API contract shape
      */
-    public function getSnowpackComparison(): array
+    public function getSnowpackComparison(?\DateTime $today = null): array
     {
-        $today        = new \DateTime('today');
+        $today      ??= new \DateTime('today');
         [$curStart,]  = $this->snowpack->getSeasonRange($today);
         $curYear      = (int) substr($curStart, 0, 4);
         $currentLabel = $curYear . '-' . ($curYear + 1);
@@ -240,13 +244,16 @@ class AnomalyModel
             $currentSeries     = $this->snowpack->computeSWESeries($currentSeasonRows);
             $currentSWE        = !empty($currentSeries) ? end($currentSeries)['swe'] : 0.0;
 
-            // Historical stats for current calendar day — compare same season-day offset
+            // Historical stats for current calendar day — compare same season-day offset.
+            // Jun–Sep getSeasonRange() returns the UPCOMING season, so "today" lies before its
+            // start: there is no snowpack to compare, the result stays neutral (z = 0).
+            $offSeason           = (int) $today->format('n') >= 6 && (int) $today->format('n') <= 9;
             $curSeasonStartDt    = new \DateTime($curStart);
-            $todaySeasonOffset   = (int) $curSeasonStartDt->diff($today)->days;
+            $todaySeasonOffset   = $offSeason ? 0 : (int) $curSeasonStartDt->diff($today)->days;
 
             $historicalSameDaySWE = [];
             foreach ($comparisonYears as $s) {
-                if ($s['year'] === $currentLabel || empty($s['series'])) {
+                if ($offSeason || $s['year'] === $currentLabel || empty($s['series'])) {
                     continue;
                 }
 
@@ -385,6 +392,31 @@ class AnomalyModel
             log_message('error', 'AnomalyModel::_getTodayRow error: ' . $e->getMessage());
             return [];
         }
+    }
+
+    /**
+     * Z-score of the precipitation of the last COMPLETE day (before $today) of the season rows.
+     * Today's row is a partial total and would be compared with full-day climatology.
+     *
+     * @param array     $dailyRows Season rows sorted ASC
+     * @param \DateTime $today
+     * @return float|null
+     */
+    private function _computeLastCompleteDayPrecipZScore(array $dailyRows, \DateTime $today): ?float
+    {
+        $todayStr = $today->format('Y-m-d');
+
+        for ($i = count($dailyRows) - 1; $i >= 0; $i--) {
+            $dateStr = substr((string) ($dailyRows[$i]['date'] ?? ''), 0, 10);
+
+            if ($dateStr === '' || $dateStr >= $todayStr || !isset($dailyRows[$i]['precipitation'])) {
+                continue;
+            }
+
+            return $this->detector->computeZScore('precipitation', new \DateTime($dateStr), (float) $dailyRows[$i]['precipitation']);
+        }
+
+        return null;
     }
 
     /**
