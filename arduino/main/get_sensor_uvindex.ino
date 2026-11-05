@@ -11,6 +11,11 @@ void get_sensor_uvindex() {
   // Map the output voltage to a UV intensity value in mW/cm^2, within the range of 0.0 to 15.0
   float uvIntensity = mapfloat(outputVoltage, 0.99, 2.9, 0.0, 15.0);
 
+  // The sensor reads below its 0.99 V baseline in the dark, giving a negative intensity
+  if (uvIntensity < 0.0) {
+    uvIntensity = 0.0;
+  }
+
   // Convert the UV intensity value to a string with 2 decimal places and store it in uvindex
   dtostrf(uvIntensity, 0, 2, uvindex);
 

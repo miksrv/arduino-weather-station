@@ -42,9 +42,12 @@ class Sensors extends ResourceController
      *   - t  (float): temperature
      *   - p  (float): pressure, mmHg from the station firmware (hPa is accepted too)
      *   - h  (float): humidity
-     *   - ws (float): wind speed
+     *   - ws (float): wind speed, m/s
      *   - wd (int):   wind direction in degrees
      *   - uv (float): UV index
+     *
+     * Every field is checked on its own: a non-numeric or out-of-range value is dropped (and logged) instead of
+     * rejecting the whole reading; negative wind speed / UV (calm anemometer, night) is clamped to 0.
      *
      * @return ResponseInterface
      * @throws Exception
@@ -70,12 +73,12 @@ class Sensors extends ResourceController
         try {
             $parsedData = [
                 'date'        => new DateTime('now'),
-                'temperature' => $data['t']  ?? null,
-                'pressure'    => $this->_normalizePressure($data['p'] ?? null),
-                'humidity'    => $data['h']  ?? null,
-                'wind_speed'  => $data['ws'] ?? null,
-                'wind_deg'    => $data['wd'] ?? null,
-                'uv_index'    => $data['uv'] ?? null,
+                'temperature' => $this->_sanitize('t', $data['t'] ?? null, -80, 60),
+                'pressure'    => $this->_sanitize('p', $this->_normalizePressure($data['p'] ?? null), 800, 1100, true),
+                'humidity'    => $this->_sanitize('h', $data['h'] ?? null, 0, 100),
+                'wind_speed'  => $this->_sanitize('ws', $data['ws'] ?? null, 0, 100, false, true),
+                'wind_deg'    => $this->_sanitize('wd', $data['wd'] ?? null, 0, 360, true),
+                'uv_index'    => $this->_sanitize('uv', $data['uv'] ?? null, 0, 20, false, true),
                 'source'      => RawWeatherDataModel::SOURCE_CUSTOMSTATION,
             ];
 
@@ -121,5 +124,44 @@ class Sensors extends ResourceController
         $value = (float) $pressure;
 
         return (int) round($value < 800 ? $value * 1.33322 : $value);
+    }
+
+    /**
+     * Validates a single posted measurement so one bad sensor does not reject the whole reading.
+     *
+     * The limits mirror the validation rules of RawWeatherDataModel. A missing value stays null; a non-numeric or
+     * out-of-range one is dropped (null) with a warning.
+     *
+     * @param string $field        POST field name (for the log)
+     * @param mixed  $value        Raw value
+     * @param float  $min          Lowest accepted value
+     * @param float  $max          Highest accepted value
+     * @param bool   $integer      Whether the value is stored as a whole number
+     * @param bool   $clampNegative Clamp a negative value to 0 instead of dropping it
+     * @return float|int|null
+     */
+    private function _sanitize(string $field, mixed $value, float $min, float $max, bool $integer = false, bool $clampNegative = false): float|int|null
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (!is_numeric($value)) {
+            log_message('warning', "Sensors::setWeather - dropped non-numeric '{$field}'");
+            return null;
+        }
+
+        $number = (float) $value;
+
+        if ($clampNegative && $number < 0) {
+            $number = 0.0;
+        }
+
+        if ($number < $min || $number > $max) {
+            log_message('warning', "Sensors::setWeather - dropped out-of-range '{$field}': {$number}");
+            return null;
+        }
+
+        return $integer ? (int) round($number) : $number;
     }
 }

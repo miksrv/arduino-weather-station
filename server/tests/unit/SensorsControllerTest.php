@@ -169,4 +169,46 @@ final class SensorsControllerTest extends CIUnitTestCase
 
         $this->assertSame(400, $result->response()->getStatusCode());
     }
+
+    /**
+     * The calm anemometer (-1) and negative night UV must not reject the whole reading.
+     */
+    public function testNegativeWindAndUvDoNotRejectReading(): void
+    {
+        putenv('app.arduino.token=test_sensor_token_12345');
+
+        $result = $this->post('sensors?token=test_sensor_token_12345', ['t' => '20.5', 'ws' => '-1', 'uv' => '-0.8']);
+
+        putenv('app.arduino.token=');
+
+        $this->assertNotSame(400, $result->response()->getStatusCode());
+    }
+
+    /**
+     * An invalid single field is dropped while the valid ones are still stored.
+     */
+    public function testInvalidFieldIsDroppedNotWholeReading(): void
+    {
+        putenv('app.arduino.token=test_sensor_token_12345');
+
+        $result = $this->post('sensors?token=test_sensor_token_12345', ['t' => '999', 'h' => '60', 'wd' => 'abc']);
+
+        putenv('app.arduino.token=');
+
+        $this->assertNotSame(400, $result->response()->getStatusCode());
+    }
+
+    /**
+     * Only invalid fields: nothing is left to store, so the reading is rejected.
+     */
+    public function testOnlyInvalidFieldsReturns400(): void
+    {
+        putenv('app.arduino.token=test_sensor_token_12345');
+
+        $result = $this->post('sensors?token=test_sensor_token_12345', ['t' => 'abc', 'wd' => '999']);
+
+        putenv('app.arduino.token=');
+
+        $this->assertSame(400, $result->response()->getStatusCode());
+    }
 }
