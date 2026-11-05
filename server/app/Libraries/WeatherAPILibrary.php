@@ -19,23 +19,23 @@ class WeatherAPILibrary extends AbstractWeatherAPILibrary
         // WeatherAPI ID => Custom ID
         1000 => 800, // Clear sky
         1003 => 801, // Partly cloudy
-        1006 => 802, // Cloudy
+        1006 => 803, // Cloudy (broken clouds)
         1009 => 804, // Overcast
-        1030 => 741, // Mist
+        1030 => 701, // Mist
         1063 => 500, // Patchy rain possible
         1066 => 600, // Patchy snow possible
         1069 => 611, // Patchy sleet possible
-        1072 => 615, // Patchy freezing drizzle possible
+        1072 => 511, // Patchy freezing drizzle possible
         1087 => 211, // Thunderstorm
         1114 => 621, // Blowing snow
         1117 => 602, // Blizzard
         1135 => 741, // Fog
         1147 => 741, // Freezing fog
-        1150 => 511, // Patchy light drizzle
-        1153 => 511, // Light drizzle
+        1150 => 300, // Patchy light drizzle
+        1153 => 301, // Light drizzle
         1168 => 511, // Freezing drizzle
         1171 => 511, // Heavy freezing drizzle
-        1180 => 520, // Patchy light rain
+        1180 => 500, // Patchy light rain
         1183 => 500, // Light rain
         1186 => 501, // Moderate rain at times
         1189 => 501, // Moderate rain
@@ -53,7 +53,7 @@ class WeatherAPILibrary extends AbstractWeatherAPILibrary
         1225 => 602, // Heavy snow
         1237 => 611, // Ice pellets
         1240 => 520, // Light rain shower
-        1243 => 522, // Moderate or heavy rain shower
+        1243 => 521, // Moderate or heavy rain shower
         1246 => 522, // Torrential rain shower
         1249 => 611, // Light sleet showers
         1252 => 611, // Moderate or heavy sleet showers
@@ -61,10 +61,10 @@ class WeatherAPILibrary extends AbstractWeatherAPILibrary
         1258 => 621, // Moderate or heavy snow showers
         1261 => 611, // Light showers of ice pellets
         1264 => 611, // Moderate or heavy showers of ice pellets
-        1273 => 211, // Patchy light rain with thunder
-        1276 => 211, // Moderate or heavy rain with thunder
-        1279 => 212, // Patchy light snow with thunder
-        1282 => 212, // Moderate or heavy snow with thunder
+        1273 => 200, // Patchy light rain with thunder
+        1276 => 201, // Moderate or heavy rain with thunder
+        1279 => 211, // Patchy light snow with thunder (OWM has no snow+thunder code)
+        1282 => 211, // Moderate or heavy snow with thunder
     ];
 
     public function __construct()
@@ -158,15 +158,15 @@ class WeatherAPILibrary extends AbstractWeatherAPILibrary
     private function _mapCommonFields(array $data): array
     {
         return [
-            'temperature'   => (float) $data['temp_c'] ?? null,
-            'dew_point'     => (float) $data['dewpoint_c'] ?? null,
-            'feels_like'    => (float) $data['feelslike_c'] ?? null,
-            'pressure'      => (int) $data['pressure_mb'] ?? null,
-            'humidity'      => (float) $data['humidity'] ?? null,
-            'visibility'    => !empty($data['vis_km']) ? (int) $data['vis_km'] * 1000 : null,
-            'wind_speed'    => !empty($data['wind_kph']) ? kmh_to_ms($data['wind_kph']) : null,
-            'wind_gust'     => !empty($data['gust_kph']) ? kmh_to_ms($data['gust_kph']) : null,
-            'wind_deg'      => (int) $data['wind_degree'] ?? null,
+            'temperature'   => isset($data['temp_c']) ? (float) $data['temp_c'] : null,
+            'dew_point'     => isset($data['dewpoint_c']) ? (float) $data['dewpoint_c'] : null,
+            'feels_like'    => isset($data['feelslike_c']) ? (float) $data['feelslike_c'] : null,
+            'pressure'      => isset($data['pressure_mb']) ? (int) round((float) $data['pressure_mb']) : null,
+            'humidity'      => isset($data['humidity']) ? (float) $data['humidity'] : null,
+            'visibility'    => isset($data['vis_km']) ? (int) round((float) $data['vis_km'] * 1000) : null,
+            'wind_speed'    => isset($data['wind_kph']) ? kmh_to_ms($data['wind_kph']) : null,
+            'wind_gust'     => isset($data['gust_kph']) ? kmh_to_ms($data['gust_kph']) : null,
+            'wind_deg'      => isset($data['wind_degree']) ? (int) $data['wind_degree'] : null,
             'clouds'        => $data['cloud'] ?? null,
             'uv_index'      => $data['uv'] ?? null,
             'precipitation' => $data['precip_mm'] ?? null,

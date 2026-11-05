@@ -148,4 +148,31 @@ final class VisualCrossingAPILibraryTest extends CIUnitTestCase
         $library = $this->_buildLibraryWithMockClient('[]');
         $this->assertFalse($library->getWeatherData());
     }
+
+    public function testConvertWeatherConditionUsesAllTokensAndPrecipIntensity(): void
+    {
+        $this->assertSame(804, VisualCrossingAPILibrary::convertWeatherCondition('Overcast, Partially cloudy'));
+        $this->assertSame(211, VisualCrossingAPILibrary::convertWeatherCondition('Overcast, Thunderstorm, Rain'));
+        $this->assertSame(500, VisualCrossingAPILibrary::convertWeatherCondition('Rain, Overcast', 0.8));
+        $this->assertSame(501, VisualCrossingAPILibrary::convertWeatherCondition('Rain, Overcast', 4.0));
+        $this->assertSame(502, VisualCrossingAPILibrary::convertWeatherCondition('Rain', 12.0));
+        $this->assertSame(600, VisualCrossingAPILibrary::convertWeatherCondition('Snow, Overcast', 0.3));
+        $this->assertSame(741, VisualCrossingAPILibrary::convertWeatherCondition('Fog, Overcast'));
+    }
+
+    public function testGetWeatherDataKeepsZerosAndNullsMissingFields(): void
+    {
+        $library = $this->_buildLibraryWithMockClient(json_encode(['currentConditions' => [
+            'temp' => 1.0, 'visibility' => 0.5, 'windspeed' => 0.0, 'windgust' => 0.0, 'precip' => 0.0,
+            'datetimeEpoch' => 1700000000, 'conditions' => 'Clear',
+        ]]));
+        $result = $library->getWeatherData();
+
+        $this->assertSame(500, $result['visibility']);
+        $this->assertSame(0.0, (float) $result['wind_speed']);
+        $this->assertSame(0.0, (float) $result['precipitation']);
+        $this->assertNull($result['pressure']);
+        $this->assertNull($result['humidity']);
+        $this->assertNull($result['uv_index']);
+    }
 }

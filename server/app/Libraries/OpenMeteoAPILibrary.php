@@ -108,6 +108,9 @@ class OpenMeteoAPILibrary extends AbstractWeatherAPILibrary
         $weatherCurrent = $weatherResponse['current'] ?? null;
         if ($weatherCurrent === null) {
             log_message('warning', 'OpenMeteo: current weather data unavailable — weather fields will be null.');
+        } else {
+            // `current.precipitation` only sums the previous `current.interval` (15 min); store mm over the last hour.
+            $weatherCurrent['precipitation'] = $this->_lastHourPrecipitation($weatherCurrent, $weatherResponse['minutely_15'] ?? null);
         }
 
         $airQualityCurrent = $airQualityResponse['current'] ?? null;
@@ -287,9 +290,48 @@ class OpenMeteoAPILibrary extends AbstractWeatherAPILibrary
             'latitude'        => getenv('app.lat'),
             'longitude'       => getenv('app.lon'),
             'current'         => implode(',', self::WEATHER_VARIABLES),
+            'minutely_15'     => 'precipitation',
+            'past_minutely_15' => 4,
+            'forecast_minutely_15' => 1,
             'wind_speed_unit' => 'ms',
             'timezone'        => 'UTC',
         ];
+    }
+
+    /**
+     * Precipitation over the last hour (mm), the unit every other source stores.
+     *
+     * Open-Meteo's `current.precipitation` is the sum of the preceding `current.interval` (900 s = 15 min),
+     * i.e. about 4x too low next to the other sources' hourly values, and the hourly series' "preceding hour"
+     * value would be for a past full hour or a partly future one. A `minutely_15` slot is the sum of the
+     * preceding 15 minutes, so the slots stamped in (now - 60 min, now] add up to exactly the last hour,
+     * with no extra HTTP call (they ride along with the `current` request). Null when the hour is incomplete.
+     * @param array      $current   The `current` object (needs `time`).
+     * @param array|null $minutely  The `minutely_15` object (`time` + `precipitation` parallel arrays).
+     * @return float|null
+     */
+    private function _lastHourPrecipitation(array $current, ?array $minutely): ?float
+    {
+        if (empty($current['time']) || empty($minutely['time']) || !is_array($minutely['precipitation'] ?? null)) {
+            log_message('warning', 'OpenMeteo: minutely_15 precipitation unavailable — precipitation will be null.');
+            return null;
+        }
+
+        $now   = strtotime($current['time'] . ' UTC');
+        $sum   = 0.0;
+        $slots = 0;
+
+        foreach ($minutely['time'] as $index => $time) {
+            $stamp = strtotime($time . ' UTC');
+            $value = $minutely['precipitation'][$index] ?? null;
+
+            if ($stamp > $now - 3600 && $stamp <= $now && $value !== null) {
+                $sum += (float) $value;
+                $slots++;
+            }
+        }
+
+        return $slots === 4 ? round($sum, 2) : null;
     }
 
     /**

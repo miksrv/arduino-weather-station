@@ -95,7 +95,7 @@ class GetCurrentWeather extends BaseCommand
             }
 
             $hourlySaved = $this->_saveHourlyAverages($weatherDataModel, $hourlyAveragesModel);
-            $dailySaved  = $this->_saveDailyAverages($weatherDataModel, $dailyAveragesModel);
+            $dailySaved  = $this->_saveDailyAverages($hourlyAveragesModel, $dailyAveragesModel);
 
             CLI::write('Hourly averages: ' . $hourlySaved . ' records saved.', 'white');
             CLI::write('Daily averages: ' . $dailySaved . ' records saved.', 'white');
@@ -115,7 +115,8 @@ class GetCurrentWeather extends BaseCommand
     // -------------------------------------------------------------------------
 
     /**
-     * Fetches hourly averages from raw_weather_data and upserts each row into
+     * Fetches the hourly averages of the previous and the current hour from
+     * raw_weather_data (API reports arrive late) and upserts each row into
      * hourly_averages. Returns the number of records processed.
      *
      * @param RawWeatherDataModel  $weatherDataModel    Source model
@@ -147,20 +148,20 @@ class GetCurrentWeather extends BaseCommand
     }
 
     /**
-     * Fetches daily averages from raw_weather_data and upserts each row into
-     * daily_averages. Returns the number of records processed.
+     * Rolls the hourly averages of the previous and the current day up into
+     * daily_averages (upsert). Returns the number of records processed.
      *
-     * @param RawWeatherDataModel $weatherDataModel   Source model
-     * @param DailyAveragesModel  $dailyAveragesModel Target model
+     * @param HourlyAveragesModel $hourlyAveragesModel Source model
+     * @param DailyAveragesModel  $dailyAveragesModel  Target model
      * @return int
      * @throws ReflectionException
      * @throws Exception
      */
     private function _saveDailyAverages(
-        RawWeatherDataModel $weatherDataModel,
+        HourlyAveragesModel $hourlyAveragesModel,
         DailyAveragesModel  $dailyAveragesModel
     ): int {
-        $dailyData = $weatherDataModel->getDailyAverages();
+        $dailyData = $hourlyAveragesModel->getDailyAverages();
         $count     = 0;
 
         foreach ($dailyData as $data) {

@@ -212,4 +212,18 @@ final class OpenWeatherAPILibraryTest extends CIUnitTestCase
 
         $this->assertEqualsWithDelta(0.8, (float) $result['precipitation'], 0.001);
     }
+
+    public function testForecastPrecipitationIsThreeHourSpreadPerHour(): void
+    {
+        $wet = ['dt' => 1700003600, 'main' => ['temp' => 1.0], 'rain' => ['3h' => 3.0]];
+        $snow = ['dt' => 1700014400, 'main' => ['temp' => -5.0], 'snow' => ['3h' => 1.5]];
+        $dry = ['dt' => 1700025200, 'main' => ['temp' => 2.0]];
+
+        $library = $this->_buildLibraryWithMockClient(json_encode(['list' => [$wet, $snow, $dry]]));
+        $result  = $library->getForecastWeatherData();
+
+        $this->assertEqualsWithDelta(1.0, (float) $result[0]['precipitation'], 0.001);
+        $this->assertEqualsWithDelta(0.5, (float) $result[1]['precipitation'], 0.001);
+        $this->assertSame(0.0, $result[2]['precipitation']);
+    }
 }
