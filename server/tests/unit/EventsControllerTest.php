@@ -3,6 +3,7 @@
 use App\Controllers\Events;
 use App\Libraries\EventFeedBuilder;
 use App\Models\AnomalyLogModel;
+use App\Models\HourlyAveragesModel;
 use App\Models\RawWeatherDataModel;
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\ControllerTestTrait;
@@ -81,6 +82,21 @@ final class EventsControllerTest extends CIUnitTestCase
             ->getMock();
 
         $mock->method('getAnomaliesTouchingWindow')->willReturn($rowsReturn);
+
+        return $mock;
+    }
+
+    /**
+     * Builds a HourlyAveragesModel mock whose query chain ends in findAll().
+     */
+    private function _mockHourlyModel(array $rows = []): HourlyAveragesModel
+    {
+        $mock = $this->getMockBuilder(HourlyAveragesModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mock->method('__call')->willReturnSelf();
+        $mock->method('findAll')->willReturn($rows);
 
         return $mock;
     }
@@ -180,6 +196,7 @@ final class EventsControllerTest extends CIUnitTestCase
         $this->controller(Events::class);
         $this->setPrivateProperty($this->controller, 'weatherDataModel', $this->_mockWeatherModel([]));
         $this->setPrivateProperty($this->controller, 'anomalyLogModel', $this->_mockAnomalyLogModel([]));
+        $this->setPrivateProperty($this->controller, 'hourlyModel', $this->_mockHourlyModel());
         $this->setPrivateProperty($this->controller, 'eventFeedBuilder', $this->_mockEventFeedBuilder($fakeEvents));
 
         $this->request->setMethod('GET');
@@ -203,6 +220,7 @@ final class EventsControllerTest extends CIUnitTestCase
         $this->controller(Events::class);
         $this->setPrivateProperty($this->controller, 'weatherDataModel', $this->_mockWeatherModel([]));
         $this->setPrivateProperty($this->controller, 'anomalyLogModel', $this->_mockAnomalyLogModel([]));
+        $this->setPrivateProperty($this->controller, 'hourlyModel', $this->_mockHourlyModel());
         $this->setPrivateProperty($this->controller, 'eventFeedBuilder', $this->_mockEventFeedBuilder([]));
 
         $this->request->setMethod('GET');
@@ -232,6 +250,7 @@ final class EventsControllerTest extends CIUnitTestCase
             $this->_mockWeatherModel(new \Exception('DB error'))
         );
         $this->setPrivateProperty($this->controller, 'anomalyLogModel', $this->_mockAnomalyLogModel([]));
+        $this->setPrivateProperty($this->controller, 'hourlyModel', $this->_mockHourlyModel());
         $this->setPrivateProperty($this->controller, 'eventFeedBuilder', $this->_mockEventFeedBuilder([]));
 
         $this->request->setMethod('GET');
@@ -316,6 +335,7 @@ final class EventsControllerTest extends CIUnitTestCase
         $this->controller(Events::class);
         $this->setPrivateProperty($this->controller, 'weatherDataModel', $this->_mockWeatherModel([]));
         $this->setPrivateProperty($this->controller, 'anomalyLogModel', $this->_mockAnomalyLogModel([]));
+        $this->setPrivateProperty($this->controller, 'hourlyModel', $this->_mockHourlyModel());
         $this->setPrivateProperty($this->controller, 'eventFeedBuilder', $this->_mockEventFeedBuilder($fakeEvents));
 
         $this->request->setMethod('GET');

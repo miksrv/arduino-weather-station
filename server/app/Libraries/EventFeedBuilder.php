@@ -11,13 +11,19 @@ use DateTimeZone;
  * Class EventFeedBuilder
  *
  * Dynamically derives a "recent events" feed for the /events endpoint from
- * data that already exists — raw_weather_data and anomaly_log. Nothing this
- * class computes is persisted; every call re-derives the feed from scratch.
+ * data that already exists — raw_weather_data, hourly_averages and anomaly_log.
+ * Nothing this class computes is persisted; every call re-derives the feed.
+ *
+ * Raw rows hold several sources that disagree by a degree or so, so value events
+ * come from ONE consistent series per field: the station's own readings
+ * (source CustomStation) when it has any in the window, otherwise the hourly averages.
+ * Precipitation always comes from the hourly averages (the station reports no
+ * precipitation, the API readings are rates, not amounts).
  *
  * Event types produced:
  *   - temperature_change / pressure_change: rolling-window value deltas
- *   - wind_gust: individual readings exceeding a gust threshold
- *   - precipitation: consecutive positive readings collapsed into one entry
+ *   - wind_gust: readings exceeding a gust threshold (one per timestamp)
+ *   - precipitation: consecutive wet hours collapsed into one entry (sum of hourly mm)
  *   - system_status: freshness of the most recent raw_weather_data row
  *   - anomaly_started / anomaly_ended: anomaly_log rows touching the window
  *
@@ -37,18 +43,22 @@ class EventFeedBuilder
     /** @var float Wind gust speed (m/s) above which a reading is flagged as a wind_gust event */
     public const WIND_GUST_THRESHOLD_MS = 7.0;
 
+    /** @var string Source name of the station's own readings in raw_weather_data */
+    public const STATION_SOURCE = 'CustomStation';
+
     /** @var int Freshness window, in minutes, within which the latest reading is considered "ok" */
     public const SYSTEM_FRESHNESS_MINUTES = 15;
 
     /**
      * Builds and returns the merged, sorted, capped event feed.
      *
-     * @param array         $rawRows     raw_weather_data rows (toRawArray() shape, snake_case keys), ASC by date.
+     * @param array         $rawRows     raw_weather_data rows (toRawArray() shape, snake_case keys, all sources), ASC by date.
      * @param array         $anomalyRows anomaly_log rows touching the requested window.
      * @param DateTime      $windowStart Inclusive start of the requested window.
      * @param DateTime      $windowEnd   Inclusive end of the requested window.
      * @param mixed         $lastUpdate  Most recent raw_weather_data date (string|Time|DateTime|null).
      * @param int           $limit       Maximum number of events to return.
+     * @param array         $hourlyRows  hourly_averages rows of the window (snake_case keys), ASC by date.
      * @return array Events sorted by date descending, capped at $limit.
      */
     public function build(
@@ -57,26 +67,27 @@ class EventFeedBuilder
         DateTime $windowStart,
         DateTime $windowEnd,
         mixed $lastUpdate,
-        int $limit
+        int $limit,
+        array $hourlyRows = []
     ): array {
         $events = [];
 
         $events = array_merge($events, $this->_buildChangeEvents(
-            $rawRows,
+            $this->_pickSeries($rawRows, $hourlyRows, 'temperature'),
             'temperature',
             'temperature_change',
             self::TEMPERATURE_CHANGE_THRESHOLD_C
         ));
 
         $events = array_merge($events, $this->_buildChangeEvents(
-            $rawRows,
+            $this->_pickSeries($rawRows, $hourlyRows, 'pressure'),
             'pressure',
             'pressure_change',
             self::PRESSURE_CHANGE_THRESHOLD_HPA
         ));
 
-        $events = array_merge($events, $this->_buildWindGustEvents($rawRows));
-        $events = array_merge($events, $this->_buildPrecipitationEvents($rawRows));
+        $events = array_merge($events, $this->_buildWindGustEvents($this->_pickSeries($rawRows, $hourlyRows, 'wind_gust')));
+        $events = array_merge($events, $this->_buildPrecipitationEvents($hourlyRows));
 
         $systemEvent = $this->_buildSystemStatusEvent($lastUpdate);
 
@@ -94,6 +105,31 @@ class EventFeedBuilder
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * Picks the one series a field's events are derived from: the station's own rows
+     * having the field when there are any (the station can be offline), otherwise the hourly averages having it.
+     *
+     * @param array  $rawRows    raw_weather_data rows of all sources.
+     * @param array  $hourlyRows hourly_averages rows.
+     * @param string $field      Column name.
+     * @return array Rows ASC by date, all with a non-null $field.
+     */
+    private function _pickSeries(array $rawRows, array $hourlyRows, string $field): array
+    {
+        $hasField = static fn(array $row): bool => isset($row[$field], $row['date']) && $row[$field] !== null;
+
+        $station = array_values(array_filter(
+            $rawRows,
+            static fn(array $row): bool => ($row['source'] ?? null) === self::STATION_SOURCE && $hasField($row)
+        ));
+
+        if ($station !== []) {
+            return $station;
+        }
+
+        return array_values(array_filter($hourlyRows, $hasField));
+    }
 
     /**
      * Detects notable value changes for a single field using non-overlapping
@@ -149,14 +185,15 @@ class EventFeedBuilder
     }
 
     /**
-     * Flags individual raw readings whose wind_gust exceeds the threshold.
+     * Flags readings whose wind_gust exceeds the threshold; readings sharing a
+     * timestamp collapse into one event carrying the strongest gust.
      *
-     * @param array $rows raw_weather_data rows.
+     * @param array $rows Series rows with wind_gust.
      * @return array
      */
     private function _buildWindGustEvents(array $rows): array
     {
-        $events = [];
+        $byDate = [];
 
         foreach ($rows as $row) {
             if (!isset($row['wind_gust'], $row['date']) || $row['wind_gust'] === null) {
@@ -169,50 +206,68 @@ class EventFeedBuilder
                 continue;
             }
 
-            $events[] = [
-                'date'    => $this->_formatDate($this->_toDateTime($row['date'])),
+            $date = $this->_formatDate($this->_toDateTime($row['date']));
+
+            if (isset($byDate[$date]) && $byDate[$date]['value'] >= $gust) {
+                continue;
+            }
+
+            $byDate[$date] = [
+                'date'    => $date,
                 'type'    => 'wind_gust',
                 'value'   => $gust,
                 'windDeg' => isset($row['wind_deg']) ? (int) $row['wind_deg'] : null,
             ];
         }
 
-        return $events;
+        return array_values($byDate);
     }
 
     /**
-     * Flags precipitation readings above the noise threshold, collapsing
-     * consecutive positive readings into a single accumulated event.
+     * Flags wet hours (hourly precipitation above the noise threshold, in mm),
+     * collapsing consecutive wet hours into a single event whose value is the sum
+     * of their hourly amounts. A missing hour ends the run.
      *
-     * @param array $rows raw_weather_data rows, ASC by date.
+     * @param array $hourlyRows hourly_averages rows, ASC by date.
      * @return array
      */
-    private function _buildPrecipitationEvents(array $rows): array
+    private function _buildPrecipitationEvents(array $hourlyRows): array
     {
-        $events     = [];
-        $runSum     = 0.0;
-        $runEndDate = null;
+        $events   = [];
+        $runSum   = 0.0;
+        $runEnd   = null;
 
-        foreach ($rows as $row) {
+        foreach ($hourlyRows as $row) {
             $precip = isset($row['precipitation']) ? (float) $row['precipitation'] : 0.0;
 
-            // Noise floor for "did it actually rain" lives on PrecipitationModel
-            // (single source of truth shared with the precipitation calendar stats).
-            if ($precip > PrecipitationModel::RAIN_THRESHOLD_MM && isset($row['date'])) {
-                $runSum    += $precip;
-                $runEndDate = $this->_toDateTime($row['date']);
+            if (!isset($row['date'])) {
                 continue;
             }
 
-            if ($runEndDate !== null) {
-                $events[]   = $this->_makePrecipitationEvent($runEndDate, $runSum);
-                $runSum     = 0.0;
-                $runEndDate = null;
+            $date = $this->_toDateTime($row['date']);
+
+            // Noise floor for "did it actually rain" lives on PrecipitationModel
+            // (single source of truth shared with the precipitation calendar stats).
+            if ($precip > PrecipitationModel::RAIN_THRESHOLD_MM) {
+                if ($runEnd !== null && $date->getTimestamp() - $runEnd->getTimestamp() > 3600) {
+                    $events[] = $this->_makePrecipitationEvent($runEnd, $runSum);
+                    $runSum   = 0.0;
+                }
+
+                $runSum += $precip;
+                $runEnd  = $date;
+                continue;
+            }
+
+            if ($runEnd !== null) {
+                $events[] = $this->_makePrecipitationEvent($runEnd, $runSum);
+                $runSum   = 0.0;
+                $runEnd   = null;
             }
         }
 
-        if ($runEndDate !== null) {
-            $events[] = $this->_makePrecipitationEvent($runEndDate, $runSum);
+        if ($runEnd !== null) {
+            $events[] = $this->_makePrecipitationEvent($runEnd, $runSum);
         }
 
         return $events;
@@ -221,7 +276,7 @@ class EventFeedBuilder
     /**
      * Builds a single precipitation event entry.
      *
-     * @param DateTime $date Timestamp of the last reading in the run.
+     * @param DateTime $date Start of the last wet hour in the run.
      * @param float    $sum  Accumulated precipitation over the run, in mm.
      * @return array
      */

@@ -105,7 +105,7 @@ class AnomalyLogModel extends Model
     }
 
     /**
-     * Closes an open anomaly episode by setting its end_date.
+     * Closes an open anomaly episode by setting its end_date (the last ACTIVE day, inclusive).
      *
      * @param int    $id      Row ID to close.
      * @param string $endDate End date in 'Y-m-d' format.
@@ -116,6 +116,116 @@ class AnomalyLogModel extends Model
         $this->update($id, [
             'end_date' => $endDate,
         ]);
+    }
+
+    /**
+     * Returns the most recent episode (by start_date) of the given type, open or closed.
+     *
+     * @param string $type Anomaly type key.
+     * @return array|null Row data or null.
+     */
+    public function getLatestByType(string $type): ?array
+    {
+        $row = $this
+            ->where('type', $type)
+            ->orderBy('start_date', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->first();
+
+        return $row ? (array) $row : null;
+    }
+
+    /**
+     * Removes every anomaly_log row (used by the forced backfill before it replays history).
+     *
+     * @return void
+     */
+    public function deleteAllRows(): void
+    {
+        $this->where('id >', 0)->delete();
+    }
+
+    /**
+     * Applies one evaluated day of one anomaly type to the log. Idempotent: evaluating
+     * the same day again changes nothing, and days must be fed in ascending order.
+     *
+     * An episode runs from start_date to end_date, both inclusive (end_date = the last
+     * ACTIVE day, NULL while still active at the last evaluated day).
+     *
+     * Active day:
+     *   - no episode yet / the latest one ended before the previous day: open a new one;
+     *   - the latest one is open or already covers the day: keep it (peak updated);
+     *   - the latest one ended the previous day: re-open it (no duplicate row).
+     * Inactive day:
+     *   - an open episode is closed with end_date = the previous day; an episode that
+     *     started on this very day is dropped (the day was evaluated active before).
+     *
+     * @param string      $type        Anomaly type key.
+     * @param bool        $active      Whether the anomaly is active on $date.
+     * @param string      $date        Evaluated day, 'Y-m-d'.
+     * @param float|null  $peakValue   Peak metric of the day.
+     * @param string|null $description Description for a newly opened episode.
+     * @param array|null  $latest      Latest episode of the type as returned by getLatestByType().
+     * @return array{action: string, row: array|null} action is opened|reopened|updated|closed|dropped|none;
+     *                                                row is the episode now latest for the type.
+     */
+    public function applyDayState(
+        string $type,
+        bool $active,
+        string $date,
+        ?float $peakValue,
+        ?string $description,
+        ?array $latest
+    ): array {
+        $start = $latest !== null ? substr((string) $latest['start_date'], 0, 10) : null;
+        $end   = $latest !== null && $latest['end_date'] !== null ? substr((string) $latest['end_date'], 0, 10) : null;
+        $prev  = (new \DateTime($date))->modify('-1 day')->format('Y-m-d');
+
+        if ($active) {
+            if ($latest === null || $end !== null && $end < $prev) {
+                $id = $this->openAnomaly($type, $date, $peakValue, $description);
+
+                return ['action' => 'opened', 'row' => [
+                    'id' => $id, 'type' => $type, 'start_date' => $date, 'end_date' => null, 'peak_value' => $peakValue,
+                ]];
+            }
+
+            if ($start > $date) {
+                return ['action' => 'none', 'row' => $latest];
+            }
+
+            $action = 'updated';
+
+            if ($end === $prev) {
+                $this->update((int) $latest['id'], ['end_date' => null]);
+                $latest['end_date'] = null;
+                $action             = 'reopened';
+            }
+
+            $stored = $latest['peak_value'] !== null ? (float) $latest['peak_value'] : null;
+
+            if ($peakValue !== null && ($stored === null || abs($peakValue) > abs($stored))) {
+                $this->updatePeakIfHigher((int) $latest['id'], $peakValue);
+                $latest['peak_value'] = round($peakValue, 4);
+            }
+
+            return ['action' => $action, 'row' => $latest];
+        }
+
+        if ($latest === null || $end !== null || $start > $date) {
+            return ['action' => 'none', 'row' => $latest];
+        }
+
+        if ($start === $date) {
+            $this->delete((int) $latest['id']);
+
+            return ['action' => 'dropped', 'row' => $this->getLatestByType($type)];
+        }
+
+        $this->closeAnomaly((int) $latest['id'], $prev);
+        $latest['end_date'] = $prev;
+
+        return ['action' => 'closed', 'row' => $latest];
     }
 
     /**

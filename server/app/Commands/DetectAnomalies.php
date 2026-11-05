@@ -13,7 +13,7 @@ use CodeIgniter\CLI\CLI;
  * Class DetectAnomalies
  *
  * Spark CLI command that runs all meteorological anomaly checks and updates
- * the anomaly_log table. Intended to run daily via cron after calculateDailyAverages.
+ * the anomaly_log table for the last complete UTC days. Intended to run once a day via cron after midnight UTC.
  *
  * Usage:
  *   php spark system:detectAnomalies
@@ -22,6 +22,9 @@ use CodeIgniter\CLI\CLI;
  */
 class DetectAnomalies extends BaseCommand
 {
+    /** @var int Number of last complete days evaluated per run (catches up skipped runs) */
+    public const DAYS_LOOKBACK = 3;
+
     /** @var string Command group */
     protected $group = 'system';
 
@@ -33,11 +36,13 @@ class DetectAnomalies extends BaseCommand
 
     /**
      * Executes the anomaly detection workflow:
-     * 1. Fetch today's daily row and last 3 hourly rows.
-     * 2. Run AnomalyDetector::checkAllAnomalies().
-     * 3. Open new anomaly log entries for newly active conditions.
-     * 4. Close open entries for conditions that are no longer active.
-     * 5. Log a summary.
+     * 1. Take the last COMPLETE UTC days (yesterday and the DAYS_LOOKBACK - 1 days before it,
+     *    so a skipped cron run is caught up). Today is never evaluated: its partial
+     *    averages would be compared with full-day climatology.
+     * 2. For each day with a daily_averages row, run AnomalyDetector::evaluateDay()
+     *    (the same evaluation the backfill uses).
+     * 3. Apply each state to anomaly_log via AnomalyLogModel::applyDayState() (idempotent).
+     * 4. Log a summary.
      *
      * @param array $params CLI parameters (unused)
      * @return void
@@ -49,69 +54,45 @@ class DetectAnomalies extends BaseCommand
             $hourlyModel = new HourlyAveragesModel();
             $detector    = new AnomalyDetector($dailyModel, $hourlyModel);
             $logModel    = new AnomalyLogModel();
-            $today       = new \DateTime('today');
-            $todayStr    = $today->format('Y-m-d');
-
-            // Fetch today's daily row
-            $todayRow = $dailyModel
-                ->where('date >=', $todayStr . ' 00:00:00')
-                ->where('date <=', $todayStr . ' 23:59:59')
-                ->first();
-
-            $todayArr = $todayRow instanceof \CodeIgniter\Entity\Entity
-                ? $todayRow->toRawArray()
-                : (is_array($todayRow) ? $todayRow : (array) $todayRow);
-
-            // Fetch all hourly rows for today (DESC)
-            $recentHourly = $hourlyModel
-                ->where('date >=', $todayStr . ' 00:00:00')
-                ->where('date <=', $todayStr . ' 23:59:59')
-                ->orderBy('date', 'DESC')
-                ->findAll();
-
-            $recentHourlyArr = array_map(
-                fn($r) => $r instanceof \CodeIgniter\Entity\Entity
-                    ? $r->toRawArray()
-                    : (is_array($r) ? $r : (array) $r),
-                $recentHourly
-            );
-
-            // Run all anomaly checks
-            $anomalyStates = $detector->checkAllAnomalies($today, $recentHourlyArr, $todayArr);
+            $yesterday   = new \DateTime('yesterday', new \DateTimeZone('UTC'));
 
             $opened = 0;
             $closed = 0;
+            $days   = 0;
 
-            foreach ($anomalyStates as $type => $state) {
-                $isActive  = (bool) $state['active'];
-                $openRow   = $logModel->getOpenByType($type);
-                $peakValue = $this->_extractPeakValue($state);
+            for ($offset = self::DAYS_LOOKBACK - 1; $offset >= 0; $offset--) {
+                $date    = (clone $yesterday)->modify("-{$offset} days");
+                $dateStr = $date->format('Y-m-d');
+                $states  = $detector->evaluateDay($date);
 
-                if ($isActive && $openRow === null) {
-                    // New episode — open with peak_value and description
-                    $logModel->openAnomaly(
+                if ($states === null) {
+                    CLI::write("[SKIP]   {$dateStr} — no daily averages", 'dark_gray');
+                    continue;
+                }
+
+                $days++;
+
+                foreach ($states as $type => $state) {
+                    $result = $logModel->applyDayState(
                         $type,
-                        $todayStr,
-                        $peakValue,
-                        $this->_buildDescription($type, $state)
+                        (bool) $state['active'],
+                        $dateStr,
+                        $this->_extractPeakValue($state),
+                        $this->_buildDescription($type, $state),
+                        $logModel->getLatestByType($type)
                     );
-                    CLI::write("[OPENED] {$type}", 'green');
-                    $opened++;
-                } elseif ($isActive && $openRow !== null) {
-                    // Ongoing episode — update peak if current value is higher
-                    $logModel->updatePeakIfHigher((int) $openRow['id'], $peakValue);
-                    CLI::write("[OK]     {$type} — still active", 'dark_gray');
-                } elseif (!$isActive && $openRow !== null) {
-                    // Episode ended — close it
-                    $logModel->closeAnomaly((int) $openRow['id'], $todayStr);
-                    CLI::write("[CLOSED] {$type}", 'yellow');
-                    $closed++;
-                } else {
-                    CLI::write("[OK]     {$type} — not active", 'dark_gray');
+
+                    if ($result['action'] === 'opened') {
+                        CLI::write("[OPENED] {$type} ({$dateStr})", 'green');
+                        $opened++;
+                    } elseif ($result['action'] === 'closed') {
+                        CLI::write("[CLOSED] {$type} ({$dateStr})", 'yellow');
+                        $closed++;
+                    }
                 }
             }
 
-            $summary = "system:detectAnomalies completed for {$todayStr}: {$opened} opened, {$closed} closed.";
+            $summary = "system:detectAnomalies completed for {$days} day(s) up to {$yesterday->format('Y-m-d')}: {$opened} opened, {$closed} closed.";
             CLI::write($summary, 'white');
             log_message('info', $summary);
         } catch (\Exception $e) {
@@ -159,7 +140,7 @@ class DetectAnomalies extends BaseCommand
             'heat_wave'         => 'Heat wave' . ($z !== null ? sprintf(' (temp Z-score: %+.2f)', $z) : ''),
             'cold_snap'         => 'Cold snap' . ($z !== null ? sprintf(' (temp Z-score: %+.2f)', $z) : ''),
             'pressure_collapse' => 'Rapid pressure collapse (≥5 hPa drop in 3 hours)',
-            'freezing_rain'     => 'Freezing rain (precipitation with temperature between -5°C and +1.5°C)',
+            'freezing_rain'     => 'Freezing rain (precipitation with temperature between -4°C and +1°C)',
             'fog_risk'          => 'Fog risk (dew-point spread ≤2.5°C, wind <2 m/s, clouds <40%)',
             'drought_spi30'     => 'Drought' . ($em ? sprintf(' (SPI-30: %+.2f)', (float) $em['value']) : ''),
             'extreme_uv'        => 'Extreme UV index (≥7)' . ($z !== null ? sprintf(' (UV Z-score: %+.2f)', $z) : ''),

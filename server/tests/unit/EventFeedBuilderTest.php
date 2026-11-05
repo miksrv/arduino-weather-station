@@ -37,6 +37,7 @@ final class EventFeedBuilderTest extends CIUnitTestCase
     private function _row(array $overrides = []): array
     {
         return array_merge([
+            'source'        => 'CustomStation',
             'date'          => '2026-07-13 15:00:00',
             'temperature'   => null,
             'pressure'      => null,
@@ -190,62 +191,148 @@ final class EventFeedBuilderTest extends CIUnitTestCase
     // -------------------------------------------------------------------------
 
     /**
-     * Consecutive positive precipitation readings must be collapsed into a
-     * single event, summed, timestamped at the last reading in the run.
+     * Consecutive wet hours collapse into one event whose value is the sum of the
+     * hourly amounts (mm), timestamped at the last wet hour.
      */
-    public function testConsecutivePrecipitationReadingsAreCollapsedIntoOneEvent(): void
+    public function testConsecutiveWetHoursAreCollapsedIntoOneEvent(): void
     {
-        $rows = [
-            $this->_row(['date' => '2026-07-13 15:37:00', 'precipitation' => 0.2]),
-            $this->_row(['date' => '2026-07-13 15:38:00', 'precipitation' => 0.15]),
+        $hourly = [
+            $this->_row(['date' => '2026-07-13 14:00:00', 'precipitation' => 0.0]),
+            $this->_row(['date' => '2026-07-13 15:00:00', 'precipitation' => 0.2]),
+            $this->_row(['date' => '2026-07-13 16:00:00', 'precipitation' => 0.15]),
+            $this->_row(['date' => '2026-07-13 17:00:00', 'precipitation' => 0.0]),
         ];
 
         [$start, $end] = $this->_window('2026-07-13 00:00:00', '2026-07-13 23:59:59');
-        $events = $this->builder->build($rows, [], $start, $end, null, 50);
+        $events = $this->builder->build([], [], $start, $end, null, 50, $hourly);
 
         $precipEvents = array_values(array_filter($events, static fn($e) => $e['type'] === 'precipitation'));
 
         $this->assertCount(1, $precipEvents);
         $this->assertSame(0.35, $precipEvents[0]['value']);
-        $this->assertStringStartsWith('2026-07-13T15:38:00', $precipEvents[0]['date']);
+        $this->assertStringStartsWith('2026-07-13T16:00:00', $precipEvents[0]['date']);
     }
 
     /**
-     * A precipitation value at or below the noise threshold must not start
-     * or extend a run.
+     * An hour at or below the noise threshold neither starts nor extends a run.
      */
     public function testPrecipitationAtThresholdEmitsNoEvent(): void
     {
-        $rows = [
-            $this->_row(['date' => '2026-07-13 15:37:00', 'precipitation' => 0.1]),
-            $this->_row(['date' => '2026-07-13 15:38:00', 'precipitation' => 0.0]),
+        $hourly = [
+            $this->_row(['date' => '2026-07-13 15:00:00', 'precipitation' => 0.1]),
+            $this->_row(['date' => '2026-07-13 16:00:00', 'precipitation' => 0.0]),
         ];
 
         [$start, $end] = $this->_window('2026-07-13 00:00:00', '2026-07-13 23:59:59');
-        $events = $this->builder->build($rows, [], $start, $end, null, 50);
+        $events = $this->builder->build([], [], $start, $end, null, 50, $hourly);
 
-        $precipEvents = array_filter($events, static fn($e) => $e['type'] === 'precipitation');
-
-        $this->assertCount(0, $precipEvents);
+        $this->assertCount(0, array_filter($events, static fn($e) => $e['type'] === 'precipitation'));
     }
 
     /**
-     * A run that is still positive at the end of the row list must still be
-     * flushed as an event (no trailing zero reading required).
+     * A run that is still wet at the last hour is flushed; a missing hour ends a run.
      */
-    public function testPrecipitationRunIsFlushedAtEndOfRows(): void
+    public function testPrecipitationRunIsFlushedAtEndAndBrokenByMissingHour(): void
+    {
+        $hourly = [
+            $this->_row(['date' => '2026-07-13 10:00:00', 'precipitation' => 0.3]),
+            $this->_row(['date' => '2026-07-13 13:00:00', 'precipitation' => 0.4]),   // 11:00, 12:00 missing
+        ];
+
+        [$start, $end] = $this->_window('2026-07-13 00:00:00', '2026-07-13 23:59:59');
+        $events = $this->builder->build([], [], $start, $end, null, 50, $hourly);
+
+        $precipEvents = array_values(array_filter($events, static fn($e) => $e['type'] === 'precipitation'));
+
+        $this->assertCount(2, $precipEvents);
+        $this->assertSame(0.4, $precipEvents[0]['value']);
+        $this->assertSame(0.3, $precipEvents[1]['value']);
+    }
+
+    /**
+     * Precipitation is never derived from raw rows (API readings are rates, the
+     * station reports none): per-reading values produce no event.
+     */
+    public function testPrecipitationIgnoresRawRows(): void
     {
         $rows = [
-            $this->_row(['date' => '2026-07-13 15:37:00', 'precipitation' => 0.3]),
+            $this->_row(['source' => 'OpenWeatherMap', 'date' => '2026-07-13 15:37:00', 'precipitation' => 2.0]),
+            $this->_row(['date' => '2026-07-13 15:38:00', 'precipitation' => null]),
+        ];
+
+        [$start, $end] = $this->_window('2026-07-13 00:00:00', '2026-07-13 23:59:59');
+        $events = $this->builder->build($rows, [], $start, $end, null, 50, []);
+
+        $this->assertCount(0, array_filter($events, static fn($e) => $e['type'] === 'precipitation'));
+    }
+
+    // -------------------------------------------------------------------------
+    // One consistent series
+    // -------------------------------------------------------------------------
+
+    /**
+     * API readings that disagree with the station by a degree must not produce
+     * change events while the station has data.
+     */
+    public function testValueEventsUseStationSeriesOnly(): void
+    {
+        $rows = [
+            $this->_row(['date' => '2026-07-13 15:00:00', 'temperature' => 2.8]),
+            $this->_row(['source' => 'OpenWeatherMap', 'date' => '2026-07-13 15:10:00', 'temperature' => 3.4]),
+            $this->_row(['date' => '2026-07-13 15:25:00', 'temperature' => 2.9]),
+            $this->_row(['source' => 'OpenWeatherMap', 'date' => '2026-07-13 15:30:00', 'temperature' => 3.4]),
         ];
 
         [$start, $end] = $this->_window('2026-07-13 00:00:00', '2026-07-13 23:59:59');
         $events = $this->builder->build($rows, [], $start, $end, null, 50);
 
-        $precipEvents = array_values(array_filter($events, static fn($e) => $e['type'] === 'precipitation'));
+        $this->assertCount(0, array_filter($events, static fn($e) => $e['type'] === 'temperature_change'));
+    }
 
-        $this->assertCount(1, $precipEvents);
-        $this->assertSame(0.3, $precipEvents[0]['value']);
+    /**
+     * With the station offline the hourly averages are the series.
+     */
+    public function testValueEventsFallBackToHourlyWhenStationHasNoData(): void
+    {
+        $raw = [
+            $this->_row(['source' => 'OpenWeatherMap', 'date' => '2026-07-13 15:10:00', 'temperature' => 9.0]),
+            $this->_row(['source' => 'WeatherAPI', 'date' => '2026-07-13 15:20:00', 'temperature' => 1.0]),
+        ];
+        $hourly = [
+            $this->_row(['source' => null, 'date' => '2026-07-13 14:00:00', 'temperature' => 20.0, 'pressure' => 1010.0]),
+            $this->_row(['source' => null, 'date' => '2026-07-13 15:00:00', 'temperature' => 21.0, 'pressure' => 1010.2]),
+        ];
+
+        [$start, $end] = $this->_window('2026-07-13 00:00:00', '2026-07-13 23:59:59');
+        $events = $this->builder->build($raw, [], $start, $end, null, 50, $hourly);
+
+        $changes = array_values(array_filter($events, static fn($e) => $e['type'] === 'temperature_change'));
+
+        $this->assertCount(1, $changes);
+        $this->assertSame('up', $changes[0]['direction']);
+        $this->assertSame(1.0, $changes[0]['value']);
+        $this->assertCount(0, array_filter($events, static fn($e) => $e['type'] === 'pressure_change'));
+    }
+
+    /**
+     * Gust readings sharing a timestamp collapse into one event with the strongest gust.
+     */
+    public function testWindGustEventsAreDedupedPerTimestamp(): void
+    {
+        $rows = [
+            $this->_row(['date' => '2026-07-13 15:39:00', 'wind_gust' => 8.0, 'wind_deg' => 10]),
+            $this->_row(['date' => '2026-07-13 15:39:00', 'wind_gust' => 9.5, 'wind_deg' => 20]),
+            $this->_row(['date' => '2026-07-13 15:39:00', 'wind_gust' => 8.5, 'wind_deg' => 30]),
+        ];
+
+        [$start, $end] = $this->_window('2026-07-13 00:00:00', '2026-07-13 23:59:59');
+        $events = $this->builder->build($rows, [], $start, $end, null, 50);
+
+        $gusts = array_values(array_filter($events, static fn($e) => $e['type'] === 'wind_gust'));
+
+        $this->assertCount(1, $gusts);
+        $this->assertSame(9.5, $gusts[0]['value']);
+        $this->assertSame(20, $gusts[0]['windDeg']);
     }
 
     // -------------------------------------------------------------------------

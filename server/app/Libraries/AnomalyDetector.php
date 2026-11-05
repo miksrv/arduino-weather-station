@@ -4,6 +4,7 @@ namespace App\Libraries;
 
 use App\Models\DailyAveragesModel;
 use App\Models\HourlyAveragesModel;
+use App\Models\PrecipitationModel;
 
 /**
  * Class AnomalyDetector
@@ -17,6 +18,24 @@ class AnomalyDetector
 {
     protected DailyAveragesModel  $dailyModel;
     protected HourlyAveragesModel $hourlyModel;
+
+    /** @var float Pressure drop (hPa) over a 3-hour window that counts as a collapse */
+    public const PRESSURE_COLLAPSE_HPA = 5.0;
+
+    /** @var int Length (seconds) of the window in which the pressure drop is measured */
+    public const PRESSURE_WINDOW_SECONDS = 3 * 3600;
+
+    /** @var float Lower bound (°C) of the hourly mean temperature for freezing rain */
+    public const FREEZING_RAIN_MIN_C = -4.0;
+
+    /** @var float Upper bound (°C) of the hourly mean temperature for freezing rain */
+    public const FREEZING_RAIN_MAX_C = 1.0;
+
+    /** @var float Share of the days of a precipitation window that must have data */
+    public const WINDOW_COVERAGE = 0.9;
+
+    private ?int $firstPrecipYear = null;
+    private bool $firstPrecipYearLoaded = false;
 
     /**
      * @param DailyAveragesModel  $dailyModel  Injected daily averages model
@@ -93,27 +112,68 @@ class AnomalyDetector
     }
 
     /**
-     * Checks whether the last 3 rows of $hourlyRows show a pressure drop of >= 5 hPa.
-     * Rows must be sorted DESC (newest first).
+     * Evaluates all anomalies for one COMPLETE UTC day, exactly as the cron and the
+     * backfill do, so both produce the same anomaly_log.
      *
-     * @param array $hourlyRows Hourly rows sorted DESC by date
-     * @return bool True if pressure dropped >= 5 hPa over the 3-row window
+     * Returns null when daily_averages has no row for the day.
+     *
+     * @param \DateTime $date Day to evaluate (time part ignored)
+     * @return array|null Anomaly state keyed by type, or null without data
      */
-    public function checkPressureCollapse(array $hourlyRows): bool
+    public function evaluateDay(\DateTime $date): ?array
     {
-        if (count($hourlyRows) < 2) {
-            return false;
+        $dateStr = $date->format('Y-m-d');
+
+        $dailyRow = $this->dailyModel
+            ->where('date >=', $dateStr . ' 00:00:00')
+            ->where('date <=', $dateStr . ' 23:59:59')
+            ->first();
+
+        if (!$dailyRow) {
+            return null;
         }
 
-        $window  = array_slice($hourlyRows, 0, 3);
-        $newest  = (float) ($window[0]['pressure'] ?? 0.0);
-        $oldest  = (float) (end($window)['pressure'] ?? 0.0);
+        $hourly = $this->hourlyModel
+            ->where('date >=', $dateStr . ' 00:00:00')
+            ->where('date <=', $dateStr . ' 23:59:59')
+            ->orderBy('date', 'DESC')
+            ->findAll();
 
-        return ($oldest - $newest) >= 5.0;
+        // The previous day's last hours let a pressure collapse straddle midnight
+        $prevDay   = (clone $date)->modify('-1 day')->format('Y-m-d');
+        $tailStart = $prevDay . ' ' . sprintf('%02d:00:00', 24 - (int) (self::PRESSURE_WINDOW_SECONDS / 3600));
+        $tail      = $this->hourlyModel
+            ->where('date >=', $tailStart)
+            ->where('date <', $dateStr . ' 00:00:00')
+            ->orderBy('date', 'DESC')
+            ->findAll();
+
+        return $this->checkAllAnomalies(
+            new \DateTime($dateStr),
+            $this->_toArrays($hourly),
+            $this->_toArray($dailyRow),
+            $this->_toArrays($tail)
+        );
     }
 
     /**
-     * Returns true if ANY hourly row has precipitation > 0 AND temperature between -5°C and +1.5°C.
+     * Returns true if some pair of hourly readings at most 3 hours apart shows a pressure
+     * drop of >= 5 hPa. Uses the rows' real timestamps; rows without a date are assumed
+     * to be consecutive hours, newest first.
+     *
+     * @param array $hourlyRows   Hourly rows of the day
+     * @param array $contextRows  Optional extra rows (e.g. the previous day's last hours)
+     * @return bool
+     */
+    public function checkPressureCollapse(array $hourlyRows, array $contextRows = []): bool
+    {
+        return $this->_maxPressureDrop($hourlyRows, $contextRows) >= self::PRESSURE_COLLAPSE_HPA;
+    }
+
+    /**
+     * Returns true if ANY hourly row shows freezing rain: at least RAIN_THRESHOLD_MM
+     * of precipitation with a mean temperature between -4 °C and +1 °C and, when the
+     * weather code is known, a drizzle/rain code (3xx, 5xx incl. 511) rather than snow.
      *
      * @param array $hourlyRows All hourly rows for the day, each as a plain array
      * @return bool
@@ -121,10 +181,7 @@ class AnomalyDetector
     public function checkFreezingRain(array $hourlyRows): bool
     {
         foreach ($hourlyRows as $row) {
-            $temp   = (float) ($row['temperature']   ?? PHP_FLOAT_MAX);
-            $precip = (float) ($row['precipitation'] ?? 0.0);
-
-            if ($precip > 0.0 && $temp >= -5.0 && $temp <= 1.5) {
+            if ($this->_isFreezingRainRow($row)) {
                 return true;
             }
         }
@@ -267,9 +324,13 @@ class AnomalyDetector
 
     /**
      * Computes the Standardised Precipitation Index (SPI) for a rolling window
-     * of $days days ending on $endDate.
+     * of $days days (inclusive of $endDate) ending on $endDate.
      *
-     * Returns null if fewer than 3 full years of historical windows exist.
+     * Only windows with at least 90% of their days present in daily_averages count,
+     * both the current one and the historical ones (those start at the first year with
+     * precipitation data), so a partly recorded window never looks like a drought.
+     * Returns null if the current window is incomplete or fewer than 3 historical
+     * windows qualify.
      *
      * @param string $endDate End date in 'Y-m-d' format
      * @param int    $days    Window length in days
@@ -278,42 +339,34 @@ class AnomalyDetector
     public function computeSPI(string $endDate, int $days): ?float
     {
         try {
-            $end   = new \DateTime($endDate);
-            $start = (clone $end)->modify("-{$days} days");
+            $end        = new \DateTime($endDate);
+            $start      = (clone $end)->modify('-' . ($days - 1) . ' days');
+            $minPresent = (int) ceil(self::WINDOW_COVERAGE * $days);
 
-            // Current accumulated precipitation
-            $currentRows = $this->dailyModel
-                ->select('precipitation')
-                ->where('date >=', $start->format('Y-m-d'))
-                ->where('date <=', $end->format('Y-m-d'))
-                ->where('precipitation IS NOT NULL')
-                ->findAll();
+            $currentSum = $this->_windowPrecipSum($start, $end, $minPresent);
 
-            $currentAccum = array_sum(array_map(fn($r) => (float) (is_array($r) ? $r['precipitation'] : $r->precipitation), $currentRows));
+            if ($currentSum === null) {
+                return null;
+            }
 
-            // Historical same-window sums from past years
-            $endYear  = (int) $end->format('Y');
-            $endMD    = $end->format('m-d');
-            $startMD  = $start->format('m-d');
+            $firstYear = $this->_firstPrecipYear();
+
+            if ($firstYear === null) {
+                return null;
+            }
+
+            $endYear = (int) $end->format('Y');
+            $endMonth = (int) $end->format('n');
+            $endDay   = (int) $end->format('j');
 
             $historicalSums = [];
 
-            for ($y = $endYear - 1; $y >= 2000; $y--) {
-                $histEnd   = new \DateTime("{$y}-{$endMD}");
-                $histStart = (clone $histEnd)->modify("-{$days} days");
+            for ($y = $endYear - 1; $y >= $firstYear; $y--) {
+                $histEnd   = (new \DateTime())->setDate($y, $endMonth, $endDay)->setTime(0, 0);
+                $histStart = (clone $histEnd)->modify('-' . ($days - 1) . ' days');
+                $sum       = $this->_windowPrecipSum($histStart, $histEnd, $minPresent);
 
-                $rows = $this->dailyModel
-                    ->select('precipitation')
-                    ->where('date >=', $histStart->format('Y-m-d'))
-                    ->where('date <=', $histEnd->format('Y-m-d'))
-                    ->where('precipitation IS NOT NULL')
-                    ->findAll();
-
-                if (!empty($rows)) {
-                    $sum = array_sum(array_map(
-                        fn($r) => (float) (is_array($r) ? ($r['precipitation'] ?? 0.0) : ($r->precipitation ?? 0.0)),
-                        $rows
-                    ));
+                if ($sum !== null) {
                     $historicalSums[] = $sum;
                 }
             }
@@ -330,7 +383,7 @@ class AnomalyDetector
                 return 0.0;
             }
 
-            return ($currentAccum - $mean) / $std;
+            return ($currentSum - $mean) / $std;
         } catch (\Exception $e) {
             log_message('error', 'AnomalyDetector::computeSPI error: ' . $e->getMessage());
             return null;
@@ -372,15 +425,21 @@ class AnomalyDetector
     }
 
     /**
-     * Runs all anomaly checks for today and returns an array keyed by anomaly type string.
+     * Runs all anomaly checks for the given day and returns an array keyed by anomaly type string.
      * Each value is ['active' => bool, 'zScore' => ?float, 'extraMetric' => ?array].
      *
      * @param \DateTime $today            Reference date
      * @param array     $recentHourlyRows All hourly rows for the day, sorted DESC
      * @param array     $todayRow         Today's daily_averages row (plain array)
+     * @param array     $contextHourlyRows Hourly rows just before the day (used only for the pressure collapse)
      * @return array Anomaly state keyed by type
      */
-    public function checkAllAnomalies(\DateTime $today, array $recentHourlyRows, array $todayRow): array
+    public function checkAllAnomalies(
+        \DateTime $today,
+        array $recentHourlyRows,
+        array $todayRow,
+        array $contextHourlyRows = []
+    ): array
     {
         $zScores = $this->computeAllParameterZScores($today, $todayRow);
 
@@ -412,8 +471,9 @@ class AnomalyDetector
         try {
             $precip7Rows = $this->dailyModel
                 ->select('precipitation')
-                ->where('date >=', (clone $today)->modify('-7 days')->format('Y-m-d'))
+                ->where('date >=', (clone $today)->modify('-6 days')->format('Y-m-d'))
                 ->where('date <=', $today->format('Y-m-d'))
+                ->where('precipitation IS NOT NULL')
                 ->findAll();
 
             $precip7days = array_sum(array_map(
@@ -426,15 +486,14 @@ class AnomalyDetector
         }
 
         $spi30     = $this->computeSPI($today->format('Y-m-d'), 30);
-        $uvValue   = (float) ($todayRow['uv_index'] ?? 0.0);
         $pressureZ = $zScores['pressure'] ?? 0.0;
         $windZScore = $zScores['windSpeed'] ?? 0.0;
 
         // hourlyRows as plain arrays for all intraday threshold checks
-        $hourlyArr = array_map(
-            fn($r) => $r instanceof \CodeIgniter\Entity\Entity ? $r->toRawArray() : (is_array($r) ? $r : (array) $r),
-            $recentHourlyRows
-        );
+        $hourlyArr  = $this->_toArrays($recentHourlyRows);
+        $contextArr = $this->_toArrays($contextHourlyRows);
+
+        $uvMax = $this->_getMaxUv($hourlyArr);
 
         return [
             'heat_wave' => [
@@ -448,9 +507,9 @@ class AnomalyDetector
                 'extraMetric' => null,
             ],
             'pressure_collapse' => [
-                'active'      => $this->checkPressureCollapse($hourlyArr),
+                'active'      => $this->checkPressureCollapse($hourlyArr, $contextArr),
                 'zScore'      => null,
-                'extraMetric' => ['label' => 'pressure_drop_hpa', 'value' => $this->_computePressureDrop($hourlyArr)],
+                'extraMetric' => ['label' => 'pressure_drop_hpa', 'value' => round($this->_maxPressureDrop($hourlyArr, $contextArr), 2)],
             ],
             'freezing_rain' => [
                 'active'      => $this->checkFreezingRain($hourlyArr),
@@ -468,9 +527,9 @@ class AnomalyDetector
                 'extraMetric' => ['label' => 'SPI-30', 'value' => $spi30],
             ],
             'extreme_uv' => [
-                'active'      => $uvValue >= 7.0,
+                'active'      => $uvMax !== null && $uvMax >= 7.0,
                 'zScore'      => $zScores['uvIndex'],
-                'extraMetric' => null,
+                'extraMetric' => $uvMax !== null ? ['label' => 'uv_index_max', 'value' => round($uvMax, 1)] : null,
             ],
             'pressure_high' => [
                 'active'      => $pressureZ !== null && $pressureZ > 1.8,
@@ -535,10 +594,17 @@ class AnomalyDetector
                 return false;
             }
 
-            foreach ($rows as $row) {
+            foreach (array_values($rows) as $index => $row) {
                 $rowArr  = $row instanceof \CodeIgniter\Entity\Entity ? $row->toRawArray() : (is_array($row) ? $row : (array) $row);
                 $dateStr = substr((string) ($rowArr['date'] ?? ''), 0, 10);
                 $value   = (float) ($rowArr[$parameter] ?? 0.0);
+
+                // The rows must be today, yesterday, … with no missing day in between
+                $expected = (clone $today)->modify('-' . $index . ' days')->format('Y-m-d');
+
+                if ($dateStr !== $expected) {
+                    return false;
+                }
 
                 $rowDate = new \DateTime($dateStr);
                 $z       = $this->computeZScore($parameter, $rowDate, $value);
@@ -584,28 +650,186 @@ class AnomalyDetector
     }
 
     /**
-     * Returns the pressure drop (oldest minus newest) over the last 3 hourly rows,
-     * or 0.0 if fewer than 2 rows. Rows must be sorted DESC (newest first).
+     * Returns the largest pressure drop (earlier minus later reading) found between
+     * two hourly readings at most PRESSURE_WINDOW_SECONDS apart.
      *
-     * @param array $hourlyRows Hourly rows sorted DESC by date
-     * @return float Pressure drop in hPa (positive = drop)
+     * Rows carrying a 'date' are ordered by it; rows without one are taken as
+     * consecutive hours, newest first.
+     *
+     * @param array $hourlyRows  Hourly rows of the day
+     * @param array $contextRows Extra rows before the day (optional)
+     * @return float Largest drop in hPa (0.0 if none or fewer than 2 readings)
      */
-    private function _computePressureDrop(array $hourlyRows): float
+    private function _maxPressureDrop(array $hourlyRows, array $contextRows = []): float
     {
-        if (count($hourlyRows) < 2) {
-            return 0.0;
+        $rows   = array_merge($hourlyRows, $contextRows);
+        $points = [];
+
+        foreach ($rows as $index => $row) {
+            if (!isset($row['pressure']) || $row['pressure'] === null || $row['pressure'] === '') {
+                continue;
+            }
+
+            $ts = isset($row['date']) && $row['date'] !== ''
+                ? strtotime(substr((string) $row['date'], 0, 19) . ' UTC')
+                : -$index * 3600;
+
+            if ($ts === false) {
+                continue;
+            }
+
+            $points[] = ['ts' => $ts, 'p' => (float) $row['pressure']];
         }
 
-        $window = array_slice($hourlyRows, 0, 3);
-        $newest = (float) ($window[0]['pressure'] ?? 0.0);
-        $oldest = (float) (end($window)['pressure'] ?? 0.0);
+        usort($points, static fn(array $a, array $b): int => $a['ts'] <=> $b['ts']);
 
-        return round($oldest - $newest, 2);
+        $count   = count($points);
+        $maxDrop = 0.0;
+
+        for ($i = 0; $i < $count; $i++) {
+            for ($j = $i + 1; $j < $count && $points[$j]['ts'] - $points[$i]['ts'] <= self::PRESSURE_WINDOW_SECONDS; $j++) {
+                $maxDrop = max($maxDrop, $points[$i]['p'] - $points[$j]['p']);
+            }
+        }
+
+        return $maxDrop;
+    }
+
+    /**
+     * Whether one hourly row qualifies as freezing rain.
+     *
+     * @param array $row Hourly row
+     * @return bool
+     */
+    private function _isFreezingRainRow(array $row): bool
+    {
+        if (!isset($row['temperature'], $row['precipitation'])) {
+            return false;
+        }
+
+        $temp   = (float) $row['temperature'];
+        $precip = (float) $row['precipitation'];
+
+        if ($precip < PrecipitationModel::RAIN_THRESHOLD_MM
+            || $temp < self::FREEZING_RAIN_MIN_C
+            || $temp > self::FREEZING_RAIN_MAX_C) {
+            return false;
+        }
+
+        if (isset($row['weather_id']) && $row['weather_id'] !== '') {
+            $id = (int) $row['weather_id'];
+
+            return ($id >= 300 && $id < 400) || ($id >= 500 && $id < 600);
+        }
+
+        return true;
+    }
+
+    /**
+     * Highest hourly uv_index of the day, or null if no row has one.
+     *
+     * @param array $hourlyRows Hourly rows as plain arrays
+     * @return float|null
+     */
+    private function _getMaxUv(array $hourlyRows): ?float
+    {
+        $max = null;
+
+        foreach ($hourlyRows as $row) {
+            if (!isset($row['uv_index'])) {
+                continue;
+            }
+
+            $uv = (float) $row['uv_index'];
+
+            if ($max === null || $uv > $max) {
+                $max = $uv;
+            }
+        }
+
+        return $max;
+    }
+
+    /**
+     * Sum of daily precipitation over [$start, $end], or null when fewer than
+     * $minPresent days have a (non-NULL) value.
+     *
+     * @param \DateTime $start      First day (inclusive)
+     * @param \DateTime $end        Last day (inclusive)
+     * @param int       $minPresent Minimum number of days with data
+     * @return float|null
+     */
+    private function _windowPrecipSum(\DateTime $start, \DateTime $end, int $minPresent): ?float
+    {
+        $rows = $this->dailyModel
+            ->select('precipitation')
+            ->where('date >=', $start->format('Y-m-d'))
+            ->where('date <=', $end->format('Y-m-d') . ' 23:59:59')
+            ->where('precipitation IS NOT NULL')
+            ->findAll();
+
+        if (count($rows) < $minPresent) {
+            return null;
+        }
+
+        return array_sum(array_map(
+            fn($r) => (float) (is_array($r) ? ($r['precipitation'] ?? 0.0) : ($r->precipitation ?? 0.0)),
+            $rows
+        ));
+    }
+
+    /**
+     * Year of the first daily_averages row with precipitation, or null if none.
+     *
+     * @return int|null
+     */
+    private function _firstPrecipYear(): ?int
+    {
+        if ($this->firstPrecipYearLoaded) {
+            return $this->firstPrecipYear;
+        }
+
+        $row = $this->dailyModel
+            ->select('MIN(date) AS first_date')
+            ->where('precipitation IS NOT NULL')
+            ->first();
+
+        $arr   = $row ? $this->_toArray($row) : [];
+        $first = $arr['first_date'] ?? ($arr['date'] ?? null);
+
+        $this->firstPrecipYear       = $first ? (int) substr((string) $first, 0, 4) : null;
+        $this->firstPrecipYearLoaded = true;
+
+        return $this->firstPrecipYear;
+    }
+
+    /**
+     * Normalises a model row (entity, array or object) to a plain array.
+     *
+     * @param mixed $row
+     * @return array
+     */
+    private function _toArray(mixed $row): array
+    {
+        return $row instanceof \CodeIgniter\Entity\Entity
+            ? $row->toRawArray()
+            : (is_array($row) ? $row : (array) $row);
+    }
+
+    /**
+     * Normalises a list of model rows to plain arrays.
+     *
+     * @param array $rows
+     * @return array
+     */
+    private function _toArrays(array $rows): array
+    {
+        return array_map(fn($r) => $this->_toArray($r), $rows);
     }
 
     /**
      * Returns the temperature of the coldest hourly row that meets freezing-rain
-     * conditions (precip > 0, temp in [-5, +1.5]), or null if none found.
+     * conditions (see _isFreezingRainRow), or null if none found.
      *
      * @param array $hourlyRows All hourly rows for the day, each as a plain array
      * @return float|null Minimum qualifying temperature rounded to 1dp, or null
@@ -615,13 +839,14 @@ class AnomalyDetector
         $minTemp = null;
 
         foreach ($hourlyRows as $row) {
-            $temp   = (float) ($row['temperature']   ?? PHP_FLOAT_MAX);
-            $precip = (float) ($row['precipitation'] ?? 0.0);
+            if (!$this->_isFreezingRainRow($row)) {
+                continue;
+            }
 
-            if ($precip > 0.0 && $temp >= -5.0 && $temp <= 1.5) {
-                if ($minTemp === null || $temp < $minTemp) {
-                    $minTemp = $temp;
-                }
+            $temp = (float) $row['temperature'];
+
+            if ($minTemp === null || $temp < $minTemp) {
+                $minTemp = $temp;
             }
         }
 

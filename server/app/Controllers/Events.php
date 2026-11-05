@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Libraries\EventFeedBuilder;
 use App\Models\AnomalyLogModel;
+use App\Models\HourlyAveragesModel;
 use App\Models\RawWeatherDataModel;
 use CodeIgniter\Entity\Entity;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -16,7 +17,7 @@ use Exception;
  *
  * REST controller for the "recent events" feed shown in the Event Log widget.
  * The feed is dynamically computed on every request from data that already
- * exists (raw_weather_data, anomaly_log) — nothing produced here is
+ * exists (raw_weather_data, hourly_averages, anomaly_log) — nothing produced here is
  * persisted to any table.
  *
  * @package App\Controllers
@@ -42,6 +43,7 @@ class Events extends ResourceController
 
     protected RawWeatherDataModel $weatherDataModel;
     protected AnomalyLogModel     $anomalyLogModel;
+    protected HourlyAveragesModel $hourlyModel;
     protected EventFeedBuilder    $eventFeedBuilder;
 
     /**
@@ -51,6 +53,7 @@ class Events extends ResourceController
     {
         $this->weatherDataModel = new RawWeatherDataModel();
         $this->anomalyLogModel  = new AnomalyLogModel();
+        $this->hourlyModel      = new HourlyAveragesModel();
         $this->eventFeedBuilder = new EventFeedBuilder();
     }
 
@@ -107,6 +110,18 @@ class Events extends ResourceController
                 $rawRows
             );
 
+            // Hourly averages (from the start of the window's first hour) feed the
+            // precipitation events and stand in for the station when it is offline.
+            $hourlyRows = $this->hourlyModel
+                ->where('date >=', $windowStart->format('Y-m-d H:00:00'))
+                ->orderBy('date', 'ASC')
+                ->findAll();
+
+            $hourlyRowsArr = array_map(
+                fn($r) => $r instanceof Entity ? $r->toRawArray() : (is_array($r) ? $r : (array) $r),
+                $hourlyRows
+            );
+
             $anomalyRows = $this->anomalyLogModel->getAnomaliesTouchingWindow(
                 $windowStart->format('Y-m-d'),
                 $windowEnd->format('Y-m-d')
@@ -120,7 +135,8 @@ class Events extends ResourceController
                 $windowStart,
                 $windowEnd,
                 $lastUpdate,
-                $limit
+                $limit,
+                $hourlyRowsArr
             );
 
             $response = ['events' => $events];

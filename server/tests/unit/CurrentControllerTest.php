@@ -150,6 +150,24 @@ final class CurrentControllerTest extends CIUnitTestCase
     }
 
     /**
+     * With no observation at all the observatory feed answers 503 with no-store headers,
+     * never a "fresh" feed stamped with the current time.
+     */
+    public function testGetCurrentTextWeatherReturns503WithoutObservation(): void
+    {
+        $mockModel = $this->createMock(RawWeatherDataModel::class);
+        $mockModel->method('getCurrentActualWeatherData')->willReturn(['date' => null]);
+
+        $this->controller(Current::class);
+        $this->setPrivateProperty($this->controller, 'weatherDataModel', $mockModel);
+
+        $result = $this->execute('getCurrentTextWeather');
+
+        $this->assertSame(503, $result->response()->getStatusCode());
+        $this->assertStringContainsString('no-store', $result->response()->getHeaderLine('Cache-Control'));
+    }
+
+    /**
      * A Throwable that is not an Exception (e.g. TypeError, as previously thrown
      * by array_merge() receiving a null argument when the sensor had not
      * reported for ~30 minutes) must be caught and turned into a valid JSON

@@ -58,6 +58,7 @@ class Current extends ResourceController
      * row) and `isStale` (true when there is no reading, or the most recent one
      * is older than {@see EventFeedBuilder::SYSTEM_FRESHNESS_MINUTES}) so the
      * frontend can flag outdated data instead of silently showing it as current.
+     * With no reading at all it still answers 200, with `isStale` true and no `lastUpdated`.
      *
      * @return ResponseInterface
      */
@@ -84,7 +85,8 @@ class Current extends ResourceController
      * This feed drives the observatory's INDI Weather Watcher, where a false
      * alarm closes the roof. So precipitation, clouds, wind, gust and the forecast flag
      * are the confirmed values of {@see ObservatorySafety}: one source or one
-     * spike can not make them unsafe. The response is never cached.
+     * spike can not make them unsafe. The response is never cached. With no
+     * observation at all it answers 503 (also uncached) instead of a fresh-looking feed.
      *
      * @return ResponseInterface
      */
@@ -94,6 +96,13 @@ class Current extends ResourceController
 
         if ($weatherData instanceof ResponseInterface) {
             return $weatherData;
+        }
+
+        // No observation at all: never present "now" as the observation time, the feed must not look fresh
+        if (empty($weatherData['date'])) {
+            return $this->fail('No weather data available.', 503)
+                ->setHeader('Cache-Control', 'no-store, max-age=0')
+                ->setHeader('Expires', 'Thu, 01 Jan 1970 00:00:00 GMT');
         }
 
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
