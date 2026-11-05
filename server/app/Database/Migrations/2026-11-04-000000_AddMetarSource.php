@@ -18,8 +18,11 @@ class AddMetarSource extends Migration
     /** @var string[] Source ENUM values before this migration */
     private const ORIGINAL_SOURCE_VALUES = ['OpenWeatherMap', 'WeatherAPI', 'VisualCrossing', 'OpenMeteo', 'CustomStation', 'OtherSource'];
 
-    /** @var string[] Source ENUM values with Metar */
-    private const UPDATED_SOURCE_VALUES = ['OpenWeatherMap', 'WeatherAPI', 'VisualCrossing', 'OpenMeteo', 'Metar', 'CustomStation', 'OtherSource'];
+    /**
+     * @var string[] Source ENUM values with Metar, appended last: MySQL adds a value at the end of an ENUM in place,
+     * while one inserted in the middle rebuilds the whole table (and locks the large raw_weather_data meanwhile)
+     */
+    private const UPDATED_SOURCE_VALUES = ['OpenWeatherMap', 'WeatherAPI', 'VisualCrossing', 'OpenMeteo', 'CustomStation', 'OtherSource', 'Metar'];
 
     public function up()
     {

@@ -18,6 +18,9 @@ use Exception;
  */
 class Sensors extends ResourceController
 {
+    /** @var int First firmware payload version (`fw`) that sends wind in m/s and degrees */
+    public const WIND_UNITS_PAYLOAD_VERSION = 2;
+
     protected $format = 'json';
 
     protected RawWeatherDataModel $weatherDataModel;
@@ -45,6 +48,7 @@ class Sensors extends ResourceController
      *   - ws (float): wind speed, m/s
      *   - wd (int):   wind direction in degrees
      *   - uv (float): UV index
+     *   - fw (int):   payload version; wind is taken only from version {@see self::WIND_UNITS_PAYLOAD_VERSION} on
      *
      * Every field is checked on its own: a non-numeric or out-of-range value is dropped (and logged) instead of
      * rejecting the whole reading; negative wind speed / UV (calm anemometer, night) is clamped to 0.
@@ -72,14 +76,9 @@ class Sensors extends ResourceController
 
         try {
             $parsedData = [
-                'date'        => new DateTime('now'),
-                'temperature' => $this->_sanitize('t', $data['t'] ?? null, -80, 60),
-                'pressure'    => $this->_sanitize('p', $this->_normalizePressure($data['p'] ?? null), 800, 1100, true),
-                'humidity'    => $this->_sanitize('h', $data['h'] ?? null, 0, 100),
-                'wind_speed'  => $this->_sanitize('ws', $data['ws'] ?? null, 0, 100, false, true),
-                'wind_deg'    => $this->_sanitize('wd', $data['wd'] ?? null, 0, 360, true),
-                'uv_index'    => $this->_sanitize('uv', $data['uv'] ?? null, 0, 20, false, true),
-                'source'      => RawWeatherDataModel::SOURCE_CUSTOMSTATION,
+                'date'   => new DateTime('now'),
+                ...$this->_parseMeasurements($data),
+                'source' => RawWeatherDataModel::SOURCE_CUSTOMSTATION,
             ];
 
             $measurements = array_filter(
@@ -104,6 +103,35 @@ class Sensors extends ResourceController
             log_message('error', 'Sensors::setWeather - failed to save weather data: ' . $e->getMessage());
             return $this->failServerError('Internal server error.');
         }
+    }
+
+    /**
+     * Turns the posted fields into database columns, each validated on its own.
+     *
+     * Wind is taken only from firmware that says it sends m/s and degrees (`fw` >= {@see self::WIND_UNITS_PAYLOAD_VERSION}).
+     * The older firmware posts raw anemometer pulses as `ws` (several times the speed) and a sector number 0-7 as
+     * `wd`; stored as m/s they would reach the observatory feed as strong wind and close its roof. Its other
+     * measurements are kept.
+     *
+     * @param array<string, mixed> $data POST fields
+     * @return array<string, float|int|null> Column => value (null when missing or invalid)
+     */
+    private function _parseMeasurements(array $data): array
+    {
+        $windInUnits = is_numeric($data['fw'] ?? null) && (int) $data['fw'] >= self::WIND_UNITS_PAYLOAD_VERSION;
+
+        if (!$windInUnits && (isset($data['ws']) || isset($data['wd']))) {
+            log_message('info', 'Sensors::setWeather - wind dropped: firmware without fw >= ' . self::WIND_UNITS_PAYLOAD_VERSION . ' sends pulses and sectors');
+        }
+
+        return [
+            'temperature' => $this->_sanitize('t', $data['t'] ?? null, -80, 60),
+            'pressure'    => $this->_sanitize('p', $this->_normalizePressure($data['p'] ?? null), 800, 1100, true),
+            'humidity'    => $this->_sanitize('h', $data['h'] ?? null, 0, 100),
+            'wind_speed'  => $windInUnits ? $this->_sanitize('ws', $data['ws'] ?? null, 0, 100, false, true) : null,
+            'wind_deg'    => $windInUnits ? $this->_sanitize('wd', $data['wd'] ?? null, 0, 360, true) : null,
+            'uv_index'    => $this->_sanitize('uv', $data['uv'] ?? null, 0, 20, false, true),
+        ];
     }
 
     /**

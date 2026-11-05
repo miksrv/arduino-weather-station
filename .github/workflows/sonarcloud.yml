@@ -63,7 +63,9 @@ jobs:
           path: |
             client/node_modules
             ~/.npm
-          key: ${{ runner.os }}-modules-${{ hashFiles('yarn.lock') }}
+          # The lockfile lives in client/: hashing a root yarn.lock (none) made the key constant, so the cache
+          # always hit, `yarn install` never ran and the tests used whatever node_modules were cached first
+          key: ${{ runner.os }}-modules-${{ hashFiles('client/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-modules-
             ${{ runner.os }}-

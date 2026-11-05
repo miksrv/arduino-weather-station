@@ -17,7 +17,7 @@
 - Rain, snow and thunderstorms are no longer hidden behind "overcast" when sources disagree about the weather
 - Hourly precipitation and cloud cover weigh every source equally, however often it reports, and late reports of the previous hour are included
 - New `system:rebuildAverages` command recalculates all stored hourly and daily averages
-- Weather station firmware sends wind speed in m/s and wind direction in degrees (it sent raw anemometer pulses and a sector number); a calm reading or a night UV reading no longer makes the server drop the whole measurement, and a single invalid value is skipped instead of the whole reading
+- Weather station firmware sends wind speed in m/s and wind direction in degrees (it sent raw anemometer pulses and a sector number) and marks its payload with a version; the server stores the station's wind only from that firmware, so the old one can no longer report pulses as strong wind. A calm reading or a night UV reading no longer makes the server drop the whole measurement, and a single invalid value is skipped instead of the whole reading
 - OpenWeatherMap forecast precipitation was always empty and is now taken into account
 - Open-Meteo current precipitation covered only the last 15 minutes and is now the last hour, like the other sources
 - Visibility below 1 km (fog) from WeatherAPI and VisualCrossing was stored as 0 m

@@ -125,6 +125,11 @@ describe('helpers', () => {
             expect(getStationStatus(true, minutesBefore(90))).toBe('offline')
         })
 
+        it('ages a cached fresh answer when polling fails: stale after 15 minutes, offline after an hour', () => {
+            expect(getStationStatus(false, minutesBefore(20))).toBe('stale')
+            expect(getStationStatus(false, minutesBefore(90))).toBe('offline')
+        })
+
         it('is offline when there has never been a reading', () => {
             expect(getStationStatus(true)).toBe('offline')
         })

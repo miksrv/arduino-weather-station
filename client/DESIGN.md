@@ -136,7 +136,7 @@ value roles), so readings don't jitter as they update. A unit follows its number
 - **App bar** (`components/app-bar`): sticky, on the card surface (`--app-bar-background` = `--surface-1`),
   full width with its content aligned to the page column, a hairline under it. Left: the menu
   button, the station status dot (`getStationStatus`: green and pulsing while the server calls the
-  data fresh, steady `--color-yellow` once it is `isStale`, red after an hour without a reading), the time of the last reading and "N минут назад". Right: the
+  data fresh, steady `--color-yellow` once it is `isStale` or the last reading is over 15 minutes old — a failed poll keeps the old answer —, red after an hour without a reading), the time of the last reading and "N минут назад". Right: the
   theme switch (`role="switch"`; its slot is reserved on the server so the bar doesn't shift). While
   the data may be outdated, a `StatusBadge` "Данные могут быть устаревшими" in the dot's colour
   follows the time on the left (`role="status"`); on phones it is a strip of its own under the bar's row.
