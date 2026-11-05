@@ -43,26 +43,34 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Light theme: cool neutral surfaces                                   */
+/* Light theme: warm paper surfaces, near-black ink                     */
 /* ------------------------------------------------------------------ */
 :root,
 [data-theme='light'] {
-    --body-background: #f7f8fa;
+    --ink-rgb: 20, 20, 19;
+
+    --body-background: #faf9f5;
     --surface-1: #ffffff;
-    --surface-2: #f3f4f6;
-    --surface-3: #e8eaee;
+    --surface-2: #f4f3ee;
+    --surface-3: #e9e7df;
 
-    --border: #e6e8ec;
-    --border-strong: #cfd4db;
+    --border: #e6e4dc;
+    --border-strong: #d3d0c6;
 
-    --text-color-secondary: #66707d;
-    --text-color-secondary-hover: #4f5864;
+    --text-color-primary: #141413;
+    --text-color-secondary: #5f5e57;
+    --text-color-secondary-hover: #3d3c38;
+    --text-color-disabled: #a3a197;
 
-    /* Brand: one step deeper than the kit's #2688eb, so links, the active menu item and white text on
-       primary buttons reach 4.5:1 on white */
-    --color-main: #1f6fd1;
-    --color-main-hover: #1a5fb4;
-    --color-main-active: #16519a;
+    /* Brand: terracotta, one step deeper than the dark theme's, so links, the active menu item and white
+       text on primary buttons reach 4.5:1 on white */
+    --color-main: #b5532f;
+    --color-main-hover: #9e4626;
+    --color-main-active: #8a3d21;
+    --color-main-background: #f8ebe4;
+
+    --button-secondary-background-hover: #f3dcd0;
+    --button-secondary-background-active: #edcdbd;
 
     /* Weather data hues: one colour per measured quantity, each line ≥ 3:1 on the card (WCAG 1.4.11).
        The light theme takes deeper tones of the pale hues. Mirrored in `tools/colors.ts` for the charts. */
@@ -76,27 +84,46 @@
     --data-sun: #b28811;
     --data-dew-point: #3793e6;
 
+    /* Yellow status (data that may be outdated), next to the kit's green / orange / red */
+    --color-yellow: #b28811;
+    --color-yellow-background: #faf3dc;
+
     /* Value accents as text (AA on surface-1): a maximum is warm, a minimum is cool */
     --color-max: #c8323a;
     --color-min: #1f6fd1;
 }
 
 /* ------------------------------------------------------------------ */
-/* Dark theme: cool slate surfaces                                      */
+/* Dark theme: warm near-black surfaces, paper-white ink                */
 /* ------------------------------------------------------------------ */
 :root[data-theme='dark'],
 [data-theme='dark'] {
-    --body-background: #0b0d10;
-    --surface-1: #14181d;
-    --surface-2: #1b2026;
-    --surface-3: #242a31;
+    --body-background: #0b0b0a;
+    --surface-1: #141413;
+    --surface-2: #1c1c1a;
+    --surface-3: #262624;
 
-    --border: #252b33;
-    --border-strong: #333a43;
+    --border: #2a2926;
+    --border-strong: #3d3c38;
 
-    --text-color-primary: #e6e9ee;
-    --text-color-secondary: #8e97a4;
-    --text-color-secondary-hover: #aab2bd;
+    --text-color-primary: #faf9f5;
+    --text-color-secondary: #a3a197;
+    --text-color-secondary-hover: #c2c0b6;
+    --text-color-disabled: #6b6a63;
+
+    /* Brand: terracotta; primary buttons are the accent with page-black text (6:1) */
+    --color-main: #d57455;
+    --color-main-hover: #e38d6e;
+    --color-main-active: #c5654a;
+    --color-main-background: #2b1d17;
+
+    --button-primary-color: var(--body-background);
+    --button-primary-background: var(--color-main);
+    --button-primary-background-hover: var(--color-main-hover);
+    --button-primary-background-active: var(--color-main-active);
+
+    --color-yellow: #e9b51f;
+    --color-yellow-background: #3a3015;
 
     --color-max: #ff7b80;
     --color-min: #6aaaf5;
@@ -133,5 +160,6 @@
     --popout-radius: var(--radius-md);
     --message-radius: var(--card-radius);
 
-    --app-bar-background: color-mix(in srgb, var(--body-background) 82%, transparent);
+    /* The app bar is the card surface, so the page column reads as cards on the page under a card-coloured bar */
+    --app-bar-background: var(--surface-1);
 }

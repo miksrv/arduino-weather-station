@@ -41,6 +41,21 @@
         gap: var(--space-2)
         margin-bottom: var(--space-2)
 
+        .heading
+            min-width: 0
+
+        // With an action the header wraps: the action drops under the title when they don't fit side by side
+        &.withAction
+            flex-wrap: wrap
+            column-gap: var(--space-4)
+
+            .heading
+                flex: 1 1 240px
+
+        .subtitle
+            margin: 2px 0 0
+            +type.caption
+
         h3
             margin: 0
             min-width: 0

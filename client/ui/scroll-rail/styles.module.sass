@@ -1,5 +1,3 @@
-$fadeWidth: 48px
-
 .rail
     position: relative
     min-width: 0
@@ -15,15 +13,6 @@ $fadeWidth: 48px
 
     &::-webkit-scrollbar
         display: none
-
-.fadeStart .list
-    mask-image: linear-gradient(to right, transparent, #000 $fadeWidth)
-
-.fadeEnd .list
-    mask-image: linear-gradient(to left, transparent, #000 $fadeWidth)
-
-.fadeStart.fadeEnd .list
-    mask-image: linear-gradient(to right, transparent, #000 $fadeWidth, #000 calc(100% - #{$fadeWidth}), transparent)
 
 // Round floating arrows over the edges; fingers swipe, the arrows are for a mouse
 .arrow

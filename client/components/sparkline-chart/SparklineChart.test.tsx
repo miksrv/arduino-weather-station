@@ -62,8 +62,8 @@ describe('SparklineChart', () => {
             axisLabel: { color: string }
         }
 
-        expect(xAxis.axisLine.lineStyle.color).toBe('#e6e8ec')
-        expect(xAxis.axisLabel.color).toBe('#66707d')
+        expect(xAxis.axisLine.lineStyle.color).toBe('#e6e4dc')
+        expect(xAxis.axisLabel.color).toBe('#5f5e57')
     })
 
     it('scales the y-axis to the data when no minimum is given', () => {

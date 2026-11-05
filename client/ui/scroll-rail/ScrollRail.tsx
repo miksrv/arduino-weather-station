@@ -17,7 +17,7 @@ interface ScrollRailProps {
 /**
  * One row of items that scrolls sideways instead of wrapping: the native scroll — a swipe on touch screens,
  * a trackpad or Shift + wheel — and round arrow buttons with a mouse, shown only while there is more to that
- * side, with the edges faded. The inner padding is `--scroll-rail-inset` (2px by default, room for focus rings), the
+ * side. The edges are not faded: the cards stay flat, the arrow marks the cut-off side. The inner padding is `--scroll-rail-inset` (2px by default, room for focus rings), the
  * space between items `--scroll-rail-gap`. The one horizontal scroller of the site.
  */
 export const ScrollRail: React.FC<ScrollRailProps> = ({
@@ -69,7 +69,7 @@ export const ScrollRail: React.FC<ScrollRailProps> = ({
     }
 
     return (
-        <div className={cn(styles.rail, overflow.start && styles.fadeStart, overflow.end && styles.fadeEnd, className)}>
+        <div className={cn(styles.rail, className)}>
             {overflow.start && (
                 <button
                     type={'button'}

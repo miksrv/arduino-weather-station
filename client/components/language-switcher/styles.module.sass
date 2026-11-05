@@ -1,12 +1,23 @@
-@use '../../styles/mixins'
-
+// Plain text links "En / Ru": the current language in primary text, the other one quiet until hovered
 .languageSwitcher
-    +mixins.segmented
+    display: inline-flex
+    align-items: center
+    gap: var(--space-2)
+    font-family: var(--font-family-mono)
+    font-size: var(--font-size-secondary)
+    line-height: 1.4
 
     a
-        +mixins.segment
-        display: inline-flex
-        align-items: center
+        color: var(--text-color-secondary)
+        transition: color var(--duration-fast) var(--ease)
+
+        &:hover
+            color: var(--text-color-primary)
 
         &.active
-            +mixins.segmentActive
+            color: var(--text-color-primary)
+            font-weight: var(--font-weight-medium)
+            cursor: default
+
+.separator
+    color: var(--border-strong)

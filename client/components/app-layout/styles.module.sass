@@ -16,7 +16,10 @@
         gap: var(--space-3)
         min-height: 40px
         align-items: center
-        color: var(--text-color-primary)
+        // Navigation is set in the mono face, quiet until hovered or active
+        font-family: var(--font-family-mono)
+        font-size: var(--font-size-secondary)
+        color: var(--text-color-secondary)
         font-weight: var(--font-weight-normal)
         +mixins.interactiveRow
 
@@ -24,8 +27,9 @@
             color: var(--text-color-primary)
 
     .active, .active:hover
-        background-color: var(--color-main-background)
-        color: var(--color-main)
+        background-color: var(--surface-2)
+        box-shadow: inset 0 0 0 1px var(--border)
+        color: var(--text-color-primary)
         font-weight: var(--font-weight-medium)
 
         .iconWrapper svg
@@ -129,6 +133,3 @@
             margin-top: auto
             padding: var(--space-4) var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom))
             border-top: 1px solid var(--border)
-
-        .switchers
-            display: flex

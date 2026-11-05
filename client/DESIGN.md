@@ -27,21 +27,28 @@ user-facing component. The current code and this file are the reference; `docs/`
 
 ### Surfaces and text
 
-| Token                    | Light                | Dark      | Use                                       |
-| ------------------------ | -------------------- | --------- | ----------------------------------------- |
-| `--body-background`      | `#f7f8fa`            | `#0b0d10` | the page                                  |
-| `--surface-1`            | `#ffffff`            | `#14181d` | cards (`--card-background`)               |
-| `--surface-2`            | `#f3f4f6`            | `#1b2026` | hover rows, icon squares, segmented track |
-| `--surface-3`            | `#e8eaee`            | `#242a31` | meter tracks, empty dots                  |
-| `--border`               | `#e6e8ec`            | `#252b33` | card ring, separators                     |
-| `--border-strong`        | `#cfd4db`            | `#333a43` | controls, the compass ring                |
-| `--text-color-primary`   | `rgba(0, 0, 0, 0.9)` | `#e6e9ee` | values, titles                            |
-| `--text-color-secondary` | `#66707d`            | `#8e97a4` | labels, units, captions, axis labels      |
+| Token                    | Light     | Dark      | Use                                       |
+| ------------------------ | --------- | --------- | ----------------------------------------- |
+| `--body-background`      | `#faf9f5` | `#0b0b0a` | the page                                  |
+| `--surface-1`            | `#ffffff` | `#141413` | cards (`--card-background`)               |
+| `--surface-2`            | `#f4f3ee` | `#1c1c1a` | hover rows, icon squares, segmented track |
+| `--surface-3`            | `#e9e7df` | `#262624` | meter tracks, empty dots                  |
+| `--border`               | `#e6e4dc` | `#2a2926` | card ring, separators                     |
+| `--border-strong`        | `#d3d0c6` | `#3d3c38` | controls, the compass ring                |
+| `--text-color-primary`   | `#141413` | `#faf9f5` | values, titles                            |
+| `--text-color-secondary` | `#5f5e57` | `#a3a197` | labels, units, captions, axis labels      |
+| `--color-main`           | `#b5532f` | `#d57455` | brand: links, active states, focus        |
 
-Surfaces are cool neutrals (a slight blue in the grey), the same family in both themes. Status
-colours (`--color-green|orange|red` and their `-background` tints) are the kit's. The brand
-`--color-main` is the kit's in dark; in light it is one step deeper (`#1f6fd1`, hover `#1a5fb4`)
-so that links, the active menu item and white text on primary buttons reach 4.5:1.
+Surfaces are warm neutrals (a touch of yellow in the grey): near-black ink on paper in light,
+paper-white ink on near-black in dark, the same family in both themes. Secondary text is strong
+(6:1 and more), so labels stay readable while the hierarchy comes from size and weight. Status
+colours (`--color-green|orange|red` and their `-background` tints) are the kit's, plus the
+project's `--color-yellow` for the outdated-data state. The brand
+`--color-main` is terracotta: `#d57455` in dark, where primary buttons are the accent with
+page-black text (6:1); in light it is deeper (`#b5532f`, hover `#9e4626`) so that links and
+white text on primary buttons reach 4.5:1. The brand is for interaction only (links, focus,
+active icons, the current period); the active menu row is a raised `--surface-2` with a hairline
+ring, not a brand tint.
 
 Contrast targets: text 4.5:1 on its surface (secondary text too), chart lines, icons and
 other graphics 3:1.
@@ -96,25 +103,26 @@ wind rose, the warming stripes and the heat-map gradients.
 Two faces of one family, self-hosted with `next/font` (`pages/_app.tsx`, Latin and Cyrillic, no
 request to Google and no layout shift): **Geist** for all text and numbers (`--font-family`) and
 **Geist Mono** for the small uppercase labels (`--font-family-mono`, the `overline` role). The canvas
-charts get the same face from `components/echart`. The weights are light: the data is the loud part,
-so big numbers are thin (200–300), titles medium (500), and semibold is kept for the page `h1`.
+charts get the same face from `components/echart`. The data is the loud part by size, not
+by weight: big numbers are light to regular (300–400), titles semibold (600) but small, and the
+navigation is set in Geist Mono.
 Text is set by **role**: a mixin of `styles/typography.sass` (`@use '../../styles/typography' as type`, then
 `+type.titleCard`) carries size, weight, line height and tracking together. A component takes a
 role, never a bare `font-size`.
 
 | Role (mixin)   | px (phones) | Weight · line height               | Use                                           |
 | -------------- | ----------- | ---------------------------------- | --------------------------------------------- |
-| `valueDisplay` | 56 (48)     | 200 · 1, tabular, −0.04em          | the temperature of the home summary card only |
-| `value`        | 32 (28)     | 300 · 1.1, tabular, −0.03em        | the main reading of a card: "21.4"            |
+| `valueDisplay` | 56 (48)     | 300 · 1, tabular, −0.04em          | the temperature of the home summary card only |
+| `value`        | 32 (28)     | 400 · 1.1, tabular, −0.03em        | the main reading of a card: "21.4"            |
 | `unit`         | 16          | 400, secondary                     | the unit after a `value`: "°C", "мм рт. ст."  |
 | `titlePage`    | 24 (20)     | 600 · 1.2, −0.025em, balanced      | the page `h1` (`PageHeader`)                  |
 | `titleSection` | 16          | 600 · 1.3                          | `h2` between groups of cards (anomaly page)   |
-| `titleCard`    | 14          | 500 · 1.3                          | every card title                              |
+| `titleCard`    | 14          | 600 · 1.3, −0.01em                 | every card title                              |
 | `valueSmall`   | 16          | 500 · 1.3, tabular                 | tile values, secondary readings               |
 | `body`         | 14          | 400 · 1.5                          | UI text                                       |
 | `secondary`    | 13          | 400 · 1.45, secondary colour       | labels, descriptions                          |
 | `caption`      | 12          | 400 · 1.4, secondary colour        | min / max labels, timestamps, legends         |
-| `overline`     | 11          | Mono 500 · 1.4, +0.08em, uppercase | weekday names of the forecast, status pills   |
+| `overline`     | 11          | Mono 500 · 1.4, +0.08em, uppercase | weekday names of the forecast                 |
 
 Every number that can change in place uses tabular figures (`+type.numbers`, included in the
 value roles), so readings don't jitter as they update. A unit follows its number through
@@ -125,15 +133,18 @@ value roles), so readings don't jitter as they update. A unit follows its number
 
 - **Width.** Content is capped by `--width-max` (1200px). The page column has 16px of air under
   the app bar and 12px side gutters (8px on phones).
-- **App bar** (`components/app-bar`): sticky, translucent (`--app-bar-background` with a blur),
+- **App bar** (`components/app-bar`): sticky, on the card surface (`--app-bar-background` = `--surface-1`),
   full width with its content aligned to the page column, a hairline under it. Left: the menu
-  button, the station status dot (green and pulsing while data is fresh, red when the last
-  reading is older than 30 minutes), the time of the last reading and "N минут назад". Right: the
-  theme switch (`role="switch"`; its slot is reserved on the server so the bar doesn't shift).
+  button, the station status dot (`getStationStatus`: green and pulsing while the server calls the
+  data fresh, steady `--color-yellow` once it is `isStale`, red after an hour without a reading), the time of the last reading and "N минут назад". Right: the
+  theme switch (`role="switch"`; its slot is reserved on the server so the bar doesn't shift). While
+  the data may be outdated, a `StatusBadge` "Данные могут быть устаревшими" in the dot's colour
+  follows the time on the left (`role="status"`); on phones it is a strip of its own under the bar's row.
 - **Menu** (`components/app-layout`): a drawer sliding over the page (transform, not `left`),
-  with a scrim. Rows are 40px, a 20px secondary icon and the label; the current page is
-  `--color-main` on `--color-main-background`. The language switch (segmented) and the footer
-  sit at the bottom of the drawer.
+  with a scrim. Rows are 40px, a 20px secondary icon and the label in Geist Mono 13px,
+  secondary until hovered; the current page is primary text on `--surface-2` with a hairline ring
+  and a `--color-main` icon. The footer sits at the bottom of the drawer, with the language
+  switch (plain mono links "En / Ru") at the right end of its copyright line.
 - **Page header** (`components/page-header`): every page except home starts with `PageHeader`:
   the `h1` (`titlePage`), an optional description (secondary text across the full width of the page) and an `actions` slot. Home has its
   `h1` inside the summary card ("Погода в Оренбурге"). One `h1` per page.
@@ -160,8 +171,9 @@ value roles), so readings don't jitter as they update. A unit follows its number
 ### `WidgetCard` (`components/widget-card`)
 
 The shell of every titled widget: the card surface, a header (title `titleCard`, optional link
-with a small external-link icon that turns `--color-main` on hover, optional 20px secondary icon
-on the right), the `size` columns above, and a skeleton while `loading`. Purely presentational;
+with a small external-link icon that turns `--color-main` on hover, optional `subtitle` in `caption`
+under it, optional `action` at the right end level with both — a legend or a toggle, dropping under
+the title when they don't fit side by side —, optional 20px secondary icon on the right), the `size` columns above, and a skeleton while `loading`. Purely presentational;
 widgets put their own content inside.
 
 ### Reading cards (`widgets/`)
@@ -170,9 +182,13 @@ A reading card always reads top to bottom: **title → value + unit → what cha
 chart**.
 
 - `widget-sensor-stat` (temperature, humidity, pressure): `value` + `unit`, the change over the
-  last hour (caption, the number semibold), max / min of today on the right (`StatBlock`,
-  `--color-max` / `--color-min`), the 24h `SparklineChart` with the real values on its axis.
-- `widget-precip`: today's total, 24h and 7-day totals on the right, a spike chart.
+  last hour (caption, the number semibold), max / min / mean of the 24 hours side by side on the
+  right (`StatBlock`, `--color-max` / `--color-min`, to one decimal; a short unit after each figure,
+  a long one like "мм рт. ст." only after the main value), dropping under the value on a narrow
+  card; the 24h `SparklineChart` in the quantity's hue (`getSensorColor`) with the real values on
+  its axis (tenths when the day's range is under 3 units).
+- `widget-precip`: today's total, 24h and 7-day totals on the right, a spike chart in
+  `--data-precipitation`.
 - `widget-sensor-wind`: speed, direction, gusts; the compass is an SVG drawn with tokens (CSS
   classes, not colour attributes), so it follows the theme without re-rendering; the needle head
   is `--data-feels-like`.
@@ -190,7 +206,8 @@ chart**.
   is "нет данных", never 0.
 - `widget-sensor`: the compact reading card of the home grid (x1): title, `value`, min / max with
   times, a sparkline bleeding to the card edges.
-- `widget-forecast-cards` (home): a scroll rail of forecast cards: weekday (`overline`), the date
+- `widget-forecast-cards` (home): a scroll rail of forecast cards, six to a row (each at least 140px, 200px on
+  mobile; more days scroll): weekday (`overline`), the date
   ("24 октября" / "October 24", `date-day-month`), the icon, the temperature, clouds and wind as
   captions. The current period is `--color-main-background` with a `--color-main` ring.
 
@@ -232,8 +249,10 @@ value at its local hour and converts pressure to mm Hg), so they always agree wi
   pressure, humidity, clouds): period mean, maximum and minimum with their date and hour
   (`--color-max` / `--color-min`), mean daily swing. Precipitation: total, max in an hour, days with
   precipitation, the wettest day.
-- `widget-heatmap` (x4): days as columns, the 24 hours as rows from midnight down; the colour scale
-  under the map with the unit on its handles. Precipitation uses a stepped scale (dry, 0.1–0.5,
+- `widget-heatmap` (x4): days as columns, the 24 hours as rows from midnight down; the period in words
+  as the subtitle ("6 мая – 6 ноября 2026", `formatDateRange`) and the colour scale as an HTML legend
+  in the header `action` (`HeatmapLegend`: the period's range around a gradient, the ECharts visual
+  map only colours the cells). Precipitation uses a stepped scale (dry, 0.1–0.5,
   0.5–1, 1–2.5, 2.5–5, 5–10, 10+ mm) with the dry hours in the grid-line tone, because rain is rare
   and skewed and a linear scale would wash it out.
 - `widget-diurnal-profile` (x2): the typical day — the mean of each hour with the 10–90th
@@ -247,22 +266,30 @@ read as the new one.
 
 ### Status and anomalies
 
+- `widget-anomaly-history` (full width; a card without title or padding, the table edge to edge): the anomalies of the last month and the ongoing
+  ones, newest first, in a kit `Table`: type (a pulsing red dot while it goes on), the period in
+  words ("18–20 окт.", "с 3 нояб. по сей день"), the duration in whole days (the detector works by
+  day), and the measure with its meaning by type (`getAnomalyMetric`: "+2.3σ от нормы" for
+  z-score anomalies, the measured quantity with its unit for the others; σ explained in the header
+  tooltip).
 - `widget-anomaly-card`: a card with a status dot; an active anomaly is tinted
   `--color-red-background` with a red ring and a haloed dot. z-score bars are `track` meters.
-- `widget-flood-risk`: the gauge, the level as a status pill (`overline` on the status tint), the
+- `widget-flood-risk`: the gauge, the level as a `StatusBadge` (the gauge's colours), the
   factors as `track` meters, the disclaimer on a `--surface-2` plate.
 - `widget-anomaly-calendar`, `widget-precip-calendar`: contribution-style grids of 3px-rounded
   squares; empty days are `--surface-2`, intensity is a share of the brand / precipitation hue
   (`color-mix`), so they work in both themes. Tooltips use `+mixins.floatingTooltip`.
-- `stale-data-banner`: an orange-tinted card above the content when the station is silent.
 
 ## 6. Patterns
 
 - **Segmented control** (`+mixins.segmented` / `segment` / `segmentActive`): a `--surface-2`
   track with the active segment raised on `--surface-1`. Used by the chart period toggle, the
-  precipitation year picker and the language switch. Buttons carry `aria-pressed`.
+  precipitation year picker. Buttons carry `aria-pressed`.
 - **Meters** (`+mixins.track`): 6px pill tracks on `--surface-3` with a coloured fill.
-- **Status pills**: `overline` text on the status `-background` tint, `--radius-full`.
+- **Status badges** (`components/status-badge`, `StatusBadge`): the kit `Badge` in a status `tone`
+  (green / yellow / orange / red) — the tone sets the badge's own `--badge-background` (the status
+  `-background` tint) and `--badge-border-color` (the status colour at 40%) and the icon fill; size,
+  radius and type stay the kit's. Used for the outdated-data warning and the flood-risk level.
 - **Empty and missing values**: "—" for a missing statistic, `t('no-data')` for a missing reading.
   Never render 0 for "unknown".
 - **Loading**: kit `Skeleton` of the final size, so nothing jumps when data arrives.

@@ -68,7 +68,7 @@ describe('colors', () => {
 
         it.each(Object.keys(colors) as Array<keyof typeof colors>)('%s reads on both cards', (name) => {
             expect(contrast(getColor(name, 'light')[0], '#ffffff')).toBeGreaterThanOrEqual(3)
-            expect(contrast(getColor(name, 'dark')[0], '#14181d')).toBeGreaterThanOrEqual(3)
+            expect(contrast(getColor(name, 'dark')[0], '#141413')).toBeGreaterThanOrEqual(3)
         })
     })
 

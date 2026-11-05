@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { cn } from 'simple-react-ui-kit'
 
 import { TRANSITION_TIME } from '@/ui/theme-switcher/constants'
 import MoonIcon from '@/ui/theme-switcher/MoonIcon'
@@ -19,12 +20,8 @@ const Circle: React.FC<ToggleSwitchProps> = ({ checked }) => {
 
     return (
         <div
-            className={styles.circle}
-            style={{
-                transform: `translateX(${value === 1 ? 'calc(100% + 15px)' : '5px'})`,
-                backgroundColor: checked ? 'rgba(255,255,255,0.4)' : '#fddf75',
-                borderColor: checked ? 'rgba(255,255,255,0.9)' : '#d6b05eb5'
-            }}
+            className={cn(styles.circle, checked ? styles.moon : styles.sun)}
+            style={{ transform: `translateX(${value === 1 ? 'calc(100% + 15px)' : '5px'})` }}
         >
             <MoonIcon checked={checked} />
         </div>

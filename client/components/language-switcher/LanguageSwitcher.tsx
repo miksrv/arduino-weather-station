@@ -18,8 +18,8 @@ import styles from './styles.module.sass'
 const LOCALE_COOKIE_MAX_AGE = 365 * 24 * 60 * 60
 
 const LANGUAGES: Array<{ locale: Locale; label: string }> = [
-    { locale: 'en', label: 'Eng' },
-    { locale: 'ru', label: 'Rus' }
+    { locale: 'en', label: 'En' },
+    { locale: 'ru', label: 'Ru' }
 ]
 
 const LanguageSwitcher: React.FC = () => {
@@ -53,18 +53,27 @@ const LanguageSwitcher: React.FC = () => {
 
     return (
         <div className={styles.languageSwitcher}>
-            {LANGUAGES.map(({ locale, label }) => (
-                <Link
-                    key={locale}
-                    href={router.asPath}
-                    locale={locale}
-                    hrefLang={locale}
-                    aria-current={locale === currentLanguage ? 'true' : undefined}
-                    className={cn(locale === currentLanguage && styles.active)}
-                    onClick={(event) => handleSelect(event, locale)}
-                >
-                    {label}
-                </Link>
+            {LANGUAGES.map(({ locale, label }, index) => (
+                <React.Fragment key={locale}>
+                    {index > 0 && (
+                        <span
+                            className={styles.separator}
+                            aria-hidden={true}
+                        >
+                            /
+                        </span>
+                    )}
+                    <Link
+                        href={router.asPath}
+                        locale={locale}
+                        hrefLang={locale}
+                        aria-current={locale === currentLanguage ? 'true' : undefined}
+                        className={cn(locale === currentLanguage && styles.active)}
+                        onClick={(event) => handleSelect(event, locale)}
+                    >
+                        {label}
+                    </Link>
+                </React.Fragment>
             ))}
         </div>
     )

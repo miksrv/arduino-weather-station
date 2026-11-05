@@ -19,9 +19,10 @@ jest.mock('@/components/app-bar', () =>
         </button>
     ))
 )
-jest.mock('@/components/footer', () => jest.fn(() => <div data-testid='footer' />))
+jest.mock('@/components/footer', () =>
+    jest.fn(({ action }: { action?: React.ReactNode }) => <div data-testid='footer'>{action}</div>)
+)
 jest.mock('@/components/language-switcher', () => jest.fn(() => <div data-testid='language-switcher' />))
-jest.mock('@/components/stale-data-banner', () => jest.fn(() => <div data-testid='stale-data-banner' />))
 jest.mock('./Menu', () =>
     jest.fn(({ onClick }) => (
         <button
@@ -57,7 +58,6 @@ describe('AppLayout', () => {
         expect(screen.getByTestId('footer')).toBeInTheDocument()
         expect(screen.getByTestId('language-switcher')).toBeInTheDocument()
         expect(screen.getByTestId('menu')).toBeInTheDocument()
-        expect(screen.getByTestId('stale-data-banner')).toBeInTheDocument()
         expect(screen.getByText('ChildContent')).toBeInTheDocument()
     })
 
