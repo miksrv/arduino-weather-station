@@ -1,5 +1,48 @@
 # CHANGELOG
 
+## 3.10.0
+
+### Minor Changes
+
+- New look: warm neutral dark and light themes with higher-contrast text, a terracotta accent, semibold card titles, firmer numbers and a monospace navigation menu
+- The "data may be outdated" warning moved from every page into the header; the status dot turns yellow when the data may be outdated and red after an hour without readings
+- The anomaly history shows the last month: the period in words, the duration in days and each anomaly's measure with its unit or deviation from normal, instead of a bare "peak value"
+- Sensor cards are more compact, show the 24-hour max, min and mean side by side and draw each chart in the colour of its quantity
+- The heat map shows its colour scale next to the title and the period in words
+- New weather source: the routine METAR report of the nearest airport (Orenburg, UWOO), an actual observation of cloud cover, rain, snow, fog and thunderstorms rather than a model forecast
+- The airport report counts as one more independent source when the observatory feed confirms rain and cloud cover
+- Daily precipitation is now the day's total instead of an hourly mean: yearly totals, heavy-rain days, fire-risk and snowpack calculations were about 24 times too low
+- The precipitation calendar shows the same daily totals as the climate page; a single wet source among dry ones no longer makes a whole hour wet
+- Wind direction is averaged as a vector: north winds around 350° and 10° no longer average to south
+- Rain, snow and thunderstorms are no longer hidden behind "overcast" when sources disagree about the weather
+- Hourly precipitation and cloud cover weigh every source equally, however often it reports, and late reports of the previous hour are included
+- New `system:rebuildAverages` command recalculates all stored hourly and daily averages
+- Weather station firmware sends wind speed in m/s and wind direction in degrees (it sent raw anemometer pulses and a sector number); a calm reading or a night UV reading no longer makes the server drop the whole measurement, and a single invalid value is skipped instead of the whole reading
+- OpenWeatherMap forecast precipitation was always empty and is now taken into account
+- Open-Meteo current precipitation covered only the last 15 minutes and is now the last hour, like the other sources
+- Visibility below 1 km (fog) from WeatherAPI and VisualCrossing was stored as 0 m
+- WeatherAPI drizzle is no longer shown as freezing rain; several other weather conditions are mapped more precisely, and VisualCrossing conditions take intensity and all reported phenomena into account
+- Missing values from WeatherAPI and VisualCrossing are no longer stored as zeros, and calm wind is no longer stored as missing
+- The observatory cloud cover no longer moves halfway towards an outlier when only two sources report
+- Pressure, humidity, cloud cover and visibility are rounded instead of cut off
+- Anomalies are detected for the last complete day instead of the first hours of the current one; episodes no longer last one extra day or appear several times, and rebuilding the anomaly history with `--force` no longer duplicates it
+- Extreme UV, pressure collapse, freezing rain, drought and heat wave / cold snap detection fixed; the snowpack comparison is neutral outside the winter season
+- Precipitation statistics no longer count days without data as dry, and use one threshold for rainy days and streaks
+- The event feed no longer reports differences between weather sources as weather changes, and reports each rain spell once with its total
+- History shows whole local days, and today's heatmap is available right after local midnight
+- Cached history, heatmap and precipitation data is refreshed after the averages are rebuilt, and recent data is refreshed within minutes
+- The observatory feed returns an error instead of a fresh-looking timestamp when there is no data at all
+- The forecast cards on the home page fill the row, six to a row, instead of leaving an empty slot
+
+### Patch Changes
+
+- The history and heat map date pickers show their preset ("Последние сутки", "Последние полгода") instead of plain dates when the browser is in another time zone than the station, and a picked preset no longer misses the station's last day (simple-react-ui-kit 2.2.0)
+- The pressure chart axis no longer repeats the same label, and the day's max and min are rounded to one decimal
+- The flood-risk level uses the same status badge as the header warning
+- The language switch is a pair of plain links next to the copyright, and the footer no longer shows the build date
+- The day-details tiles on the forecast page sit at the bottom of the card, the heat map's daily-range caption fits on one line, and the home forecast cards no longer fade at the edges
+- UI deploy ships the i18n config with the standalone build, fails when the image optimizer cannot load sharp instead of silently serving unoptimized images, and can be started by hand
+
 ## 3.9.2
 
 ### Patch Changes

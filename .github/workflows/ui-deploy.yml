@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - 'client/**/*'
+  # By hand from the Actions tab (or `gh workflow run ui-deploy.yml`): a change to this workflow
+  # alone, or a re-deploy of the same build, has no client push to start it
+  workflow_dispatch:
 
 jobs:
   ui-ssh-deploy:
@@ -65,6 +68,26 @@ jobs:
           yarn build
         working-directory: client
 
+      # serverSideTranslations (and the app's own config import) read ./next-i18next.config.js from
+      # the server's working directory at runtime, but the standalone trace does not copy it: put it
+      # in the bundle, so the --delete sync below keeps it and the host always has the current one.
+      # Not under the cache check: a cached build needs it too
+      - name: Add the i18n config to the standalone bundle
+        run: cp next-i18next.config.js .next/standalone/
+        working-directory: client
+
+      # Next's image optimizer needs sharp with the Linux binary inside the standalone
+      # bundle. When sharp fails to load, Next does not error: it serves every image as
+      # the unoptimized original (no resize, no WebP), which is invisible until someone
+      # looks at the response sizes. Fail the deploy instead. Resolved from Next's own
+      # directory, the way the image optimizer requires it: a copy nested under
+      # node_modules/next would shadow the top-level one
+      - name: Check sharp in the standalone bundle
+        working-directory: client/.next/standalone
+        run: |
+          ls node_modules/@img
+          node -e "const sharp = require(require.resolve('sharp', { paths: ['node_modules/next/dist/server'] })); console.log('sharp', sharp.versions.sharp, 'libvips', sharp.versions.vips)"
+
       - name: Configure SSH
         env:
           SSH_HOST: ${{secrets.SSH_HOST}}
@@ -96,7 +119,14 @@ jobs:
           # requested for a month go. The previous builds' static files stay for a week: pages rendered
           # before the release (open tabs, the crawler page cache) still load their chunks and icons
           ssh vps "cd /var/www/meteo.miksoft.pro && mkdir -p .next && find .next -mindepth 1 -maxdepth 1 ! -name cache ! -name static -exec rm -rf {} + && (find .next/static -type f -mtime +7 -delete; find .next/static -mindepth 1 -type d -empty -delete; find .next/cache/images -type f -atime +30 -delete) 2>/dev/null || true"
-          rsync -avz -e ssh client/.next/standalone/ vps:/var/www/meteo.miksoft.pro
+          # --delete for the server bundle: a package left behind by an older build is not
+          # harmless (on astro.miksoft.pro a stale node_modules/next/node_modules/sharp shadowed the
+          # real one for months and every image went out unoptimized).
+          # Protect (P) filters, not --exclude: an excluded path is not sent either, and the
+          # bundle's .next (server pages, BUILD_ID, the manifests) must be. They only keep from
+          # the delete what is synced or managed outside the bundle: the image cache and the
+          # static files (kept for a week, cleaned above), public and the ecosystem file (synced below)
+          rsync -avz --delete --filter='P /.next/cache/' --filter='P /.next/static/' --filter='P /public/' --filter='P /ecosystem.config.js' -e ssh client/.next/standalone/ vps:/var/www/meteo.miksoft.pro
           rsync -avz -e ssh client/.next/static vps:/var/www/meteo.miksoft.pro/.next
           rsync -avz -e ssh client/public vps:/var/www/meteo.miksoft.pro
           rsync -avz -e ssh client/ecosystem.config.js vps:/var/www/meteo.miksoft.pro
@@ -104,6 +134,19 @@ jobs:
       # Restarting by the ecosystem file applies its env changes; pm2 save keeps the list for a reboot
       - name: Restart PM2
         run: ssh vps "cd /var/www/meteo.miksoft.pro && pm2 restart ecosystem.config.js --update-env && pm2 save"
+
+      # PM2 reports "online" for a process that crashes right after the start (it restarts it in a
+      # loop): ask the server itself. Fails the run with the app's last log lines if it doesn't answer
+      - name: Check the site answers
+        run: |
+          ssh vps 'for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:3007/ && echo "the site answers" && exit 0; sleep 1; done; pm2 logs meteo.miksoft.pro --lines 40 --nostream; exit 1'
+
+      # Same check on the host: the binary must also load with the server's Node and glibc
+      # (see "Check sharp in the standalone bundle"). A block scalar: the `paths: [` in the
+      # command is a "key: value" to YAML on a plain one-line `run:`
+      - name: Check sharp on the host
+        run: |
+          ssh vps "cd /var/www/meteo.miksoft.pro && node -e \"const sharp = require(require.resolve('sharp', { paths: ['node_modules/next/dist/server'] })); console.log('sharp', sharp.versions.sharp, 'libvips', sharp.versions.vips)\""
 
       # If for deployment we use not SSH, but an FTP connection
       # - name: Export UI
