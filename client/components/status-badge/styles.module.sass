@@ -1,0 +1,8 @@
+// The kit Badge reads its colours from tokens: a tone overrides them on the badge itself
+@each $tone in "green", "yellow", "orange", "red"
+    .statusBadge.#{$tone}
+        --badge-background: var(--color-#{$tone}-background)
+        --badge-border-color: color-mix(in srgb, var(--color-#{$tone}) 40%, transparent)
+
+        svg
+            fill: var(--color-#{$tone})

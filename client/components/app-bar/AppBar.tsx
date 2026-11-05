@@ -5,9 +5,11 @@ import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
 import { API } from '@/api'
+import StatusBadge from '@/components/status-badge'
 import useClientOnly from '@/hooks/useClientOnly'
 import { POLLING_INTERVAL_CURRENT } from '@/tools/constants'
-import { formatDate, minutesAgo, timeAgo } from '@/tools/date'
+import { formatDate, timeAgo } from '@/tools/date'
+import { getStationStatus } from '@/tools/helpers'
 import ThemeSwitcher from '@/ui/theme-switcher'
 
 import styles from './styles.module.sass'
@@ -17,8 +19,6 @@ interface HeaderProps {
     onMenuClick?: () => void
 }
 
-const OFFLINE_TIME = 30
-
 const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
     const isClient = useClientOnly()
     const { resolvedTheme, setTheme } = useTheme()
@@ -26,6 +26,9 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
     const { data: current, isLoading } = API.useGetCurrentQuery(undefined, {
         pollingInterval: POLLING_INTERVAL_CURRENT
     })
+
+    // No answer at all reads as offline, like a reading that is hours old
+    const status = current ? getStationStatus(current.isStale, current.lastUpdated) : 'offline'
 
     return (
         <header className={styles.appBar}>
@@ -39,11 +42,7 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
                         <Icon name={'Menu'} />
                     </button>
 
-                    {!isLoading && (
-                        <div
-                            className={cn(minutesAgo(current?.date) <= OFFLINE_TIME ? styles.online : styles.offline)}
-                        />
-                    )}
+                    {!isLoading && <div className={cn(styles.dot, styles[status])} />}
 
                     {isLoading ? (
                         <div className={styles.loading}>
@@ -56,6 +55,16 @@ const AppBar: React.FC<HeaderProps> = ({ onMenuClick }) => {
                         </div>
                     )}
                 </div>
+
+                {!isLoading && status !== 'online' && (
+                    <StatusBadge
+                        role={'status'}
+                        tone={status === 'stale' ? 'yellow' : 'red'}
+                        icon={'ReportError'}
+                        className={styles.notice}
+                        label={t('stale-data-warning')}
+                    />
+                )}
 
                 <div className={styles.themeSlot}>
                     {isClient && (

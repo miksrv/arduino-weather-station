@@ -1,4 +1,6 @@
-import { encodeQueryData, isValidJSON, round, unitSuffix } from './helpers'
+import dayjs from 'dayjs'
+
+import { encodeQueryData, getStationStatus, isValidJSON, round, unitSuffix } from './helpers'
 
 describe('helpers', () => {
     describe('encodeQueryData', () => {
@@ -105,6 +107,26 @@ describe('helpers', () => {
         it('separates word units with a space', () => {
             expect(unitSuffix('мм рт. ст.')).toBe(' мм рт. ст.')
             expect(unitSuffix('m/s')).toBe(' m/s')
+        })
+    })
+
+    describe('getStationStatus', () => {
+        const minutesBefore = (minutes: number) => dayjs().subtract(minutes, 'minute').toISOString()
+
+        it('is online while the server says the data is fresh', () => {
+            expect(getStationStatus(false, minutesBefore(5))).toBe('online')
+        })
+
+        it('is stale when the server says so and the last reading is within the hour', () => {
+            expect(getStationStatus(true, minutesBefore(24))).toBe('stale')
+        })
+
+        it('is offline when the last reading is more than an hour old', () => {
+            expect(getStationStatus(true, minutesBefore(90))).toBe('offline')
+        })
+
+        it('is offline when there has never been a reading', () => {
+            expect(getStationStatus(true)).toBe('offline')
         })
     })
 })

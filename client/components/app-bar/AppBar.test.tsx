@@ -26,8 +26,10 @@ jest.mock('next-i18next/pages', () => ({
 jest.mock('@/ui/theme-switcher', () => () => <div data-testid='theme-switcher' />)
 jest.mock('@/tools/date', () => ({
     formatDate: jest.fn(() => '1 January 2024, 12:00'),
-    minutesAgo: jest.fn(() => 5),
     timeAgo: jest.fn(() => '5 minutes ago')
+}))
+jest.mock('@/tools/helpers', () => ({
+    getStationStatus: jest.fn((isStale?: boolean) => (isStale ? 'stale' : 'online'))
 }))
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -78,6 +80,26 @@ describe('AppBar', () => {
         })
         render(<AppBar />)
         expect(screen.getByText('5 minutes ago')).toBeInTheDocument()
+    })
+
+    it('shows a pulsing green dot and no warning while the data is fresh', () => {
+        useGetCurrentQuery.mockReturnValue({ data: { date: '2024-01-01T12:00:00Z', isStale: false }, isLoading: false })
+        const { container } = render(<AppBar />)
+        expect(container.querySelector('.dot')).toHaveClass('online')
+        expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    })
+
+    it('shows a yellow dot and the warning in the bar when the data may be outdated', () => {
+        useGetCurrentQuery.mockReturnValue({ data: { date: '2024-01-01T12:00:00Z', isStale: true }, isLoading: false })
+        const { container } = render(<AppBar />)
+        expect(container.querySelector('.dot')).toHaveClass('stale')
+        expect(screen.getByRole('status')).toHaveTextContent('stale-data-warning')
+    })
+
+    it('reads no answer at all as offline', () => {
+        const { container } = render(<AppBar />)
+        expect(container.querySelector('.dot')).toHaveClass('offline')
+        expect(screen.getByRole('status')).toHaveClass('notice', 'red')
     })
 
     it('shows ThemeSwitcher only when isClient is true', () => {

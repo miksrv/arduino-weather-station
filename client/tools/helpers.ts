@@ -1,3 +1,5 @@
+import { minutesAgo } from './date'
+
 /**
  * Encodes an object into a query string.
  *
@@ -64,4 +66,22 @@ export const unitSuffix = (unit?: string): string => {
     }
 
     return /^[°%‰]/.test(unit) ? unit : ` ${unit}`
+}
+
+/** The station as the app bar shows it: fresh data, data that may be outdated, or no data for a long time */
+export type StationStatus = 'online' | 'stale' | 'offline'
+
+/** Past this many minutes without a reading, outdated data turns into a station that is offline */
+export const STATION_OFFLINE_MINUTES = 60
+
+/**
+ * Freshness comes from the server (`isStale`, past its freshness window); a reading older than
+ * `STATION_OFFLINE_MINUTES`, or none at all, makes the station offline.
+ */
+export const getStationStatus = (isStale?: boolean, lastUpdated?: string): StationStatus => {
+    if (!isStale) {
+        return 'online'
+    }
+
+    return lastUpdated && minutesAgo(lastUpdated) <= STATION_OFFLINE_MINUTES ? 'stale' : 'offline'
 }
