@@ -15,7 +15,8 @@ jest.mock('@/tools/conditions', () => ({
 }))
 
 jest.mock('@/tools/date', () => ({
-    formatDate: (_date: string, _fmt: string) => 'formatted-date'
+    formatDate: (_date: string, _fmt: string) => 'formatted-date',
+    getCurrentDate: () => jest.requireActual<typeof import('dayjs')>('dayjs')()
 }))
 
 const today = new Date()

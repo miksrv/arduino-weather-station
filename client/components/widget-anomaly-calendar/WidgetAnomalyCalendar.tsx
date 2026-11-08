@@ -5,9 +5,9 @@ import { useTranslation } from 'next-i18next/pages'
 
 import { ApiType } from '@/api'
 import { anomalyTypeToI18nKey } from '@/tools/conditions'
-import { formatDate } from '@/tools/date'
+import { formatDate, getCurrentDate } from '@/tools/date'
 
-import { formatDateStr, getIntensityClass, isFutureDate } from './utils'
+import { getCalendarDays, getIntensityClass, getMonthLabels } from './utils'
 
 import styles from './styles.module.sass'
 
@@ -32,7 +32,8 @@ const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ loading, 
     const { i18n, t } = useTranslation()
     const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
-    const today = useMemo(() => new Date(), [])
+    // The station's today, as on the server: both renders build the same grid
+    const today = getCurrentDate().format('YYYY-MM-DD')
 
     const dataMap = useMemo(() => {
         const map = new Map<string, { count: number; types: string[] }>()
@@ -40,54 +41,20 @@ const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ loading, 
         return map
     }, [data])
 
-    const gridStart = useMemo(() => {
-        const start = new Date(today)
-        start.setDate(start.getDate() - TOTAL_DAYS + 1)
-        return start
-    }, [today])
+    const days = useMemo(() => getCalendarDays(today, TOTAL_DAYS), [today])
 
-    const cells = useMemo(() => {
-        return Array.from({ length: TOTAL_DAYS }, (_, i) => {
-            const cellDate = new Date(gridStart)
-            cellDate.setDate(gridStart.getDate() + i)
-            const dateStr = formatDateStr(cellDate)
-            const future = isFutureDate(cellDate, today)
-            const entry = dataMap.get(dateStr)
-            const count = future ? 0 : (entry?.count ?? 0)
-            const types = future ? [] : (entry?.types ?? [])
-            return { dateStr, count, types, isFuture: future }
-        })
-    }, [gridStart, today, dataMap])
+    const cells = useMemo(
+        () =>
+            days.map((dateStr) => {
+                const entry = dataMap.get(dateStr)
+                return { dateStr, count: entry?.count ?? 0, types: entry?.types ?? [] }
+            }),
+        [days, dataMap]
+    )
 
-    const monthLabels = useMemo(() => {
-        const labels: Array<{ label: string; weekIndex: number }> = []
-        let prevMonth = -1
-        for (let w = 0; w < WEEKS; w++) {
-            const cellIndex = w * DAYS_PER_WEEK
-            const cellDate = new Date(gridStart)
-            cellDate.setDate(gridStart.getDate() + cellIndex)
-            const month = cellDate.getMonth()
-            if (month !== prevMonth) {
-                labels.push({
-                    label: cellDate.toLocaleString(i18n.language, { month: 'short' }),
-                    weekIndex: w
-                })
-                prevMonth = month
-            }
-        }
-        return labels
-    }, [gridStart, i18n.language])
+    const monthLabels = useMemo(() => getMonthLabels(days, DAYS_PER_WEEK, i18n.language), [days, i18n.language])
 
-    const handleMouseEnter = (
-        e: React.MouseEvent<HTMLDivElement>,
-        dateStr: string,
-        count: number,
-        types: string[],
-        future: boolean
-    ) => {
-        if (future) {
-            return
-        }
+    const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>, dateStr: string, count: number, types: string[]) => {
         const rect = e.currentTarget.getBoundingClientRect()
         setTooltip({ x: rect.left + rect.width / 2, y: rect.top - 8, date: dateStr, count, types })
     }
@@ -119,11 +86,11 @@ const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ loading, 
             </div>
 
             <div className={styles.grid}>
-                {cells.map(({ dateStr, count, types, isFuture }) => (
+                {cells.map(({ dateStr, count, types }) => (
                     <div
                         key={dateStr}
-                        className={cn(isFuture || count === 0 ? styles.cell : styles[getIntensityClass(count)])}
-                        onMouseEnter={(e) => handleMouseEnter(e, dateStr, count, types, isFuture)}
+                        className={cn(count === 0 ? styles.cell : styles[getIntensityClass(count)])}
+                        onMouseEnter={(e) => handleMouseEnter(e, dateStr, count, types)}
                         onMouseLeave={handleMouseLeave}
                     />
                 ))}
