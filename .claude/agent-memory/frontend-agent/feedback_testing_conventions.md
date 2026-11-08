@@ -12,14 +12,6 @@ The `simple-react-ui-kit` mock at `client/__mocks__/simple-react-ui-kit.js` must
 
 ---
 
-Components that import from `@/pages/_app` (e.g. `AppBar.tsx` imports `POLING_INTERVAL_CURRENT`) must mock that module in their test:
-```ts
-jest.mock('@/pages/_app', () => ({ POLING_INTERVAL_CURRENT: 600000 }))
-```
-**Why:** `pages/_app.tsx` imports `appWithTranslation` from `next-i18next/pages` and creates a Redux store, causing test suite failure if not mocked.
-
----
-
 Components import `useTranslation` from `next-i18next/pages` (not `next-i18next`). Tests must mock the new path:
 ```ts
 jest.mock('next-i18next/pages', () => ({
@@ -28,13 +20,11 @@ jest.mock('next-i18next/pages', () => ({
 ```
 **Why:** After upgrading to `next-i18next` v16, the `useTranslation` hook was moved to the `next-i18next/pages` subpath (Pages Router API). Tests that mocked `next-i18next` directly stopped working.
 
-Preferred alternative: avoid importing constants from `@/pages/_app` in components entirely. Define polling interval constants inline or in a dedicated constants file. Only `AppBar.tsx` has this pattern — do not replicate it in new components.
-
 ---
 
-ECharts components (`Chart.tsx`, `Heatmap.tsx`, `Meteogram.tsx`) use `ReactECharts` from `echarts-for-react`. Mock it with a simple div:
-```ts
-jest.mock('echarts-for-react', () => (props) => <div data-testid='echarts' />)
+Chart components render through the `EChart` wrapper (`@/components/echart`), not `echarts-for-react` directly. Mock the wrapper with a simple div:
+```tsx
+jest.mock('@/components/echart', () => () => <div data-testid='echarts' />)
 ```
 Also mock `echarts` if `graphic.LinearGradient` is used:
 ```ts
@@ -43,17 +33,13 @@ jest.mock('echarts', () => ({ graphic: { LinearGradient: jest.fn((_,_,_,_, stops
 
 ---
 
-`useLocalStorage` hook: After calling `remove()`, the state resets to `initialState` but `useEffect` will write `initialState` back to localStorage (not delete the key). Test the state value, not the localStorage key existence after removal.
-
----
-
 `useClientOnly` hook: In Testing Library's `renderHook`, the `useEffect` that sets `isClient=true` runs before the first result check, so `result.current` is always `true` in tests. Test the final state (true) rather than an initial false state.
 
 ---
 
-ESLint enforces `eqeqeq` in "smart" mode: use `!= null` (not `!== null` and not `!== undefined`) to check for both `null` and `undefined`. The linter will error on `!== null` when you mean a nullish check — use `!= null` throughout JSX conditions that guard optional props.
+ESLint enforces `eqeqeq` with `null: 'never'`: use `!= null` (not `!== null` and not `!== undefined`) to check for both `null` and `undefined`. The linter will error on `!== null` when you mean a nullish check — use `!= null` throughout JSX conditions that guard optional props.
 
-**Why:** Codebase ESLint config uses `"eqeqeq": ["error", "smart"]` which specifically prefers `!= null` for nullish comparisons.
+**Why:** Codebase ESLint config uses `eqeqeq: ['error', 'always', { null: 'never' }]`, which requires `!= null` / `== null` for null comparisons.
 
 **How to apply:** In any JSX conditional like `{prop !== undefined && prop !== null && (...)}`, simplify to `{prop != null && (...)}`. This applies to optional component props in render guards.
 
@@ -67,17 +53,9 @@ When testing elements whose text is split across multiple sibling text nodes in 
 
 ---
 
-`isActiveToday()` in `widget-anomaly-history/utils.ts` compares dates using local-time getters (`getFullYear/getMonth/getDate`) but `new Date('YYYY-MM-DD')` parses as UTC midnight. In UTC+ timezones the date shifts to the previous local day. To test "today" reliably, pass `'YYYY-MM-DDT12:00:00'` (no Z) so the date is parsed as local time.
-
-**Why:** A test using the bare date string `2026-03-17` fails in UTC+5 because it parses to 2026-03-16 local time.
-
-**How to apply:** In any test that builds a "today" date string for a function that uses local-time getters, append `T12:00:00` (noon, no Z suffix) to ensure the parsed Date lands on the correct local day across all timezones.
-
----
-
 jsdom normalises hex colour values (`#rrggbb`) to `rgb(r, g, b)` form when they are set as `style.backgroundColor` programmatically by React. This applies to both `element.style.backgroundColor` and `element.getAttribute('style')`. Do not compare the exact hex string returned by a utility (e.g. `getRiskLevelColor`) against the rendered `style.backgroundColor` — jsdom will have already converted it. Instead, assert that all fills share the same non-empty color value (`new Set(colors).size === 1`) or skip the exact-value comparison when the utility internally calls `resolveCssVar` (whose fallback is a hex string).
 
-**Why:** `FloodRiskBars.test.tsx` failed because `#f8a01c` was stored as `rgb(248, 160, 28)` in the DOM after React applied it.
+**Why:** `FloodRiskBars.test.tsx` failed because `#f8a01c` was stored as `rgb(248, 160, 28)` in the DOM after React applied it. (The bars now take `var(<token>)` from `getRiskLevelCssVar`, which jsdom keeps verbatim, so the test asserts the exact `var(--color-orange)` string.)
 
 **How to apply:** For any test checking `style.backgroundColor` where the source is a hex literal from a utility function, either use `toEqual` with the rgb form or check structural equality (same value across elements) rather than the raw hex string.
 
@@ -100,13 +78,9 @@ fn.mockReturnValue(...)
 
 ---
 
-When mocking `echarts-for-react` for components that also use `echarts.connect()` (e.g. `WidgetSnowpackChart`), also mock the `echarts` module:
-```ts
-jest.mock('echarts', () => ({ connect: jest.fn(), ECharts: {} }))
-```
-**Why:** `WidgetSnowpackChart` calls `echarts.connect('snowpack')` inside `onChartReady` callbacks. Without the mock the import succeeds but the function call may cause issues in jsdom.
+Linked charts (`group` prop, e.g. `WidgetSnowpackChart`'s `group={'snowpack'}`) are connected by `echarts.connect()` inside `components/echart/EChartCanvas.tsx`, so a test that mocks `@/components/echart` never reaches it. `WidgetSnowpackChart.test.tsx` still also mocks `echarts` (`{ connect: jest.fn(), ECharts: {} }`).
 
-**How to apply:** For any chart component that imports directly from `echarts` (not just `echarts-for-react`), add an `echarts` mock alongside the `echarts-for-react` mock.
+**How to apply:** For any chart component that imports runtime values from `echarts` (e.g. `graphic.LinearGradient`), add an `echarts` mock alongside the `@/components/echart` mock.
 
 ---
 

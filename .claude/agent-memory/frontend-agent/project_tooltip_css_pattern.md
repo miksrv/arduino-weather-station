@@ -1,6 +1,6 @@
 ---
 name: ECharts tooltip CSS class pattern
-description: Tooltip HTML injected by ECharts formatters requires .value class defined in the SASS module; this class is frequently missing in older modules
+description: Tooltip HTML injected by ECharts formatters needs its classes defined in the SASS module — include +mixins.chartTooltip
 type: project
 ---
 
@@ -15,21 +15,4 @@ This means the `.value` class must be defined in the corresponding `.module.sass
 
 **How to apply:** Whenever adding or reviewing ECharts tooltip formatters that reference `styles.*`, verify each referenced class is actually defined in the SASS file — especially `.value`, `.label`, `.icon`, `.chartTooltipTitle`, `.chartTooltipItem`.
 
-The standard tooltip CSS pattern (consistent across all chart widgets) is:
-```sass
-.chartTooltipTitle
-    font-size: 12px
-    color: var(--text-color-primary)
-
-.chartTooltipItem
-    .icon
-        float: left
-        width: 6px
-        height: 6px
-    .label
-        font-size: 12px
-        color: var(--text-color-secondary)
-    .value
-        color: var(--text-color-primary)
-        margin-left: 10px
-```
+These classes now come from the shared `=chartTooltip` mixin in `styles/mixins.sass` (see `client/DESIGN.md` section 7): include `+mixins.chartTooltip` in the chart's `.module.sass` (as `widget-chart`, `widget-heatmap`, `widget-climate` and the other chart widgets do) instead of hand-writing the classes.

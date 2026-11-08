@@ -35,16 +35,16 @@ const columns: TableColumnProps<MyType>[] = useMemo(
 | Field | Type | Description |
 |---|---|---|
 | `accessor` | `keyof T` | Which field from the row object to pass as `value` |
-| `header` | `string` | Column heading text |
-| `formatter` | `(value, data, i) => ReactNode \| string` | Cell renderer (see below) |
+| `header` | `string \| ReactNode` | Column heading text |
+| `formatter` | `(value, data, i) => ReactNode` | Cell renderer (see below) |
 | `isSortable` | `boolean` | Enables sort on this column |
-| `background` | `(value) => string` | Returns CSS color string for cell background |
+| `background` | `(value, row) => string \| undefined` | Returns CSS color string for cell background |
 | `className` | `string` | CSS class applied to all cells in this column |
 
 ## Formatter Signature
 
 ```ts
-formatter: (value: unknown, data: T[], i: number) => React.ReactNode | string
+formatter: (value: T[keyof T], data: T[], i: number) => React.ReactNode
 ```
 
 - `value` — the cell value (the field named by `accessor` for row `i`)
@@ -55,8 +55,6 @@ Use `data[i]` to access sibling fields when a column needs more than one field:
 ```ts
 formatter: (startDate, data, i) => getDuration(startDate as string, data[i].endDate)
 ```
-
-When two columns share the same `accessor`, the `formatter` distinguishes their rendering (used in `WidgetForecastTable` for `date`/`time` sharing `accessor: 'date'`).
 
 ## Table Component Usage
 
@@ -102,8 +100,7 @@ Apply this pattern to every column that needs the row highlight. Name the CSS cl
 
 ## Reference Components
 
-- `client/components/widget-forecast-table/WidgetForecastTable.tsx` — full-featured example with columnsPreset, stickyHeader, title/link, background colors, multi-field formatters
-- `client/components/widget-anomaly-history/index.tsx` — simpler example showing 5-column history table with pure data display
+- `client/components/widget-anomaly-history/WidgetAnomalyHistory.tsx` — 4-column anomaly history table with a `Skeleton` loading state
 - `client/components/widget-snowpack-chart/ComparisonTable.tsx` — minimal 3-column table with conditional per-row cell styling via formatter + `cn`
 
 ## Mock (\_\_mocks\_\_/simple-react-ui-kit.js)

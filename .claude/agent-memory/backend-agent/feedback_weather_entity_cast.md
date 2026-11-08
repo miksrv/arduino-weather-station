@@ -20,8 +20,8 @@ $rowArr = $row instanceof \CodeIgniter\Entity\Entity
 
 Always use `toRawArray()` when the downstream code expects column-name keys (e.g. passing to AnomalyDetector).
 
-**Why:** This caused `BackfillAnomalyLog` to detect 0 anomalies on first attempt. `DetectAnomalies.php` has the same latent bug but it was not caught because it also silently returns null/fallback values for all checks.
+**Why:** This caused `BackfillAnomalyLog` to detect 0 anomalies on first attempt. Both `BackfillAnomalyLog` and `AnomalyDetector` (which `DetectAnomalies` delegates to) now use the `toRawArray()` pattern above.
 
 **How to apply:** Any time you iterate `DailyAveragesModel::findAll()` or `HourlyAveragesModel::findAll()` and need to work with raw column values, use `toRawArray()` — never `(array) $entity`.
 
-**Additional gotcha — `date` column after `toRawArray()`:** Even after `toRawArray()`, the `date` key is NOT a plain string. The entity's cast `'date' => 'datetime'` means the value is a `CodeIgniter\I18n\Time` object (which extends `DateTimeImmutable`, NOT `DateTime`). So `instanceof \DateTime` checks fail on it. Always use `instanceof \DateTimeInterface` when checking if a date field is a date object. `(string) $timeObject` calls `Time::__toString()` → `'YYYY-MM-DD HH:MM:SS'`, so `substr(..., 0, 10)` still works for date extraction.
+**Additional gotcha — `date` column after `toRawArray()`:** Even after `toRawArray()`, the `date` key is NOT a plain string. The entity lists `date` in `$dates`, so the value is a `CodeIgniter\I18n\Time` object (which extends `DateTimeImmutable`, NOT `DateTime`). So `instanceof \DateTime` checks fail on it. Always use `instanceof \DateTimeInterface` when checking if a date field is a date object. `(string) $timeObject` calls `Time::__toString()` → `'YYYY-MM-DD HH:MM:SS'`, so `substr(..., 0, 10)` still works for date extraction.
