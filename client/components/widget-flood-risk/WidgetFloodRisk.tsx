@@ -5,10 +5,11 @@ import { useTranslation } from 'next-i18next/pages'
 import { useTheme } from 'next-themes'
 
 import { ApiType } from '@/api'
-import StatusBadge, { StatusTone } from '@/components/status-badge'
+import StatusBadge from '@/components/status-badge'
 
 import { FloodRiskBars } from './FloodRiskBars'
 import { FloodRiskGauge } from './FloodRiskGauge'
+import { RISK_LEVEL_TONES } from './utils'
 
 import styles from './styles.module.sass'
 
@@ -18,14 +19,6 @@ interface WidgetFloodRiskProps {
     level?: ApiType.Anomaly.RiskLevel
     components?: ApiType.Anomaly.FloodRisk['components']
     season?: ApiType.Anomaly.RiskSeason
-}
-
-// The same colours as the gauge and the bars (`getRiskLevelColor`)
-const LEVEL_TONES: Record<ApiType.Anomaly.RiskLevel, StatusTone> = {
-    low: 'green',
-    elevated: 'orange',
-    high: 'orange',
-    critical: 'red'
 }
 
 const WidgetFloodRisk: React.FC<WidgetFloodRiskProps> = ({ loading, score, level, components, season }) => {
@@ -54,7 +47,7 @@ const WidgetFloodRisk: React.FC<WidgetFloodRiskProps> = ({ loading, score, level
             <div className={styles.header}>
                 <span className={styles.title}>{t('flood-risk')}</span>
                 <StatusBadge
-                    tone={LEVEL_TONES[level ?? 'low']}
+                    tone={RISK_LEVEL_TONES[level ?? 'low']}
                     label={t(`flood-risk-${level}`)}
                 />
             </div>

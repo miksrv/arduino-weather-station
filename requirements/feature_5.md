@@ -170,20 +170,20 @@ daily_wh = avgDailyEnergy * 1000 / 3.6 * panel_efficiency
 ```
 where `panel_efficiency = 0.20` is a frontend constant (not configurable via API).
 
-### New Component: `WidgetSolarEnergy` (`client/components/widget-solar-energy/`)
+### New Component: `WidgetSolarEnergy` (`client/widgets/widget-solar-energy/`)
 
 - ECharts `bar` chart of `total_energy` per day (or month).
 - Y-axis: MJ/m².
 - Colour gradient: pale yellow for low values, deep amber for high.
 - Toggle button to switch daily / monthly grouping (triggers new API request with `resolution=monthly`).
 
-### New Component: `WidgetPeakHour` (`client/components/widget-peak-hour/`)
+### New Component: `WidgetPeakHour` (`client/widgets/widget-peak-hour/`)
 
 - ECharts bar chart: average radiation by hour of day (0–23).
 - The bar for the peak hour is rendered in a distinct highlight colour.
 - X-axis labels: "06:00", "07:00", … (locale-aware).
 
-### New RTK Query Endpoint (`client/api/endpoints/Solar.ts`)
+### New RTK Query Endpoint (`getSolar` in `client/api/api.ts`, types in `client/api/types/solar.ts`)
 
 ```typescript
 interface SolarSeriesItem {

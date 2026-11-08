@@ -41,10 +41,10 @@ const char API_SECRET[] = "";  // API token for authorization (must be provided)
 #define API_PAYLOAD_VERSION "2"
 
 // Anemometer calibration. Pulses are counted for ANEMOMETER_WINDOW_MS and converted to m/s.
-// Assumption: common cup anemometer, 1 pulse per revolution, 2.4 km/h per 1 Hz = 0.667 m/s per Hz.
-// NEEDS CALIBRATION against a reference anemometer for the installed sensor.
+// The station's 3D-printed anemometer (models/README.md): 2 magnets = 2 pulses per revolution, and its 50 cm
+// perimeter makes 2 revolutions per second at 1 m/s, so 1 m/s = 4 Hz = 0.25 m/s per Hz.
 #define ANEMOMETER_WINDOW_MS 5000      // Pulse counting window, ms
-#define ANEMOMETER_MS_PER_HZ 0.667     // Wind speed (m/s) per 1 Hz of pulses
+#define ANEMOMETER_MS_PER_HZ 0.25      // Wind speed (m/s) per 1 Hz of pulses
 
 // Pin assignments for different sensors
 const int PIN_ANEMOMETR = 3; // Digital PIN for the anemometer (wind speed sensor)

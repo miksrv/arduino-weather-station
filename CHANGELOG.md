@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 3.10.1
+
+### Patch Changes
+
+- The anomaly calendar is built from the station's date: in a browser in another time zone the page no longer fails to hydrate
+- The flood-risk factor bars take the level's colour from the theme instead of a fixed fallback
+- The anomaly page shows a rebuilt or newly detected anomaly log right away instead of after its 15-minute cache
+- Station firmware converts anemometer pulses with the calibration of the station's own anemometer (0.25 m/s per Hz: 2 magnets, 2 revolutions per second at 1 m/s) instead of a generic 0.667, which read the wind about 2.7 times too high
+- Outdated documentation updated: finished items removed from the roadmaps and feature specs, docs and agent notes brought in line with the code
+
 ## 3.10.0
 
 ### Minor Changes

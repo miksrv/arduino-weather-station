@@ -1,6 +1,6 @@
 ---
 name: Dependency upgrade notes and constraints
-description: Known breaking changes and constraints from the 2026-05 dependency upgrade (next-i18next v16, next-seo v7, TS 6, ESLint 9/10)
+description: Known breaking changes and constraints from the 2026-05 dependency upgrade (next-i18next v16, next-seo v7, TS 6, ESLint 9/10) plus current simple-react-ui-kit notes
 type: project
 ---
 
@@ -40,7 +40,7 @@ TS 6 introduced two new errors relevant to this project:
 
 ## ESLint version constraint
 
-ESLint is pinned to **v9** (currently `^9.39.4`). **Do NOT upgrade to ESLint v10** because:
+ESLint is pinned to **v9** (currently `^9.39.5`). **Do NOT upgrade to ESLint v10** because:
 - `eslint-plugin-react` v7.37.5 only supports ESLint `^9.7` (its peer dep cap is `^9.7`, not `^10`)
 - ESLint v10 removed `eslint/use-at-your-own-risk` exports that `@typescript-eslint/utils` still relied on
 
@@ -51,10 +51,10 @@ A Yarn `resolution` forces `eslint-plugin-jest` to use the newer `@typescript-es
 }
 ```
 
-## simple-react-ui-kit 1.8.x
+## simple-react-ui-kit 2.2.0
 
-Upgraded from v1.7.x. No code changes were needed — the API is backward compatible.
+Currently `^2.2.0`. Its `DatePicker` takes a `today` prop (`YYYY-MM-DD`): `history.tsx` and `heatmap.tsx` pass the station's date (`getCurrentDate().format('YYYY-MM-DD')`), not the browser's, so the presets count back from it.
 
 ## schema-dts v2
 
-Upgraded from v1. Used only in `_document.tsx` for JSON-LD type hints. No code changes needed.
+Upgraded from v1. Used for JSON-LD type hints in `tools/structured-data.ts` and `components/json-ld/JsonLd.tsx`. No code changes needed.

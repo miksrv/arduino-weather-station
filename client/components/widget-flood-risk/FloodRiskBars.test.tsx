@@ -62,7 +62,7 @@ describe('FloodRiskBars', () => {
         })
     })
 
-    it('level=high → all fills share the same background color (from getRiskLevelColor)', () => {
+    it('level=high → all fills take the orange modifier class, colour only from the theme', () => {
         const { container } = render(
             <FloodRiskBars
                 components={mockComponents}
@@ -71,9 +71,9 @@ describe('FloodRiskBars', () => {
         )
         const fills = Array.from(container.querySelectorAll('[class*="barFill"]'))
         expect(fills).toHaveLength(5)
-        // All fills must share the same non-empty background color
-        const colors = fills.map((fill) => (fill as HTMLElement).style.backgroundColor)
-        expect(colors.every((c) => c !== '')).toBe(true)
-        expect(new Set(colors).size).toBe(1)
+        fills.forEach((fill) => {
+            expect(fill).toHaveClass('orange')
+            expect((fill as HTMLElement).style.backgroundColor).toBe('')
+        })
     })
 })

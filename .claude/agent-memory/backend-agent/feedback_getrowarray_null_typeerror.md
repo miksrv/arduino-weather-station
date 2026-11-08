@@ -14,5 +14,3 @@ Concretely: `RawWeatherDataModel::getRecentAverages()` (used by `getCurrentActua
 - Any time you see `->getRowArray()`, `->getRow()`, or `->first()` results flowing into `array_merge()`, string concatenation, or foreach without a null check, add `?? []` (or an explicit null check) at the call site inside the Model — don't rely on the caller to guard it.
 - Controller `_get*Data()`-style private helpers that wrap a Model call in try-catch should catch `\Throwable`, not `\Exception`, specifically because PHP 8 `TypeError`/`Error` from bad-shape data (null args to typed builtins, etc.) are common failure modes here and are NOT `Exception` subclasses.
 - `getResultArray()` (used by History/Heatmap) is safe by contrast — it already returns `[]` on no rows, which is why those controllers were unaffected by this bug class.
-
-See also [[feedback_history_controller_bug]] — same PHP 8 TypeError class of bug, different controller (return-type mismatch there vs. null-array-merge here).

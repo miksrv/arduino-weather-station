@@ -2,6 +2,7 @@
 
 namespace App\Commands;
 
+use App\Controllers\Anomaly;
 use App\Libraries\AnomalyDetector;
 use App\Models\AnomalyLogModel;
 use App\Models\DailyAveragesModel;
@@ -171,6 +172,13 @@ class BackfillAnomalyLog extends BaseCommand
 
             CLI::write($summary, 'green');
             log_message('info', $summary);
+
+            // The /anomaly response is cached: drop it so the rebuilt log shows up now, not after the TTL
+            if (cache()->delete(Anomaly::CACHE_KEY_INDEX)) {
+                CLI::write('[OK] Anomaly response cache cleared.', 'green');
+            } else {
+                CLI::write('[WARN] Anomaly response cache not cleared (no entry, or no permission); it expires in 15 minutes.', 'yellow');
+            }
 
             // Report any anomalies left open at the end of history
             $stillOpen = array_keys(array_filter(

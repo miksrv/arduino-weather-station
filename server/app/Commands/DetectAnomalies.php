@@ -2,6 +2,7 @@
 
 namespace App\Commands;
 
+use App\Controllers\Anomaly;
 use App\Libraries\AnomalyDetector;
 use App\Models\AnomalyLogModel;
 use App\Models\DailyAveragesModel;
@@ -95,6 +96,9 @@ class DetectAnomalies extends BaseCommand
             $summary = "system:detectAnomalies completed for {$days} day(s) up to {$yesterday->format('Y-m-d')}: {$opened} opened, {$closed} closed.";
             CLI::write($summary, 'white');
             log_message('info', $summary);
+
+            // The /anomaly response is cached: drop it so the new log shows up now, not after the TTL
+            cache()->delete(Anomaly::CACHE_KEY_INDEX);
         } catch (\Exception $e) {
             $msg = 'system:detectAnomalies failed: ' . $e->getMessage();
             log_message('error', $msg);

@@ -1,7 +1,7 @@
 # Backend Roadmap — Arduino Weather Station Server
 
 Generated: 2026-03-22
-Scope: `/server` directory (PHP 8.2+, CodeIgniter 4.6, MySQL)
+Scope: `/server` directory (PHP 8.2+, CodeIgniter 4.7, MySQL)
 
 ---
 
@@ -28,7 +28,7 @@ Scope: `/server` directory (PHP 8.2+, CodeIgniter 4.6, MySQL)
 header("Access-Control-Allow-Origin: *");
 ```
 
-The CORS filter is registered as a global `before` filter and allows any origin to issue cross-origin requests with any HTTP method (`GET, POST, OPTIONS, PATCH, PUT, DELETE`). Any malicious web page visited by a user can silently call `POST /sensors` or `GET /history/export` using the user's browser. It also nullifies any future cookie-based or token-based access control at the browser layer.
+The CORS filter is registered as a global `before` filter and allows any origin to issue cross-origin requests with `GET, POST, OPTIONS`. Any malicious web page visited by a user can silently call `POST /sensors` or `GET /history/export` using the user's browser. It also nullifies any future cookie-based or token-based access control at the browser layer.
 
 Restrict `Access-Control-Allow-Origin` to the known frontend origin(s) (e.g., `https://meteo.miksoft.pro`). Use an allowlist for multiple origins if needed.
 
@@ -36,10 +36,10 @@ Restrict `Access-Control-Allow-Origin` to the known frontend origin(s) (e.g., `h
 
 ### SEC-05 · Arduino authentication token transmitted as a URL query string parameter [HIGH]
 
-**File:** `server/app/Controllers/Sensors.php`, line 39
+**File:** `server/app/Controllers/Sensors.php`, line 61
 
 ```php
-$token = $this->request->getGet('token', FILTER_SANITIZE_SPECIAL_CHARS);
+$token       = $this->request->getGet('token');
 ```
 
 The token is passed as `?token=TOKEN` in the URL. Query strings are written to web server access logs, reverse-proxy logs, CDN logs, and browser history. Any party with access to any of these log sources can silently extract the token without any indication of compromise.
@@ -50,7 +50,7 @@ Move the token to an HTTP header (e.g., `Authorization: Bearer <token>`) and upd
 
 ### SEC-13 · HTTPS not enforced at the application level [MEDIUM]
 
-**File:** `server/app/Config/App.php`, line 136
+**File:** `server/app/Config/App.php`, line 160
 
 ```php
 public bool $forceGlobalSecureRequests = false;
@@ -62,22 +62,9 @@ Set `$forceGlobalSecureRequests = true` in production.
 
 ---
 
-### SEC-18 · Physical station GPS coordinates committed to a public repository [LOW]
-
-**File:** `server/.env.production`
-
-```
-app.lat = 51.70952
-app.lon = 55.26690
-```
-
-The exact GPS coordinates of the physical hardware are committed to the public repository. While publicly exposing a weather station's location may be intentional, it should be a documented decision, not an accidental disclosure via a committed secrets file. Remove from `.env.production` (see SEC-01) and store in the runtime environment instead.
-
----
-
 ### SEC-19 · `CorsFilter` uses `die()` for OPTIONS preflight, bypassing the response pipeline [LOW]
 
-**File:** `server/app/Filters/CorsFilter.php`, lines 28–31
+**File:** `server/app/Filters/CorsFilter.php`, lines 29–33
 
 ```php
 if ($method === "OPTIONS") {
@@ -88,14 +75,6 @@ if ($method === "OPTIONS") {
 Using `die()` exits PHP immediately, bypassing all CodeIgniter `after` filters. Any future after-filters (security headers, audit logging) will never execute for OPTIONS preflight requests. Additionally, `$_SERVER['REQUEST_METHOD']` is accessed directly instead of `$request->getMethod()`, bypassing framework abstraction.
 
 Replace with a proper `$response->setStatusCode(204)->send(); exit;` pattern, or return a response object from the filter method and let the framework terminate the request cleanly.
-
----
-
-### SEC-20 · No sensitive data redaction in debug traces [LOW]
-
-**File:** `server/app/Config/Exceptions.php`, line 52
-
-No keys are registered for redaction in debug stack traces. If an API key, database password, or Arduino token is passed as a function argument and an exception is thrown during that call, the value appears in the trace output. Register all sensitive key names (e.g., `password`, `token`, `api_key`, `key`, `mac`) in `$sensitiveDataInTrace`.
 
 ---
 
@@ -118,19 +97,17 @@ The `fileExtension` defaults to `.log`. The CodeIgniter documentation notes that
 | ID     | Summary                                                    | File |
 | ------ | ---------------------------------------------------------- | ---- |
 | SEC-03 | Wildcard CORS `*` allows any origin to call all endpoints  | `Filters/CorsFilter.php:24` |
-| SEC-05 | Arduino token sent as a URL query parameter (logged)       | `Controllers/Sensors.php:39` |
+| SEC-05 | Arduino token sent as a URL query parameter (logged)       | `Controllers/Sensors.php:61` |
 
 ### Medium
 
 | ID     | Summary                                                    | File |
 | ------ | ---------------------------------------------------------- | ---- |
-| SEC-13 | HTTPS not enforced at application level                    | `Config/App.php:136` |
+| SEC-13 | HTTPS not enforced at application level                    | `Config/App.php:160` |
 
 ### Low
 
 | ID     | Summary                                                    | File |
 | ------ | ---------------------------------------------------------- | ---- |
-| SEC-18 | Physical GPS coordinates in a public repository            | `server/.env.production` |
-| SEC-19 | `die()` in CorsFilter bypasses the response pipeline       | `Filters/CorsFilter.php:30` |
-| SEC-20 | No sensitive data redaction in debug stack traces          | `Config/Exceptions.php:52` |
+| SEC-19 | `die()` in CorsFilter bypasses the response pipeline       | `Filters/CorsFilter.php:32` |
 | SEC-21 | Log files use `.log` extension without PHP guard           | `Config/Logger.php:104` |
