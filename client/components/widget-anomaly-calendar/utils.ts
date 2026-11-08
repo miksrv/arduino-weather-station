@@ -16,6 +16,14 @@ export const getCalendarDays = (today: string, total: number): string[] => {
 }
 
 /**
+ * The calendar's last day: the date of the server's last point, so the grid ends on the same day the API counts as
+ * today (the API works in UTC, the station in UTC+5 — taken from the browser's clock, the last cell would be a day
+ * the API has not produced yet for five hours a day). Without data, the station's own today.
+ */
+export const getCalendarToday = (data: Array<{ date: string }>, fallback: string): string =>
+    data.length ? data[data.length - 1].date : fallback
+
+/**
  * The month labels above the weeks: the short month name at the first week (column) that starts in a new month.
  * Formatted in UTC from the date string, so the server and the browser print the same month.
  */

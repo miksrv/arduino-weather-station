@@ -7,7 +7,7 @@ import { ApiType } from '@/api'
 import { anomalyTypeToI18nKey } from '@/tools/conditions'
 import { formatDate, getCurrentDate } from '@/tools/date'
 
-import { getCalendarDays, getIntensityClass, getMonthLabels } from './utils'
+import { getCalendarDays, getCalendarToday, getIntensityClass, getMonthLabels } from './utils'
 
 import styles from './styles.module.sass'
 
@@ -32,8 +32,8 @@ const WidgetAnomalyCalendar: React.FC<WidgetAnomalyCalendarProps> = ({ loading, 
     const { i18n, t } = useTranslation()
     const [tooltip, setTooltip] = useState<TooltipState | null>(null)
 
-    // The station's today, as on the server: both renders build the same grid
-    const today = getCurrentDate().format('YYYY-MM-DD')
+    // The API's today: the server render and the browser build the same grid, aligned with the data
+    const today = getCalendarToday(data, getCurrentDate().format('YYYY-MM-DD'))
 
     const dataMap = useMemo(() => {
         const map = new Map<string, { count: number; types: string[] }>()

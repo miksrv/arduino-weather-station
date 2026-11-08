@@ -1,4 +1,4 @@
-import { getCalendarDays, getIntensityClass, getMonthLabels } from './utils'
+import { getCalendarDays, getCalendarToday, getIntensityClass, getMonthLabels } from './utils'
 
 describe('getCalendarDays', () => {
     it('ends on the given today, oldest day first', () => {
@@ -9,6 +9,17 @@ describe('getCalendarDays', () => {
         const days = getCalendarDays('2026-01-02', 5)
         expect(days).toStrictEqual(['2025-12-29', '2025-12-30', '2025-12-31', '2026-01-01', '2026-01-02'])
         expect(getCalendarDays('2026-03-30', 3)).toStrictEqual(['2026-03-28', '2026-03-29', '2026-03-30'])
+    })
+})
+
+describe('getCalendarToday', () => {
+    it('ends the grid on the API last day, not the station clock', () => {
+        const data = [{ date: '2026-11-05' }, { date: '2026-11-06' }]
+        expect(getCalendarToday(data, '2026-11-07')).toBe('2026-11-06')
+    })
+
+    it('falls back to the given date without data', () => {
+        expect(getCalendarToday([], '2026-11-07')).toBe('2026-11-07')
     })
 })
 

@@ -114,4 +114,15 @@ describe('WidgetAnomalyCalendar', () => {
             expect(true).toBe(true)
         }
     })
+
+    it('ends the grid on the API last day even when the browser clock is on another date', () => {
+        const data = [
+            { date: '2020-01-09', activeCount: 0, types: [] },
+            { date: '2020-01-10', activeCount: 1, types: ['heat_wave'] }
+        ]
+        const { container } = render(<WidgetAnomalyCalendar data={data} />)
+        const cells = container.querySelector('[class*="grid"]')!.children
+        expect(cells[cells.length - 1]).toHaveClass('cellIntensity1')
+        expect(cells[cells.length - 2]).toHaveClass('cell')
+    })
 })
