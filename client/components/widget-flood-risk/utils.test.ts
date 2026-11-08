@@ -1,4 +1,4 @@
-import { clampContribution, getRiskLevelColor, resolveCssVar } from './utils'
+import { clampContribution, getRiskLevelColor, getRiskLevelCssVar, resolveCssVar } from './utils'
 
 describe('resolveCssVar', () => {
     it('returns fallback on the server (no window)', () => {
@@ -12,6 +12,15 @@ describe('resolveCssVar', () => {
     it('returns fallback when CSS variable is not set', () => {
         // jsdom does not resolve CSS custom properties — getPropertyValue returns ''
         expect(resolveCssVar('--nonexistent-var', '#fallback')).toBe('#fallback')
+    })
+})
+
+describe('getRiskLevelCssVar', () => {
+    it('maps each level to its status token', () => {
+        expect(getRiskLevelCssVar('low')).toBe('--color-green')
+        expect(getRiskLevelCssVar('elevated')).toBe('--color-orange')
+        expect(getRiskLevelCssVar('high')).toBe('--color-orange')
+        expect(getRiskLevelCssVar('critical')).toBe('--color-red')
     })
 })
 

@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next/pages'
 
 import { ApiType } from '@/api'
 
-import { clampContribution, getRiskLevelColor } from './utils'
+import { clampContribution, getRiskLevelCssVar } from './utils'
 
 import styles from './styles.module.sass'
 
@@ -33,7 +33,8 @@ interface FloodRiskBarsProps {
 
 export const FloodRiskBars: React.FC<FloodRiskBarsProps> = ({ components, level }) => {
     const { t } = useTranslation()
-    const colorVar = getRiskLevelColor(level)
+    // The token itself, not its resolved value: the same on the server and in the browser
+    const color = `var(${getRiskLevelCssVar(level)})`
 
     return (
         <div className={styles.bars}>
@@ -49,7 +50,7 @@ export const FloodRiskBars: React.FC<FloodRiskBarsProps> = ({ components, level 
                         <div className={styles.barTrack}>
                             <div
                                 className={styles.barFill}
-                                style={{ width: `${widthPct}%`, backgroundColor: colorVar }}
+                                style={{ width: `${widthPct}%`, backgroundColor: color }}
                             />
                         </div>
                         <span className={styles.barValue}>+{comp.contribution}</span>
