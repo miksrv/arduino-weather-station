@@ -27,6 +27,9 @@ class Anomaly extends ResourceController
     /** @var int Cache TTL in seconds (15 minutes) */
     public const CACHE_TTL = 15 * 60;
 
+    /** @var string Cache key of the index response (flood risk, anomalies, log); the anomaly commands drop it */
+    public const CACHE_KEY_INDEX = 'anomaly_index';
+
     protected $format = 'json';
 
     protected AnomalyModel    $anomalyModel;
@@ -64,7 +67,7 @@ class Anomaly extends ResourceController
      */
     public function index(): ResponseInterface
     {
-        $cacheKey = 'anomaly_index';
+        $cacheKey = self::CACHE_KEY_INDEX;
         $cached   = cache()->get($cacheKey);
 
         if ($cached !== null) {
