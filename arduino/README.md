@@ -89,7 +89,9 @@ inputs onto the shared I2C bus.
   reads `HIGH` when idle and is pulled `LOW` only when its switch closes
 - As the vane rotates, its magnet passes over one sensor at a time, pulling
   the matching port `LOW`; `get_sensor_wind_direction()` scans all 8 ports and
-  reports the index of the active one as the current wind direction
+  converts the first active one into degrees (sector × 45°, `0` = North,
+  clockwise). `WIND_VANE_NORTH_PIN` (default `0`) sets which port faces North;
+  when no port is active the last known direction is kept
 
 ## Files
 
@@ -99,6 +101,10 @@ The main file that initializes the sensors, manages the main loop, and sends dat
 
 - Initialization of sensors and network settings
 - Main loop to periodically read sensor data and send it to the server
+- `get_sensor_anemometer()`: counts anemometer pulses for `ANEMOMETER_WINDOW_MS` (5 s)
+  and converts the frequency to m/s with `ANEMOMETER_MS_PER_HZ` (0.25 m/s per Hz for the
+  printed anemometer in `models/`: 2 magnets = 2 pulses per revolution, 2 revolutions per second
+  at 1 m/s — adjust it for a different anemometer)
 
 ### `get_sensor_dht22.ino`
 
@@ -111,7 +117,7 @@ Contains functions to read data from the DHT22 temperature and humidity sensor. 
 
 Handles reading the wind direction using an I2C expander. It includes:
 
-- `get_sensor_wind_direction()`: Reads wind direction from the wind vane
+- `get_sensor_wind_direction()`: Reads wind direction from the wind vane, in degrees
 - Data processing and debugging output
 
 ### `get_sensor_luxmeter.ino`
@@ -125,7 +131,7 @@ Reads light levels from the BH1750 light sensor. It includes:
 
 Manages data collection from the BMP085 barometric pressure sensor. It includes:
 
-- `get_sensor_pressure()`: Reads and processes atmospheric pressure
+- `get_sensor_pressure()`: Reads and processes atmospheric pressure (converted to mmHg)
 - Data conversion and debugging output
 
 ### `get_sensor_uvindex.ino`
@@ -142,6 +148,23 @@ Handles sending collected sensor data to the web server. It includes:
 - `webclient_send_data()`: Formats and sends data to the specified API endpoint
 - Network connection and data transmission
 
+The reading is sent as `POST {API_METHOD}?token={API_SECRET}` to `API_SERVER` on port 80, with a
+form-encoded body:
+
+| Field | Value |
+|-------|-------|
+| `fw`  | Payload version (`API_PAYLOAD_VERSION`, currently `2`) |
+| `p`   | Pressure, mmHg (the server converts it to hPa) |
+| `t`   | Temperature, °C |
+| `h`   | Humidity, % |
+| `uv`  | UV index |
+| `i`   | Light level, lux (not stored by the server) |
+| `wd`  | Wind direction, degrees |
+| `ws`  | Wind speed, m/s |
+
+The server stores the wind only from payload version 2 on (`fw` ≥ 2); readings without `fw`
+(the old firmware sent anemometer pulses and a sector number 0–7) keep every value except the wind.
+
 ## Setup
 
 1. **Hardware Connections**: Follow the wiring diagram to connect sensors to the Arduino.
@@ -153,7 +176,7 @@ Handles sending collected sensor data to the web server. It includes:
    - `PCF8574.h`
    - `SPI.h`
    - `Ethernet.h`
-3. **API Configuration**: Update `API_SERVER`, `API_METHOD`, and `API_SECRET` in `main.ino` with your API server address and credentials.
+3. **API Configuration**: Update `API_SERVER`, `API_METHOD`, and `API_SECRET` in `main.ino` with your API server address and credentials (`API_SECRET` must match `app.arduino.token` on the server). The Ethernet shield uses the static `IP` and `MAC` set in `main.ino`.
 4. **Upload Code**: Upload all `.ino` files to your Arduino. The Arduino IDE will automatically handle file organization.
 
 ## Usage
