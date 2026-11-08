@@ -62,7 +62,7 @@ describe('FloodRiskBars', () => {
         })
     })
 
-    it('level=high → all fills take the status token, the same on the server and in the browser', () => {
+    it('level=high → all fills take the orange modifier class, colour only from the theme', () => {
         const { container } = render(
             <FloodRiskBars
                 components={mockComponents}
@@ -71,8 +71,9 @@ describe('FloodRiskBars', () => {
         )
         const fills = Array.from(container.querySelectorAll('[class*="barFill"]'))
         expect(fills).toHaveLength(5)
-        // All fills must share the same non-empty background color
-        const colors = fills.map((fill) => (fill as HTMLElement).style.backgroundColor)
-        expect(colors.every((c) => c === 'var(--color-orange)')).toBe(true)
+        fills.forEach((fill) => {
+            expect(fill).toHaveClass('orange')
+            expect((fill as HTMLElement).style.backgroundColor).toBe('')
+        })
     })
 })

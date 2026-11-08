@@ -1,4 +1,4 @@
-import { clampContribution, getRiskLevelColor, getRiskLevelCssVar, resolveCssVar } from './utils'
+import { clampContribution, getRiskLevelColor, resolveCssVar, RISK_LEVEL_TONES } from './utils'
 
 describe('resolveCssVar', () => {
     it('returns fallback on the server (no window)', () => {
@@ -15,12 +15,9 @@ describe('resolveCssVar', () => {
     })
 })
 
-describe('getRiskLevelCssVar', () => {
-    it('maps each level to its status token', () => {
-        expect(getRiskLevelCssVar('low')).toBe('--color-green')
-        expect(getRiskLevelCssVar('elevated')).toBe('--color-orange')
-        expect(getRiskLevelCssVar('high')).toBe('--color-orange')
-        expect(getRiskLevelCssVar('critical')).toBe('--color-red')
+describe('RISK_LEVEL_TONES', () => {
+    it('maps each level to its status tone', () => {
+        expect(RISK_LEVEL_TONES).toStrictEqual({ low: 'green', elevated: 'orange', high: 'orange', critical: 'red' })
     })
 })
 

@@ -1,10 +1,11 @@
 import React from 'react'
+import { cn } from 'simple-react-ui-kit'
 
 import { useTranslation } from 'next-i18next/pages'
 
 import { ApiType } from '@/api'
 
-import { clampContribution, getRiskLevelCssVar } from './utils'
+import { clampContribution, RISK_LEVEL_TONES } from './utils'
 
 import styles from './styles.module.sass'
 
@@ -33,8 +34,7 @@ interface FloodRiskBarsProps {
 
 export const FloodRiskBars: React.FC<FloodRiskBarsProps> = ({ components, level }) => {
     const { t } = useTranslation()
-    // The token itself, not its resolved value: the same on the server and in the browser
-    const color = `var(${getRiskLevelCssVar(level)})`
+    const tone = RISK_LEVEL_TONES[level]
 
     return (
         <div className={styles.bars}>
@@ -49,8 +49,8 @@ export const FloodRiskBars: React.FC<FloodRiskBarsProps> = ({ components, level 
                         <span className={styles.barLabel}>{t(COMPONENT_I18N_KEYS[key])}</span>
                         <div className={styles.barTrack}>
                             <div
-                                className={styles.barFill}
-                                style={{ width: `${widthPct}%`, backgroundColor: color }}
+                                className={cn(styles.barFill, styles[tone])}
+                                style={{ width: `${widthPct}%` }}
                             />
                         </div>
                         <span className={styles.barValue}>+{comp.contribution}</span>
