@@ -8,15 +8,17 @@
 |------------------|--------------------------------------------------------------------|
 | Framework        | PHPUnit 11.5                                                       |
 | Configuration    | `server/phpunit.xml.dist`                                          |
-| Test paths       | `server/tests/unit/`, `server/tests/database/`                     |
+| Test suite       | One suite (`App`) covering everything under `server/tests/`        |
 | Bootstrap        | CodeIgniter 4 framework bootstrap (configured in `phpunit.xml.dist`) |
+| Test database    | `tests` group in `app/Config/Database.php` — in-memory SQLite      |
 
 ### Test Categories
 
 | Directory                 | Type              | Description                                        |
 |---------------------------|-------------------|----------------------------------------------------|
-| `server/tests/unit/`      | Unit tests        | Test individual classes in isolation, no DB needed |
-| `server/tests/database/`  | Integration tests | Test models and queries against a real database    |
+| `server/tests/unit/`      | Unit tests        | Controllers, models, libraries, filters, commands — models and the DB are mocked |
+| `server/tests/database/`  | Example           | CodeIgniter's example database test (in-memory SQLite) |
+| `server/tests/session/`   | Example           | CodeIgniter's example session test                 |
 
 ### Running Tests
 
@@ -26,13 +28,13 @@ cd server
 # Run all tests
 vendor/bin/phpunit
 
-# Run only unit tests
-vendor/bin/phpunit --testsuite unit
+# Run only one directory
+vendor/bin/phpunit tests/unit
 
-# Run only database tests
-vendor/bin/phpunit --testsuite database
+# Run one test class
+vendor/bin/phpunit --filter PrecipitationModelTest
 
-# Run with verbose output
+# Run with readable output
 vendor/bin/phpunit --testdox
 ```
 
@@ -41,8 +43,8 @@ vendor/bin/phpunit --testdox
 Coverage is configured in `server/phpunit.xml.dist`:
 
 - **Source:** `server/app/**/*.php`
-- **Excluded:** view files, `Routes.php`
-- **Output formats:** HTML report and Clover XML (`clover.xml`)
+- **Excluded:** `app/Views`, `app/Config/Routes.php`
+- **Output formats:** Clover XML (`build/logs/clover.xml`), HTML (`build/logs/html`) and a text summary
 
 To generate a coverage report locally PHP must have Xdebug or PCOV installed:
 
@@ -70,6 +72,8 @@ Tests are co-located close to the code they cover:
 | Location                      | What is tested                                          |
 |-------------------------------|---------------------------------------------------------|
 | `client/tools/*.test.ts`      | Pure utility / helper functions                         |
+| `client/hooks/*.test.ts`      | Custom React hooks                                      |
+| `client/api/*.test.ts`        | SSR prefetch helpers                                    |
 | Next to component files       | Component render and interaction tests                  |
 
 ### Running Tests
@@ -90,7 +94,7 @@ yarn test:coverage
 ### Coverage
 
 - **Included:** all `.ts` and `.tsx` files
-- **Excluded:** test files themselves (`*.test.ts`, `*.test.tsx`), index barrel files (`index.ts`), Next.js page files (covered by E2E, not unit tests)
+- **Excluded:** `*.test.tsx` files, `*.d.ts`, `index.ts` barrel files, Next.js page files (`pages/**`) and `.next/`
 
 ---
 
@@ -98,23 +102,28 @@ yarn test:coverage
 
 ### `ui-checks.yml` — Pull Request Quality Gate
 
-Runs on every PR targeting `main`. Steps:
+Runs on every PR targeting `main` that touches `client/**`. Steps:
 
-1. Install dependencies (`yarn install`)
-2. Run ESLint
-3. Run Prettier check
-4. Run Jest (`yarn test --ci`)
+1. Install dependencies (`yarn workspaces focus`)
+2. Run ESLint (`yarn eslint:check`)
+3. Run Prettier check (`yarn prettier:check`)
+4. Run Jest (`yarn test`)
 5. Run `yarn build` (type-check + Next.js compilation)
 
 All steps must pass before a PR can be merged.
 
+### `api-checks.yml` — Server Quality Gate
+
+Runs on every PR targeting `main` that touches `server/**`: `composer install`, then `vendor/bin/phpunit --no-coverage` on PHP 8.2.
+
 ### `sonarcloud.yml` — Code Quality Analysis
 
-Runs on push and PR events. Steps:
+Runs on push to `main` (including `v*` tags) and on PRs. Steps:
 
-1. Run Jest with LCOV coverage output
-2. Upload LCOV report to SonarCloud
-3. SonarCloud evaluates the quality gate
+1. Run PHPUnit with Clover coverage (`server/build/logs/clover.xml`)
+2. Run Jest with LCOV coverage output (`yarn test:coverage`)
+3. Upload both reports to SonarCloud
+4. SonarCloud evaluates the quality gate
 
 | SonarCloud setting | Value                              |
 |--------------------|------------------------------------|
@@ -123,7 +132,7 @@ Runs on push and PR events. Steps:
 
 ### `arduino-code-check.yml` — Firmware Compilation
 
-Compiles the Arduino sketch to verify it builds without errors on every push and PR. No upload to hardware occurs in CI.
+Compiles every sketch in `arduino/*/` with `arduino-cli` for the Arduino Uno (`arduino:avr:uno`), with the bundled BMP085/PCF8574 libraries installed, on every push to `main` and every PR touching `arduino/**`. No upload to hardware occurs in CI.
 
 ---
 

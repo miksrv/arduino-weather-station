@@ -13,9 +13,8 @@ use to test your application. Those details can be found in the documentation.
 
 ## Requirements
 
-It is recommended to use the latest version of PHPUnit. At the time of this
-writing we are running version 9.x. Support for this has been built into the
-**composer.json** file that ships with CodeIgniter and can easily be installed
+The project uses PHPUnit 11.5. It is listed in the `require-dev` section of
+**composer.json** and can easily be installed
 via [Composer](https://getcomposer.org/) if you don't already have it installed globally.
 
 ```console
@@ -28,15 +27,16 @@ If running under macOS or Linux, you can create a symbolic link to make running 
 > ln -s ./vendor/bin/phpunit ./phpunit
 ```
 
-You also need to install [XDebug](https://xdebug.org/docs/install) in order
-for code coverage to be calculated successfully. After installing `XDebug`, you must add `xdebug.mode=coverage` in the **php.ini** file to enable code coverage.
+You also need to install [XDebug](https://xdebug.org/docs/install) or PCOV in order
+for code coverage to be calculated successfully. With `XDebug`, you must add `xdebug.mode=coverage` in the **php.ini** file to enable code coverage.
 
 ## Setting Up
 
-A number of the tests use a running database.
-In order to set up the database edit the details for the `tests` group in
-**app/Config/Database.php** or **phpunit.xml**.
-Make sure that you provide a database engine that is currently running on your machine.
+The application tests in **tests/unit/** mock the models and need no database.
+Only CodeIgniter's example tests in **tests/database/** and **tests/session/** use one:
+the `tests` group in **app/Config/Database.php**, an in-memory SQLite database
+(the PHP `sqlite3` extension must be enabled). To test against another database, edit the
+`tests` group or the database settings in **phpunit.xml**.
 More details on a test database setup are in the
 [Testing Your Database](https://codeigniter4.github.io/userguide/testing/database.html) section of the documentation.
 
@@ -58,7 +58,7 @@ You can limit tests to those within a single test directory by specifying the
 directory name after phpunit.
 
 ```console
-> ./phpunit app/Models
+> ./phpunit tests/unit
 ```
 
 ## Generating Code Coverage
@@ -80,14 +80,14 @@ The HTML files can be viewed by opening **tests/coverage/index.html** in your fa
 
 ## PHPUnit XML Configuration
 
-The repository has a ``phpunit.xml.dist`` file in the project root that's used for
+The repository has a ``phpunit.xml.dist`` file in the `server/` directory that's used for
 PHPUnit configuration. This is used to provide a default configuration if you
 do not have your own configuration file in the project root.
 
 The normal practice would be to copy ``phpunit.xml.dist`` to ``phpunit.xml``
 (which is git ignored), and to tailor it as you see fit.
-For instance, you might wish to exclude database tests, or automatically generate
-HTML code coverage reports.
+For instance, you might wish to exclude database tests. The `.dist` file already
+writes Clover and HTML coverage reports to **build/logs/** whenever coverage is collected.
 
 ## Test Cases
 

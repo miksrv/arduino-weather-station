@@ -62,7 +62,6 @@ Detailed documentation lives in the [`/docs`](./docs) directory:
 - [Architecture](./docs/architecture.md) — system design, data flow, external services
 - [Backend](./docs/backend.md) — PHP/CodeIgniter API reference and setup
 - [Frontend](./docs/frontend.md) — Next.js app structure and development
-- [Development Guide](./docs/development.md) — local setup, commands, conventions
 - [Testing Guide](./docs/testing.md) — running tests, coverage, CI pipeline
 - [Anomaly Monitor](./docs/anomaly-monitor.md) — meteorological anomaly detection, flood risk scoring, and visualization
 - [Precipitation Calendar](./docs/precipitation-calendar.md) — annual rainfall calendar, daily totals, wet/dry streaks, and monthly breakdown

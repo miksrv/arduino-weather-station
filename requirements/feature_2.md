@@ -192,26 +192,26 @@ Layout:
 └──────────────────────────────────────────────────────┘
 ```
 
-### New Component: `WidgetObservabilityScore` (`client/components/widget-observability-score/`)
+### New Component: `WidgetObservabilityScore` (`client/widgets/widget-observability-score/`)
 
 - Circular gauge (0–10) rendered in ECharts.
 - Color: red (0–4), yellow (5–6), green (7–10).
 - Shows score number and label ("Good", "Excellent", etc.).
 
-### New Component: `WidgetMoonPhase` (`client/components/widget-moon-phase/`)
+### New Component: `WidgetMoonPhase` (`client/widgets/widget-moon-phase/`)
 
 - Renders a CSS/SVG moon phase diagram based on `illumination` and `phaseName`.
 - Shows age, illumination %, phase name.
 - Shows next new moon and full moon dates.
 
-### New Component: `WidgetObservabilityChart` (`client/components/widget-observability-chart/`)
+### New Component: `WidgetObservabilityChart` (`client/widgets/widget-observability-chart/`)
 
 - ECharts `line` chart of `score` over the 48-hour forecast array.
 - Time axis with hour labels.
 - Colored background bands (thresholds at 5 and 7).
 - Tooltip shows all contributing values on hover.
 
-### New RTK Query Endpoint (`client/api/endpoints/Astronomy.ts`)
+### New RTK Query Endpoint (`getAstronomy` in `client/api/api.ts`, types in `client/api/types/astronomy.ts`)
 
 ```typescript
 interface AstronomyForecastItem {

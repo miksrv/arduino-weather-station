@@ -4,7 +4,7 @@
 
 The **Precipitation Calendar** (`/precipitation`) is a full-year rainfall visualisation page. It displays daily precipitation totals in a compact GitHub-style contribution grid — one cell per day, coloured by rainfall intensity — so you can see seasonal patterns, dry spells, and wet periods at a glance across any recorded year.
 
-The page also surfaces three key statistics and a monthly bar chart, giving a complete picture of the year's precipitation without any need to hunt through raw data tables.
+The page also surfaces four summary cards and a monthly bar chart, giving a complete picture of the year's precipitation without any need to hunt through raw data tables.
 
 ---
 
@@ -12,7 +12,7 @@ The page also surfaces three key statistics and a monthly bar chart, giving a co
 
 ### Year Selector
 
-At the top of the page, a row of buttons shows every year for which the station has data. Click any year to reload the calendar and all statistics for that year. The current year is selected by default.
+At the top of the page, a row of buttons shows every year for which the station has precipitation data. Click any year to reload the calendar and all statistics for that year. The current year is selected by default.
 
 ### Calendar Grid
 
@@ -32,7 +32,7 @@ Dec  [■][▒][▒][□][□][□][□][□]…
 
 | Colour | Meaning |
 |--------|---------|
-| Grey (neutral) | No data recorded for this day |
+| Neutral (surface) | Dry day (0 mm) or no data — the grid does not tell the two apart |
 | Lightest blue | Trace — more than 0 mm and up to 1 mm |
 | Light blue | Light rain — more than 1 mm and up to 5 mm |
 | Medium blue | Moderate rain — more than 5 mm and up to 20 mm |
@@ -48,15 +48,16 @@ Hover over any cell to see the exact date and the daily total in millimetres.
 
 ## Statistics Cards
 
-Three summary cards appear below the calendar.
+Four summary cards appear below the calendar.
 
 | Card | What it shows |
 |------|---------------|
-| **Total precipitation** | Accumulated rainfall for the selected year in mm |
-| **Rainy days** | Number of days with more than 0.1 mm of rain, plus the percentage of the year |
-| **Longest dry stretch** | The longest unbroken sequence of days with no measurable rain — shown with the start and end dates |
+| **Total precipitation** | Accumulated precipitation for the selected year in mm |
+| **Rainy days** | Number of days with more than 0.1 mm, plus their share of the observed days |
+| **Longest dry stretch** | The longest unbroken sequence of days without a rainy day — shown with the start and end dates |
+| **Longest wet stretch** | The longest unbroken sequence of rainy days — shown with the start and end dates |
 
-> **Note:** A "rainy day" is defined as any day with a recorded total **greater than 0.1 mm**. Days with trace amounts of 0.1 mm or less count as dry for reporting purposes but do break the dry streak (see below).
+> **Note:** A "rainy day" is defined as any day with a recorded total **greater than 0.1 mm**. Days with 0.1 mm or less count as dry — for the counters and for the streaks alike.
 
 ---
 
@@ -68,12 +69,12 @@ A vertical bar chart at the bottom of the page shows precipitation totals for ea
 
 ## How Streaks Are Calculated
 
-Both the wet streak and the dry streak scan every calendar day of the selected year — including days with no station data, which are treated as 0 mm.
+Both streaks scan the **observed** days of the selected year — days with a `daily_averages` row whose precipitation is known. A day without data is neither wet nor dry: it is left out, and it ends any streak running through it.
 
-- **Wet streak** — the longest consecutive run of days where the daily total is **greater than 0 mm** (any measurable precipitation).
-- **Dry streak** — the longest consecutive run of days where the daily total is **exactly 0 mm**. Even a trace of 0.1 mm resets the dry streak counter.
+- **Wet streak** — the longest consecutive run of days where the daily total is **greater than 0.1 mm**.
+- **Dry streak** — the longest consecutive run of days where the daily total is **0.1 mm or less**.
 
-Streaks cross month boundaries naturally. The station reports only the longest streak found; shorter streaks during the year are not listed separately.
+Streaks cross month boundaries naturally. Only the longest streak of each kind is reported; shorter streaks during the year are not listed separately.
 
 > For the current year, only days up to and including today are considered — future dates are not counted as dry days.
 
@@ -81,7 +82,7 @@ Streaks cross month boundaries naturally. The station reports only the longest s
 
 ## Interpreting the Data
 
-**Seasonal patterns are immediately visible.** In the Orenburg region, winters typically show sparse blue cells (frozen precipitation is not always captured by the rain gauge), spring brings a cluster of moderate rainfall, and summer is characterised by alternating wet and dry periods.
+**Seasonal patterns are immediately visible.** In the Orenburg region, winters typically show sparse blue cells, spring brings a cluster of moderate rainfall, and summer is characterised by alternating wet and dry periods.
 
 **Long dry stretches in summer** (July–August) are normal for the continental climate of the southern Urals and typically span 3–5 weeks. Stretches exceeding 40 days are historically unusual and may indicate drought conditions.
 
@@ -91,19 +92,17 @@ Streaks cross month boundaries naturally. The station reports only the longest s
 
 ## Frequently Asked Questions
 
+**Where does the precipitation figure come from?**
+
+The station hardware has no rain gauge. Precipitation is reported by the external weather sources (OpenWeatherMap, WeatherAPI, VisualCrossing, Open-Meteo, airport METAR) that `system:getCurrentWeather` stores in `raw_weather_data`. Each hour's amount is the mean of the per-source means, so one wet source among dry ones does not make the whole hour wet, and the daily total is the sum of the hourly amounts.
+
 **Why does the total precipitation differ from official meteorological reports?**
 
-The station's rain gauge measures precipitation at the installation point only, while official totals are station-averaged over a wider area. Micro-topographic effects, wind, and evaporation from the gauge funnel can all introduce differences of 10–20 % compared with regional averages.
-
-**Why are some winter days shown as grey (no data)?**
-
-Snow and ice can block the rain gauge funnel. The station records 0 mm during blockage periods, which are omitted from the grid to distinguish "no data" from "confirmed dry day." Snow water equivalent is tracked separately on the [Anomaly Monitor](./anomaly-monitor.md) page using a temperature-index model.
+The sources are model and nowcast estimates for the station's coordinates, plus a nominal rate (mm/h by precipitation kind and intensity) derived from the nearby airport METAR, not a gauge at the installation point, and they are averaged with each other. Differences of 10–20 % compared with official station totals are normal.
 
 **Why does the calendar show fewer rainy days than I remember?**
 
-Only days with a recorded total **above 0.1 mm** count as rainy. Very light drizzle or dew condensation may register below this threshold.
-
----
+Only days with a recorded total **above 0.1 mm** count as rainy. Very light drizzle may stay below this threshold.
 
 ---
 
@@ -123,7 +122,6 @@ Only days with a recorded total **above 0.1 mm** count as rainy. Very light driz
 {
   "year": 2025,
   "days": [
-    { "date": "2025-01-01", "total": 0.0 },
     { "date": "2025-01-14", "total": 3.2 }
   ],
   "stats": {
@@ -142,40 +140,29 @@ Only days with a recorded total **above 0.1 mm** count as rainy. Very light driz
 }
 ```
 
-`days` contains **only days with recorded precipitation** (`total > 0`). Days absent from the array had no measurable rain. The frontend fills in the full calendar grid by treating absent dates as 0 mm.
+`days` contains **only days with recorded precipitation** (`total > 0`). Days absent from the array are drawn as dry cells by the frontend.
 
-`stats` is computed entirely in PHP from the `days` array — no extra database queries are made.
+`dryDays` counts observed days only, so `rainyDays + dryDays` can be smaller than the number of days in the year. Responses are cached on the server: 5 minutes for the current year, 1 hour for a year that ended in the last few days, 7 days for older years.
 
 ### Precipitation Aggregation
 
-Daily totals are computed from `raw_weather_data` using a two-level query to avoid inflating values when multiple external API sources report data for the same time period:
+The calendar reads `daily_averages`, whose `precipitation` is the day's total. It is built in two steps by `system:getCurrentWeather` (and `system:rebuildAverages` for history):
 
-```sql
--- Step 1: average all source readings within each calendar hour
-SELECT DATE(date) AS day,
-       DATE_FORMAT(date, '%Y-%m-%d %H:00:00') AS hour_slot,
-       AVG(precipitation) AS hour_avg
-FROM raw_weather_data
-WHERE YEAR(date) = ?
-  AND precipitation IS NOT NULL AND precipitation > 0
-GROUP BY day, hour_slot
+1. `RawWeatherDataModel::getHourlyAverages()` — for each hour, the mean of the per-source mean precipitation (a dry report counts too), stored in `hourly_averages`.
+2. `HourlyAveragesModel::getDailyAverages()` — `SUM` of the hourly amounts of the day, stored in `daily_averages`.
 
--- Step 2: sum hourly averages to get the daily total
-SELECT day, ROUND(SUM(hour_avg), 1) AS total
-FROM ( … ) AS hourly
-GROUP BY day ORDER BY day
-```
-
-The inner `AVG` collapses multiple sources (OpenWeatherMap, WeatherAPI, VisualCrossing, CustomStation) that each report the same physical rain event. The outer `SUM` then accumulates those hourly values into a correct daily total.
+`PrecipitationModel` then only reads `daily_averages`: `getDailyTotals()` (days with `precipitation > 0`, rounded to 0.1 mm), `getObservedDays()` (days with a non-NULL value, dry ones included) and `getAvailableYears()`. The climate page sums the same daily values.
 
 ### Streak Algorithm
 
-`PrecipitationModel::getStats()` expands the sparse `days` array into a **complete calendar** (every day from `{year}-01-01` to `min({year}-12-31, today)`) before running streak detection. Missing days are inserted with `total = 0.0`. This ensures that long dry periods with no recorded measurements are counted correctly.
+`PrecipitationModel::getStats()` expands the sparse `days` array into a calendar of the **observed** days (from `{year}-01-01` to `min({year}-12-31, today)`): observed days missing from `days` are inserted with `total = 0.0`, unobserved days are left out. Statistics come from this calendar only — no extra database queries.
 
 `_computeStreaks()` then performs a single linear pass over the sorted calendar:
-- **Wet threshold:** `total > 0.0` — any measurable precipitation.
-- **Dry threshold:** `total === 0.0` — trace amounts (≤ 0.1 mm) also count as wet for streak purposes, so they break a dry streak.
-- The `rainyDays` / `dryDays` counters in `getStats()` use the stricter `> 0.1 mm` threshold, matching the user-facing definition of a "rainy day."
+- **Wet:** `total > RAIN_THRESHOLD_MM` (0.1 mm); everything else is dry.
+- A gap in the dates (an unobserved day) resets both running streaks.
+- The `rainyDays` / `dryDays` counters use the same threshold.
+
+`PrecipitationModel::RAIN_THRESHOLD_MM` is the single source of truth for this threshold (the event feed and the freezing-rain check use it too).
 
 ### Frontend Components
 

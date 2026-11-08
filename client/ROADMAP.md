@@ -1,8 +1,8 @@
 # Frontend Roadmap — Arduino Weather Station Client
 
 Generated: 2026-03-14
-Updated: 2026-04-05
-Scope: `/client` directory (Next.js 16, React 19, TypeScript 5.9, RTK Query, ECharts, i18next)
+Updated: 2026-11-05
+Scope: `/client` directory (Next.js 16, React 19, TypeScript 6.0, RTK Query, ECharts, i18next)
 
 ---
 
@@ -26,7 +26,7 @@ Scope: `/client` directory (Next.js 16, React 19, TypeScript 5.9, RTK Query, ECh
 
 ### QC-11 · `encodeQueryData` uses `for...in` loop which iterates inherited properties [Low]
 
-**File:** `tools/helpers.ts` — lines 15–19
+**File:** `tools/helpers.ts` — lines 18–22
 
 ```ts
 for (const key in data) {
@@ -38,7 +38,7 @@ for (const key in data) {
 
 ### QC-13 · Switch `case` order in `colors.ts` — `undefined` case appears after `default` [Medium]
 
-**File:** `tools/colors.ts` — lines 68–72
+**File:** `tools/colors.ts` — lines 105–109
 
 ```ts
 default:
@@ -53,21 +53,6 @@ The `undefined` case is unreachable because `default` matches first. Either move
 ---
 
 ## 2. Performance
-
-### PERF-03 · `currentDate` and `yesterdayDate` are module-level constants evaluated once at import time [Medium]
-
-**File:** `tools/date.ts` — lines 10–12
-
-```ts
-export const currentDate = dayjs().utc(false).tz(TIME_ZONE)
-export const yesterdayDate = currentDate.subtract(1, 'day').toDate()
-```
-
-These are computed when the module is first imported and never update. On long-running sessions or after midnight, the dates become stale. Query args using these values do not change, so no re-fetch occurs after midnight.
-
-Fix: convert to functions (`getCurrentDate()`, `getYesterdayDate()`) and call them at query-arg computation time, or store a derived value that includes the current date in component state so it refreshes.
-
----
 
 ### PERF-06 · No RTK Query `keepUnusedDataFor` tuning [Low]
 
@@ -115,44 +100,23 @@ None of the pages or widgets check `isError` from RTK Query. If the API is unrea
 
 ---
 
-### FEAT-06 · `heatmap.tsx` `isMobile` uses synchronous `window.innerWidth` without resize listener [Medium]
-
-**File:** `components/widget-heatmap/Heatmap.tsx` — line 33
-
-```ts
-const isMobile = isClient && !!(window?.innerWidth && window?.innerWidth < 500)
-```
-
-`isMobile` is computed once when `isClient` becomes `true` and never updates on window resize. The heatmap title visibility (`show: !isMobile`) therefore becomes stale after orientation changes. Add a resize listener or use a CSS media query approach.
-
----
-
 ## 5. Security
 
 > All items below were identified during a security audit. Severity levels: **CRITICAL** · **HIGH** · **MEDIUM** · **LOW**
 
 ---
 
-### SEC-01 · Missing HTTP security headers — no CSP, X-Frame-Options, HSTS, or X-Content-Type-Options [HIGH]
+### SEC-01 · Content-Security-Policy is report-only [HIGH]
 
 **File:** `next.config.js`
 
-The `next.config.js` exports no `headers()` function, so every page is served without any protective HTTP headers:
-
-- **Content-Security-Policy** — no restriction on which scripts, styles, or frames may load.
-- **X-Frame-Options / CSP `frame-ancestors`** — the application can be embedded in a third-party `<iframe>`, enabling clickjacking attacks.
-- **X-Content-Type-Options: nosniff** — browsers may sniff response MIME types.
-- **Strict-Transport-Security** — no HSTS; downgrade attacks are possible.
-- **Referrer-Policy** — referrer data leaks to third-party domains.
-- **Permissions-Policy** — no restrictions on camera, microphone, or geolocation access.
-
-Add a `headers()` export to `next.config.js` setting at minimum `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, and a restrictive `Content-Security-Policy`.
+`headers()` already sends `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy` and (in production) `Strict-Transport-Security`, but the CSP is only sent as `Content-Security-Policy-Report-Only`, so nothing is actually blocked. Once the reports are clean, switch it to an enforcing `Content-Security-Policy` header.
 
 ---
 
 ### SEC-03 · ECharts tooltip formatters render unescaped API data as raw HTML [MEDIUM]
 
-**Files:** `components/widget-chart/Chart.tsx`, `components/widget-heatmap/Heatmap.tsx`, `components/widget-meteogram/Meteogram.tsx`, `components/widget-precip-chart/WidgetPrecipChart.tsx`, `components/widget-climate/Chart.tsx`
+**Files:** `components/widget-chart/Chart.tsx`, `components/widget-heatmap/Heatmap.tsx`, `components/widget-precip-chart/WidgetPrecipChart.tsx`, `components/widget-climate/Chart.tsx`
 
 All chart tooltip formatters build HTML strings by concatenating values received directly from the API, then pass the resulting string to ECharts which renders it as `innerHTML` without escaping. If the backend were to return a malicious string, it would execute as JavaScript.
 
@@ -160,21 +124,21 @@ Sanitize or numeric-coerce all values before inserting them into formatter strin
 
 ---
 
-### SEC-05 · `NEXT_LOCALE` cookie set without `Secure` or `SameSite` flags [LOW]
+### SEC-05 · `NEXT_LOCALE` cookie set without the `Secure` flag [LOW]
 
-**File:** `components/language-switcher/LanguageSwitcher.tsx`, line 31
+**File:** `components/language-switcher/LanguageSwitcher.tsx`, line 42
 
 ```ts
-void setCookie('NEXT_LOCALE', locale)
+void setCookie('NEXT_LOCALE', locale, { maxAge: LOCALE_COOKIE_MAX_AGE, path: '/', sameSite: 'lax' })
 ```
 
-The `setCookie` call passes no options, so the cookie is written without `Secure`, without `SameSite`, and without `HttpOnly`. Pass `{ secure: true, sameSite: 'lax' }` to all `setCookie` calls.
+`sameSite: 'lax'` is already set, but the cookie is still written without `Secure`. Add `secure: true`.
 
 ---
 
 ### SEC-06 · Application version number exposed in the footer [LOW]
 
-**File:** `components/footer/Footer.tsx`, lines 31–32
+**File:** `components/footer/Footer.tsx`, line 40
 
 The exact `package.json` version string is rendered on every page. This gives any visitor instant visibility into the precise software version. Consider removing the version from the rendered HTML or showing it only in dev mode.
 
@@ -188,11 +152,11 @@ The PM2 deployment config commits the production service name (`meteo.miksoft.pr
 
 ---
 
-### SEC-08 · `sessionStorage` and `localStorage` data deserialised without runtime schema validation [LOW]
+### SEC-08 · `localStorage` data deserialised without runtime schema validation [LOW]
 
-**Files:** `pages/climate.tsx`, `hooks/useLocalStorage.ts`
+**Files:** `hooks/useLocalStorage.ts`, `tools/localstorage.ts`
 
-Both files parse JSON from browser storage and immediately cast the result to a typed interface with no runtime field validation. Add a lightweight runtime validator (e.g., a shape-check function) before casting.
+Both files parse JSON from `localStorage` and immediately cast the result to a typed interface with no runtime field validation. Add a lightweight runtime validator (e.g., a shape-check function) before casting.
 
 ---
 
@@ -200,26 +164,24 @@ Both files parse JSON from browser storage and immediately cast the result to a 
 
 ### High (fix first)
 
-| ID      | Summary                                                    |
-| ------- | ---------------------------------------------------------- |
-| SEC-01  | Missing HTTP security headers (CSP, X-Frame-Options, HSTS) |
-| FEAT-03 | No error state handling for any RTK Query endpoint         |
+| ID      | Summary                                            |
+| ------- | -------------------------------------------------- |
+| SEC-01  | CSP is report-only — switch to enforcing           |
+| FEAT-03 | No error state handling for any RTK Query endpoint |
 
 ### Medium (address in regular sprints)
 
-| ID      | Summary                                                   |
-| ------- | --------------------------------------------------------- |
-| SEC-03  | ECharts tooltip renders unescaped API data as HTML        |
-| QC-03   | `showOverlay` redux field is never dispatched             |
-| QC-13   | `undefined` case after `default` in switch is unreachable |
-| PERF-03 | `currentDate` / `yesterdayDate` never refresh             |
-| FEAT-06 | Heatmap `isMobile` stale after window resize              |
+| ID     | Summary                                                   |
+| ------ | --------------------------------------------------------- |
+| SEC-03 | ECharts tooltip renders unescaped API data as HTML        |
+| QC-03  | `showOverlay` redux field is never dispatched             |
+| QC-13  | `undefined` case after `default` in switch is unreachable |
 
 ### Low (backlog)
 
 | ID      | Summary                                             |
 | ------- | --------------------------------------------------- |
-| SEC-05  | `NEXT_LOCALE` cookie missing `Secure`/`SameSite`    |
+| SEC-05  | `NEXT_LOCALE` cookie missing `Secure`               |
 | SEC-06  | App version number exposed in footer                |
 | SEC-07  | `ecosystem.config.js` exposes production port       |
 | SEC-08  | Storage deserialisation without schema validation   |

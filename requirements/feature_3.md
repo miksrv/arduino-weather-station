@@ -4,13 +4,13 @@
 
 A dedicated **Wind** page providing a full statistical breakdown of wind behavior at the station's location. The centrepiece is an interactive **wind rose diagram** — a polar chart showing the frequency and speed distribution of wind across 16 compass sectors. Alongside it, the page presents speed distribution histograms, calm-day statistics, and strongest recorded gusts — giving a complete picture of the local wind climate.
 
-Wind data is one of the richest datasets the station records (`wind_speed`, `wind_deg`, `wind_gust`) and is currently under-represented: it only appears as a single value on the Sensors page.
+Wind data is one of the richest datasets the station records (`wind_speed`, `wind_deg`, `wind_gust`) and is currently under-represented: the Sensors page shows only the current wind (`client/widgets/widget-sensor-wind/`) and an 8-sector wind rose of the last 24 hours (`client/widgets/widget-wind-rose/`, computed on the client from `/history`); there is no long-range directional analysis.
 
 ---
 
 ## Motivation
 
-- The station records wind direction and speed at every 10-minute interval, making multi-year directional analysis possible.
+- The station records wind direction and speed every minute (`SEND_DATA_INTERVAL = 60` s in `arduino/main/main.ino`), making multi-year directional analysis possible.
 - Wind rose diagrams are standard in meteorology but absent from most DIY stations.
 - Understanding prevailing wind direction is practically useful for the observatory (dome orientation, tube currents) and for local residents.
 - Gust frequency analysis helps identify storm patterns.
@@ -160,25 +160,24 @@ Layout:
 └──────────────────────────────────────────────────┘
 ```
 
-### New Component: `WidgetWindRose` (`client/components/widget-wind-rose/`)
+### Wind rose: extend the existing `WidgetWindRose` (`client/widgets/widget-wind-rose/`)
 
-Implemented using ECharts `radar` or custom polar series.
+The widget already renders a stacked ECharts polar `bar` series with a speed legend, but it bins up to 24 h of `/history` readings on the client into 8 directions and 6 speed bins (calm < 0.5 m/s is computed but not shown). For this page it still needs:
 
 - 16 axes (compass directions as labels).
 - Each axis has stacked bars for 4 speed bands.
 - Colors: calm=grey, 0–3=light-blue, 3–6=blue, 6–10=orange, 10+=red.
 - Calm percentage displayed below the chart.
-- Legend showing speed band colors.
 - Responsive: scales with container width.
 
-### New Component: `WidgetSpeedDistribution` (`client/components/widget-speed-distribution/`)
+### New Component: `WidgetSpeedDistribution` (`client/widgets/widget-speed-distribution/`)
 
 - Horizontal ECharts bar chart.
 - X-axis: percentage of observations.
 - Y-axis: speed range labels.
 - Color gradient from light blue (calm) to dark red (storm).
 
-### New RTK Query Endpoint (`client/api/endpoints/Wind.ts`)
+### New RTK Query Endpoint (`getWind` in `client/api/api.ts`, types in `client/api/types/wind.ts`)
 
 ```typescript
 interface WindRoseSector {
@@ -220,7 +219,6 @@ Add "Wind" to the main navigation menu.
 
 ```json
 "wind-analysis": "Wind Analysis",
-"wind-rose": "Wind Rose",
 "speed-distribution": "Speed Distribution",
 "monthly-avg-speed": "Monthly Average Wind Speed",
 "calm": "Calm",

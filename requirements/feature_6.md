@@ -17,6 +17,7 @@ Together they transform raw archives into an engaging, daily-visit reason that i
 - Streaks are the single most relatable weather statistic for non-meteorologists ("it's been 27 days without rain — is that a record?").
 - "Today in history" is a universally engaging daily feature used by major weather services and newspapers.
 - Neither feature requires any new sensor data; both are 100% computable from the existing `daily_averages` table.
+- Only a small part exists today: the Precipitation page shows the longest dry and wet streak of the selected year (`PrecipitationModel::_computeStreaks`, `client/components/widget-streak-card/`). Current (ongoing) streaks, all-time streak records, the other streak types and Today in History are not implemented.
 - The streak counters also double as anomaly detection: a "28 days without rain" banner signals a drought even to a casual visitor.
 
 ---
@@ -224,7 +225,7 @@ Layout:
   Historical average for March 16: +3.9 °C · 0.77 mm · 48% clouds
 ```
 
-### New Component: `WidgetStreak` (`client/components/widget-streak/`)
+### New Component: `WidgetStreak` (`client/widgets/widget-streak/`)
 
 Props:
 - `streakId: string` — used to look up label and icon
@@ -239,13 +240,13 @@ Displays:
 - Record days in a smaller, subdued style
 - Inactive state: greyed out with record shown
 
-### New Component: `WidgetTodayInHistory` (`client/components/widget-today-in-history/`)
+### New Component: `WidgetTodayInHistory` (`client/widgets/widget-today-in-history/`)
 
 - Card grid — one card per historical year.
 - Each card: temperature (large), precipitation, clouds (with WeatherIcon), wind speed.
 - Footer row: "Historical average for this day".
 
-### New RTK Query Endpoint (`client/api/endpoints/Statistics.ts`)
+### New RTK Query Endpoint (`getStatistics` in `client/api/api.ts`, types in `client/api/types/statistics.ts`)
 
 ```typescript
 interface StreakEntry {

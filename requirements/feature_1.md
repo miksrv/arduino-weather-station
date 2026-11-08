@@ -143,7 +143,7 @@ Category: Wind
 [Footer note: "Records computed from data since January 2022"]
 ```
 
-### New RTK Query Endpoint (`client/api/endpoints/Records.ts`)
+### New RTK Query Endpoint (`getRecords` in `client/api/api.ts`, types in `client/api/types/records.ts`)
 
 ```typescript
 interface RecordValue {
@@ -174,7 +174,7 @@ interface RecordsRequest {
 }
 ```
 
-### New Component: `WidgetRecord` (`client/components/widget-record/`)
+### New Component: `WidgetRecord` (`client/widgets/widget-record/`)
 
 Props:
 - `label: string` — translated label (e.g., "Maximum temperature")
@@ -190,7 +190,7 @@ Displays:
 
 ### Navigation
 
-Add "Records" to the main navigation menu (`client/components/app-bar/` and locale files).
+Add "Records" to the main navigation menu (`client/components/app-layout/Menu.tsx` and locale files).
 
 ---
 

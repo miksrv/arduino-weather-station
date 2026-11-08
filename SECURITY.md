@@ -6,12 +6,10 @@ This section lists the versions of the project that are currently supported with
 
 | Version | Supported          |
 |---------| ------------------ |
-| 3.4.x   | :white_check_mark: |
-| 3.3.x   | :white_check_mark: |
-| 2.1.x   | :x:                |
-| 2.0.x   | :x:                |
+| 3.10.x  | :white_check_mark: |
+| < 3.10  | :x:                |
 
-We only support the latest stable versions (3.3.x and 3.4.x). If you are using an older version, please upgrade to receive the latest security patches.
+We only support the latest stable version (3.10.x). If you are using an older version, please upgrade to receive the latest security patches.
 
 ## Reporting a Vulnerability
 
@@ -19,7 +17,7 @@ If you discover a vulnerability in the project, we would appreciate it if you co
 
 ### How to report a vulnerability:
 
-1. Email us at: `astro@miksoft.pro` (replace with your actual email).
+1. Email us at: `astro@miksoft.pro`.
 2. Please provide as much detail as possible:
    - A description of the vulnerability.
    - Steps to reproduce it.

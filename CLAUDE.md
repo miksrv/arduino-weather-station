@@ -40,8 +40,6 @@ Agents must read their instruction file before starting. Each agent reports comp
 
 > Note: only backend-agent and frontend-agent currently exist under `.claude/agents/`. There is no separate QA or Doc agent — testing and docs work is handled by whichever of the two agents owns the affected code.
 
-> Note: `docs/*.md` (architecture, backend, frontend, testing) is a snapshot that has drifted from the code — it references old command names (`system:current`/`system:forecast`/`system:narodmon` instead of the actual `system:getCurrentWeather`/`getForecastWeather`/`sendNarodmonData`) and is missing the Anomaly/Precipitation/Climate controllers. Treat this file and the current code as authoritative over `docs/`.
-
 ---
 
 ## High-Level Architecture
@@ -92,16 +90,16 @@ arduino-weather-station/
 ├── server/                # CodeIgniter 4 backend
 │   ├── app/
 │   │   ├── Commands/      # spark CLI commands (system:* — see Development Commands)
-│   │   ├── Controllers/   # REST controllers (Current, Forecast, Heatmap, History, Sensors, Precipitation, Anomaly, Climate)
+│   │   ├── Controllers/   # REST controllers (Current, Forecast, Heatmap, History, Sensors, Precipitation, Anomaly, Climate, Events)
 │   │   ├── Database/      # Migrations + Seeds
 │   │   ├── Entities/      # Data entities (WeatherData, WeatherDataEntity, WeatherForecastEntity)
-│   │   ├── Libraries/     # External API clients (OpenWeather, WeatherAPI, VisualCrossing, OpenMeteo, Metar, NarodMon) + AnomalyDetector, SnowpackCalculator
+│   │   ├── Libraries/     # External API clients (OpenWeather, WeatherAPI, VisualCrossing, OpenMeteo, Metar, NarodMon) + AnomalyDetector, SnowpackCalculator, ForecastAggregator, ObservatorySafety, EventFeedBuilder, DevWeatherGenerator
 │   │   ├── Models/        # DB models (RawWeatherDataModel, Hourly/DailyAveragesModel, ForecastWeatherDataModel, ClimateModel, PrecipitationModel, AnomalyModel, AnomalyLogModel)
 │   │   └── Config/        # Routes.php, app configuration
 │   └── tests/             # PHPUnit test suites (unit/, database/, session/)
 ├── models/                # 3D-printable STL/CAD files for enclosure
 ├── docs/                  # Markdown docs (architecture, backend, frontend, testing, etc.) + screenshots
-├── requirements/          # Feature proposal specs (not yet implemented — e.g. records, wind rose, solar dashboard)
+├── requirements/          # Feature proposal specs (not yet implemented — e.g. records, wind analysis, solar dashboard, anomaly push notifications)
 ├── config/                # Shared configuration files (docker-compose.yml, nginx.conf)
 └── .github/workflows/     # GitHub Actions (sonarcloud, ui-checks, ui-deploy, api-checks, api-deploy, arduino-code-check)
 ```
@@ -246,6 +244,7 @@ CodeIgniter dotted-key env vars — database (`database.production.*`), app coor
 | GET | `/anomaly` | Anomaly::index |
 | GET | `/anomaly/history` | Anomaly::history |
 | GET | `/climate` | Climate::index |
+| GET | `/events` | Events::index |
 
 `/current/text` is the `key=value` feed of the observatory's INDI Weather Watcher (the roof closes on its alerts), so it is never cached and never emits an empty value (the driver's parser would swallow the next line). Its `precipitation`, `clouds`, `wind_speed`, `wind_gust` and `forecast` lines are the confirmed values of `App\Libraries\ObservatorySafety`: unsafe only when at least two API sources agree (clouds: their median), or for wind, the station's 30-minute median; a single source or spike never raises an alarm. These lines are always present, since the driver only creates parameters for keys it sees on connect.
 

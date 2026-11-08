@@ -138,6 +138,8 @@ A simple **sensor holder arm** used to mount both the **anemometer** and **wind 
 
 The vane uses a **5×3 mm round magnet** mounted in the rotating part and eight Hall sensors placed around the base to detect the magnet’s position.
 
+> The current firmware (`arduino/main/get_sensor_wind_direction.ino`) takes the first active sensor only, so it reports 8 directions in 45° steps; the in-between positions (two sensors active at once) are not used yet.
+
 ### Electronics Required
 - **8× Hall sensors** (digital, e.g., A3144 or similar)
 - **1× 5×3 mm round neodymium magnet**

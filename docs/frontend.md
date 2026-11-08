@@ -6,30 +6,34 @@
 |---------------------|-----------------------------------------------------------|
 | Next.js             | 16 (Pages Router)                                         |
 | React               | 19                                                        |
-| TypeScript          | 5.9, strict mode enabled                                  |
-| Redux Toolkit       | State management                                          |
+| TypeScript          | 6.0, strict mode enabled                                  |
+| Redux Toolkit       | 2.13 — state management                                   |
 | RTK Query           | Data fetching and cache management                        |
 | next-redux-wrapper  | Server-side Redux integration with Next.js                |
 | SASS / CSS Modules  | Component-scoped styling                                  |
-| ECharts             | 6 — interactive charts for weather data                   |
-| next-i18next        | Internationalisation (Russian and English)                |
+| ECharts             | 6 — interactive charts (tree-shaken, through `components/echart`) |
+| next-i18next        | 16 (i18next 26) — internationalisation (Russian and English) |
 | next-themes         | Light / dark theme switching                              |
-| Yarn                | 4 (package manager)                                       |
+| Yarn                | 4.9 (package manager)                                     |
+
+Read `client/DESIGN.md` before adding or changing any UI.
 
 ## Directory Structure
 
 ```
 client/
-├── api/                  # RTK Query API slice definitions
-├── components/           # Reusable UI components (each with CSS Module)
+├── api/                  # RTK Query API, store, application slice, SSR prefetch, types
+├── components/           # Reusable UI components and shared widget building blocks
+├── widgets/              # Finished dashboard card widgets, one directory per widget
+├── hooks/                # Shared custom React hooks
 ├── pages/                # Next.js pages (file-based routing)
 ├── public/
 │   ├── locales/
-│   │   ├── en/           # English translation JSON files
-│   │   └── ru/           # Russian translation JSON files
+│   │   ├── en/           # English translations (common.json)
+│   │   └── ru/           # Russian translations (common.json)
 │   └── images/           # Static screenshots and assets
-├── styles/               # Global styles, CSS variables, theme definitions
-├── tools/                # Pure utility functions and helpers
+├── styles/               # Global styles, theme tokens (theme.css), mixins, typography
+├── tools/                # Pure utility functions and helpers (with tests)
 ├── ui/                   # Low-level UI primitives
 ├── env                   # Environment variable template
 ├── next.config.js
@@ -39,16 +43,19 @@ client/
 
 ## Pages
 
-| Page       | Route         | Purpose                                                              |
-|------------|---------------|----------------------------------------------------------------------|
-| index      | `/`           | Current weather overview — live readings and summary cards           |
-| climate    | `/climate`    | Climate statistics and seasonal comparisons                          |
-| sensors    | `/sensors`    | List of all connected sensors with current status and readings       |
-| history    | `/history`    | Historical data browser with interactive charts and date picker      |
-| heatmap    | `/heatmap`    | Heatmap visualisation of weather metrics across a time range         |
-| forecast   | `/forecast`   | Multi-day and hourly forecast sourced from external APIs             |
-| 404        | `/404`        | Custom not-found page                                                |
-| _app       | (layout)      | Root application wrapper — Redux Provider, theme, i18n               |
+| Page            | Route            | Purpose                                                              |
+|-----------------|------------------|----------------------------------------------------------------------|
+| index           | `/`              | Current weather overview — live readings and summary cards           |
+| sensors         | `/sensors`       | Per-sensor cards with current readings, trends and the event log     |
+| history         | `/history`       | Historical data browser with interactive charts and date picker      |
+| heatmap         | `/heatmap`       | Heatmap visualisation of weather metrics across a time range         |
+| forecast        | `/forecast`      | Multi-day and hourly forecast sourced from external APIs             |
+| precipitation   | `/precipitation` | Yearly precipitation calendar, statistics and monthly totals         |
+| anomaly         | `/anomaly`       | Anomaly monitor: flood risk, snowpack, z-scores, anomaly history     |
+| climate         | `/climate`       | Climate statistics and long-term comparisons                         |
+| sitemap.xml     | `/sitemap.xml`   | XML sitemap written in `getServerSideProps`                          |
+| [...not-found]  | any other path   | Custom not-found page                                                |
+| _app            | (layout)         | Root application wrapper — Redux Provider, theme, i18n               |
 
 ## RTK Query API
 
@@ -58,19 +65,23 @@ All requests include a custom `Locale` header so the backend can serve locale-aw
 
 ### Endpoints
 
-| Endpoint name    | HTTP            | Backend route       | Used by              |
-|------------------|-----------------|---------------------|----------------------|
-| `getCurrent`     | GET             | `/current`          | index, sensors pages |
-| `getHistory`     | GET             | `/history`          | history page         |
-| `getHeatmap`     | GET             | `/heatmap`          | heatmap page         |
-| `getForecast`    | GET             | `/forecast/daily`   | forecast page        |
-| `getForecastHourly` | GET          | `/forecast/hourly`  | forecast page        |
+| Endpoint name       | HTTP | Backend route                      | Used by                          |
+|---------------------|------|------------------------------------|----------------------------------|
+| `getCurrent`        | GET  | `/current`                         | index, sensors, forecast pages   |
+| `getHistory`        | GET  | `/history`                         | index, sensors, history pages    |
+| `getHeatmap`        | GET  | `/heatmap`                         | heatmap page                     |
+| `getForecast`       | GET  | `/forecast/hourly`, `/forecast/daily` (argument `'hourly' \| 'daily'`) | index, forecast pages |
+| `getAnomaly`        | GET  | `/anomaly`                         | index, anomaly pages             |
+| `getAnomalyHistory` | GET  | `/anomaly/history`                 | defined, not used by any page yet |
+| `getPrecipitation`  | GET  | `/precipitation`                   | precipitation page               |
+| `getClimate`        | GET  | `/climate`                         | climate page                     |
+| `getEvents`         | GET  | `/events`                          | sensors page (event log widget)  |
 
-RTK Query handles loading states, error states, and caching automatically. All data fetching throughout the application goes through these endpoints — never raw `fetch` or Axios.
+RTK Query handles loading states, error states, and caching automatically. All data fetching throughout the application goes through these endpoints — never raw `fetch` or Axios. Data above the fold is prefetched on the server with `prefetchQueries()` (`api/ssr.ts`) using the same query arguments as the client hooks.
 
 ## Redux Store
 
-The store is configured in `client/store.ts` (or `client/store/`) and wrapped with `next-redux-wrapper` for SSR compatibility.
+The store is configured in `client/api/store.ts` and wrapped with `next-redux-wrapper` for SSR compatibility.
 
 ### Slices
 
@@ -85,14 +96,14 @@ The store is configured in `client/store.ts` (or `client/store/`) and wrapped wi
 |-------------------|------------------------------------------|
 | Default locale    | `ru`                                     |
 | Supported locales | `ru`, `en`                               |
-| Translation files | `client/public/locales/{locale}/*.json`  |
+| Translation files | `client/public/locales/{locale}/common.json` |
 | Library           | next-i18next                             |
 
-Pages that require translations call `serverSideTranslations` in `getStaticProps` or `getServerSideProps`, and components access strings via the `useTranslation` hook.
+Every page calls `serverSideTranslations` in `getServerSideProps`, and components access strings via the `useTranslation` hook.
 
 ## Theming
 
-Themes are managed by `next-themes`. Light and dark mode CSS custom properties (variables) are defined in `client/styles/`. Component styles reference these variables so they automatically respond to theme changes without JavaScript.
+Themes are managed by `next-themes`. Light and dark design tokens (CSS custom properties) are defined in `client/styles/theme.css`. Component styles reference these variables so they automatically respond to theme changes without JavaScript; see `client/DESIGN.md`.
 
 ## Environment Variables
 
@@ -113,9 +124,9 @@ The project enforces the following rules via ESLint and Prettier:
 | Semicolons             | No semicolons                                                      |
 | Quotes                 | Single quotes                                                      |
 | TypeScript `any`       | Not allowed — use explicit types or `unknown`                      |
-| Import order           | Enforced by `eslint-plugin-import` — groups: external, internal, relative |
+| Import order           | Enforced by `eslint-plugin-simple-import-sort` — react → node → external → `@/*` aliases → relative → styles |
 | JSX nesting depth      | Maximum 4 levels                                                   |
-| `console.log`          | Not allowed in committed code                                      |
+| `console.log`          | Not allowed (only `console.warn` / `console.error`)                |
 | Styling                | CSS Modules only — no inline styles, no global class name strings  |
 | API calls              | RTK Query only — no direct `fetch` or `axios` in components        |
 
