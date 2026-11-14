@@ -4,7 +4,7 @@
 
 | Component        | Version / Details                         |
 |------------------|-------------------------------------------|
-| PHP              | 8.2+                                      |
+| PHP              | 8.4+                                      |
 | CodeIgniter      | 4.7                                       |
 | MySQL            | Any version compatible with CI4 driver    |
 | HTTP client      | CodeIgniter `CURLRequest`                 |

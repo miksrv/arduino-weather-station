@@ -114,7 +114,7 @@ All steps must pass before a PR can be merged.
 
 ### `api-checks.yml` — Server Quality Gate
 
-Runs on every PR targeting `main` that touches `server/**`: `composer install`, then `vendor/bin/phpunit --no-coverage` on PHP 8.2.
+Runs on every PR targeting `main` that touches `server/**`: `composer install`, then `vendor/bin/phpunit --no-coverage` on PHP 8.4.
 
 ### `sonarcloud.yml` — Code Quality Analysis
 

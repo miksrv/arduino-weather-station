@@ -6,6 +6,7 @@
 
 - Client dependencies updated within their major versions (Next.js 16.4.6, Redux Toolkit 2.14, Sass 1.108, Prettier 3.10, typescript-eslint 8.72.2) and transitive packages refreshed
 - Server dependencies updated (CodeIgniter 4.7.6, PHPUnit 11.5.58)
+- The API requires PHP 8.4: CI, deploy and the composer platform moved from PHP 8.2
 
 ## 3.10.1
 

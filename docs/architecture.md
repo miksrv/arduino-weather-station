@@ -11,7 +11,7 @@
                                ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                      PHP / CODEIGNITER API                      │
-│  server/  ·  PHP 8.2+  ·  CodeIgniter 4.7  ·  MySQL            │
+│  server/  ·  PHP 8.4+  ·  CodeIgniter 4.7  ·  MySQL            │
 │                                                                 │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
 │  │  Controllers │  │    Models    │  │      Libraries       │  │

@@ -1,7 +1,7 @@
 # Backend Roadmap — Arduino Weather Station Server
 
 Generated: 2026-03-22
-Scope: `/server` directory (PHP 8.2+, CodeIgniter 4.7, MySQL)
+Scope: `/server` directory (PHP 8.4+, CodeIgniter 4.7, MySQL)
 
 ---
 
