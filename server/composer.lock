@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "codeigniter4/framework",
-            "version": "v4.7.5",
+            "version": "v4.7.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/codeigniter4/framework.git",
-                "reference": "a1f129d56df3278702a8d1048af955d0ebf68c03"
+                "reference": "d755dca632526b116e4611eea9e303505fa6889a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/codeigniter4/framework/zipball/a1f129d56df3278702a8d1048af955d0ebf68c03",
-                "reference": "a1f129d56df3278702a8d1048af955d0ebf68c03",
+                "url": "https://api.github.com/repos/codeigniter4/framework/zipball/d755dca632526b116e4611eea9e303505fa6889a",
+                "reference": "d755dca632526b116e4611eea9e303505fa6889a",
                 "shasum": ""
             },
             "require": {
@@ -81,32 +81,32 @@
                 "slack": "https://codeigniterchat.slack.com",
                 "source": "https://github.com/codeigniter4/CodeIgniter4"
             },
-            "time": "2026-10-09T15:41:56+00:00"
+            "time": "2026-11-01T18:17:59+00:00"
         },
         {
             "name": "laminas/laminas-escaper",
-            "version": "2.18.0",
+            "version": "2.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-escaper.git",
-                "reference": "06f211dfffff18d91844c1f55250d5d13c007e18"
+                "reference": "766b8583bbf64be9d3330e7a075197f54c46f642"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-escaper/zipball/06f211dfffff18d91844c1f55250d5d13c007e18",
-                "reference": "06f211dfffff18d91844c1f55250d5d13c007e18",
+                "url": "https://api.github.com/repos/laminas/laminas-escaper/zipball/766b8583bbf64be9d3330e7a075197f54c46f642",
+                "reference": "766b8583bbf64be9d3330e7a075197f54c46f642",
                 "shasum": ""
             },
             "require": {
                 "ext-ctype": "*",
                 "ext-mbstring": "*",
-                "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0"
+                "php": "~8.3.0 || ~8.4.0 || ~8.5.0 || ~8.6.0"
             },
             "conflict": {
                 "zendframework/zend-escaper": "*"
             },
             "require-dev": {
-                "infection/infection": "^0.31.0",
+                "infection/infection": "^0.32.0",
                 "laminas/laminas-coding-standard": "~3.1.0",
                 "phpunit/phpunit": "^11.5.42",
                 "psalm/plugin-phpunit": "^0.19.5",
@@ -138,11 +138,11 @@
             },
             "funding": [
                 {
-                    "url": "https://funding.communitybridge.org/projects/laminas-project",
-                    "type": "community_bridge"
+                    "url": "https://crowdfunding.linuxfoundation.org/initiatives/laminas-project",
+                    "type": "custom"
                 }
             ],
-            "time": "2025-10-14T18:31:13+00:00"
+            "time": "2026-11-10T12:33:38+00:00"
         },
         {
             "name": "psr/log",
@@ -895,16 +895,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "11.5.57",
+            "version": "11.5.58",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "36b75bf56a8535623f5b3e24b27ea1823759da1a"
+                "reference": "c14b3145a2fcfa5dd9b25ee999ce2ba5933adf6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/36b75bf56a8535623f5b3e24b27ea1823759da1a",
-                "reference": "36b75bf56a8535623f5b3e24b27ea1823759da1a",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c14b3145a2fcfa5dd9b25ee999ce2ba5933adf6f",
+                "reference": "c14b3145a2fcfa5dd9b25ee999ce2ba5933adf6f",
                 "shasum": ""
             },
             "require": {
@@ -977,7 +977,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.57"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.58"
             },
             "funding": [
                 {
@@ -985,7 +985,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-10-05T05:47:54+00:00"
+            "time": "2026-11-13T11:08:08+00:00"
         },
         {
             "name": "psr/container",
@@ -2080,16 +2080,16 @@
         },
         {
             "name": "symfony/deprecation-contracts",
-            "version": "v3.7.1",
+            "version": "v3.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/deprecation-contracts.git",
-                "reference": "f3202fa1b5097b0af062dc978b32ecf63404e31d"
+                "reference": "feb1edf4e546af3b85c5caebe8359a20db230ca3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/f3202fa1b5097b0af062dc978b32ecf63404e31d",
-                "reference": "f3202fa1b5097b0af062dc978b32ecf63404e31d",
+                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/feb1edf4e546af3b85c5caebe8359a20db230ca3",
+                "reference": "feb1edf4e546af3b85c5caebe8359a20db230ca3",
                 "shasum": ""
             },
             "require": {
@@ -2102,7 +2102,7 @@
                     "name": "symfony/contracts"
                 },
                 "branch-alias": {
-                    "dev-main": "3.7-dev"
+                    "dev-main": "3.8-dev"
                 }
             },
             "autoload": {
@@ -2127,7 +2127,7 @@
             "description": "A generic function and convention to trigger deprecation notices",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.7.1"
+                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.8.1"
             },
             "funding": [
                 {
@@ -2147,7 +2147,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-05T06:23:12+00:00"
+            "time": "2026-09-16T14:15:10+00:00"
         },
         {
             "name": "theseer/tokenizer",
