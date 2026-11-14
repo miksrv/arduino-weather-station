@@ -15,7 +15,7 @@ Full-stack DIY weather monitoring system that collects real environmental data f
 | Layer | Technology |
 |---|---|
 | Firmware | C++ (Arduino / ESP32), Arduino IDE |
-| Backend | PHP 8.2+, CodeIgniter 4.7, MySQL |
+| Backend | PHP 8.4+, CodeIgniter 4.7, MySQL |
 | Frontend | Next.js 16.4, React 19.3, TypeScript 6.0 |
 | State management | Redux Toolkit 2.13 + RTK Query, next-redux-wrapper |
 | Styling | SASS/SCSS, CSS Modules, next-themes |
