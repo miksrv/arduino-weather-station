@@ -1,4 +1,3 @@
-import React from 'react'
 import type { EChartsOption } from 'echarts'
 
 import { render } from '@testing-library/react'

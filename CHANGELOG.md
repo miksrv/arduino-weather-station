@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 3.10.3
+
+### Patch Changes
+
+- Client dependencies updated within their major versions (Redux Toolkit 2.15, next-i18next 16.5.2, echarts-for-react 3.1, simple-react-ui-kit 2.2.1, typescript-eslint 8.74, eslint-plugin-jest 29.17.1) and transitive packages refreshed
+- Unused `React` imports removed from pages and tests (reported by the updated typescript-eslint, JSX uses the automatic runtime)
+
 ## 3.10.2
 
 ### Patch Changes
