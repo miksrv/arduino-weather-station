@@ -1,4 +1,5 @@
 const { i18n } = require('./next-i18next.config.js')
+const { version } = require('./package.json')
 
 const isDev = process.env.NODE_ENV !== 'production'
 const apiHost = (process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:8080').replace(/\/+$/, '')
@@ -30,6 +31,11 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Inlined as a plain string at build time: importing package.json from a component
+    // would ship the whole file (every dependency and script) in the client chunks
+    env: {
+        NEXT_PUBLIC_APP_VERSION: version
+    },
     i18n,
     reactStrictMode: false,
     poweredByHeader: false,

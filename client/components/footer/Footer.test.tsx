@@ -6,10 +6,7 @@ import Footer from './Footer'
 
 import '@testing-library/jest-dom'
 
-jest.mock('@/package.json', () => ({
-    name: 'TestApp',
-    version: '1.0.0'
-}))
+jest.mock('@/tools/constants', () => ({ APP_VERSION: '1.0.0' }))
 
 jest.mock('@/tools/date', () => ({ formatDate: jest.fn() }))
 
