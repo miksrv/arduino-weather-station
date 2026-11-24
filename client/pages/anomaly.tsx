@@ -1,5 +1,3 @@
-import React from 'react'
-
 import type { GetServerSidePropsResult, NextPage } from 'next'
 import Head from 'next/head'
 import { useTranslation } from 'next-i18next/pages'

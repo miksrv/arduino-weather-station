@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { render } from '@testing-library/react'
 
 import { WIND_ROSE_DIRECTIONS, WIND_SPEED_BINS } from './utils'

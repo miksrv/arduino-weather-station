@@ -2,7 +2,7 @@ import React from 'react'
 
 import Image from 'next/image'
 
-import packageInfo from '@/package.json'
+import { APP_VERSION } from '@/tools/constants'
 import { formatDate } from '@/tools/date'
 
 import styles from './styles.module.sass'
@@ -37,7 +37,7 @@ const Footer: React.FC<FooterProps> = ({ action }) => (
         </div>
         <div>
             {'v'}
-            <span>{packageInfo.version}</span>
+            <span>{APP_VERSION}</span>
             <a
                 href={'https://github.com/miksrv/arduino-weather-station'}
                 rel={'nofollow noreferrer'}
